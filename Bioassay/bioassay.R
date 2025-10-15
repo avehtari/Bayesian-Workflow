@@ -41,7 +41,7 @@ library(dplyr)
 library(tidyr)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size=16))
 library("rprojroot")
-root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
+root<-has_file(".Workflow-Examples-root")$make_fix_file()
 
 #' ## Data
 #'
@@ -60,7 +60,8 @@ df_bioassay <- data.frame(
 #| fig-height: 4
 #| fig-width: 7
 with(df_bioassay,
-     plot(dose, deaths, xlab = "Dose log(g/ml)", ylab = "# of deaths", pch=19, cex=1.5, bty="l"))
+     plot(dose, deaths, xlab = "Dose log(g/ml)", ylab = "# of deaths",
+          pch=19, cex=1.5, bty="l"))
 
 #' Data plotted with ggplot
 #| label: fig-bioassay-data-ggplot
@@ -115,12 +116,15 @@ draws1 <- fit1$draws(format="df")
 #| fig-width: 7
 draws1 <- fit1$draws(format="df")
 with(df_bioassay,
-     plot(dose, deaths/batch_size, xlab = "Dose log(g/ml)", ylab = "Pr (death)", pch=19, cex=1.5, bty="l"))
+     plot(dose, deaths/batch_size, xlab = "Dose log(g/ml)", ylab = "Pr (death)",
+          pch=19, cex=1.5, bty="l"))
 invlogit <- plogis
 for (s in sample(nrow(draws1), 20)) {
-  curve(invlogit(draws1$a[s] + draws1$b[s] * x), col = "red", lwd = 0.5, add = TRUE)
+  curve(invlogit(draws1$a[s] + draws1$b[s] * x),
+        col = "red", lwd = 0.5, add = TRUE)
 }
-curve(invlogit(mean(draws1$a) + mean(draws1$b) * x), col = "blue", lwd = 2, add = TRUE)
+curve(invlogit(mean(draws1$a) + mean(draws1$b) * x),
+      col = "blue", lwd = 2, add = TRUE)
 
 #' Plot with ggplot: data, 20 logistic curves given 20 posterior
 #' draws, and one logistic given the posterior mean
