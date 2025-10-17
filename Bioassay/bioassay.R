@@ -41,7 +41,7 @@ library(dplyr)
 library(tidyr)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size=16))
 library("rprojroot")
-root<-has_file(".Workflow-Examples-root")$make_fix_file()
+root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 
 #' ## Data
 #'
