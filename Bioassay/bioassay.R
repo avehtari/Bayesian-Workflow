@@ -112,9 +112,9 @@ draws1 <- fit1$draws(format="df")
 #' Plot with base plot: data, 20 logistic curves given 20 posterior
 #' draws, and one logistic given the posterior mean
 #| label: fig-bioassay-posterior-plot
-#| fig-height: 4
-#| fig-width: 7
-draws1 <- fit1$draws(format="df")
+#| fig-height: 3
+#| fig-width: 5
+par(mar=c(3,3,1,1), mgp=c(1.5,.5,0), tck=-.01)
 with(df_bioassay,
      plot(dose, deaths/batch_size, xlab = "Dose log(g/ml)", ylab = "Pr (death)",
           pch=19, cex=1.5, bty="l"))
@@ -147,8 +147,17 @@ draws1 |>
 #' 
 #' Compute posterior draws for LD50 in log(g/ml) and in mg/ml
 draws1 <- draws1 |>
-  mutate_variables(LD50_log_g_ml = -a/b,
+  mutate_variables(LD50_log_g_ml = -a / b,
                    LD50_mg_ml = 1000 * exp(LD50_log_g_ml)) 
+
+#' Alternatively using base R (as posterior package draws object is
+#' more than just plain data frame, it is better to use
+#' `mutate_variables()`, which will also work for all other posterior
+#' draws objects (`draws_list`, `draws_array`, `draws_rvars`))
+#' 
+#| eval: false
+draws1$LD50_log_g_ml <- -draws1$a /  draws1$b 
+draws1$LD50_mg_ml <- 1000 * exp(draws1$LD50_log_g_ml)
 
 #' Summarise LD50 posterior
 draws1 |>
