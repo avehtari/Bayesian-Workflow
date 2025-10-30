@@ -3,6 +3,7 @@ library("posterior")
 options(mc.cores = parallel::detectCores())
 set.seed(1234)
 
+# Model for two movies
 y_1 <- c(3, 5)
 y_2 <- rep(c(2, 3, 4, 5), c(10, 20, 30, 40))
 y <- c(y_1, y_2)
@@ -13,6 +14,7 @@ mod_1 <- cmdstan_model("ratings_1.stan")
 fit_1 <- mod_1$sample(data = movie_data)
 print(fit_1)
 
+# Extending the model to J movies
 J <- 40
 N_ratings <- sample(0:100, J, replace=TRUE)
 N <- sum(N_ratings)
@@ -25,7 +27,9 @@ fit_2 <- mod_2$sample(data = movie_data)
 print(fit_2)
 
 theta_post <- fit_2$draws("theta", format = "matrix")
-theta_post_quants <- t(apply(theta_post, 2, function(x) quantile(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975))))
+theta_post_quants <- t(apply(theta_post, 2, function(x) 
+  quantile(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975))
+))
 
 pdf("movies_1.pdf", height = 4, width = 5)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, 0.5, 0), tck = -0.02)
@@ -56,6 +60,9 @@ points(N_ratings, interval_width, pch = 20)
 mtext("Where you have more data, you have less uncertainty", side=3)
 dev.off()
 
+
+# Item-response model with parameters for raters and for movies
+# Fit to balanced data
 J <- 40
 K <- 100
 N <- J * K
@@ -115,6 +122,7 @@ mtext(expression(paste("Checking the ", beta[j], "'s")), side=3)
 dev.off()
 
 
+# Fit to unbalanced data
 genre <- rep(c("romantic", "crime"), c(round(J / 2), J - round(J / 2)))
 prob_of_rated <- ifelse(beta[rater] > 0,
                         ifelse(genre[movie] == "romantic", 0.2, 0.7),
@@ -183,6 +191,7 @@ mtext("Checking fits for model when difficult reviewers were more likely to rate
       side = 3, outer = TRUE)
 dev.off()
 
+# Comparison to naive data averaging
 ybar <- rep(NA, J)
 for (j in 1:J) {
   ybar[j] <- mean(y[movie == j & rated])
