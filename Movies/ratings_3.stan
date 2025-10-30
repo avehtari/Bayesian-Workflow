@@ -21,4 +21,7 @@ model {
   y ~ normal(mu + sigma_a * alpha[movie] - sigma_b * beta[rater], sigma_y);
   alpha ~ normal(0, 1);
   beta ~ normal(0, 1);
+  sigma_a ~ normal(0, 5);
+  sigma_b ~ normal(0, 5);
+  sigma_y ~ normal(0, 5);
 }
