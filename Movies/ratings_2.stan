@@ -10,5 +10,6 @@ parameters {
 }
 model {
   theta ~ normal(3, 1);
+  sigma_y ~ normal(0, 2.5);
   y ~ normal(theta[movie], sigma_y);
 }

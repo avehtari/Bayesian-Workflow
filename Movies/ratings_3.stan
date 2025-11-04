@@ -18,7 +18,11 @@ transformed parameters {
   vector[J] a = mu + sigma_a * alpha;
 }
 model {
-  y ~ normal(mu + sigma_a * alpha[movie] - sigma_b * beta[rater], sigma_y);
+  y ~ normal(a[movie] - sigma_b * beta[rater], sigma_y);
   alpha ~ normal(0, 1);
   beta ~ normal(0, 1);
+  mu ~ normal(3, 5);
+  sigma_a ~ normal(0, 5);
+  sigma_b ~ normal(0, 5);
+  sigma_y ~ normal(0, 5);
 }
