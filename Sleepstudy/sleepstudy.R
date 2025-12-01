@@ -35,19 +35,14 @@ root<-has_file(".Workflow-Examples-root")$make_fix_file()
 library(ggplot2)
 library(patchwork)
 library(dplyr)
-## library(loo)
-devtools::load_all("~/proj/loo/")
+library(loo)
 library(brms)
 dir.create(root("Sleepstudy"),"models/")
 BRMS_MODEL_DIR <- root("Sleepstudy", "models/")
 options(future.globals.maxSize = 1e9)
 library(priorsense)
-theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
-
-# powerscaling of the prior via priorsense
-powerscale_prior_seq <- function(x, ...) {
-  priorsense::powerscale_sequence(x, component = "prior", ...)
-}
+options(priorsense.plot_help_text = FALSE)
+theme_set(bayesplot::theme_default(base_family = "sans"))
 
 #' # Main Story and Messages
 #'
@@ -94,13 +89,14 @@ sleepstudy <- sleepstudy |>
 
 #' Plot the data
 #| label: fig-sleepstudy-data
-#| height: 4
-#| width: 8
+#| fig-height: 4
+#| fig-width: 8
 sleepstudy |>
   ggplot(aes(Days, Reaction)) + 
   geom_point() +
   facet_wrap("Subject", ncol = 6) +
-  scale_x_continuous(breaks = 0:7)
+  scale_x_continuous(breaks = 0:7) +
+  labs(y="Reaction time (ms)")
 #ggsave("plots/sleepstudy_data.pdf", height = 4, width = 8)
 
 #' ## Simple Linear Model
@@ -127,9 +123,11 @@ summary(fit_lin_base, priors = TRUE)
 
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit_lin_base
-#| height: 4
-#| width: 8
-plot(conditional_effects(fit_lin_base), points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit_lin_base), points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
+  
 
 #' ## Simple Linear Model (centered predictors)
 #' 
@@ -157,11 +155,12 @@ fit1_prior <- brm(
 
 #' Prior predictive checking
 #| label: fig-sleepstudy-pp_check-fit1_prior
-#| height: 2.5
-#| width: 5
+#| fig-height: 2.5
+#| fig-width: 5
 set.seed(652312)
 pp_check(fit1_prior, ndraws = 100) + 
-  ylim(c(0, 0.02))
+  ylim(c(0, 0.02)) +
+  theme_sub_axis_y(line = element_blank())
 #ggsave("plots/prior_pred_lin_sleep.pdf", height = 2.5, width = 5)
 
 #' Model 1: sample from the posterior
@@ -178,21 +177,23 @@ fit1 <- brm(
 summary(fit1, priors = TRUE)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit1
-#| height: 4
-#| width: 8
-plot(conditional_effects(fit1), points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit1), points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 #' Posterior predictive checking
 #| label: fig-sleepstudy-pp_check-fit1
-#| height: 2.5
-#| width: 5
-pp_check(fit1, ndraws = 50)
+#| fig-height: 2.5
+#| fig-width: 5
+pp_check(fit1, ndraws = 50) +
+  theme_sub_axis_y(line = element_blank())
 
 #' Prior sensitivity analysis
 #| label: fig-sleepstudy-priorsense-fit1
-#| height: 3
-#| width: 7
-psps1 <- powerscale_prior_seq(fit1)
-powerscale_plot_dens(psps1, variable = c("b_Intercept", "b_Days", "sigma"))
+#| fig-height: 3
+#| fig-width: 7
+powerscale_plot_dens(fit1, variable = c("b_Intercept", "b_Days", "sigma"),
+                     component="prior")
 ## ggsave("plots/sleep_priorsense_weak.pdf", width = 7, height = 3)
 
 #' ## Simple Linear Model (informative priors)
@@ -222,16 +223,17 @@ fit2 <- brm(
 summary(fit2)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit2
-#| height: 4
-#| width: 8
-plot(conditional_effects(fit2), points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit2), points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' Prior sensitivity analysis
 #| label: fig-sleepstudy-priorsense-fit2
-#| height: 3
-#| width: 7
-psps2 <- powerscale_prior_seq(fit2)
-powerscale_plot_dens(psps2, variable = c("b_Intercept", "b_Days", "sigma"))
+#| fig-height: 3
+#| fig-width: 7
+powerscale_plot_dens(fit2, variable = c("b_Intercept", "b_Days", "sigma"),
+                     component="prior")
 ## ggsave("plots/sleep_priorsense_strong.pdf", width = 7, height = 3)
 
 #' ## Simple Linear Model (informative priors with fat tails)
@@ -258,22 +260,23 @@ fit2b <- brm(
 summary(fit2b)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit2b
-#| height: 4
-#| width: 8
-plot(conditional_effects(fit2b), points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit2b), points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' Prior sensitivity analysis
 #| label: fig-sleepstudy-priorsense-fit2b
-#| height: 3
-#| width: 7
-psps2b <- powerscale_prior_seq(fit2b)
-powerscale_plot_dens(psps2b, variable = c("b_Intercept", "b_Days", "sigma"))
+#| fig-height: 3
+#| fig-width: 7
+powerscale_plot_dens(fit2b, variable = c("b_Intercept", "b_Days", "sigma"),
+                     component="prior")
 ## ggsave("plots/sleep_priorsense_student.pdf", width = 7, height = 3)
 
 #' Illustrate difference between normal and Student-t prior:
 #| label: fig-compare-normal-student-density
-#| height: 2
-#| width: 5
+#| fig-height: 2
+#| fig-width: 5
 x <- seq(-4, 4, 0.01)
 d1 <- dnorm(x, 0, 1)
 d2 <- dstudent_t(x, 7, 0, 1)
@@ -319,17 +322,19 @@ fit3 <- brm(
 summary(fit3)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-1-fit3
-#| height: 4
-#| width: 8
-conditional_effects(fit3)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit3), plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-2-fit3
-#| height: 4
-#| width: 8
-me <- conditional_effects(fit3, conditions = conditions, 
-                           re_formula = NULL)
-plot(me, ncol = 6, points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit3, conditions = conditions, 
+                         re_formula = NULL),
+     ncol = 6, points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' ## Linear Varying Intercept and Slope Model
 #' 
@@ -361,28 +366,30 @@ fit4 <- brm(
 summary(fit4)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-1-fit4
-#| height: 4
-#| width: 8
-conditional_effects(fit4)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit4), plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' Posterior predictive checking
-pp_check(fit4)
+pp_check(fit4) +
+  theme_sub_axis_y(line = element_blank())
 
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-2-fit4
-#| height: 4
-#| width: 7
-me <- conditional_effects(fit4, conditions = conditions, 
-                           re_formula = NULL)
-plot(me, ncol = 6, points = TRUE, plot = FALSE)[[1]] +
-  scale_x_continuous(breaks = 0:9)
-
+#| fig-height: 4
+#| fig-width: 7
+plot(conditional_effects(fit4, conditions = conditions, 
+                         re_formula = NULL),
+     ncol = 6, points = TRUE, plot = FALSE)[[1]] +
+  scale_x_continuous(breaks = 0:9) +
+  labs(y="Reaction time (ms)")
 ## ggsave("plots/sleep_multilevel_ceffects.pdf", height = 4, width = 7)
 
 #' Illustrate the marginal LKJ(1) prior for different dimensions.
 #| label: fig-sleepstudy-LKJ1
-#| height: 2.5
-#| width: 5
+#| fig-height: 2.5
+#| fig-width: 5
 dmLKJ <- function(x, eta, d) {
   dbeta((x + 1) / 2, eta + (d - 2)/2, eta + (d - 2)/2)
 }
@@ -419,9 +426,10 @@ fit_ln1_prior <- brm(
 
 #' Prior predictive checking
 #| label: fig-sleepstudy-pp_check-fit_ln1_prior
-#| height: 2.5
-#| width: 5
-pp_check(fit_ln1_prior)
+#| fig-height: 2.5
+#| fig-width: 5
+pp_check(fit_ln1_prior) +
+  theme_sub_axis_y(line = element_blank())
 
 #' Prior predictive checking
 set.seed(652312)
@@ -452,9 +460,10 @@ fit_ln2_prior <- brm(
 
 #' Prior predictive checking
 #| label: fig-sleepstudy-pp_check-fit_ln2_prior
-#| height: 2.5
-#| width: 5
-pp_check(fit_ln2_prior)
+#| fig-height: 2.5
+#| fig-width: 5
+pp_check(fit_ln2_prior) +
+  theme_sub_axis_y(line = element_blank())
 
 #' Prior predictive checking
 set.seed(652312)
@@ -469,8 +478,8 @@ gg_ln2_prior <- ggplot(prp_ln_dat, aes(y, yrep)) +
 
 #' Prior predictive checking comparing priors ln1 and ln2
 #| label: fig-sleepstudy-pp_check-fit_ln1_ln2_prior
-#| height: 2.5
-#| width: 6
+#| fig-height: 2.5
+#| fig-width: 6
 gg_ln1_prior + gg_ln2_prior
 ## ggsave("plots/prior_pred_ln_sleep.pdf", height = 2.5, width = 6)
 
@@ -488,16 +497,17 @@ fit_ln2 <- brm(
 summary(fit_ln2)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-1-ln2
-#| height: 4
-#| width: 8
-conditional_effects(fit_ln2)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit_ln2), plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' Prior sensitivity analysis
 #| label: fig-sleepstudy-priorsense-fit_ln2
-#| height: 3
-#| width: 7
-psps_ln2 <- powerscale_prior_seq(fit_ln2)
-powerscale_plot_dens(psps_ln2, variable = c("b_Intercept", "b_Days", "sigma"))
+#| fig-height: 3
+#| fig-width: 7
+powerscale_plot_dens(fit_ln2, variable = c("b_Intercept", "b_Days", "sigma"),
+                     component="prior")
 ## ggsave("plots/sleep_priorsense_ln_reg.pdf", width = 7, height = 3)
 
 #' ## Log-Linear Varying Intercept and Slope Model
@@ -534,43 +544,44 @@ fit5 <- brm(
 summary(fit5)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit5
-#| height: 4
-#| width: 8
-conditional_effects(fit5)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit5), plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' Posterior predictive checking
 #| label: fig-sleepstudy-pp_check-fit5
-#| height: 2.5
-#| width: 5
-pp_check(fit5)
+#| fig-height: 2.5
+#| fig-width: 5
+pp_check(fit5) +
+  theme_sub_axis_y(line = element_blank())
 
 #' Posterior predictive checking comparing fit4 and fit5
-#| label: fig-sleepstudy-pp_check--fit4-fit5
-#| height: 4
-#| width: 7
-pp_check(fit4, type = "intervals") + 
+#| label: fig-sleepstudy-pp_check-fit4-fit5
+#| fig-height: 4
+#| fig-width: 7
+pp_check(fit4, type = "intervals") + labs(y="Reaction time (ms)") +
   pp_check(fit5, type = "intervals") + 
-  plot_layout(guides = "collect")
+  plot_layout(guides = "collect") 
 ## ggsave("plots/sleep_multilevel_ppc.pdf", height = 4, width = 7)
 
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-plus-fit5
-#| height: 4
-#| width: 7
-me <- conditional_effects(fit5, conditions = conditions, 
-                           re_formula = NULL)
-plot(me, ncol = 6, points = TRUE, plot = FALSE)[[1]] +
-  scale_x_continuous(breaks = 0:9)
+#| fig-height: 4
+#| fig-width: 7
+plot(conditional_effects(fit5, conditions = conditions, re_formula = NULL),
+     ncol = 6, points = TRUE, plot = FALSE)[[1]] +
+  scale_x_continuous(breaks = 0:9) +
+  labs(y="Reaction time (ms)")
 ## ggsave("plots/sleep_multilevel_ceffects_ln.pdf", height = 4, width = 7)
 
 #' Prior sensitivity analysis
 #| label: fig-sleepstudy-priorsense-fit5
-#| height: 4
-#| width: 13
-psps5 <- powerscale_prior_seq(fit5)
+#| fig-height: 4
+#| fig-width: 13
 vars5 <- c("b_Intercept", "b_Days", "sd_Subject__Intercept", 
            "sd_Subject__Days", "cor_Subject__Intercept__Days", "sigma")
-powerscale_plot_dens(psps5, variable = vars5)
+powerscale_plot_dens(fit5, variable = vars5, component="prior")
 ## ggsave("plots/sleep_priorsense_ln_mlm.pdf", width = 13, height = 4)
 
 #' Compare with linear multilevel model which indicated the lognormal model
@@ -616,11 +627,11 @@ fit6 <- brm(
 summary(fit6)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit6
-#| height: 4
-#| width: 8
-me <- conditional_effects(fit6, conditions = conditions, 
-                           re_formula = NULL)
-plot(me, ncol = 6, points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit6, conditions = conditions, re_formula = NULL),
+     ncol = 6, points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 ## ## Exgaussian Distributional Multilevel Model
 
@@ -663,11 +674,11 @@ fit7 <- brm(
 summary(fit7)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit7
-#| height: 4
-#| width: 8
-me <- conditional_effects(fit7, conditions = conditions, 
-                           re_formula = NULL)
-plot(me, ncol = 6, points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit7, conditions = conditions, re_formula = NULL),
+     ncol = 6, points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 ## ## Exgaussian Distributional Multilevel Model (default priors)
 
@@ -695,11 +706,11 @@ fit8 <- brm(
 summary(fit8)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit8
-#| height: 4
-#| width: 8
-me <- conditional_effects(fit8, conditions = conditions, 
-                           re_formula = NULL)
-plot(me, ncol = 6, points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit8, conditions = conditions, re_formula = NULL),
+     ncol = 6, points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' ## Exgaussian Distributional Multilevel Model (flat priors)
 #' 
@@ -738,11 +749,11 @@ fit9 <- brm(
 summary(fit9)
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-fit9
-#| height: 4
-#| width: 8
-me <- conditional_effects(fit9, conditions = conditions, 
-                           re_formula = NULL)
-plot(me, ncol = 6, points = TRUE)
+#| fig-height: 4
+#| fig-width: 8
+plot(conditional_effects(fit9, conditions = conditions, re_formula = NULL),
+     ncol = 6, points = TRUE, plot = FALSE)[[1]] +
+  labs(y="Reaction time (ms)")
 
 #' # Model comparison and checking
 #'
@@ -759,10 +770,10 @@ loo_compare(fit4, fit5)
 #' 
 #' Posterior predictive checking of fit4 using LOO predictive intervals
 #| label: fig-sleepstudy-ppc-loo_intervals-fit4
-#| height: 4
-#| width: 11
+#| fig-height: 4
+#| fig-width: 11
 pp_check(fit4, type="loo_intervals") +
-  labs(y="Reaction")
+  labs(y="Reaction time (ms)")
 ## ggsave(file='sleepstudy_fit4_loo_intervals.pdf', width=11, height=4)
 
 #' There are clearly some outliers.
@@ -780,16 +791,16 @@ fit4t <- add_criterion(fit4t, criterion="loo", save_psis=TRUE)
 
 #' Posterior predictive checking of fit4t using LOO predictive intervals
 #| label: fig-sleepstudy-ppc-loo_intervals-fit4t
-#| height: 4
-#| width: 11
+#| fig-height: 4
+#| fig-width: 11
 pp_check(fit4t, type="loo_intervals") +
-  labs(y="Reaction")
+  labs(y="Reaction time (ms)")
 
 #' The LOO predictive intervals look better now.
 
 #| label: fig-sleepstudy-ppc-loo_intervals-fit4-fit5-fit4t
-#| height: 3.5
-#| width: 11
+#| fig-height: 3.5
+#| fig-width: 11
 pp_check(fit4, type="loo_pit_ecdf", ndraws=4000) +
   pp_check(fit5, type="loo_pit_ecdf", ndraws=4000) +
   pp_check(fit4t, type="loo_pit_ecdf", ndraws=4000) 
@@ -803,13 +814,13 @@ pp_check(fit4, type="loo_pit_ecdf", ndraws=4000) +
 #' Compare normal and Student's t models
 loo_compare(fit4, fit4t)
 
-#' Student's t model has much better predictive performance
-
-#' Examine how much adding varying slope improved predictive performance in case of normal data model
+#' Student's t model has much better predictive performance.
+#' 
+#' Examine how much adding varying slope improved predictive performance in case of normal data model:
 loo_compare(fit3, fit4)
 
 #' Examine how much adding varying slope improved predictive
-#' performance in case of Student's t data model
+#' performance in case of Student's t data model:
 loo_compare(fit3t, fit4t)
 
 #' When using Student's t model, the predictive performance difference
