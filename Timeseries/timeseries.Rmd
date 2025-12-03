@@ -143,7 +143,7 @@ K <- 3
 mu <- c(0, -1, 1)
 data <- list(y = y, K = K, N = N, mu = mu)
 mod <- cmdstan_model("mixture.stan")
-fit_mix <- mod$sample(data = data, parallel_chains = 4)
+fit_mix <- mod$sample(data = data, parallel_chains = 4, refresh = 0)
 print(fit_mix)
 ```
 
@@ -185,8 +185,8 @@ posterior simulations. This is made simpler using the posterior R package's
 
 ```{r, results=FALSE}
 mod <- cmdstan_model("mixture_2.stan")
-fit_mix <- mod$sample(data = data, parallel_chains = 4)
-prob_sims <- posterior::as_draws_rvars(fit_mix$draws())
+fit_mix <- mod$sample(data = data, parallel_chains = 4, refresh = 0)
+prob_sims <- as_draws_rvars(fit_mix$draws())
 prob <- mean(prob_sims$p)
 ```
 
@@ -239,27 +239,28 @@ sd_correct <- sqrt(sum(max_prob * (1 - max_prob)))
 round(c(expected_correct, sd_correct), 1)
 ```
 
-Interesting.  The expected number of correct guesses is 854. Not
-quite the 900 that's needed to win! The standard error of the number
-of correct guesses is 10.3, so 900 is over 5 standard errors away from
-our expected number correct. That's bad news!
+Interesting.  The expected number of correct guesses is 
+`r round(expected_correct)`. Not quite the 900 that's needed to win! The standard
+error of the number of correct guesses is `r round(sd_correct, 1)`, so 900 is
+over 5 standard errors away from our expected number correct. That's bad news!
 
 How bad is it?  We can compute the normal cumulative density function
 to get the probability of at least 900 successes; that's
-$\mbox{pnorm}(854.1, 900, 10.3)$:
-```{r}
+
+```{r, echo = TRUE}
 pnorm(expected_correct, 900, sd_correct)
 ```
 That's a small number; here's its reciprocal:
 ```{r}
-1 / pnorm(expected_correct, 900, sd_correct)
+recip <- 1 / pnorm(expected_correct, 900, sd_correct)
+recip
 ```
-That's a 1-in-240,000 chance of winning the big prize!
+That's almost a 1-in-200,000 chance of winning the big prize!
 
 But we only have to get _at least_ 900. So we can do the continuity
 correction and evaluate the probability of at least 899.5 successes,
 which, when inverted, yields:
-```{r}
+```{r, echo = TRUE}
 1 / pnorm(expected_correct, 899.5, sd_correct)
 ```
 Nope, still no good. For the bet to be worth it, even in the crudest
