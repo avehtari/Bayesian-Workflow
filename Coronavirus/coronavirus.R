@@ -376,9 +376,9 @@ for (sigma_sens in sigma_senss) {
 ggplot(ribbon_df, aes(x = sigma_spec)) +
   facet_wrap(~ sigma_sens, nrow = 1) +
   geom_ribbon(aes(ymin = prev05, ymax = prev95), fill = "gray95") +
-  geom_line(aes(y = prev50), size = 0.5) +
-  geom_line(aes(y = prev05), color = "darkgray", size = 0.25) +
-  geom_line(aes(y = prev95), color = "darkgray", size = 0.25) +
+  geom_line(aes(y = prev50), linewidth = 0.5) +
+  geom_line(aes(y = prev05), color = "darkgray", linewidth = 0.25) +
+  geom_line(aes(y = prev95), color = "darkgray", linewidth = 0.25) +
   scale_y_log10(limits = c(0.0009, 1.1), breaks = c(0.001, 0.01, 0.1, 1)) +
   scale_x_continuous(expand = c(0, 0), lim = c(0, 1),
                      breaks = c(0.1, 0.3, 0.5, 0.7, 0.9)) +
