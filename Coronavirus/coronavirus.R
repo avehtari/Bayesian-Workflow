@@ -269,7 +269,7 @@ for (i_zip in 1:N_zip){
   }
 }
 
-# Put togther the data and fit the model
+# Put together the data and fit the model
 santaclara_mrp_data <- list(
   N = N,
   y = y,
