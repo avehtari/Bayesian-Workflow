@@ -29,12 +29,7 @@ model {
 }
 generated quantities {
   vector[N_games] y_rep;
-  vector[N_games] log_lik;
   for (n in 1:N_games) {
     y_rep[n] = student_t_rng(df, a[team_1[n]] - a[team_2[n]], sigma_y);
-    log_lik[n] = log_diff_exp(
-      student_t_lcdf(dif[n]+0.5 | df, a[team_1[n]] - a[team_2[n]], sigma_y), 
-      student_t_lcdf(dif[n]-0.5 | df, a[team_1[n]] - a[team_2[n]], sigma_y)
-    );
   }
 }
