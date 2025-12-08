@@ -1,9 +1,10 @@
 library("cmdstanr")
 library("posterior")
 library("MASS")
+library("arm")
 set.seed(123)
 
-dogs <- read.table("http://www.stat.columbia.edu/~gelman/bda.course/dogs.dat", skip=2)
+dogs <- read.table("https://sites.stat.columbia.edu/gelman/bda.course/dogs.dat", skip=2)
 shock <- ifelse(as.matrix(dogs[, 2:26]) == "S", 1, 0)
 dogs_data <- list(y = shock, J = nrow(shock), T = ncol(shock))
 
