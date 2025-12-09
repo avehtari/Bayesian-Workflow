@@ -1,7 +1,7 @@
 data {
   int J;
-  array[J] int n;
   vector[J] x;
+  array[J] int n;
   array[J] int y;
 }
 parameters {
