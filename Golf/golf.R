@@ -43,22 +43,28 @@ fround <- function (x, digits) format(round(x, digits), nsmall = digits)
 #' The following graph shows data from professional golfers on the proportion of successful
 #' putts as a function of distance from the hole.  Unsurprisingly, the
 #' probability of making the shot declines as a function of distance:
-golf <- read.table("data/golf_data.txt", header=TRUE, skip=2)
+golf <- read.table("data/golf_data.txt", header = TRUE, skip = 2)
 x <- golf$x
 y <- golf$y
 n <- golf$n
 J <- length(y)
-r <- (1.68/2)/12
-R <- (4.25/2)/12
-se <- sqrt((y/n)*(1-y/n)/n)
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(0, 1.1*max(x)), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="Probability of success", main="Data on putts in pro golf", type="n")
-points(x, y/n, pch=20, col="blue")
-segments(x, y/n + se, x, y/n-se, lwd=.5, col="blue")
-text(x + .4, y/n + se + .02, paste(y, "/", n,sep=""), cex=.6, col="gray40")
+r <- (1.68 / 2) / 12
+R <- (4.25 / 2) / 12
+se <- sqrt((y / n) * (1 - y / n) / n)
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "Probability of success", 
+     main = "Data on putts in pro golf", 
+     type = "n")
+points(x, y / n, pch = 20, col = "blue")
+segments(x, y / n + se, x, y / n - se, lwd = .5, col = "blue")
+text(x + .4,
+     y / n + se + .02,
+     paste(y, "/", n, sep = ""),
+     cex = .6,
+     col = "gray40")
 
 #' The error bars associated with each point $j$ in the above graph are
 #' simple classical standard deviations,
@@ -88,13 +94,13 @@ print_file("golf_logistic.stan")
 #' We fit the model to the data:
 #| label: fit_logistic
 #| results: hide
-golf_data <- list(x=x, y=y, n=n, J=J)
+golf_data <- list(x = x, y = y, n = n, J = J)
 golf_logistic <- cmdstan_model("golf_logistic.stan")
-fit_logistic <- golf_logistic$sample(data=golf_data, refresh=0)
+fit_logistic <- golf_logistic$sample(data = golf_data, refresh = 0)
 
 #' And here is the result:
-draws_logistic <- fit_logistic$draws(format="df")
-a_sim <- median(draws_logistic$a)
+draws_logistic <- fit_logistic$draws(format = "df")
+a_sim <- draws_logistic$a
 b_sim <- draws_logistic$b
 a_hat <- median(a_sim)
 b_hat <- median(b_sim)
@@ -122,14 +128,18 @@ print(fit_logistic)
 #' $\widehat{R}$ is near 1 is a good start.)
 #'
 #' The following graph shows the fit plotted along with the data:
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(0, 1.1*max(x)), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="Probability of success", main="Fitted logistic regression", type="n")
-for (i in sample(n_sims, 10))
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "Probability of success", 
+     main = "Fitted logistic regression", 
+     type = "n")
+for (i in sample(n_sims, 10)) {
   curve(invlogit(a_sim[i] + b_sim[i]*x),
-        from=0, to=1.1*max(x), lwd=0.5, add=TRUE, col="green")
+        from = 0, to = 1.1 * max(x), 
+        wd = 0.5, add = TRUE, col = "green")
+}
 curve(invlogit(a_hat + b_hat*x), from=0, to=1.1*max(x), add=TRUE)
 points(x, y/n, pch=20, col="blue")
 segments(x, y/n + se, x, y/n-se, lwd=.5, col="blue")
@@ -159,22 +169,22 @@ par(mar=c(0,0,0,0))
 dist <- 2
 r_plot <- r
 R_plot <- R
-plot(0, 0, xlim=c(-R_plot, dist+3*R_plot), ylim=c(-2*R_plot, 2*R_plot),
-     xaxs="i", yaxs="i", xaxt="n", yaxt="n", bty="n",
-     xlab="", ylab="", type="n", asp=1)
+plot(0, 0, xlim = c(-R_plot, dist + 3 * R_plot), ylim = c(-2 * R_plot, 2 * R_plot), 
+     xaxs = "i", yaxs = "i", xaxt = "n", yaxt = "n", bty = "n", 
+     xlab = "", ylab = "", type = "n", asp = 1)
 symbols(0, 0, circles=r_plot, inches=FALSE, add=TRUE)
-symbols(dist, 0, circles=R_plot-r_plot, inches=FALSE, lty=2, add=TRUE)
-symbols(dist, 0, circles=R_plot, inches=FALSE, add=TRUE)
-curve(0*x, from=0, to=dist, add=TRUE)
-curve(((R_plot-r_plot)/dist)*x, from=0, to=dist, lty=2, add=TRUE)
-curve(-((R_plot-r_plot)/dist)*x, from=0, to=dist, lty=2, add=TRUE)
-text(0.5*dist, -1.5*R_plot, "x")
-arrows(0.5*dist + 0.05, -1.5*R_plot, dist, -1.5*R_plot, 2, length=.1)
-arrows(0.5*dist - 0.05, -1.5*R_plot, 0, -1.5*R_plot, 2, length=.1)
-text(dist+1.2*R_plot, .5*R_plot, "R")
-arrows(dist+1.2*R_plot, .7*R_plot, dist+1.2*R_plot, R_plot, length=.05)
-arrows(dist+1.2*R_plot, .3*R_plot, dist+1.2*R_plot, 0, length=.05)
-text(0, r_plot/2, "r")
+symbols(dist, 0, circles = R_plot - r_plot, inches = FALSE, lty = 2, add = TRUE)
+symbols(dist, 0, circles = R_plot, inches = FALSE, add = TRUE)
+curve(0 * x, from = 0, to = dist, add = TRUE)
+curve(((R_plot - r_plot) / dist) * x, from = 0, to = dist, lty = 2, add = TRUE)
+curve(-((R_plot - r_plot) / dist) * x, from = 0, to = dist, lty = 2, add = TRUE)
+text(0.5 * dist, -1.5 * R_plot, "x")
+arrows(0.5 * dist + 0.05, -1.5 * R_plot, dist, -1.5 * R_plot, 2, length = .1)
+arrows(0.5 * dist - 0.05, -1.5 * R_plot, 0, -1.5 * R_plot, 2, length = .1)
+text(dist + 1.2 * R_plot, .5 * R_plot, "R")
+arrows(dist + 1.2 * R_plot, .7 * R_plot, dist + 1.2 * R_plot, R_plot, length = .05)
+arrows(dist + 1.2 * R_plot, .3 * R_plot, dist + 1.2 * R_plot, 0, length = .05)
+text(0, r_plot / 2, "r")
 
 #' The next step is to model human error.  We assume that the golfer is
 #' attempting to hit the ball completely straight but that many small
@@ -183,13 +193,14 @@ text(0, r_plot/2, "r")
 #' $\sigma$.
 #| fig-height:  2
 #| fig-width:  5
-par(mar=c(3,3,0,0), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(-4, 4), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", xaxt="n", yaxt="n", bty="n",
-     xlab="Angle of shot",
-     ylab="", type="n")
-axis(1, seq(-4,4), c("", "", expression(-2*sigma), "", 0, "", expression(2*sigma),"", ""))
-curve(dnorm(x)/dnorm(0), add=TRUE)
+par(mar=c(3, 3, 0, 0), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(-4, 4), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", xaxt = "n", yaxt = "n", bty = "n", 
+     xlab = "Angle of shot", ylab = "", type = "n")
+axis(1, seq(-4,4), 
+     c("", "", expression(-2*sigma), "", 
+       0, "", expression(2*sigma),"", ""))
+curve(dnorm(x) / dnorm(0), add = TRUE)
 
 #' The probability the ball goes in the hole is then the probability
 #' that the angle is less than the threshold; that is,
@@ -208,19 +219,23 @@ curve(dnorm(x)/dnorm(0), add=TRUE)
 #' p_j &= 2\Phi\left(\frac{\sin^{-1}((R-r)/x_j)}{\sigma}\right) - 1 , \text{ for } j=1,\dots, J.
 #' \end{align}
 #' Here is a graph showing the curve for some potential values of the parameter $\sigma$.
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(0, 1.1*max(x)), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="Probability of success", main=expression(paste("Modeled Pr(success) for different values of ", sigma)), type="n")
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", bty = "l", 
+     xlab = "Distance from hole (feet)", ylab = "Probability of success", 
+     main = expression(paste("Modeled Pr(success) for different values of ", sigma)), 
+     type = "n")
 sigma_degrees_plot <- c(0.5, 1, 2, 5, 20)
 x_text <- c(15, 10, 6, 4, 2)
 for (i in 1:length(sigma_degrees_plot)){
-  sigma <- (pi/180)*sigma_degrees_plot[i]
-  x_grid <- seq(R-r, 1.1*max(x), .01)
-  p_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma) - 1
-  lines(c(0, R-r, x_grid), c(1, 1, p_grid))
-  text(x_text[i] + 0.7,  2*pnorm(asin((R-r)/x_text[i]) / sigma) - 1, bquote(sigma == .(sigma_degrees_plot[i])*degree), adj=0)
+  sigma <- (pi / 180) * sigma_degrees_plot[i]
+  x_grid <- seq(R - r, 1.1 * max(x), .01)
+  p_grid <- 2 * pnorm(asin((R - r) / x_grid) / sigma) - 1
+  lines(c(0, R - r, x_grid), c(1, 1, p_grid))
+  text(x_text[i] + 0.7,
+       2 * pnorm(asin((R - r) / x_text[i]) / sigma) - 1,
+       bquote(sigma == .(sigma_degrees_plot[i]) * degree),
+       adj = 0)
 }
 
 #' The highest curve on the graph corresponds to $\sigma=0.5^\circ$:
@@ -248,10 +263,10 @@ r <- (1.68/2)/12
 R <- (4.25/2)/12
 golf_data <- c(golf_data, r=r, R=R)
 golf_angle <- cmdstan_model("golf_angle.stan")
-fit_angle <- golf_angle$sample(data=golf_data, refresh=0)
+fit_angle <- golf_angle$sample(data = golf_data, refresh = 0)
 
 #' Here is the result:
-draws_angle <- fit_angle$draws(format="df")
+draws_angle <- fit_angle$draws(format = "df")
 sigma_sim <- draws_angle$sigma
 sigma_degrees_sim <- draws_angle$sigma_degrees
 sigma_hat <- median(sigma_sim)
@@ -278,18 +293,20 @@ print(fit_angle)
 #' narrow that any reasonable posterior summary would give essentially
 #' the same result), along with the logistic regression fitted
 #' earlier:
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(0, 1.1*max(x)), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="Probability of success",
-     main="Two models fit to the golf putting data", type="n")
-segments(x, y/n + se, x, y/n-se, lwd=.5)
-curve(invlogit(a_hat + b_hat*x), from=0, to=1.1*max(x), add=TRUE)
-x_grid <- seq(R-r, 1.1*max(x), .01)
-p_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_hat) - 1
-lines(c(0, R-r, x_grid), c(1, 1, p_grid), col="blue")
-points(x, y/n, pch=20, col="blue")
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "Probability of success", 
+     main = "Two models fit to the golf putting data", type = "n")
+segments(x, y / n + se, x, y / n - se, lwd = .5)
+curve(invlogit(a_hat + b_hat*x), 
+      from = 0, to = 1.1 * max(x), 
+      add = TRUE)
+x_grid <- seq(R - r, 1.1 * max(x), .01)
+p_grid <- 2 * pnorm(asin((R - r) / x_grid) / sigma_hat) - 1
+lines(c(0, R - r, x_grid), c(1, 1, p_grid), col = "blue")
+points(x, y / n, pch = 20, col = "blue")
 text(10.3, .58, "Logistic regression")
 text(18.5, .24, "Geometry-based model", col="blue")
 
@@ -302,19 +319,19 @@ text(18.5, .24, "Geometry-based model", col="blue")
 #' # Testing the fitted model on new data
 #'
 #' Recently a local business school professor and golfer, Mark Broadie, came by my office with tons of new data.  For simplicity we'll just look here at the summary data, probabilities of the ball going into the hole for shots up to 75 feet from the hole.  The graph below shows these new data (in red), along with our earlier dataset (in blue) and the already-fit geometry-based model from before, extending to the range of the new data.
-golf_new <- read.table("data/golf_data_new.txt", header=TRUE, skip=2)
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="Probability of success",
-     main="Checking already-fit model to new data")
-x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
-p_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_hat) - 1
-lines(c(0, R-r, x_grid), c(1, 1, p_grid), col="blue")
-points(golf$x, golf$y/golf$n, pch=20, col="blue")
-points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
-legend(60, 0.4, legend=c("Old data", "New data"), col=c("blue", "red"), pch=20) 
+golf_new <- read.table("data/golf_data_new.txt", header = TRUE, skip = 2)
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "Probability of success", 
+     main = "Checking already-fit model to new data")
+x_grid <- seq(R - r, 1.1 * max(golf_new$x), .01)
+p_grid <- 2 * pnorm(asin((R - r) / x_grid) / sigma_hat) - 1
+lines(c(0, R - r, x_grid), c(1, 1, p_grid), col = "blue")
+points(golf$x, golf$y / golf$n, pch = 20, col = "blue")
+points(golf_new$x, golf_new$y/golf_new$n, pch = 20, col = "red")
+legend(60, 0.4, legend = c("Old data", "New data"), col = c("blue", "red"), pch = 20) 
 
 #' Comparing the two datasets in the range 0-20 feet, the success rate
 #' is similar for longer putts but is much higher than before for the
@@ -348,25 +365,38 @@ legend(60, 0.4, legend=c("Old data", "New data"), col=c("blue", "red"), pch=20)
 #' it.
 #| fig-height:  2
 #| fig-width: 8
-par(mar=c(0,0,0,0))
+par(mar = c(0, 0, 0, 0))
 dist <- 2
 r_plot <- r
 R_plot <- R
 distance_tolerance <- 0.6
-plot(0, 0, xlim=c(-R_plot, dist+3*R_plot+1.5*distance_tolerance), ylim=c(-2*R_plot, 2*R_plot),
-     xaxs="i", yaxs="i", xaxt="n", yaxt="n", bty="n",
-     xlab="", ylab="", type="n", asp=1)
-polygon(c(dist, dist, dist + distance_tolerance, dist + distance_tolerance),
-        c(R_plot-r_plot, -(R_plot-r_plot), -(R_plot-r_plot)*(dist + distance_tolerance)/dist,
-        (R_plot-r_plot)*(dist + distance_tolerance)/dist), border=NA, col="gray")
-symbols(0, 0, circles=r_plot, inches=FALSE, add=TRUE)
-symbols(dist, 0, circles=R_plot, inches=FALSE, add=TRUE)
-symbols(dist, 0, circles=R_plot-r_plot, inches=FALSE, lty=2, bg="gray", add=TRUE)
-curve(((R_plot-r_plot)/dist)*x, from=0, to=dist+1.5*distance_tolerance, lty=2, add=TRUE)
-curve(-((R_plot-r_plot)/dist)*x, from=0, to=dist+1.5*distance_tolerance, lty=2, add=TRUE)
-text(0.5*dist, -1.5*R_plot, "x")
-arrows(0.5*dist + 0.05, -1.5*R_plot, dist, -1.5*R_plot, 2, length=.1)
-arrows(0.5*dist - 0.05, -1.5*R_plot, 0, -1.5*R_plot, 2, length=.1)
+plot(0, 0, 
+     xlim = c(-R_plot, dist + 3 * R_plot + 1.5 * distance_tolerance), 
+     ylim = c(-2 * R_plot, 2 * R_plot), 
+     xaxs = "i", yaxs = "i", xaxt = "n", yaxt = "n", bty = "n", 
+     xlab = "", ylab = "", type = "n", asp = 1)
+polygon(
+  c(dist, dist, dist + distance_tolerance, dist + distance_tolerance),
+  c(
+    R_plot - r_plot,
+    -(R_plot - r_plot),
+    -(R_plot - r_plot) * (dist + distance_tolerance) / dist,
+    (R_plot - r_plot) * (dist + distance_tolerance) / dist
+  ),
+  border = NA,
+  col = "gray"
+)
+symbols(0, 0, circles = r_plot, inches = FALSE, add = TRUE)
+symbols(dist, 0, circles = R_plot, inches = FALSE, add = TRUE)
+symbols(dist, 0, circles = R_plot - r_plot, inches = FALSE, 
+        lty = 2, bg = "gray", add = TRUE)
+curve(((R_plot - r_plot) / dist) * x, from = 0, to = dist + 1.5 * distance_tolerance, 
+      lty = 2, add = TRUE)
+curve(-((R_plot - r_plot) / dist) * x, from = 0, to = dist + 1.5 * distance_tolerance, 
+      lty = 2, add = TRUE)
+text(0.5 * dist, -1.5 * R_plot, "x")
+arrows(0.5 * dist + 0.05, -1.5 * R_plot, dist, -1.5 * R_plot, 2, length = .1)
+arrows(0.5 * dist - 0.05, -1.5 * R_plot, 0, -1.5 * R_plot, 2, length = .1)
 
 #' Broadie supposes that a golfer will aim to hit the ball one foot
 #' past the hole but with a multiplicative error in the shot's
@@ -410,9 +440,18 @@ print_file("golf_angle_distance_2.stan")
 #| results: hide
 overshot <- 1
 distance_tolerance <- 3
-golf_new_data <- list(x=golf_new$x, y=golf_new$y, n=golf_new$n, J=nrow(golf_new), r=r, R=R, overshot=overshot, distance_tolerance=distance_tolerance)
+golf_new_data <- list(
+  x = golf_new$x,
+  y = golf_new$y,
+  n = golf_new$n,
+  J = nrow(golf_new),
+  r = r,
+  R = R,
+  overshot = overshot,
+  distance_tolerance = distance_tolerance
+)
 model_2 <- cmdstan_model("golf_angle_distance_2.stan")
-fit_2 <- model_2$sample(data=golf_new_data, refresh=0)
+fit_2 <- model_2$sample(data = golf_new_data, refresh = 0)
 
 #' There is poor convergence, and we need to figure out what is going
 #' on here.  (Problems with computation often indicate underlying
@@ -423,21 +462,21 @@ print(fit_2)
 #' To understand what is happening, we graph the new data and the
 #' fitted model, accepting that this "fit," based as it is on
 #' poorly-mixing chains, is only provisional:
-draws_2 <- fit_2$draws(format="df")
+draws_2 <- fit_2$draws(format = "df")
 sigma_angle_hat <- median(draws_2$sigma_angle)
 sigma_distance_hat <- median(draws_2$sigma_distance)
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="Probability of success",
-     main="Checking model fit", type="n")
-x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
-p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
-p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
-           pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "Probability of success", 
+     main = "Checking model fit", type = "n")
+x_grid <- seq(R - r, 1.1 * max(golf_new$x), .01)
+p_angle_grid <- (2 * pnorm(asin((R - r) / x_grid) / sigma_angle_hat) - 1)
+p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot) * sigma_distance_hat)) -
+  pnorm((-overshot) / ((x_grid + overshot) * sigma_distance_hat))
 lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
-points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
+points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 
 #' There are problems with the fit in the middle of the range of $x$.
 #' We suspect this is a problem with the binomial error model, as it
@@ -527,21 +566,21 @@ print(fit_3)
 #'   percentage points.
 #'
 #' And now we graph:
-draws_3 <- fit_3$draws(format="df")
+draws_3 <- fit_3$draws(format = "df")
 sigma_angle_hat <- median(draws_3$sigma_angle)
 sigma_distance_hat <- median(draws_3$sigma_distance)
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
-     xaxs="i", yaxs="i", pch=20, bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="Probability of success",
-     main="Checking model fit", type="n")
-x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
-p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
-p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
-           pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
-lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
-points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", pch = 20, bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "Probability of success", 
+     main = "Checking model fit", type = "n")
+x_grid <- seq(R - r, 1.1 * max(golf_new$x), .01)
+p_angle_grid <- (2 * pnorm(asin((R - r) / x_grid) / sigma_angle_hat) - 1)
+p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot) * sigma_distance_hat)) -
+  pnorm((-overshot) / ((x_grid + overshot) * sigma_distance_hat))
+lines(c(0, R - r, x_grid), c(1, 1, p_angle_grid * p_distance_grid), col = "red")
+points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 
 #' We can go further and plot the residuals from this fit.  First we
 #' augment the Stan model to compute residuals in the generated
@@ -549,18 +588,18 @@ points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
 #| label: fit_angle_distance_3_with_resids
 #| results: hide
 model_3_with_resids <- cmdstan_model("golf_angle_distance_3_with_resids.stan")
-fit_3_with_resids <- model_3_with_resids$sample(data=golf_new_data, refresh=0)
+fit_3_with_resids <- model_3_with_resids$sample(data = golf_new_data, refresh = 0)
 
 #' Then we compute the posterior means of the residuals, $y_j/n_j -
 #' p_j$, then plot these vs. distance:
 posterior_mean_residual <- mean(as_draws_rvars(fit_3_with_resids$draws())$residual)
-par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
-plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
-     xaxs="i", pch=20, bty="l",
-     xlab="Distance from hole (feet)",
-     ylab="y/n - fitted E(y/n)",
-     main="Residuals from fitted model", type="n")
-abline(0, 0, col="gray", lty=2)
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(golf_new$x, posterior_mean_residual, xlim = c(0, 1.1 * max(golf_new$x)), 
+     xaxs = "i", pch = 20, bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "y/n - fitted E(y/n)", 
+     main = "Residuals from fitted model", type = "n")
+abline(0, 0, col = "gray", lty = 2)
 lines(golf_new$x, posterior_mean_residual)
 
 #' The residuals are small (see the scale of the $y$-axis) and show no
@@ -614,7 +653,7 @@ lines(golf_new$x, posterior_mean_residual)
 #| label: fit_angle_distance_4
 #| results: hide
 model_4 <- cmdstan_model("golf_angle_distance_4.stan")
-fit_4 <- model_4$sample(data=golf_new_data, refresh=0)
+fit_4 <- model_4$sample(data = golf_new_data, refresh = 0)
 
 #' Results
 print(fit_4)
