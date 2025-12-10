@@ -243,10 +243,8 @@ fit_3_no_prior$draws("a") |>
   labs(x="Team quality estimate with 90% intervals\nModel without prior rankings")
 #if (savefigs) ggsave(root("Worldcup/figs","worldcup_2.pdf", height=7, width=8))
 
-#' So far no LOO-CV comparison
 
 #' # Discrete models and LOO-CV comparison
-#'
 
 #' ## Discrete model with explicit latent z sampled
 #| label: fit_discr_z
