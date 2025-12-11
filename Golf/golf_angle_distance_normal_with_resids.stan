@@ -24,8 +24,8 @@ transformed parameters {
   vector[J] p = p_angle .* p_distance;
 }
 model {
-  raw_proportion ~ normal(p, sqrt(p .* (1-p) ./ to_vector(n) + sigma_y^2));
   [sigma_angle, sigma_distance, sigma_y] ~ normal(0, 1);
+  raw_proportion ~ normal(p, sqrt(p .* (1-p) ./ to_vector(n) + sigma_y^2));
 }
 generated quantities {
   real sigma_degrees = sigma_angle * 180 / pi();

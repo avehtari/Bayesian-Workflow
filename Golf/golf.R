@@ -1,6 +1,6 @@
 #' ---
 #' title: "Model building and expansion for golf putting"
-#' author: "Andrew Gelman"
+#' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2019-09-24
 #' date-modified: today
 #' date-format: iso
@@ -18,6 +18,7 @@
 #'     embed-resources: true
 #'     anchor-sections: true
 #'     html-math-method: katex
+#' bibliography: ../casestudies.bib
 #' ---
 #' 
 #' # Setup  {.unnumbered}
@@ -41,7 +42,7 @@ fround <- function (x, digits) format(round(x, digits), nsmall = digits)
 #' # Introduction
 #' 
 #' The following graph shows data from professional golfers on the proportion of successful
-#' putts as a function of distance from the hole.  Unsurprisingly, the
+#' putts as a function of distance from the hole (from @Berry:1995).  Unsurprisingly, the
 #' probability of making the shot declines as a function of distance:
 golf <- read.table("data/golf_data.txt", header = TRUE, skip = 2)
 x <- golf$x
@@ -92,20 +93,20 @@ print_file("golf_logistic.stan")
 #' evaluations).
 #'
 #' We fit the model to the data:
-#| label: fit_logistic
+#| label: golf_logistic.stan
 #| results: hide
 golf_data <- list(x = x, y = y, n = n, J = J)
-golf_logistic <- cmdstan_model("golf_logistic.stan")
-fit_logistic <- golf_logistic$sample(data = golf_data, refresh = 0)
+model_1 <- cmdstan_model("golf_logistic.stan")
+fit_1 <- model_1$sample(data = golf_data, refresh = 0)
 
 #' And here is the result:
-draws_logistic <- fit_logistic$draws(format = "df")
-a_sim <- draws_logistic$a
-b_sim <- draws_logistic$b
+draws_1 <- fit_1$draws(format = "df")
+a_sim <- draws_1$a
+b_sim <- draws_1$b
 a_hat <- median(a_sim)
 b_hat <- median(b_sim)
-n_sims <- nrow(draws_logistic)
-print(fit_logistic)
+n_sims <- nrow(draws_1)
+print(fit_1)
 
 #' Going through the columns of the above table: Stan has computed the
 #' posterior means $\pm$ standard deviations of $a$ and $b$ to be
@@ -121,11 +122,7 @@ print(fit_logistic)
 #' [`{r} sprintf("%.2f", quantile(b_sim, 0.25))`,
 #' `{r} sprintf("%.2f", quantile(b_sim, 0.75))`] for $a$ and $b$, respectively.
 #' Finally, the values of $\widehat{R}$ near 1 tell us that the
-#' simulations from Stan's four simulated chains have mixed well.  (We
-#' have more sophisticated convergence diagnostics, and also we
-#' recommend checking the fit using simulated data, as discussed in
-#' the Bayesian Workflow Using Stan book, but checking that
-#' $\widehat{R}$ is near 1 is a good start.)
+#' simulations from Stan's four simulated chains have mixed well.
 #'
 #' The following graph shows the fit plotted along with the data:
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
@@ -150,7 +147,11 @@ text(11, .57, paste("Logistic regression,\n    a = ",
 #' estimates of the parameters $a$ and $b$; the green lines show 10 draws
 #' from the posterior distribution.
 #'
-#' In this example, posterior uncertainties in the fits are small, and for simplicity we will just plot point estimates based on posterior median parameter estimates for the remaining models.  Our focus here is on the sequence of models that we fit, not so much on uncertainty in particular model fits.
+#' In this example, posterior uncertainties in the fits are small, and
+#' for simplicity we will just plot point estimates based on posterior
+#' median parameter estimates for the remaining models.  Our focus
+#' here is on the sequence of models that we fit, not so much on
+#' uncertainty in particular model fits.
 #'
 #' # Modeling from first principles
 #'
@@ -250,27 +251,29 @@ for (i in 1:length(sigma_degrees_plot)){
 #' space of $\sigma$, sampling from the posterior distribution.
 #'
 #' We now write the Stan model in preparation to estimating $\sigma$:
-print_file("golf_angle.stan")
+print_file("golf_angle_binomial.stan")
 
-#' In the transformed data block above, the `./` in the calculation of p corresponds to componentwise division in this vectorized computation.
+#' In the transformed data block above, the `./` in the calculation of
+#' p corresponds to componentwise division in this vectorized
+#' computation.
 
 #' The data $J,n,x,y$ have already been set up; we just need to define
 #' $r$ and $R$ (the golf ball and hole have diameters 1.68 and 4.25
 #' inches, respectively), and run the Stan model:
-#| label: fit_angle
+#| label: golf_angle_binomial.stan
 #| results: hide
 r <- (1.68/2)/12
 R <- (4.25/2)/12
 golf_data <- c(golf_data, r=r, R=R)
-golf_angle <- cmdstan_model("golf_angle.stan")
-fit_angle <- golf_angle$sample(data = golf_data, refresh = 0)
+model_2 <- cmdstan_model("golf_angle_binomial.stan")
+fit_2 <- model_2$sample(data = golf_data, refresh = 0)
 
 #' Here is the result:
-draws_angle <- fit_angle$draws(format = "df")
-sigma_sim <- draws_angle$sigma
-sigma_degrees_sim <- draws_angle$sigma_degrees
+draws_2 <- fit_2$draws(format = "df")
+sigma_sim <- draws_2$sigma
+sigma_degrees_sim <- draws_2$sigma_degrees
 sigma_hat <- median(sigma_sim)
-print(fit_angle)
+print(fit_2)
 
 #' The model has a single parameter, $\sigma$.  From the output, we
 #' find that Stan has computed the posterior mean of $\sigma$ to be 
@@ -318,7 +321,13 @@ text(18.5, .24, "Geometry-based model", col="blue")
 #'
 #' # Testing the fitted model on new data
 #'
-#' Recently a local business school professor and golfer, Mark Broadie, came by my office with tons of new data.  For simplicity we'll just look here at the summary data, probabilities of the ball going into the hole for shots up to 75 feet from the hole.  The graph below shows these new data (in red), along with our earlier dataset (in blue) and the already-fit geometry-based model from before, extending to the range of the new data.
+#' One day a local business school professor and golfer, Mark Broadie,
+#' came by my office with tons of new data [@Broadie:2018].  For
+#' simplicity we'll just look here at the summary data, probabilities
+#' of the ball going into the hole for shots up to 75 feet from the
+#' hole.  The graph below shows these new data (in red), along with
+#' our earlier dataset (in blue) and the already-fit geometry-based
+#' model from before, extending to the range of the new data.
 golf_new <- read.table("data/golf_data_new.txt", header = TRUE, skip = 2)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
@@ -420,9 +429,9 @@ arrows(0.5 * dist - 0.05, -1.5 * R_plot, 0, -1.5 * R_plot, 2, length = .1)
 #' $\sigma$ from our earlier model to $\sigma_{\rm angle}$ to
 #' distinguish it from the new $\sigma_{\rm distance}$ parameter.  We
 #' write the new model in Stan, giving it the name
-#' `golf_angle_distance_2.stan` to convey that it is the second model
-#' in a series, and that it accounts both for angle and distance:
-print_file("golf_angle_distance_2.stan")
+#' `golf_angle_distance_binomial.stan` to convey that it accounts both
+#' for angle and distance:
+print_file("golf_angle_distance_binomial.stan")
 
 #' Here we have defined `overshot` and `distance_tolerance` as data,
 #' which Broadie has specified as 1 and 3 feet, respectively.  We
@@ -433,10 +442,8 @@ print_file("golf_angle_distance_2.stan")
 #' $\sigma_{\rm angle}$ and $\sigma_{\rm distance}$, which are
 #' required in this case to keep the computations stable.
 #'
-#' # Fitting the new model to data
-#'
 #' We fit the model to the new dataset.
-#| label: fit_angle_distance_2
+#| label: golf_angle_distance_binomial.stan
 #| results: hide
 overshot <- 1
 distance_tolerance <- 3
@@ -450,21 +457,27 @@ golf_new_data <- list(
   overshot = overshot,
   distance_tolerance = distance_tolerance
 )
-model_2 <- cmdstan_model("golf_angle_distance_2.stan")
-fit_2 <- model_2$sample(data = golf_new_data, refresh = 0)
+model_3 <- cmdstan_model("golf_angle_distance_binomial.stan")
+fit_3 <- model_3$sample(data = golf_new_data, refresh = 0)
 
-#' There is poor convergence, and we need to figure out what is going
-#' on here.  (Problems with computation often indicate underlying
-#' problems with the model being fit.  That's the folk theorem of
-#' statistical computing.)
-print(fit_2)
+#' Here is the result:
+print(fit_3)
 
-#' To understand what is happening, we graph the new data and the
-#' fitted model, accepting that this "fit," based as it is on
-#' poorly-mixing chains, is only provisional:
-draws_2 <- fit_2$draws(format = "df")
-sigma_angle_hat <- median(draws_2$sigma_angle)
-sigma_distance_hat <- median(draws_2$sigma_distance)
+#' There is poor convergence. Very high Rhat and very low ESSs
+#' indicate multimodality. We try initializing MCMC with Pathfinder
+#| results: hide
+pth_3 <- model_3$pathfinder(data = golf_new_data, refresh = 0,
+                            num_paths=20, max_lbfgs_iters=100)
+fit_3 <- model_3$sample(data = golf_new_data, refresh = 0, init = pth_3)
+
+#' Here is the result:
+print(fit_3)
+#' Now the convergence looks fine.
+
+#' We graph the new data and the fitted model:
+draws_3 <- fit_3$draws(format = "df")
+sigma_angle_hat <- median(draws_3$sigma_angle)
+sigma_distance_hat <- median(draws_3$sigma_distance)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -491,6 +504,8 @@ print(golf_new[1:5,])
 #' an extremely close fit at these first few points, and that drives
 #' the entire fit of the model.
 #'
+#' # Expanding the model by including a fudge factor
+#' 
 #' To fix this problem we took the data model, $y_j \sim
 #' \mathrm{binomial}(n_j, p_j)$, and added an independent error term to
 #' each observation.  There is no easy way to add error directly to
@@ -528,26 +543,26 @@ print(golf_new[1:5,])
 #' To complete the model we add $\sigma_y$ to the parameters block and
 #' assign it a weakly informative half-normal(0,1) prior
 #' distribution. Here's the new Stan program:
-print_file("golf_angle_distance_3.stan")
+print_file("golf_angle_distance_normal.stan")
 
 #' We now fit this model to the data:
-#| label: fit_angle_distance_3
+#| label: golf_angle_distance_normal.stan
 #| results: hide
-model_3 <- cmdstan_model("golf_angle_distance_3.stan")
-fit_3 <- model_3$sample(data=golf_new_data, refresh=0)
+model_4 <- cmdstan_model("golf_angle_distance_normal.stan")
+fit_4 <- model_4$sample(data=golf_new_data, refresh=0)
 
 #' Here is the result
-draws_3 <- fit_3$draws(format="df")
-print(fit_3)
+draws_4 <- fit_4$draws(format="df")
+print(fit_4)
 
 #' The new parameter estimates are:
 
 #' * $\sigma_{\rm angle}$ is estimated at `{r} sprintf("%.2f",
-#'   mean(draws_3$sigma_angle))`, which when corresponds to
+#'   mean(draws_4$sigma_angle))`, which when corresponds to
 #'   $\sigma_{\rm degrees}=$ `{r} sprintf("%.1f",
-#'   mean(draws_3$sigma_degrees))`.  According to the fitted
+#'   mean(draws_4$sigma_degrees))`.  According to the fitted
 #'   model, there is a standard deviation of `{r} sprintf("%.1f",
-#'   mean(draws_3$sigma_degrees))` degree in the angles of
+#'   mean(draws_4$sigma_degrees))` degree in the angles of
 #'   putts taken by pro golfers.  The estimate of $\sigma_{\rm angle}$
 #'   has decreased compared to the earlier model that only had angular
 #'   errors.  This makes sense: now that distance errors have been
@@ -555,20 +570,20 @@ print(fit_3)
 #'   missed shots using errors in angle.
 #'
 #' * $\sigma_{\rm distance}$ is estimated at `{r} sprintf("%.2f",
-#'   mean(draws_3$sigma_distance))`.  According to the fitted
+#'   mean(draws_4$sigma_distance))`.  According to the fitted
 #'   model, there is a standard deviation of 8\% in the errors of
 #'   distance.
 #'
 #' * $\sigma_y$ is estimated at `{r} sprintf("%.3f",
-#'   mean(draws_3$sigma_y))`.  The fitted model fits the
+#'   mean(draws_4$sigma_y))`.  The fitted model fits the
 #'   aggregate data (success rate as a function of distance) to an
-#'   accuracy of `{r} sprintf("%.1f", mean(draws_3$sigma_y)*100)`
+#'   accuracy of `{r} sprintf("%.1f", mean(draws_4$sigma_y)*100)`
 #'   percentage points.
 #'
 #' And now we graph:
-draws_3 <- fit_3$draws(format = "df")
-sigma_angle_hat <- median(draws_3$sigma_angle)
-sigma_distance_hat <- median(draws_3$sigma_distance)
+draws_4 <- fit_4$draws(format = "df")
+sigma_angle_hat <- median(draws_4$sigma_angle)
+sigma_distance_hat <- median(draws_4$sigma_distance)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", pch = 20, bty = "l", 
@@ -585,14 +600,14 @@ points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 #' We can go further and plot the residuals from this fit.  First we
 #' augment the Stan model to compute residuals in the generated
 #' quantities block.
-#| label: fit_angle_distance_3_with_resids
+#| label: golf_angle_distance_normal_with_resids.stan
 #| results: hide
-model_3_with_resids <- cmdstan_model("golf_angle_distance_3_with_resids.stan")
-fit_3_with_resids <- model_3_with_resids$sample(data = golf_new_data, refresh = 0)
+model_4_with_resids <- cmdstan_model("golf_angle_distance_normal_with_resids.stan")
+fit_4_with_resids <- model_4_with_resids$sample(data = golf_new_data, refresh = 0)
 
 #' Then we compute the posterior means of the residuals, $y_j/n_j -
 #' p_j$, then plot these vs. distance:
-posterior_mean_residual <- mean(as_draws_rvars(fit_3_with_resids$draws())$residual)
+posterior_mean_residual <- mean(as_draws_rvars(fit_4_with_resids$draws())$residual)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(golf_new$x, posterior_mean_residual, xlim = c(0, 1.1 * max(golf_new$x)), 
      xaxs = "i", pch = 20, bty = "l", 
@@ -607,100 +622,108 @@ lines(golf_new$x, posterior_mean_residual)
 #' there are no clear ways to develop it further just given the
 #' current data.
 #'
-#' # Problems with the model and potential improvements
+#' The above model fit, but we were bothered by the normal
+#' approximation, not so much for these particular data but rather
+#' because it was a sort of admission of failure to not be able to
+#' directly use the binomial model.
+#' 
+#' # Binomial with errors in logit scale
 #'
-#' The error term in the above model is a hack.  It's useful to allow
-#' the model not to fit the data perfectly, but it can't be right to
-#' model these systematic errors as being independent.  In this case,
-#' though, it doesn't really matter, given how tiny these errors are:
-#' their estimated standard deviation is less than one percentage
-#' point.
-#'
-#' The model has two parameters that were fixed as data:
-#' `distance_tolerance`, which was set to 3 (implying that the ball
-#' will only fall into the hole if it is hit on a trajectory that
-#' would go past the hole, but no more than 3 feet past) and
-#' `overshot`, which was set to 1 (implying that the golfer will aim 1
-#' foot past the hole).  In theory it would be possible to estimate
-#' either or both these parameters from the data.  In practice, no
-#' way.  The model already fits the data so well (as shown by the
-#' above graph) that there's clearly no more information available to
-#' estimate any additional parameters.  If we were to do so, the
-#' estimates would be highly noisy and unstable (if their prior is
-#' weak) or highly dependent on the prior (if an informative prior
-#' distribution is specified). Either way we don't see the advantage
-#' of this sort of fit.
-#'
-#' Just for laughs, though, we constructed such a model and fit it,
-#' just to see what would happen. We simply took our previous Stan
-#' program and moved these two parameters from the data block to the
-#' parameters block along with zero-boundary constraints:
-#' ```
-#'   real<lower=0> overshot;
-#'   real<lower=0> distance_tolerance;
-#' ```
-#'
-#' And then in the model block we added weak priors centered at Broadie's guesses and with wide uncertainties:
-#'
-#' ```
-#'   overshot ~ normal(1, 5);
-#'   distance_tolerance ~ normal(3, 5);
-#' ```
-#'
-#' Fitting this model to the data yields poor convergence and no real
-#' gain beyond the simpler version already fit in which overshot and
-#' distance_tolerance were set to fixed values.
-#| label: fit_angle_distance_4
+#' What we wanted to do was to keep the binomial model and then add
+#' the error on the logistic scale or something like that, something
+#' to keep the probabilities bounded between 0 and 1. We added an
+#' error term on the logistic scale with a scale parameter, `sigma_eta`,
+#' estimated from the data.
+
+#| label: golf_angle_distance_binomial_with_logit_errors.stan
 #| results: hide
-model_4 <- cmdstan_model("golf_angle_distance_4.stan")
-fit_4 <- model_4$sample(data = golf_new_data, refresh = 0)
+model_5 <- cmdstan_model("golf_angle_distance_binomial_with_logit_errors.stan")
+fit_5 <- model_5$sample(data=c(golf_new_data), refresh=0)
 
-#' Results
-print(fit_4)
+#' Here is the result:
+print(fit_5, digits=3)
 
-#' The model is unrealistic in other ways, for example by assuming
-#' distance error is strictly proportional to distance aimed, and
-#' assuming independence of angular and distance errors.  Presumably,
-#' angular error is higher for longer putts.  Again, though, we can't
-#' really investigate such things well using these data which are
-#' already such a good fit to the simple two-parameter model we have
-#' already fit.
+#' Unfortunately, when we try to fit this new model to our data, it
+#' doesn’t work. The console fills up with warnings and the chains
+#' don’t mix. We try initializing with Pathfinder.
+#| results: hide
+pth_5 <- model_5$pathfinder(data = golf_new_data, refresh = 0,
+                            num_paths=20, max_lbfgs_iters=100)
+fit_5 <- model_5$sample(data = golf_new_data, refresh = 0, init = pth_5)
+
+#' Here is the result:
+print(fit_5)
+#' The sampling is much slower, but the convergence diagnostic look just fine.
+
+#' We graph the new data and the fitted model:
+draws_5 <- fit_5$draws(format="df")
+sigma_angle_hat <- median(draws_5$sigma_angle)
+sigma_distance_hat <- median(draws_5$sigma_distance)
+par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
+plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
+     xaxs="i", yaxs="i", pch=20, bty="l",
+     xlab="Distance from hole (feet)",
+     ylab="Probability of success",
+     main="Checking model fit", type="n")
+x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
+p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
+p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
+  pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
+lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
+points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
+
+#' There are now problems with the fit in the low range of $x$.
+#' Clearly the additive error in logit scale is not good.
+#' 
+#' # Binomial with proportional errors
 #'
-#' Players vary in ability and golf courses vary in difficulty.  Given
-#' more granular data, we should be able to fit a multilevel model
-#' allowing parameters to vary by player, golf course, and weather
-#' conditions.
-#'
-#' # Summary of fitted models
-#'
-#' We have two datasets, `golf` and `golf_new`, to which we fit
-#' several Stan models.  First we fit `golf_logistic` and `golf_angle`
-#' to the `golf` dataset, then we fit `golf_angle` to the `golf_new`
-#' dataset and see a problem, then we fit `golf_angle_distance_2` and
-#' `golf_angle_distance_3` to `golf_new` and finally obtained a good
-#' fit, then we fit `golf_angle_distance_3_with_resids` which was the
-#' same model but also saving residuals.  Finally, we fit
-#' `golf_angle_distance_4` to `golf_new` but we didn't display the
-#' fit, we just discussed it.
+#' Instead of additive errors in logit scale, we next fit
+#' a three-parameter model that scales all the probabilities down from
+#' 1. Each observation has its own proportional error term.
+#| label: golf_angle_distance_binomial_with_proportional_errors.stan
+#| results: hide
+model_6 <- cmdstan_model("golf_angle_distance_binomial_with_proportional_errors.stan")
+fit_6 <- model_6$sample(data=c(golf_new_data), refresh=0)
+
+#' Here is the result:
+print(fit_6)
+
+#' We graph the new data and the fitted model:
+draws_6 <- fit_6$draws(format="df")
+sigma_angle_hat <- median(draws_6$sigma_angle)
+sigma_distance_hat <- median(draws_6$sigma_distance)
+par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
+plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
+     xaxs="i", yaxs="i", pch=20, bty="l",
+     xlab="Distance from hole (feet)",
+     ylab="Probability of success",
+     main="Checking model fit", type="n")
+x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
+p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
+p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
+  pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
+lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
+points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
+
+posterior_mean_residual <- mean(as_draws_rvars(fit_6$draws())$residual)
+par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
+plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
+     xaxs="i", pch=20, bty="l",
+     xlab="Distance from hole (feet)",
+     ylab="y/n - fitted E(y/n)",
+     main="Residuals from fitted model", type="n")
+abline(0, 0, col="gray", lty=2)
+lines(golf_new$x, posterior_mean_residual)
+
+#' The model fit looks good.
+#' 
 #'
 #' <br />
 #' 
 #' # References {.unnumbered}
 #'
-#' Don Berry (1995). Statistics: A Bayesian Perspective.  Duxbury
-#' Press.  The original golf dataset appears as an example in this
-#' book.
-#'
-#' Mark Broadie (2018). Two simple putting models in golf.  Linked
-#' from
-#' https://statmodeling.stat.columbia.edu/2019/03/21/new-golf-putting-data-and-a-new-golf-putting-model/.
-#' Here is the larger dataset and a document describing the model with
-#' angular and distance errors.
-#'
-#' Andrew Gelman and Deborah Nolan (2002).  A probability model for
-#' golf putting.  Teaching Statistics 50, 151-153.  Our first
-#' explanation of the angular-error model.
-#'
+#' <div id="refs"></div>
+#' 
 #' # Licenses {.unnumbered}
 #' 
 #' * Code &copy; 2019-2025, Andrew Gelman, licensed under BSD-3.
