@@ -242,7 +242,10 @@ print(fit1$time(), digits = 2)
 #' longer time to run. The difference is not subtle.
 #' 
 #' Let's examine the summary.
-fit1$summary(variables = c("lp__", "k"), "mean", "sd", "rhat", "ess_bulk")
+fit1$summary(
+  variables = c("lp__", "k"), 
+  "mean", "sd", "rhat", "ess_bulk", "ess_tail"
+)
 
 #' We see that $\hat R \gg 1$. 
 #' Wow, these numbers are dramatic!
@@ -610,7 +613,10 @@ fit1p <- mod1$sample(
 )
 
 #' Convergence diagnostics look good
-fit1p$summary(variables = c("lp__", "k"), "mean", "sd", "rhat", "ess_bulk")
+fit1p$summary(
+  variables = c("lp__", "k"), 
+  "mean", "sd", "rhat", "ess_bulk", "ess_tail"
+)
 
 #| label: fig-ppc-fit1p
 #| fig-height: 6
@@ -760,8 +766,10 @@ fit2p <- mod2$sample(
 )
 
 #' Convergence diagnostics look good
-pars <- c("lp__", "k", "q0", "p0", "star")
-fit2p$summary(variables = pars, "mean", "sd", "rhat", "ess_bulk")
+fit2p$summary(
+  variables = c("lp__", "k", "q0", "p0", "star"), 
+  "mean", "sd", "rhat", "ess_bulk", "ess_tail"
+)
 
 
 #' Posterior predictive checks look good for all chains!
