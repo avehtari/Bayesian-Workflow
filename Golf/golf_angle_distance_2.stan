@@ -1,12 +1,10 @@
 data {
   int J;
-  array[J] int n;
   vector[J] x;
+  array[J] int n;
   array[J] int y;
-  real r;
-  real R;
-  real overshot;
-  real distance_tolerance;
+  real r, R;
+  real overshot, distance_tolerance;
 }
 transformed data {
   vector[J] threshold_angle = asin((R-r) ./ x);
