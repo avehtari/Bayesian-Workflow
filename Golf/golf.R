@@ -52,6 +52,7 @@ J <- length(y)
 r <- (1.68 / 2) / 12
 R <- (4.25 / 2) / 12
 se <- sqrt((y / n) * (1 - y / n) / n)
+#| label: fig-golf-data
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -125,6 +126,7 @@ print(fit_1)
 #' simulations from Stan's four simulated chains have mixed well.
 #'
 #' The following graph shows the fit plotted along with the data:
+#| label: fig-golf-fit1
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -164,7 +166,8 @@ text(11, .57, paste("Logistic regression,\n    a = ",
 #' This threshold angle is $\sin^{-1}((R-r)/x)$.  The graph, which is
 #' not to scale, is intended to illustrate the geometry of the ball
 #' needing to go into the hole.
-#| figheight:  2
+#| label: fig-golf-sketch-1
+#| fig-height:  2
 #| fig-width:  7
 par(mar=c(0,0,0,0))
 dist <- 2
@@ -192,8 +195,9 @@ text(0, r_plot / 2, "r")
 #' factors interfere with this goal, so that the actual angle follows a
 #' normal distribution centered at 0 with some standard deviation
 #' $\sigma$.
-#| fig-height:  2
-#| fig-width:  5
+#| label: fig-golf-sketch-2
+#| fig-height:  3
+#| fig-width:  7
 par(mar=c(3, 3, 0, 0), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(-4, 4), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", xaxt = "n", yaxt = "n", bty = "n", 
@@ -220,6 +224,7 @@ curve(dnorm(x) / dnorm(0), add = TRUE)
 #' p_j &= 2\Phi\left(\frac{\sin^{-1}((R-r)/x_j)}{\sigma}\right) - 1 , \text{ for } j=1,\dots, J.
 #' \end{align}
 #' Here is a graph showing the curve for some potential values of the parameter $\sigma$.
+#| label: fig-golf-angle-curves
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -296,6 +301,7 @@ print(fit_2)
 #' narrow that any reasonable posterior summary would give essentially
 #' the same result), along with the logistic regression fitted
 #' earlier:
+#| label: fig-golf-fit-1-2
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -329,6 +335,7 @@ text(18.5, .24, "Geometry-based model", col="blue")
 #' our earlier dataset (in blue) and the already-fit geometry-based
 #' model from before, extending to the range of the new data.
 golf_new <- read.table("data/golf_data_new.txt", header = TRUE, skip = 2)
+#| label: fig-golf-fit-2-new
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -372,8 +379,9 @@ legend(60, 0.4, legend = c("Old data", "New data"), col = c("blue", "red"), pch 
 #' some range, in this case the gray zone which represents the
 #' trajectories for which the ball would reach the hole and stay in
 #' it.
+#| label: fig-golf-sketch-3
 #| fig-height:  2
-#| fig-width: 8
+#| fig-width: 7
 par(mar = c(0, 0, 0, 0))
 dist <- 2
 r_plot <- r
@@ -475,6 +483,7 @@ print(fit_3)
 #' Now the convergence looks fine.
 
 #' We graph the new data and the fitted model:
+#| label: fig-golf-fit-3
 draws_3 <- fit_3$draws(format = "df")
 sigma_angle_hat <- median(draws_3$sigma_angle)
 sigma_distance_hat <- median(draws_3$sigma_distance)
@@ -581,6 +590,7 @@ print(fit_4)
 #'   percentage points.
 #'
 #' And now we graph:
+#| label: fig-golf-fit-4
 draws_4 <- fit_4$draws(format = "df")
 sigma_angle_hat <- median(draws_4$sigma_angle)
 sigma_distance_hat <- median(draws_4$sigma_distance)
@@ -607,6 +617,7 @@ fit_4_with_resids <- model_4_with_resids$sample(data = golf_new_data, refresh = 
 
 #' Then we compute the posterior means of the residuals, $y_j/n_j -
 #' p_j$, then plot these vs. distance:
+#| label: fig-golf-res-4
 posterior_mean_residual <- mean(as_draws_rvars(fit_4_with_resids$draws())$residual)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(golf_new$x, posterior_mean_residual, xlim = c(0, 1.1 * max(golf_new$x)), 
@@ -656,6 +667,7 @@ print(fit_5)
 #' The sampling is much slower, but the convergence diagnostic look just fine.
 
 #' We graph the new data and the fitted model:
+#| label: fig-golf-fit-5
 draws_5 <- fit_5$draws(format="df")
 sigma_angle_hat <- median(draws_5$sigma_angle)
 sigma_distance_hat <- median(draws_5$sigma_distance)
@@ -689,6 +701,7 @@ fit_6 <- model_6$sample(data=c(golf_new_data), refresh=0)
 print(fit_6)
 
 #' We graph the new data and the fitted model:
+#| label: fig-golf-fit-6
 draws_6 <- fit_6$draws(format="df")
 sigma_angle_hat <- median(draws_6$sigma_angle)
 sigma_distance_hat <- median(draws_6$sigma_distance)
@@ -705,6 +718,7 @@ p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*
 lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
 points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
 
+#| label: fig-golf-res-6
 posterior_mean_residual <- mean(as_draws_rvars(fit_6$draws())$residual)
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
