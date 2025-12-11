@@ -31,6 +31,5 @@ model {
 }
 generated quantities {
   real sigma_degrees = sigma_angle * 180 / pi();
-  vector[J] residual = raw_proportion - p_angle .* p_distance;
+  vector[J] residual = raw_proportion - p;
 }
-
