@@ -748,8 +748,8 @@ pth2 <- mod2$pathfinder(
   refresh = 0
 )
 
-#' We get informative messages that only 12 of 40 pathfinders
-#' succeeded, but that is enough for us, and all this took only 3s.
+#' We get informative messages that most of the 40 pathfinders
+#' failed, but there are enough that succeeded, and this took only 3s.
 #' 
 #' We initialize MCMC with Pathfinder results.
 #| label: fit2p
