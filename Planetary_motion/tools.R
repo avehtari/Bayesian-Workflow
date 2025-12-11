@@ -32,38 +32,6 @@ solve_trajectory <- function(q0, p0, dt, k, m, n_obs, ts, star = c(0, 0)) {
 }
 
 
-ppc_plot <- function(fit, chains, pred = "qx_pred", pars = "k",
-                     data_pred) {
-  qx_pred <- rstan::extract(fit, pars = c(pred), permuted = FALSE)
-  
-  for (i in 1:chains) { 
-    qx_pred_chain <- qx_pred[, i, ]
-    pred_new <- as.data.frame(qx_pred_chain) %>% gather(factor_key = TRUE) %>%  
-      group_by(key) %>%
-      summarize(lb = quantile(value, probs = 0.05), 
-                median = quantile(value, probs = 0.5),
-                ub = quantile(value, probs = 0.95)) %>% 
-      bind_cols(data_pred)
-    
-    if (i == 1) pred <- pred_new
-    if (i != 1) pred <- bind_rows(pred, pred_new) 
-  }
-  
-  estimated_k <- rep(NA, chains)
-  for (i in 1:chains) estimated_k[i] <-
-    paste0(pars, " = ", summary(r_fit, pars = pars)$c_summary[1, 1, i]) 
-  pred$chain <-  rep(estimated_k, each = 40)
-
-  p1 <- ggplot(pred, aes(x = t, y = q)) +
-    geom_point() +
-    geom_line(aes(x = t, y = median)) + 
-    geom_ribbon(aes(ymin = lb, ymax = ub), alpha = 0.25) + 
-    facet_wrap(~chain)
-
-  p1
-}
-
-
 ppc_plot2D <- function(fit, pred = c("qx_pred", "qy_pred"), pars = "k", data_pred,
                        plot_star = FALSE) {
   qx_pred <- fit$draws(variables = pred[1])

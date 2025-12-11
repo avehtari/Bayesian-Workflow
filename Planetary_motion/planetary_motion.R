@@ -56,7 +56,7 @@ library(tidyr)
 library(boot)
 library(latex2exp)
 dir.create(root("Planetary_motion","saved_fit"))
-source("tools.R")
+source(root("Planetary_motion", "tools.R"))
 library(bayesplot)
 bayesplot::color_scheme_set("viridisC")
 theme_set(bayesplot::theme_default(base_family = "sans"))
@@ -159,11 +159,15 @@ set.seed(1954)
 #| results: hide
 mod_sim <- cmdstan_model(root("Planetary_motion","planetary_motion_sim.stan"))
 n <- 40
-sigma = 0.01
+sigma <- 0.01
 #| label: sim
-sim <- mod_sim$sample(data = list(n = n, sigma_x = sigma, sigma_y = sigma),
-                      chains = 1, iter_warmup = 1,
-                      iter_sampling = 2, seed = 123)
+sim <- mod_sim$sample(
+  data = list(n = n, sigma_x = sigma, sigma_y = sigma),
+  chains = 1,
+  iter_warmup = 1,
+  iter_sampling = 2,
+  seed = 123
+)
 simulation <- as.vector(sim$draws(variables = "q_obs")[1, , ])
 
 q_obs <- array(NA, c(n, 2))
@@ -177,8 +181,10 @@ ggplot(data = data.frame(q_x = q_obs[, 1],
                          time = 1:40), 
        aes(x = q_x, y = q_y, label = time)) +
   geom_point() +
-  annotate(geom="text", x = q_obs[1, 1]-0.05, y = q_obs[1, 2], label = "t=1", hjust=1) +
-  annotate(geom="text", x = q_obs[40, 1]+0.05, y = q_obs[40, 2], label = "t=40", hjust=0)
+  annotate(geom = "text", x = q_obs[1, 1] - 0.05, y = q_obs[1, 2], 
+           label = "t=1", hjust = 1) +
+  annotate(geom = "text", x = q_obs[40, 1] + 0.05, y = q_obs[40, 2], 
+           label = "t=40", hjust = 0)
 1
 #' 
 #' # Fitting a simple model and diagnosing inference
@@ -216,11 +222,15 @@ chains <- 8
 #| label: fit1
 #| eval: false
 mod1 <- cmdstan_model(root("Planetary_motion","planetary_motion.stan"))
-fit1 <- mod1$sample(data = list(n = n, q_obs = q_obs),
-                    chains = chains, parallel_chains = chains,
-                    iter_warmup = 500,
-                    iter_sampling = 500,
-                    seed = 123, save_warmup = TRUE)
+fit1 <- mod1$sample(
+  data = list(n = n, q_obs = q_obs),
+  chains = chains,
+  parallel_chains = chains,
+  iter_warmup = 500,
+  iter_sampling = 500,
+  seed = 123,
+  save_warmup = TRUE
+)
 fit1$save_object(file = root("Planetary_motion/saved_fit","fit1.RDS"))
 
 #' The inference takes a while to run, so we read in the saved output.
@@ -232,7 +242,7 @@ print(fit1$time(), digits = 2)
 #' longer time to run. The difference is not subtle.
 #' 
 #' Let's examine the summary.
-fit1$summary(c("lp__", "k"))[, c(1, 2, 4, 8, 9)]
+fit1$summary(variables = c("lp__", "k"), "mean", "sd", "rhat", "ess_bulk")
 
 #' We see that $\hat R \gg 1$. 
 #' Wow, these numbers are dramatic!
@@ -352,13 +362,13 @@ for (i in 1:length(ks)) {
     sum(dnorm(q_obs[, 2], q_sim[, 2], sigma_y, log = T)) +
     dnorm(k, 0, 1, log = T)
 }
-plot <- ggplot(data = data.frame(ks = ks, lk = lk),
-               aes(x = ks, y = lk)) +
+ggplot(data = data.frame(ks = ks, lk = lk),
+       aes(x = ks, y = lk)) +
   geom_line() +
   theme(text = element_text(size = 18)) +
   ylab("log joint") +
   xlab("k")
-plot
+
 
 #' 
 #' There is a strong mode at $k = 1$ and a "wiggly" tail for larger
@@ -395,7 +405,7 @@ plot_data <- data.frame(q_plot, k_plot, obs = 1:40)
 names(plot_data) <- c("qx", "qy", "k", "obs")
 comp_point <- 35
 select <- 1:(40 * 5)
-plot <- ggplot() +
+ggplot() +
   geom_path(data = plot_data[select, ], 
             aes(x = qx, y = qy, color = k)) + 
   geom_point(aes(x = q_216[comp_point, 1], y = q_216[comp_point, 2]),
@@ -414,7 +424,6 @@ plot <- ggplot() +
                linetype = "dashed") +
   xlab(TeX("$q_x$")) +
   ylab(TeX("$q_y$"))
-plot
 
 #' 
 #' As $k$, and therefore the gravitational force, increases, the orbit
@@ -574,24 +583,34 @@ stan_data1 <- list(n = n, q_obs = q_obs)
 #' need fewer than 100 L-BFGS iterations. To illustrate the robustness of
 #' the Pathfinder algorithm we use Stan's default initialization which
 #' above was shown to be bad for MCMC.
-pth1p <- mod1$pathfinder(data = stan_data1,
-                         num_paths=40, single_path_draws=25, draws=1000,
-                         max_lbfgs_iters=100, refresh = 0)
+pth1p <- mod1$pathfinder(
+  data = stan_data1,
+  num_paths = 40,
+  single_path_draws = 25,
+  draws = 1000,
+  max_lbfgs_iters = 100,
+  refresh = 0
+)
 
 #' Pathfinder reports that some of the paths failed, but it doesn't
 #' matter as they failed fast, and the results from the rest of the
 #' paths are diagnosed to be good.
 #'
 #' We initialize MCMC with Pathfinder results
-fit1p <- mod1$sample(data = stan_data1, 
-                     init = pth1p,
-                     chains = chains, parallel_chains = chains,
-                     iter_warmup = 500, 
-                     iter_sampling = 500, 
-                     seed = 123, save_warmup = TRUE, refresh = 0)
+fit1p <- mod1$sample(
+  data = stan_data1,
+  init = pth1p,
+  chains = chains,
+  parallel_chains = chains,
+  iter_warmup = 500,
+  iter_sampling = 500,
+  seed = 123,
+  save_warmup = TRUE,
+  refresh = 0
+)
 
 #' Convergence diagnostics look good
-fit1p$summary(c("lp__", "k"))[, c(1, 2, 4, 8, 9)]
+fit1p$summary(variables = c("lp__", "k"), "mean", "sd", "rhat", "ess_bulk")
 
 #| label: fig-ppc-fit1p
 #| fig-height: 6
@@ -651,12 +670,11 @@ for (i in 1:nrow(star_s)) {
     sum(dnorm(q_obs[, 1], q_sim[, 1], sigma_x, log = T)) +
     sum(dnorm(q_obs[, 2], q_sim[, 2], sigma_y, log = T))
 }
-plot <- ggplot(data = data.frame(star_x = star_x, lk = lk),
-               aes(x = star_x, y = lk)) + 
+ggplot(data = data.frame(star_x = star_x, lk = lk),
+       aes(x = star_x, y = lk)) + 
   geom_line() +
   ylab("Conditional log likelihood") +
   xlab(TeX("$q_*^x$"))
-plot
 
 #' 
 #' This is the type of profile we expect.  We can extend this to a
@@ -686,15 +704,15 @@ for (i in 1:nrow(star_data)) {
     sum(dnorm(q_obs[, 1], q_sim[, 1], sigma_x, log = T)) +
     sum(dnorm(q_obs[, 2], q_sim[, 2], sigma_y, log = T))
 }
-plot2 <- ggplot(data = data.frame(star_x = star_data[, 1],
-                                  star_y = star_data[, 2],
-                                  lk = lk), 
-                aes(x = star_x, y = star_y, fill = lk)) +
+ggplot(data = data.frame(star_x = star_data[, 1],
+                         star_y = star_data[, 2],
+                         lk = lk), 
+       aes(x = star_x, y = star_y, fill = lk)) +
   geom_tile() +
   xlab(TeX("$q_*^x$")) +
   ylab(TeX("$q_*^y$")) +
   labs(fill = "log likelihood")
-plot2
+
 
 #' 
 #' These figures support our conjecture and, along with the log
@@ -715,9 +733,14 @@ mod2 <- cmdstan_model(root("Planetary_motion","planetary_motion_star.stan"))
 n_select <- 40
 time <- (1:n_select) / 10
 stan_data2 <- list(n = n_select, q_obs = q_obs, time = time, sigma = sigma)
-pth2 <- mod2$pathfinder(data = stan_data2,
-                        num_paths=40, single_path_draws=25, draws=1000,
-                        max_lbfgs_iters=100, refresh = 0)
+pth2 <- mod2$pathfinder(
+  data = stan_data2,
+  num_paths = 40,
+  single_path_draws = 25,
+  draws = 1000,
+  max_lbfgs_iters = 100,
+  refresh = 0
+)
 
 #' We get informative messages that only 12 of 40 pathfinders
 #' succeeded, but that is enough for us, and all this took only 3s.
@@ -725,16 +748,21 @@ pth2 <- mod2$pathfinder(data = stan_data2,
 #' We initialize MCMC with Pathfinder results.
 #| label: fit2p
 #| results: hide
-fit2p <- mod2$sample(data = stan_data2,
-                     init = pth2,
-                     chains = chains, parallel_chains = chains,
-                     iter_warmup = 500,
-                     iter_sampling = 500,
-                     seed = 123, save_warmup = TRUE)
+fit2p <- mod2$sample(
+  data = stan_data2,
+  init = pth2,
+  chains = chains,
+  parallel_chains = chains,
+  iter_warmup = 500,
+  iter_sampling = 500,
+  seed = 123,
+  save_warmup = TRUE
+)
 
 #' Convergence diagnostics look good
 pars <- c("lp__", "k", "q0", "p0", "star")
-fit2p$summary(pars)[, c(1, 2, 4, 8, 9)]
+fit2p$summary(variables = pars, "mean", "sd", "rhat", "ess_bulk")
+
 
 #' Posterior predictive checks look good for all chains!
 #| label: fig-ppc-fit2p
