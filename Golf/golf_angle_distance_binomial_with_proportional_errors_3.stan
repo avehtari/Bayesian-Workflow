@@ -5,8 +5,7 @@ functions {
     real p_j = theta[2];
     int n_j = data_j[1];
     int y_j = data_j[2];
-    real p = exp(exponential_lpdf(z | 1/sigma_epsilon) +
-                 binomial_lpmf(y_j | n_j, p_j*(1-z)));
+    real p = exp(exponential_lpdf(z | 1/sigma_epsilon) + binomial_lpmf(y_j | n_j, p_j*(1-z)));
     return (is_inf(p) || is_nan(p)) ? 0 : p;
   }
 }
@@ -17,8 +16,6 @@ data {
   array[J] int y;
   real r;
   real R;
-  real overshot;
-  real distance_tolerance;
 }
 transformed data {
   vector[J] threshold_angle = asin((R-r) ./ x);
@@ -29,6 +26,8 @@ parameters {
   real<lower=0> sigma_distance;
   real<lower=0> sigma_epsilon;
   vector<lower=0, upper=1>[J] epsilon;
+  real<lower=0> distance_tolerance;
+  real<lower=0> overshot;
 }
 transformed parameters {
   vector[J] p_angle = 2*Phi(threshold_angle / sigma_angle) - 1;
@@ -38,6 +37,8 @@ transformed parameters {
 }
 model {
   [sigma_angle, sigma_distance] ~ normal(0, 1);
+  distance_tolerance ~ lognormal(log(3), .3);
+  overshot ~ lognormal(log(1), .3);
   epsilon ~ exponential(1/sigma_epsilon);
   y ~ binomial(n, p);
 }
@@ -48,7 +49,7 @@ generated quantities {
   for (j in 1:J) {
     log_lik[j] = log(integrate_1d(integrand,
                               0.0,
-                              0.1,
+                              positive_infinity(),
                               append_array({sigma_epsilon},{p_angle[j] .* p_distance[j]}),
 			      {0}, // not used, but an empty array not allowed
 			      append_array({n[j]},{y[j]}),
