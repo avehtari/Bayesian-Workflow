@@ -703,9 +703,7 @@ points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
 #' to make each element of the multiplier vector `(1- epsilon)`
 #' positive and less than 1. This eliminates the problem with the
 #' boundary and the need for the logit.  The prior distribution for
-#' `epsilon` keeps the errors under control. The Stan model code
-#' includes also computation needed for leave-one-out cross-validation
-#' comparison results shown later.
+#' `epsilon` keeps the errors under control.
 print_file("golf_angle_distance_binomial_with_proportional_errors.stan")
 
 #' We fit the model to the data:
@@ -856,20 +854,51 @@ fit_8$summary(variables = c("distance_tolerance","overshot"))
 #' standard deviation. This also explains why adding `overshot` did
 #' not reduce much the residual standard deviation.
 #' 
-#' 
 #' As we can expect the residual standard deviation to decrease when
 #' we add more parameters, we use also cross-validation to compare the
-#' models.
-loo::loo_compare(list(`Distance tolerance and overshot fixed`=fit_6$loo(),
-                      `Distance tolerance parameter and overshot fixed`=fit_7$loo(),
-                      `Distance tolerance and overshot parameters`=fit_8$loo()))
+#' models. As we have one `epsilon` parameter for each observation, we
+#' need to use integerated PSIS-LOO. We can compute the integrated
+#' `log_lik` with the following stand alone generated quantities code.
+gq_ll <- cmdstan_model("golf_log_lik.stan")
+
+#' When calling generated quantities, we pass only the required variables which
+#' allowed us to write more compact Stan code for the `log_lik` computation.
+#| results: hide
+loo_6 <- gq_ll$generate_quantities(fit_6$draws(variables = c("sigma_epsilon",
+                                                             "p_angle",
+                                                             "p_distance")),
+                                   data = golf_new_data)$draws(variables = "log_lik") |>
+                                                       loo::loo()
+loo_7 <- gq_ll$generate_quantities(fit_7$draws(variables = c("sigma_epsilon",
+                                                             "p_angle",
+                                                             "p_distance")),
+                                   data = golf_new_data)$draws(variables = "log_lik") |>
+                                                       loo::loo()
+loo_8 <- gq_ll$generate_quantities(fit_8$draws(variables = c("sigma_epsilon",
+                                                             "p_angle",
+                                                             "p_distance")),
+                                   data = golf_new_data)$draws(variables = "log_lik") |>
+                                                       loo::loo()
+
+#' As we have integrated out the `epsilon` parameters, the effective
+#' number of parameters match the number of remaining parameters,
+#' except for the last model where `distance_tolerance` and `overshot`
+#' parameters are not well informaed by the likelihood separately.
+print(loo_6)
+print(loo_7)
+print(loo_8)
+
+#' Finally we compare the expected predictive performances
+loo::loo_compare(list(`Distance tolerance and overshot fixed`=loo_6,
+                      `Distance tolerance parameter and overshot fixed`=loo_7,
+                      `Distance tolerance and overshot parameters`=loo_8))
 
 #' Adding `distance_tolerance` parameter significantly improves the
 #' performance, but adding `overshot` parameter does not improve the
 #' fit. However the model which has both `distance_tolerance` and
 #' `overshot` has posterior that is more informative on what can be
 #' learned about this aspects of the model.
-#'
+#' 
 #' <br />
 #' 
 #' # References {.unnumbered}
