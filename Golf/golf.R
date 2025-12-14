@@ -53,6 +53,8 @@ r <- (1.68 / 2) / 12
 R <- (4.25 / 2) / 12
 se <- sqrt((y / n) * (1 - y / n) / n)
 #| label: fig-golf-data
+#| fig-width: 6
+#| fig-height: 4
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -127,6 +129,8 @@ print(fit_1)
 #'
 #' The following graph shows the fit plotted along with the data:
 #| label: fig-golf-fit1
+#| fig-width: 6
+#| fig-height: 4
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -225,6 +229,8 @@ curve(dnorm(x) / dnorm(0), add = TRUE)
 #' \end{align}
 #' Here is a graph showing the curve for some potential values of the parameter $\sigma$.
 #| label: fig-golf-angle-curves
+#| fig-width: 6
+#| fig-height: 4
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -302,6 +308,8 @@ print(fit_2)
 #' the same result), along with the logistic regression fitted
 #' earlier:
 #| label: fig-golf-fit-1-2
+#| fig-width: 6
+#| fig-height: 4
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -336,6 +344,8 @@ text(18.5, .24, "Geometry-based model", col="blue")
 #' range of the new data.
 golf_new <- read.table("data/golf_data_new.txt", header = TRUE, skip = 2)
 #| label: fig-golf-fit-2-new
+#| fig-width: 6
+#| fig-height: 4
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -489,6 +499,8 @@ print(fit_3)
 
 #' We graph the new data and the fitted model:
 #| label: fig-golf-fit-3
+#| fig-width: 6
+#| fig-height: 4
 draws_3 <- fit_3$draws(format = "df")
 sigma_angle_hat <- median(draws_3$sigma_angle)
 sigma_distance_hat <- median(draws_3$sigma_distance)
@@ -499,9 +511,9 @@ plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02),
      ylab = "Probability of success", 
      main = "Checking model fit", type = "n")
 x_grid <- seq(R - r, 1.1 * max(golf_new$x), .01)
-p_angle_grid <- (2 * pnorm(asin((R - r) / x_grid) / sigma_angle_hat) - 1)
+p_angle_grid <- 2 * pnorm(asin((R - r) / x_grid) / sigma_angle_hat) - 1
 p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot) * sigma_distance_hat)) -
-  pnorm((-overshot) / ((x_grid + overshot) * sigma_distance_hat))
+  pnorm(-overshot / ((x_grid + overshot) * sigma_distance_hat))
 lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
 points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 
@@ -596,6 +608,8 @@ print(fit_4)
 #'
 #' And now we graph:
 #| label: fig-golf-fit-4
+#| fig-width: 4.5
+#| fig-height: 4
 draws_4 <- fit_4$draws(format = "df")
 sigma_angle_hat <- median(draws_4$sigma_angle)
 sigma_distance_hat <- median(draws_4$sigma_distance)
@@ -606,9 +620,9 @@ plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02),
      ylab = "Probability of success", 
      main = "Checking model fit", type = "n")
 x_grid <- seq(R - r, 1.1 * max(golf_new$x), .01)
-p_angle_grid <- (2 * pnorm(asin((R - r) / x_grid) / sigma_angle_hat) - 1)
+p_angle_grid <- 2 * pnorm(asin((R - r) / x_grid) / sigma_angle_hat) - 1
 p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot) * sigma_distance_hat)) -
-  pnorm((-overshot) / ((x_grid + overshot) * sigma_distance_hat))
+  pnorm(-overshot / ((x_grid + overshot) * sigma_distance_hat))
 lines(c(0, R - r, x_grid), c(1, 1, p_angle_grid * p_distance_grid), col = "red")
 points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 
@@ -623,6 +637,8 @@ fit_4_with_resids <- model_4_with_resids$sample(data = golf_new_data, refresh = 
 #' Then we compute the posterior means of the residuals, $y_j/n_j -
 #' p_j$, then plot these vs. distance:
 #| label: fig-golf-res-4
+#| fig-width: 4.5
+#| fig-height: 4
 posterior_mean_residual <- mean(as_draws_rvars(fit_4_with_resids$draws())$residual)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(golf_new$x, posterior_mean_residual, xlim = c(0, 1.1 * max(golf_new$x)), 
@@ -676,6 +692,8 @@ print(fit_5)
 
 #' We graph the new data and the fitted model:
 #| label: fig-golf-fit-5
+#| fig-width: 4.5
+#| fig-height: 4
 draws_5 <- fit_5$draws(format = "df")
 sigma_angle_hat <- median(draws_5$sigma_angle)
 sigma_distance_hat <- median(draws_5$sigma_distance)
@@ -686,9 +704,9 @@ plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      ylab="Probability of success",
      main="Checking model fit", type="n")
 x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
-p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
+p_angle_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1
 p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
-  pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
+  pnorm(-overshot / ((x_grid + overshot)*sigma_distance_hat))
 lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
 points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
 
@@ -717,9 +735,11 @@ print(fit_6)
 
 #' We graph the new data and the fitted model:
 #| label: fig-golf-fit-6
+#| fig-width: 4.5
+#| fig-height: 4
 draws_6 <- fit_6$draws(format = "df")
-sigma_angle_hat <- median(draws_6$sigma_angle)
-sigma_distance_hat <- median(draws_6$sigma_distance)
+sigma_angle_hat <- mean(draws_6$sigma_angle)
+sigma_distance_hat <- mean(draws_6$sigma_distance)
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      xaxs="i", yaxs="i", pch=20, bty="l",
@@ -727,14 +747,16 @@ plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      ylab="Probability of success",
      main="Checking model fit", type="n")
 x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
-p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
+p_angle_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1
 p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
-  pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
+  pnorm(-overshot / ((x_grid + overshot)*sigma_distance_hat))
 lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
 points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
 
 #| label: fig-golf-res-6
-posterior_mean_residual <- mean(as_draws_rvars(fit_6$draws())$residual)
+#| fig-width: 4.5
+#| fig-height: 4
+posterior_mean_residual <- mean(as_draws_rvars(draws_6)$residual)
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
      xaxs="i", pch=20, bty="l",
@@ -744,30 +766,34 @@ plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
 abline(0, 0, col="gray", lty=2)
 lines(golf_new$x, posterior_mean_residual)
 
-#' The model fit looks good. The residual plots shows a pattern for
-#' short distances: for very short distances the model underestimates
-#' and then overestimates the probabilities. This pattern could be
-#' explained by sensitivity to `distance_tolerance` and `overshot`
-#' parameters that were fixed.
+#' The model fit looks good. The residual plot shows that for short
+#' distances the model overestimates the probabilities. This pattern
+#' could be explained by sensitivity to `distance_tolerance` and
+#' `overshot` parameters that were fixed.
 #'
 #' We change `distance_tolerance` to be a parameter. We assume
-#' @Broadie:2018 did use his expertise to choose the value 3 feet. We
-#' use log-normal prior with mean log(3) and standard deviation 0.3 to
+#' @Broadie:2018 did use his expertise to choose the value of 3 feet. We
+#' use log-normal prior with mean log(3) and standard deviation 0.2 to
 #' include that expert information but still have the prior to be
-#' relatively weak.
+#' relatively weak. We initialize MCMC using the draws from the previous model
+#' posterior expect for the new `distance_tolerance` parameter,
 #| label: golf_angle_distance_binomial_with_proportional_errors_2.stan
 #| results: hide
 model_7 <- cmdstan_model("golf_angle_distance_binomial_with_proportional_errors_2.stan")
-fit_7 <- model_7$sample(data = golf_new_data, refresh = 0)
+fit_7 <- model_7$sample(data = golf_new_data, refresh = 0, init = fit_6)
 
 #' Here is the result:
 print(fit_7)
 
 #' We graph the new data and the fitted model:
 #| label: fig-golf-fit-7
+#| fig-width: 4.5
+#| fig-height: 4
 draws_7 <- fit_7$draws(format = "df")
-sigma_angle_hat <- median(draws_7$sigma_angle)
-sigma_distance_hat <- median(draws_7$sigma_distance)
+sigma_angle_hat <- mean(draws_7$sigma_angle)
+sigma_distance_hat <- mean(draws_7$sigma_distance)
+distance_tolerance <- mean(draws_7$distance_tolerance)
+overshot <- 1
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      xaxs="i", yaxs="i", pch=20, bty="l",
@@ -775,14 +801,16 @@ plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      ylab="Probability of success",
      main="Checking model fit", type="n")
 x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
-p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
+p_angle_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1
 p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
-  pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
+  pnorm(-overshot / ((x_grid + overshot)*sigma_distance_hat))
 lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
 points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
 
 #| label: fig-golf-res-7
-posterior_mean_residual <- mean(as_draws_rvars(fit_7$draws())$residual)
+#| fig-width: 4.5
+#| fig-height: 4
+posterior_mean_residual <- mean(as_draws_rvars(draws_7)$residual)
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
      xaxs="i", pch=20, bty="l",
@@ -793,30 +821,37 @@ abline(0, 0, col="gray", lty=2)
 lines(golf_new$x, posterior_mean_residual)
 
 #' The residuals are now smaller with standard deviation halved, and
-#' there is no obvious pattern anymore. Looking at the posterior of
+#' there is no obvious pattern. Looking at the posterior of
 #' `distance_tolerance` most of the posterior mass is above 3 and the
 #' posterior is much narrower than the prior and thus likelihood is
 #' informative about it.
 fit_7$summary(variables = c("distance_tolerance"))
 
 #' For the final model we change `overshot` to be a parameter, too. We assume
-#' @Broadie:2018 did use his expertise to choose the value 1 feet. We
-#' use log-normal prior with mean log(3) and standard deviation 0.3 to
+#' @Broadie:2018 did use his expertise to choose the value of 1 feet. We
+#' use log-normal prior with mean log(1) and standard deviation 0.2 to
 #' include that expert information but still have the prior to be
-#' relatively weak.
+#' relatively weak. We initialize MCMC using the draws from the previous model
+#' posterior expect for the new `overshot` parameter and Pathfinder,
 #| label: golf_angle_distance_binomial_with_proportional_errors_3.stan
 #| results: hide
 model_8 <- cmdstan_model("golf_angle_distance_binomial_with_proportional_errors_3.stan")
-fit_8 <- model_8$sample(data = golf_new_data, refresh = 0)
+pth_8 <- model_8$pathfinder(data = golf_new_data, refresh = 0,
+                            num_paths=40, max_lbfgs_iters=100, init=fit_7)
+fit_8 <- model_8$sample(data = golf_new_data, refresh = 0, init = pth_8)
 
 #' Here is the result:
 print(fit_8)
 
 #' We graph the new data and the fitted model:
 #| label: fig-golf-fit-8
+#| fig-width: 4.5
+#| fig-height: 4
 draws_8 <- fit_8$draws(format = "df")
-sigma_angle_hat <- median(draws_8$sigma_angle)
-sigma_distance_hat <- median(draws_8$sigma_distance)
+sigma_angle_hat <- mean(draws_8$sigma_angle)
+sigma_distance_hat <- mean(draws_8$sigma_distance)
+distance_tolerance <- mean(draws_8$distance_tolerance)
+ovseshot <- mean(draws_8$overshot)
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      xaxs="i", yaxs="i", pch=20, bty="l",
@@ -824,14 +859,16 @@ plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      ylab="Probability of success",
      main="Checking model fit", type="n")
 x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
-p_angle_grid <- (2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1)
+p_angle_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1
 p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
-  pnorm((- overshot) / ((x_grid + overshot)*sigma_distance_hat))
+  pnorm(-overshot / ((x_grid + overshot)*sigma_distance_hat))
 lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
 points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
 
 #| label: fig-golf-res-8
-posterior_mean_residual <- mean(as_draws_rvars(fit_8$draws())$residual)
+#| fig-width: 4.5
+#| fig-height: 4
+posterior_mean_residual <- mean(as_draws_rvars(draws_8)$residual)
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
      xaxs="i", pch=20, bty="l",
@@ -841,7 +878,7 @@ plot(golf_new$x, posterior_mean_residual, xlim=c(0, 1.1*max(golf_new$x)),
 abline(0, 0, col="gray", lty=2)
 lines(golf_new$x, posterior_mean_residual)
 
-#' The residuals are very similar with the previous model and with
+#' The residuals are very similar to the previous model residuals and with
 #' similar standard deviation.  If we examine the posterior marginals
 #' of `distance_tolerance` and `overshot` the standard deviations are
 #' only half from the prior standard deviations, hinting that
@@ -853,9 +890,15 @@ fit_8$summary(variables = c("distance_tolerance","overshot"))
 #' posterior standard deviation of the ratio is one fifth of the prior
 #' standard deviation. This also explains why adding `overshot` did
 #' not reduce much the residual standard deviation.
-#' 
+#| label: fig-mcmc-scatter-tolerance-overshot
+#| fig-width: 6
+#| fig-height: 4
+fit_8$draws(variables = c("distance_tolerance","overshot")) |>
+  bayesplot::mcmc_scatter() +
+  bayesplot::theme_default(base_family = "sans", base_size=16)
+
 #' As we can expect the residual standard deviation to decrease when
-#' we add more parameters, we use also cross-validation to compare the
+#' we add more parameters, we also use cross-validation to compare the
 #' models. As we have one `epsilon` parameter for each observation, we
 #' need to use integerated PSIS-LOO. We can compute the integrated
 #' `log_lik` with the following stand alone generated quantities code.
@@ -883,7 +926,7 @@ loo_8 <- gq_ll$generate_quantities(fit_8$draws(variables = c("sigma_epsilon",
 #' As we have integrated out the `epsilon` parameters, the effective
 #' number of parameters match the number of remaining parameters,
 #' except for the last model where `distance_tolerance` and `overshot`
-#' parameters are not well informaed by the likelihood separately.
+#' parameters are not well informed by the likelihood separately.
 print(loo_6)
 print(loo_7)
 print(loo_8)
@@ -897,7 +940,7 @@ loo::loo_compare(list(`Distance tolerance and overshot fixed`=loo_6,
 #' performance, but adding `overshot` parameter does not improve the
 #' fit. However the model which has both `distance_tolerance` and
 #' `overshot` has posterior that is more informative on what can be
-#' learned about this aspects of the model.
+#' learned about this aspect of the model.
 #' 
 #' <br />
 #' 

@@ -21,7 +21,7 @@ parameters {
 transformed parameters {
   vector[J] p_angle = 2*Phi(threshold_angle / sigma_angle) - 1;
   vector[J] p_distance = Phi((distance_tolerance - overshot) ./ ((x + overshot)*sigma_distance)) -
-               Phi((- overshot) ./ ((x + overshot)*sigma_distance));
+               Phi(-overshot ./ ((x + overshot)*sigma_distance));
   vector[J] p = p_angle .* p_distance .* (1 - epsilon);
 }
 model {
@@ -31,5 +31,5 @@ model {
 }
 generated quantities {
   real sigma_degrees = sigma_angle * 180 / pi();
-  vector[J] residual = raw_proportion - p_angle .* p_distance .* (1 - sigma_epsilon);
+  vector[J] residual = raw_proportion - p_angle .* p_distance;
 }

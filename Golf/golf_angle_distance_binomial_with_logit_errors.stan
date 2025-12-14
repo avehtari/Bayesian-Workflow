@@ -22,7 +22,7 @@ model {
   [sigma_angle, sigma_distance, sigma_eta] ~ normal(0, 1);
   vector[J] p_angle = 2*Phi(threshold_angle / sigma_angle) - 1;
   vector[J] p_distance = Phi((distance_tolerance - overshot) ./ ((x + overshot)*sigma_distance)) -
-               Phi((- overshot) ./ ((x + overshot)*sigma_distance));
+               Phi(-overshot ./ ((x + overshot)*sigma_distance));
   vector[J] p = inv_logit(logit(p_angle .* p_distance) + sigma_eta*eta);
   y ~ binomial(n, p);
 }
