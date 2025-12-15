@@ -106,8 +106,8 @@ fit_1 <- model_1$sample(data = golf_data, refresh = 0)
 draws_1 <- fit_1$draws(format = "df")
 a_sim <- draws_1$a
 b_sim <- draws_1$b
-a_hat <- median(a_sim)
-b_hat <- median(b_sim)
+a_hat <- mean(a_sim)
+b_hat <- mean(b_sim)
 n_sims <- nrow(draws_1)
 print(fit_1)
 
@@ -283,7 +283,7 @@ fit_2 <- model_2$sample(data = golf_data, refresh = 0)
 draws_2 <- fit_2$draws(format = "df")
 sigma_sim <- draws_2$sigma
 sigma_degrees_sim <- draws_2$sigma_degrees
-sigma_hat <- median(sigma_sim)
+sigma_hat <- mean(sigma_sim)
 print(fit_2)
 
 #' The model has a single parameter, $\sigma$.  From the output, we
@@ -502,8 +502,8 @@ print(fit_3)
 #| fig-width: 6
 #| fig-height: 4
 draws_3 <- fit_3$draws(format = "df")
-sigma_angle_hat <- median(draws_3$sigma_angle)
-sigma_distance_hat <- median(draws_3$sigma_distance)
+sigma_angle_hat <- mean(draws_3$sigma_angle)
+sigma_distance_hat <- mean(draws_3$sigma_distance)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", bty = "l", 
@@ -611,8 +611,8 @@ print(fit_4)
 #| fig-width: 4.5
 #| fig-height: 4
 draws_4 <- fit_4$draws(format = "df")
-sigma_angle_hat <- median(draws_4$sigma_angle)
-sigma_distance_hat <- median(draws_4$sigma_distance)
+sigma_angle_hat <- mean(draws_4$sigma_angle)
+sigma_distance_hat <- mean(draws_4$sigma_distance)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", pch = 20, bty = "l", 
@@ -695,8 +695,8 @@ print(fit_5)
 #| fig-width: 4.5
 #| fig-height: 4
 draws_5 <- fit_5$draws(format = "df")
-sigma_angle_hat <- median(draws_5$sigma_angle)
-sigma_distance_hat <- median(draws_5$sigma_distance)
+sigma_angle_hat <- mean(draws_5$sigma_angle)
+sigma_distance_hat <- mean(draws_5$sigma_distance)
 par(mar=c(3,3,2,1), mgp=c(1.7,.5,0), tck=-.02)
 plot(0, 0, xlim=c(0, 1.1*max(golf_new$x)), ylim=c(0, 1.02),
      xaxs="i", yaxs="i", pch=20, bty="l",
