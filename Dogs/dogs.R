@@ -25,7 +25,7 @@
 #'
 #' This notebook is a remake of the Andrew Gelman's analysis of
 #' stochastic learning in dogs data by @Bush+Mosteller:1955. Andrew
-#' made wrote his models in [Stan language](https://mc-stan.org/), and
+#' wrote his models in [Stan language](https://mc-stan.org/), and
 #' here we use [`brms`](https://paul-buerkner.github.io/brms/)
 #' [@Buerkner:2017:brms] and add some further diagnostics.
 #'
