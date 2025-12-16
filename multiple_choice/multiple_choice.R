@@ -21,8 +21,8 @@ irt_guessing <- cmdstan_model("irt_guessing.stan")
 irt_guessing_discrimination <- cmdstan_model("irt_guessing_discrimination.stan")
 
 # Read in data and construct score for each student
-responses <- read.csv("final_exam_responses.csv")
-answers <- read.csv("final_exam_answers.csv")
+responses <- read.csv("data/final_exam_responses.csv")
+answers <- read.csv("data/final_exam_answers.csv")
 J <- nrow(responses)  # number of students
 K <- ncol(responses)  # number of items
 correct <- array(NA, c(J,K))
