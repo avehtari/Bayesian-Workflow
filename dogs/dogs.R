@@ -76,7 +76,7 @@ library(reliabilitydiag)
 #' experiment.  From then on, as long as the parameters $a$ and $b$
 #' are between 0 and 1, the probability of shock gradually declines
 #' over time.
-dogs <- read.table(root("Dogs","dogs.dat"), skip=2)
+dogs <- read.table(root("dogs", "data", "dogs.dat"), skip = 2)
 shock <- ifelse(as.matrix(dogs[, 2:26]) == "S", 1, 0)
 #' We create a data frame
 dogs_df <- data.frame(
