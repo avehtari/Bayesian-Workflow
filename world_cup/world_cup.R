@@ -1,5 +1,5 @@
 #' ---
-#' title: "Bayesian workflow book - Worldcup continuous vs discrete"
+#' title: "Bayesian workflow book - World Cup continuous vs discrete"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2021-01-12
 #' date-modified: today
@@ -21,7 +21,7 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' # Worldcup 2014 team performance analysis
+#' # World Cup 2014 team performance analysis
 #'
 #' We use an item-response model such as described in the previous
 #' chapter to fit a model to estimate the abilities of the teams in
@@ -69,17 +69,17 @@ library(readr)
 
 #' # Data
 #'
-#' Data include 64 game results from Worldcup 2014 and Soccer Power
+#' Data include 64 game results from World Cup 2014 and Soccer Power
 #' Index that was available on the internet a month before the
 #' tournament (Silver, 2014).  We took the rankings, with Brazil at
 #' the top (getting a score of 32) and Australia at the bottom (with a
 #' score of 1), and then for simplicity in interpretation of the
 #' parameters we rescaled these to have mean 0 and standard deviation
 #' 1/2, to get ``prior scores'' that ranged from $-0.83$ to $+0.83$.
-powerindex <- read_csv(root("Worldcup/data","soccerpowerindex.csv")) %>%
+powerindex <- read_csv(root("world_cup/data","soccerpowerindex.csv")) %>%
   mutate(prior_score = as.vector(scale(rev(index))/2))
 teamnames <- powerindex$team
-worldcup2014 <- read_csv(root("Worldcup/data","worldcup2014.csv")) %>%
+worldcup2014 <- read_csv(root("world_cup/data","worldcup2014.csv")) %>%
     mutate(team_1 = match(team1, teamnames),
          team_2 = match(team2, teamnames))
 N_games <- nrow(worldcup2014)
@@ -127,7 +127,7 @@ stan_data <- with(
 #| label: fit_1
 #| results: hide
 #| cache: false
-model_1 <- cmdstan_model(stan_file = root("Worldcup", "worldcup_first_try.stan"))
+model_1 <- cmdstan_model(stan_file = root("world_cup", "worldcup_first_try.stan"))
 fit_1 <- model_1$sample(data = stan_data, refresh = 0)
 
 #| label: fit_1_summary
@@ -140,13 +140,13 @@ fit_1$draws("a") |>
   mcmc_intervals(prob=0) +
   scale_y_discrete(labels=rev(teamnames),limits=rev) +
   labs(x="Team quality estimate with 90% intervals")
-#if (savefigs) ggsave(root("Worldcup/figs","worldcup_1.pdf", height=7, width=8))
+#if (savefigs) ggsave(root("world_cup/figs","worldcup_1.pdf", height=7, width=8))
 
 #' ## Check fit of the first model
 #| label: fit_1_rep
 #| results: hide
 #| cache: false
-model_1_rep <- cmdstan_model(stan_file = root("Worldcup", "worldcup_with_replication.stan"))
+model_1_rep <- cmdstan_model(stan_file = root("world_cup", "worldcup_with_replication.stan"))
 fit_1_rep <- model_1_rep$sample(data = stan_data, refresh = 0)
 
 #| label: fig-worldcup-ppc-intervals-fit_1
@@ -159,13 +159,13 @@ ppc_intervals(y=stan_data$score_1 - stan_data$score_2,
   scale_x_continuous(labels = gamenames, breaks=1:64)+
   labs(y="Game score differentials\ncompared to 90% predictive interval from model", x="") +
   coord_flip() 
-#if (savefigs) ggsave(root("Worldcup/figs","worldcup_3.pdf", height=10, width=8))
+#if (savefigs) ggsave(root("world_cup/figs","worldcup_3.pdf", height=10, width=8))
 
 #' # Second model without sqrt transformation
 #| label: fit_2
 #| results: hide
 #| cache: false
-model_2 <- cmdstan_model(stan_file = root("Worldcup", "worldcup_no_sqrt.stan"))
+model_2 <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_sqrt.stan"))
 fit_2 <- model_2$sample(data = stan_data, refresh = 0)
 
 #| label: fit_2_summary
@@ -178,7 +178,7 @@ fit_2$draws("a") |>
   mcmc_intervals(prob=0) +
   scale_y_discrete(labels=rev(teamnames),limits=rev) +
   labs(x="Team quality estimate with 90% intervals\n(model with no square root)")
-#if (savefigs) ggsave(root("Worldcup/figs","worldcup_4.pdf", height=7, width=8))
+#if (savefigs) ggsave(root("world_cup/figs","worldcup_4.pdf", height=7, width=8))
 
 #' ## Check fit of the second model to data
 #| label: fig-worldcup-ppc-intervals-fit_2
@@ -191,13 +191,13 @@ ppc_intervals(y=stan_data$score_1 - stan_data$score_2,
   scale_x_continuous(labels = gamenames, breaks=1:64)+
   labs(y="Game score differentials ncompared to 90% predictive interval\n(model with no square root)", x="") +
   coord_flip() 
-#if (savefigs) ggsave(root("Worldcup/figs","worldcup_5.pdf", height=10, width=8))
+#if (savefigs) ggsave(root("world_cup/figs","worldcup_5.pdf", height=10, width=8))
 
 #' # Fix the first model
 #| label: fit_3
 #| results: hide
 #| cache: false
-model_3 <- cmdstan_model(stan_file = root("Worldcup", "worldcup_fixed.stan"))
+model_3 <- cmdstan_model(stan_file = root("world_cup", "worldcup_fixed.stan"))
 fit_3 <- model_3$sample(data = stan_data, refresh = 0)
 
 #| label: fit_3_summary
@@ -210,7 +210,7 @@ fit_3$draws("a") |>
   mcmc_intervals(prob=0) +
   scale_y_discrete(labels=rev(teamnames),limits=rev) +
   labs(x="Team quality estimate with 90% intervals\n(corrected model)")
-#if (savefigs) ggsave(root("Worldcup/figs","worldcup_6.pdf", height=7, width=8))
+#if (savefigs) ggsave(root("world_cup/figs","worldcup_6.pdf", height=7, width=8))
 
 
 #' ## Check the fit of the fixed first model
@@ -224,14 +224,14 @@ ppc_intervals(y=stan_data$score_1 - stan_data$score_2,
   scale_x_continuous(labels = gamenames, breaks=1:64)+
   labs(y="Game score differentials ncompared to 90% predictive interval\n(corrected model with square root)", x="") +
   coord_flip() 
-#if (savefigs) ggsave(root("Worldcup/figs","worldcup_7.pdf", height=10, width=8))
+#if (savefigs) ggsave(root("world_cup/figs","worldcup_7.pdf", height=10, width=8))
 
 #' ## Fit the same model without the powerindex prior
 #' set b=0 in the data
 #| label: fit_3_no_prior
 #| results: hide
 #| cache: false
-model_3_no_prior <- cmdstan_model(stan_file = root("Worldcup", "worldcup_no_prior.stan"))
+model_3_no_prior <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_prior.stan"))
 fit_3_no_prior <- model_3_no_prior$sample(data = c(stan_data, b = 0), refresh = 0)
 
 #| label: fig-worldcup-mcmc-intervals-fit_3_no_prior
@@ -241,7 +241,7 @@ fit_3_no_prior$draws("a") |>
   mcmc_intervals(prob=0) +
   scale_y_discrete(labels=rev(teamnames),limits=rev) +
   labs(x="Team quality estimate with 90% intervals\nModel without prior rankings")
-#if (savefigs) ggsave(root("Worldcup/figs","worldcup_2.pdf", height=7, width=8))
+#if (savefigs) ggsave(root("world_cup/figs","worldcup_2.pdf", height=7, width=8))
 
 
 #' # Discrete models and LOO-CV comparison
@@ -250,7 +250,7 @@ fit_3_no_prior$draws("a") |>
 #| label: fit_discr_z
 #| results: hide
 #| cache: false
-model_discr_z <- cmdstan_model(stan_file = root("Worldcup", "worldcup_discrete_z.stan"))
+model_discr_z <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_z.stan"))
 fit_discr_z <- model_discr_z$sample(data = stan_data, refresh = 0)
 loo_discr_z <- fit_discr_z$loo()
 
@@ -261,7 +261,7 @@ fit_discr_z$summary(c("b","sigma_a","sigma_z"))
 #| label: fit_discr
 #| results: hide
 #| cache: false
-model_discr <- cmdstan_model(stan_file = root("Worldcup", "worldcup_discrete.stan"))
+model_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete.stan"))
 fit_discr <- model_discr$sample(data = stan_data, refresh = 0)
 loo_discr <- fit_discr$loo()
 
@@ -272,7 +272,7 @@ fit_discr$summary(c("a[1]","a[32]","b","sigma_a","sigma_z"))
 #| label: fit_discr_nopwer
 #| results: hide
 #| cache: false
-model_discr_nopower <- cmdstan_model(stan_file = root("Worldcup", "worldcup_discrete_nopower.stan"))
+model_discr_nopower <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_nopower.stan"))
 fit_discr_nopower <- model_discr_nopower$sample(data = stan_data, refresh = 0)
 loo_discr_nopower <- fit_discr_nopower$loo()
 
@@ -284,7 +284,7 @@ fit_discr_nopower$summary(c("a[1]","a[32]","sigma_a","sigma_z"))
 #| label: fit_discr_poweronly
 #| results: hide
 #| cache: false
-model_discr_poweronly <- cmdstan_model(stan_file = root("Worldcup", "worldcup_discrete_poweronly.stan"))
+model_discr_poweronly <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_poweronly.stan"))
 fit_discr_poweronly <- model_discr_poweronly$sample(data = stan_data, refresh = 0)
 loo_discr_poweronly <- fit_discr_poweronly$loo()
 
@@ -295,7 +295,7 @@ fit_discr_poweronly$summary(c("b0","b","sigma_z"))
 #| label: fit_discr_pooled
 #| results: hide
 #| cache: false
-model_discr_pool <- cmdstan_model(stan_file = root("Worldcup", "worldcup_discrete_pooled.stan"))
+model_discr_pool <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_pooled.stan"))
 fit_discr_pool <- model_discr_pool$sample(data = stan_data, refresh = 0)
 loo_discr_pool <- fit_discr_pool$loo()
 
@@ -325,7 +325,7 @@ loo_compare(list("Hier. w power score"=loo_discr,
 #| label: fit_cont_midp
 #| results: hide
 #| cache: false
-model_cont_midp <- cmdstan_model(stan_file = root("Worldcup", "worldcup_continuous_midpoint_ll.stan"))
+model_cont_midp <- cmdstan_model(stan_file = root("world_cup", "worldcup_continuous_midpoint_ll.stan"))
 fit_cont_midp <- model_cont_midp$sample(data = stan_data, refresh = 0)
 loo_cont_midp <- fit_cont_midp$loo()
 
@@ -337,7 +337,7 @@ fit_cont_midp$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
 #| label: fit_cont
 #| results: hide
 #| cache: false
-model_cont <- cmdstan_model(stan_file = root("Worldcup", "worldcup_continuous.stan"))
+model_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_continuous.stan"))
 fit_cont <- model_cont$sample(data = stan_data, refresh = 0)
 loo_cont <- fit_cont$loo()
 
@@ -358,7 +358,7 @@ loo_compare(list("Discrete model"=loo_discr,
 #| label: fit_sqrt_cont_noj
 #| results: hide
 #| cache: false
-model_sqrt_cont_noj <- cmdstan_model(stan_file = root("Worldcup", "worldcup_sqrt_continuous_nojacobian.stan"))
+model_sqrt_cont_noj <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_continuous_nojacobian.stan"))
 fit_sqrt_cont_noj <- model_sqrt_cont_noj$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont_noj <- fit_sqrt_cont_noj$loo()
 
@@ -374,7 +374,7 @@ fit_sqrt_cont_noj$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
 #| label: fit_sqrt_cont
 #| results: hide
 #| cache: false
-model_sqrt_cont <- cmdstan_model(stan_file = root("Worldcup", "worldcup_sqrt_continuous.stan"))
+model_sqrt_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_continuous.stan"))
 fit_sqrt_cont <- model_sqrt_cont$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont <- fit_sqrt_cont$loo()
 
@@ -387,7 +387,7 @@ fit_sqrt_cont$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
 #| label: fit_sqrt_discr
 #| results: hide
 #| cache: false
-model_sqrt_discr <- cmdstan_model(stan_file = root("Worldcup", "worldcup_sqrt_discrete.stan"))
+model_sqrt_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_discrete.stan"))
 fit_sqrt_discr <- model_sqrt_discr$sample(data = stan_data, refresh = 0)
 loo_sqrt_discr <- fit_sqrt_discr$loo()
 
@@ -433,7 +433,7 @@ ppc_pit_ecdf(y = stan_data$score_1-stan_data$score_2,
 #| label: fit_bipois
 #| results: hide
 #| cache: false
-model_bipois <- cmdstan_model(stan_file = root("Worldcup", "worldcup_bivariate_poisson.stan"))
+model_bipois <- cmdstan_model(stan_file = root("world_cup", "worldcup_bivariate_poisson.stan"))
 fit_bipois <- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta=0.95)
 
 #| label: fit_bipois_summary
@@ -443,7 +443,7 @@ fit_bipois$summary(c("a","o[1]","o[32]","d[1]","d[32]","b_o","b_d","sigma_o","si
 #| label: fit_poisdif
 #| results: hide
 #| cache: false
-model_poisdif <- cmdstan_model(stan_file = root("Worldcup", "worldcup_poisson_difference.stan"))
+model_poisdif <- cmdstan_model(stan_file = root("world_cup", "worldcup_poisson_difference.stan"))
 fit_poisdif <- model_poisdif$sample(data = stan_data, refresh = 0)
 
 #| label: fit_poisdif_summary
