@@ -35,7 +35,7 @@ options(htmltools.dir.version = FALSE)
 set.seed(1123)
 ```
 Declining exponential.  A nonlinear model that comes up in many
-  science and engineering applications, also illsutrating the use of
+  science and engineering applications, also illustrating the use of
   bounds in parameter estimation.
 
 Sum of declining exponentials.  An important class of nonlinear
@@ -61,7 +61,7 @@ print_file("exponential.stan")
 ```
 
 We have given the parameters $a$, and $b$, and $\sigma$ normal prior
-distibutions centered at 0 with standard deviation 10.  In addition,
+distributions centered at 0 with standard deviation 10.  In addition,
 the parameter $\sigma$ is constrained to be positive.  The purpose of
 the prior distributions is to keep the computations at a reasonable
 value.  If we were working on a problem in which we thought that $a$,
@@ -81,8 +81,7 @@ runs faster in Stan, for reasons discussed elsewhere in this book.
 
 To demonstrate our exponential model, we fit it to fake data.  We'll
 simulate $N=100$ data points with predictors $x$ uniformly distributed
-between 0 and 10, from the above model with $a=0.2, b=0.3,
-\sigma=0.5$.
+between 0 and 10, from the above model with $a=0.2$, $b=0.3$, $\sigma=0.5$.
 
 ```{r}
 a <- 5
@@ -113,7 +112,7 @@ fit_1 <- mod_1$sample(data = data_1)
 print(fit_1)
 ```
 
-Recall that the true parameter values were $a=5.0, b=0.3, \sigma=0.5$.
+Recall that the true parameter values were $a=5.0$, $b=0.3$, $\sigma=0.5$.
 Here the model is simple enough and the data are clean enough that we
 can estimate all three of these parameters with reasonable precision
 from the data, as can be seen from the 95% intervals above.
@@ -202,7 +201,7 @@ sigma <- 0.5
 N <- 100
 x <- runif(N, 0, 10)
 epsilon <- exp(rnorm(N, 0, sigma))
-y <- a*exp(-b*x)*epsilon
+y <- a * exp(-b * x) * epsilon
 curve(a * exp(-b * x), from = 0, to = 10, ylim = range(x, y), 
       xlab = "x", ylab = "y", bty = "l", 
       main = "Data and true model", cex.main = 1)
@@ -224,16 +223,16 @@ print(fit_3)
 ## Sum of declining exponentials
 
 From the numerical analysis literature, here is an example of an
-inference problem that appears simple but can be suprisingly
-difficult.  The challenge is to esitmate the parameters of a sum of
+inference problem that appears simple but can be surprisingly
+difficult.  The challenge is to estimate the parameters of a sum of
 declining exponentials: $y = a_1e^{-b_1x} + a_2e^{-b_2x}$.  This is
 also called an inverse problem, and it can be challenging to decompose
 these two declining functions.
 
 This expression, and others like it, arise in many examples, including
 in pharmacology, where $x$ represents time and $y$ could be the
-concentration of a drug in the blood of someoone who was given a
-specfied dose at time 0.  In a simple _two-compartment model_, the
+concentration of a drug in the blood of someone who was given a
+specified dose at time 0.  In a simple _two-compartment model_, the
 total concentration will look like a sum of declining exponentials.
 
 To set this up as a statistics problem, we add some noise to the
@@ -258,14 +257,14 @@ sort of restriction, there would be no way from the data to tell which
 component is labeled 1 and which is 2.  So we arbitrarily label the
 component with lower value of $b$---that is, the one that declines
 more slowly---as the first one, and the component with higher value of
-$b$ to be the second.  We programmed the positive_ordered type into
+$b$ to be the second.  We added the `positive_ordered` type to
 Stan because this sort of identification problem comes up fairly often
 in applications.
 
 We'll try out our Stan model by simulating fake data from a model
 where the two curves should be cleanly distinguished, setting
 $b_1=0.1$ and $b_2=2.0$, a factor of 20 apart in scale.  We'll
-simulate 1000 data points where the predictors $x$ are uniformlly
+simulate 1000 data points where the predictors $x$ are uniformly
 spaced from 0 to 10, and, somewhat arbitrarily, set $a_1=1.0$,
 $a_2=0.8$, and $\sigma=0.2$.  We can then simulate from the lognormal
 distribution to generate the data $y$.
@@ -364,7 +363,7 @@ recovering the true parameters from the data.
 
 Still, if the parameters are difficult to fit, this should just result
 in a high posterior uncertainty.  Why did the Stan fit explode?  The
-problme in this case is that, since only one term in the model was
+problem in this case is that, since only one term in the model was
 required to fit these data, the second term was completely free---and
 the parameter $\beta_2$ was unbounded: there was nothing stopping it
 from being estimated as arbitrarily large.  This sort of unbounded
@@ -372,10 +371,10 @@ posterior distribution is called _improper_ (see Bayesian Data
 Analysis for a more formal definition), and there is no way of drawing
 simulations from such a distribution, hence Stan does not
 converge. The simulations drift off to infinity, as there is nothing
-in the prior or likeliood that is keeping them from doing so.
+in the prior or likelihood that is keeping them from doing so.
 
 To fix the problem, we can add some prior information.  Here we shall
-use our default, which is independent $\mbox{norma}(0,1)$ prior
+use our default, which is independent $\mbox{normal}(0,1)$ prior
 densities on all the parameters; thus, we add these lines to the model
 block in the Stan program:
 
@@ -387,7 +386,7 @@ block in the Stan program:
 
 For this particular example, all we really need is a prior on $b$
 (really, just $b_2$ because of the ordering), but to demonstrate the
-point we shall assign default priors to everyhing.  The priors are in
+point we shall assign default priors to everything.  The priors are in
 addition to the rest of the model; that is, they go on top of the
 positivity and ordering constraints.  So, for example, the prior for
 $\sigma$ is the positive half of a normal, which is sometimes written
@@ -405,7 +404,7 @@ print(fit_5_with_priors)
 ```
 
 The fit is far from perfect---compare to the true parameter values,
-$a_1=1.0, a_2=0.8, b_1=0.1, b_2=0.2---but we have to expect that.  As
+$a_1=1.0$, $a_2=0.8$, $b_1=0.1$, $b_2=0.2$---but we have to expect that.  As
 explained above, the data at hand do not identify the parameters, so
 all we can hope for in a posterior distribution is some summary of
 uncertainty.
@@ -419,11 +418,11 @@ parameters are on "unit scale," meaning that we expect them to be of
 order of magnitude around 1.  Not all statistical models are on unit
 scale.  For example, in the above model, if the data $y_i$ are on unit
 scale, but the data values $x_i$ take on values in the millions, then
-we'd probably expect the parameters $b_1$ and $b_2$ to be roungly on
+we'd probably expect the parameters $b_1$ and $b_2$ to be roughly on
 the scale of $10^{-6}$.  In such a case, we'd want to rescale $x$ so
 that the coefficients $b$ are more interpretable.  Similarly, if the
-values of $y$ ranged in the millions, then the coefficents $a$ would
-have to be of order $10^6$, and, again, we would want ot reascale the
+values of $y$ ranged in the millions, then the coefficients $a$ would
+have to be of order $10^6$, and, again, we would want to rescale the
 data or the model so that $a$ would be on unit scale.  By using unit
 scale priors, we are implicitly assuming the model has been scaled.
 
@@ -436,7 +435,7 @@ distribution and graphing the corresponding curves of expected data,
 and seeing if these could plausibly cover the possible cases that
 might arise in the particular problem being studied.
 
-No matter how it's done, infernece has to come from somewhere, and if
+No matter how it's done, inference has to come from somewhere, and if
 the data are weak, you need to put in prior information if your goal
 is to make some statement about possible parameter values, and from
 there to make probabilistic predictions and decisions.
