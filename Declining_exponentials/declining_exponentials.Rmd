@@ -26,6 +26,9 @@ knitr::opts_chunk$set(
 print_file <- function(file) {
   cat(paste(readLines(file), "\n", sep=""), sep="")
 }
+fround <- function(x, digits) {
+  format(round(x, digits), nsmall = digits)
+}
 
 # GENERAL R CONFIGURATION
 
@@ -34,11 +37,14 @@ options(htmltools.dir.version = FALSE)
 
 set.seed(1123)
 ```
-Declining exponential.  A nonlinear model that comes up in many
+
+# Declining exponentials and sums of declining exponentials 
+
+* Declining exponential:  A nonlinear model that comes up in many
   science and engineering applications, also illustrating the use of
   bounds in parameter estimation.
 
-Sum of declining exponentials.  An important class of nonlinear
+* Sum of declining exponentials:  An important class of nonlinear
   models that can be surprisingly difficult to estimate from data.
   This example illustrates how Stan can fail, and also the way in
   which default prior information can add stability to an otherwise
@@ -341,7 +347,7 @@ curve(a[1] * exp(-b[1] * x) + a[2] * exp(-b[2] * x),
       from = 0, to = 10, ylim = c(0, 1.9), xlim = c(0, 10), 
       xlab = "x", ylab = "y", xaxs = "i", yaxs = "i", bty = "l", 
       main = "True model", cex.main = 1)
-text(5.3, 0.8, "y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)", adj = 1)
+text(5.6, 0.7, "y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)", adj = 1)
 ```
 
 And now we'll overlay a graph of a particular _one-component_ model,
@@ -353,8 +359,8 @@ curve(a[1] * exp(-b[1] * x) + a[2] * exp(-b[2] * x), from = 0, to = 10,
       xlab = "x", ylab = "y", xaxs = "i", yaxs = "i", bty = "l", 
       main = "True model and scarily-close one-component approximation", cex.main = 1)
 curve(1.8 * exp(-0.135 * x), from = 0, to = 10, add = TRUE)
-text(5.3, 0.8, "y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)", adj = 1)
-text(6.1, 1.2, "y = 1.8*exp(-0.135x)", adj = 1)
+text(5.6, 0.7, "y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)", adj = 1)
+text(6.1, 1.3, "y = 1.8*exp(-0.135x)", adj = 1)
 ```
 
 The two lines are strikingly close, and it would be essentially impossible to
