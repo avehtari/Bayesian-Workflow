@@ -1,4 +1,9 @@
-park <- read.csv("park.csv")
+library("arm")
+library("posterior")
+library("rstanarm")
+library("cmdstanr")
+
+park <- read.csv("data/park.csv")
 N <- nrow(park)
 respondents <- sort(unique(park$submission_id))
 J <- length(respondents)
@@ -18,7 +23,7 @@ male_name <- park$male
 white_name <- park$white
 n_responses_full <- n_responses[respondent]
 
-library("arm")
+
 data_matrix <- data.frame(y, respondent, item, male_name, white_name, n_responses_full)
 fit_lme4 <- glmer(y ~ (1 | item) + (1 | respondent) + male_name + white_name + n_responses_full, family=binomial(link="logit"), data=data_matrix)
 display(fit_lme4)
@@ -52,7 +57,7 @@ display(fit_lme4_sim)
 a_item_hat <- ranef(fit_lme4)$item
 print(a_item_hat)
 
-wordings <- read.csv("park.txt", header=FALSE)$V2
+wordings <- read.csv("data/park.txt", header=FALSE)$V2
 wordings <- substr(wordings, 2, nchar(wordings)-1)
 a_item_hat <- unlist(a_item_hat)
 names(a_item_hat) <- wordings
@@ -85,9 +90,7 @@ fit_lme4 <- glmer(y ~ (1 | item) + (1 | respondent) + male_name + white_name + n
 display(fit_lme4)
 
 # rstanarm
-
-library("rstanarm")
-options(mc.cores = parallel::detectCores())
+options(mc.cores = 4)
 
 fit_rstanarm <- stan_glmer(y ~ (1 | item) + (1 | respondent) + male_name + white_name + n_skipped_full + order_of_response, family=binomial(link="logit"), data=data_matrix)
 print(fit_rstanarm)
@@ -100,7 +103,6 @@ print(fit_rstanarm)
 X <- cbind(rep(1,N), male_name, white_name, n_skipped_full, order_of_response)
 stan_data <- list(N=N, J=J, K=K, L=ncol(X), y=y, respondent=respondent, item=item, X=X)
 
-library("cmdstanr")
 park_1 <- cmdstan_model("park_1.stan")
 fit_1 <- park_1$sample(data=stan_data, parallel_chains=4, iter_warmup=100, iter_sampling=100, max_treedepth=5)
 print(fit_1)
@@ -140,7 +142,6 @@ for (i in 1:3){
 }
 
 # Simulate from fitted normal model
-library("posterior")
 sims <- as_draws_rvars(fit_normal[[3]]$draws())
 a_respondent_sim <- rnorm(J, 0, median(sims$sigma_respondent))
 a_item_sim <- rnorm(K, 0, median(sims$sigma_item))
