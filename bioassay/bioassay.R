@@ -46,7 +46,7 @@ root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 #' ## Data
 #'
 #' Read the data from csv
-# df_bioassay <- read.csv("Bioassay/data/bioassay.csv")
+# df_bioassay <- read.csv("bioassay/data/bioassay.csv")
 #' 
 #' Data as data frame
 df_bioassay <- data.frame(
@@ -82,7 +82,7 @@ bioassay_data <- with(df_bioassay,
 #' ## Stan model and inference
 #' 
 #' Stan model 0 (without priors)
-bioassay_stan_file <- root("Bioassay","bioassay0.stan")
+bioassay_stan_file <- root("bioassay","bioassay0.stan")
 writeLines(readLines(bioassay_stan_file))
 
 #' Compile the Stan model code using pedantic mode
@@ -90,7 +90,7 @@ writeLines(readLines(bioassay_stan_file))
 mod0 <- cmdstan_model(bioassay_stan_file, pedantic = TRUE)
 
 #' Stan model 1 (with priors)
-bioassay_stan_file <- root("Bioassay","bioassay1.stan")
+bioassay_stan_file <- root("bioassay","bioassay1.stan")
 writeLines(readLines(bioassay_stan_file))
 
 #' Compile the uodated Stan model code using pedantic mode

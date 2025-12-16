@@ -55,8 +55,8 @@ library(plyr)
 library(tidyr)
 library(boot)
 library(latex2exp)
-dir.create(root("Planetary_motion","saved_fit"))
-source(root("Planetary_motion", "tools.R"))
+dir.create(root("planetary_motion","saved_fit"))
+source(root("planetary_motion", "tools.R"))
 library(bayesplot)
 bayesplot::color_scheme_set("viridisC")
 theme_set(bayesplot::theme_default(base_family = "sans"))
@@ -157,7 +157,7 @@ set.seed(1954)
 #' At $t = 0$, $q_0 = (1, 0)$ and $p_0 = (0, 1)$,
 #' and we set $k = 1$.
 #| results: hide
-mod_sim <- cmdstan_model(root("Planetary_motion","planetary_motion_sim.stan"))
+mod_sim <- cmdstan_model(root("planetary_motion","planetary_motion_sim.stan"))
 n <- 40
 sigma <- 0.01
 #| label: sim
@@ -221,7 +221,7 @@ ggplot(data = data.frame(q_x = q_obs[, 1],
 chains <- 8
 #| label: fit1
 #| eval: false
-mod1 <- cmdstan_model(root("Planetary_motion","planetary_motion.stan"))
+mod1 <- cmdstan_model(root("planetary_motion","planetary_motion.stan"))
 fit1 <- mod1$sample(
   data = list(n = n, q_obs = q_obs),
   chains = chains,
@@ -231,10 +231,10 @@ fit1 <- mod1$sample(
   seed = 123,
   save_warmup = TRUE
 )
-fit1$save_object(file = root("Planetary_motion/saved_fit","fit1.RDS"))
+fit1$save_object(file = root("planetary_motion/saved_fit","fit1.RDS"))
 
 #' The inference takes a while to run, so we read in the saved output.
-fit1 <- readRDS(root("Planetary_motion/saved_fit","fit1.RDS"))
+fit1 <- readRDS(root("planetary_motion/saved_fit","fit1.RDS"))
 print(fit1$time(), digits = 2)
 
 #' 
@@ -579,7 +579,7 @@ ggplot() +
 #'
 #| label: fit1p
 #| results: hide
-mod1 <- cmdstan_model(root("Planetary_motion","planetary_motion.stan"))
+mod1 <- cmdstan_model(root("planetary_motion","planetary_motion.stan"))
 stan_data1 <- list(n = n, q_obs = q_obs)
 
 #' We run the Pathfinder with 40 paths to find many modes. We usually
@@ -735,7 +735,7 @@ ggplot(data = data.frame(star_x = star_data[, 1],
 #' above was shown to be bad for MCMC.
 #| label: pth2
 #| results: hide
-mod2 <- cmdstan_model(root("Planetary_motion","planetary_motion_star.stan"))
+mod2 <- cmdstan_model(root("planetary_motion","planetary_motion_star.stan"))
 n_select <- 40
 time <- (1:n_select) / 10
 stan_data2 <- list(n = n_select, q_obs = q_obs, time = time, sigma = sigma)
