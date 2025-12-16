@@ -81,7 +81,7 @@ But also this:
 OK, now it's time to get to work.  We start by downloading and
 graphing the data.
 ```{r}
-series <- matrix(scan("Series1000.txt"), nrow=1000, ncol=135, byrow=TRUE)
+series <- matrix(scan("data/Series1000.txt"), nrow = 1000, ncol = 135, byrow = TRUE)
 T <- 135
 N <- 1000
 par(mar = c(3, 3, 2, 0), tck = -0.01, mgp = c(1.5, 0.5, 0))
