@@ -46,7 +46,7 @@ root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 #' ## Data
 #'
 #' Read the data from csv
-# df_bioassay <- read.csv("Bioassay/bioassay.csv")
+# df_bioassay <- read.csv("Bioassay/data/bioassay.csv")
 #' 
 #' Data as data frame
 df_bioassay <- data.frame(
