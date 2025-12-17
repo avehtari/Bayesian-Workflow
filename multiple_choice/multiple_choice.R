@@ -1,6 +1,6 @@
 library("cmdstanr")
-library("arm")
 library("posterior")
+library("arm")
 options(mc.cores = 4)
 set.seed(123)
 
@@ -133,12 +133,10 @@ for (j in 1:J){
   }
 }
 longdata <- list(
-  N = N,
-  J = J,
-  K = K,
-  student = student,
-  item = item,
-  y = y,
+  N = N, J = J, K = K, 
+  student = student, 
+  item = item, 
+  y = y, 
   x = score
 )
 
@@ -307,7 +305,8 @@ prior_predictive <- function(x, x_jitt, mu_a, sigma_a, mu_b, sigma_b) {
 }
 
 pdf("multiplechoice_prior_predictive_1.pdf", height = 2.5, width = 7.5)
-par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), mgp = c(1.3, .2, 0), tck = -.01)
+par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
+    mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
   prior_predictive(score_adj, score_adj_jitt, 0, 0.5, 0, 0.5)
 }
@@ -318,7 +317,8 @@ mtext(
 dev.off()
 
 pdf("multiplechoice_prior_predictive_2.pdf", height = 2.5, width = 7.5)
-par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), mgp = c(1.3, .2, 0), tck = -.01)
+par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
+    mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
   prior_predictive(score_adj, score_adj_jitt, 0, 5, 0, 5)
 }
@@ -329,7 +329,8 @@ mtext(
 dev.off()
 
 pdf("multiplechoice_prior_predictive_3.pdf", height = 2.5, width = 7.5)
-par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), mgp = c(1.3, .2, 0), tck = -.01)
+par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
+    mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
   prior_predictive(score_adj, score_adj_jitt, 0, 50, 0, 50)
 }
