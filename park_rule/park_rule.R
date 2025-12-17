@@ -19,7 +19,7 @@ item <- park$question_id
 y <- park$answer
 n_responses <- rep(NA, J)
 for (j in 1:J){
-  n_responses[j] <- sum(respondent==j)
+  n_responses[j] <- sum(respondent == j)
 }
 male_name <- park$male
 white_name <- park$white
@@ -72,8 +72,8 @@ display(fit_lme4_sim)
 a_item_hat <- ranef(fit_lme4)$item
 print(a_item_hat)
 
-wordings <- read.csv("data/park.txt", header=FALSE)$V2
-wordings <- substr(wordings, 2, nchar(wordings)-1)
+wordings <- read.csv("data/park.txt", header = FALSE)$V2
+wordings <- substr(wordings, 2, nchar(wordings) - 1)
 a_item_hat <- unlist(a_item_hat)
 names(a_item_hat) <- wordings
 sort(a_item_hat)
@@ -85,44 +85,16 @@ for (k in 1:K) {
 }
 plot(item_avg, a_item_hat, pch=20)
 
-plot(logit(item_avg), a_item_hat, type="n")
-text(logit(item_avg), a_item_hat, names(a_item_hat), cex=.5)
+plot(logit(item_avg), a_item_hat, type = "n")
+text(logit(item_avg), a_item_hat, names(a_item_hat), cex = .5)
 
 a_respondent_hat <- unlist(ranef(fit_lme4)$respondent)
 respondent_avg <- rep(NA, J)
 for (j in 1:J) {
-  respondent_avg[j] <- mean(y[respondent==j])
+  respondent_avg[j] <- mean(y[respondent == j])
 }
-plot(respondent_avg, a_respondent_hat, pch=20, cex=.4)
+plot(respondent_avg, a_respondent_hat, pch = 20, cex = .4)
 
-# Consider order of response
-order_of_response <- rep(NA, N)
-for (j in 1:J) {
-  order_of_response[respondent==j] <- 1:n_responses[j]
-}
-data_matrix <- data.frame(data_matrix, order_of_response)
-
-fit_lme4 <- glmer(
-  y ~ (1 | item) + (1 | respondent) + male_name + white_name + n_skipped_full + order_of_response,
-  family = binomial(link = "logit"),
-  data = data_matrix
-)
-display(fit_lme4)
-
-# rstanarm
-options(mc.cores = 4)
-fit_rstanarm <- stan_glmer(
-  y ~ (1 | item) + (1 | respondent) + male_name + white_name + n_skipped_full + order_of_response,
-  family = binomial(link = "logit"),
-  data = data_matrix
-)
-print(fit_rstanarm)
-
-fit_rstanarm <- stan_glmer(
-  y ~ (1 | item) + (1 | respondent) + male_name + white_name + n_skipped_full + order_of_response, 
-  family = binomial(link = "logit"), data = data_matrix, 
-  iter = 200, control = list(max_treedepth = 5))
-print(fit_rstanarm)
 
 # Fit Stan models
 X <- cbind(rep(1,N), male_name, white_name, n_skipped_full, order_of_response)
@@ -141,7 +113,7 @@ park_1 <- cmdstan_model("park_1.stan")
 fit_1 <- park_1$sample(
   data = stan_data,
   parallel_chains = 4,
-  max_treedepth = 5
+  max_treedepth = 5 # Stan's warmup can sometimes be very slow on problematic models
 )
 print(fit_1)
 
@@ -220,26 +192,3 @@ for (i in 1:3) {
   )
   print(fit_normal_sim[[i]])
 }
-
-# ADVI and Pathfinder
-advi_3 <- park_3$variational(data=stan_data)
-pathfinder_3 <- park_3$pathfinder(data=stan_data)
-print(advi_3)
-print(pathfinder_3)
-print(fit_3)
-
-# Other ADVI's
-advi_1 <- park_1$variational(data=stan_data)
-advi_2 <- park_2$variational(data=stan_data)
-print(advi_1)
-print(advi_2)
-
-# ADVI as starting point
-advi_1 <- park_1$variational(data=stan_data)
-fit_after_advi_1 <- park_1$sample(data=stan_data, init=advi_1, parallel_chains=4, max_treedepth=5)
-print(fit_after_advi_1)
-
-advi_2 <- park_2$variational(data=stan_data)
-fit_after_advi_2 <- park_2$sample(data=stan_data, init=advi_2, parallel_chains=4, max_treedepth=5)
-print(fit_after_advi_2)
-
