@@ -45,7 +45,7 @@ knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, co
 #' **Load packages**
 #| cache: false
 library("rprojroot")
-root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 library(posterior)
 library(ggplot2)

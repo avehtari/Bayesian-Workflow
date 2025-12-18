@@ -1,8 +1,12 @@
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library("cmdstanr")
 options(mc.cores = 4)
 library("priorsense")
 library("ggplot2")
 library("bayesplot")
+library("dplyr")
+library("ggh4x")
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
 
 # shortest posterior interval (Liu, Gelman, and Zheng (2015))
@@ -24,8 +28,7 @@ spin <- function(x, lower=NULL, upper=NULL, conf=0.95){
 }
 
 # Simple model fit using data from Bendavid et al. paper of 11 Apr 2020
-sc_model <- cmdstan_model("santa-clara.stan")
-
+sc_model <- cmdstan_model(root("coronavirus", "santa-clara.stan"))
 fit_1 <- sc_model$sample(
   data = list(
     y_sample = 50,
@@ -39,7 +42,7 @@ fit_1 <- sc_model$sample(
   iter_warmup = 1e4,
   iter_sampling = 1e4
 )
-print(fit_1, digits=3)
+print(fit_1, digits = 3)
 draws_1 <- fit_1$draws()
 
 # Check robustness with respect to powerscaling
@@ -51,14 +54,14 @@ powerscale_plot_dens(
   lower_alpha = 0.5,
   help_text = FALSE
 )
-ggsave("specificity_priorsense_1.pdf", width = 12, height = 6.5)
+ggsave(root("coronavirus", "specificity_priorsense_1.pdf"), width = 12, height = 6.5)
 
 # Inference for the population prevalance
 subset <- sample(1e4, 1e3)
 x <- as.vector(draws_1[subset, , "spec"])
 y <- as.vector(draws_1[subset, , "p"])
 
-pdf("scatter.pdf", height = 3.5, width = 4.5)
+pdf(root("coronavirus", "scatter.pdf"), height = 3.5, width = 4.5)
 par(mar = c(3, 3, 0, 1), mgp = c(2, .7, 0), tck = -.02)
 plot(x, y, 
      xlim = c(min(x), 1), ylim = c(0, max(y)), 
@@ -68,9 +71,10 @@ plot(x, y,
      pch=20, cex=.3)
 dev.off()
 
-pdf("hist.pdf", height=3.5, width=5.5)
+pdf(root("coronavirus", "hist.pdf"), height = 3.5, width = 5.5)
 par(mar = c(3, 3, 0, 1), mgp = c(2, .7, 0), tck = -.02)
-hist(y, yaxt = "n", yaxs = "i", 
+hist(y, 
+     yaxt = "n", yaxs = "i", 
      xlab = expression(paste("Prevalence, ", pi)), 
      ylab = "", main = "")
 dev.off()
@@ -101,9 +105,9 @@ print(spin(draws_2[, , "p"], lower = 0, upper = 1, conf = 0.95))
 
 
 draws_2 <- fit_2$draws(format = "df") |>
-  dplyr::mutate(prevalence = p,
-                specificity = spec,
-                sensitivity = sens)
+  mutate(prevalence = p,
+         specificity = spec,
+         sensitivity = sens)
 
 powerscale_sensitivity(fit_2)
 powerscale_plot_dens(
@@ -117,7 +121,7 @@ powerscale_plot_dens(
 
 # Hierarchical model allowing sensitivity and specificity to vary across studies, 
 # fit using data from Bendavid et al. paper of 27 Apr 2020
-sc_model_hierarchical <- cmdstan_model("santa-clara-hierarchical.stan")
+sc_model_hierarchical <- cmdstan_model(root("coronavirus", "santa-clara-hierarchical.stan"))
 
 santaclara_data <- list(
   y_sample = 50,
@@ -140,19 +144,10 @@ fit_3a <- sc_model_hierarchical$sample(
   adapt_delta = 0.99 # to reduce divergences 
 )
 
-print(
-  fit_3a,
-  variables = c(
-    "p",
-    "spec[1]",
-    "sens[1]",
-    "mu_logit_spec",
-    "mu_logit_sens",
-    "sigma_logit_spec",
-    "sigma_logit_sens"
-  ),
-  digits = 3
-)
+print_variables <- c("p", "spec[1]", "sens[1]", 
+                     "mu_logit_spec", "mu_logit_sens", 
+                     "sigma_logit_spec", "sigma_logit_sens")
+print(fit_3a, variables = print_variables, digits = 3)
 
 draws_3a <- fit_3a$draws()
 print(spin(draws_3a[, , "p"], lower = 0, upper = 1, conf = 0.95))
@@ -169,7 +164,7 @@ powerscale_plot_dens(
   ggh4x::facetted_pos_scales(x=rep(list(scale_x_continuous(limits=c(0, 0.35)),
                                         scale_x_continuous(limits=c(0, 1)),
                                         scale_x_continuous(limits=c(0.98, 1))), 2))
-ggsave("specificity_priorsense_2.pdf", width = 12, height = 6.5)
+ggsave(root("coronavirus", "specificity_priorsense_2.pdf"), width = 12, height = 6.5)
 
 
 # Fit again with stronger priors
@@ -182,19 +177,7 @@ fit_3b <- sc_model_hierarchical$sample(
   iter_sampling = 1e4, 
   adapt_delta = 0.99 # not as necessary with the stronger priors, but include just in case
 )
-print(
-  fit_3b,
-  variables = c(
-    "p",
-    "spec[1]",
-    "sens[1]",
-    "mu_logit_spec",
-    "mu_logit_sens",
-    "sigma_logit_spec",
-    "sigma_logit_sens"
-  ),
-  digits = 3
-)
+print(fit_3b, variables = print_variables, digits = 3)
 
 draws_3b <- fit_3b$draws()
 print(spin(draws_3b[, , "p"], lower = 0, upper = 1, conf = 0.95))
@@ -221,7 +204,7 @@ print(spin(draws_3b[, , "sigma_logit_sens"], conf = 0.95))
 # and zip code.  Model is set up to use the ethnicity, age, and zip categories
 # of Bendavid et al. (2020).
 
-sc_model_hierarchical_mrp <- cmdstan_model("santa-clara-hierarchical-mrp.stan")
+sc_model_hierarchical_mrp <- cmdstan_model(root("coronavirus", "santa-clara-hierarchical-mrp.stan"))
 
 # To fit the model, we need individual-level data.  
 # These data are not publicly available, so just to get the program running, 
@@ -300,6 +283,7 @@ print_variables <- c("p_avg", "b", "a_age", "a_eth",
                      "mu_logit_sens", "sigma_logit_sens", 
                      "p_pop[1]", "p_pop[2]", "p_pop[3]")
 print(fit_4, variables = print_variables, digits = 3, max_rows = 100)
+
 draws_4 <- fit_4$draws()
 print(spin(draws_4[, , "p_avg"], lower = 0, upper = 1, conf = 0.95))
 
@@ -317,7 +301,7 @@ pos_tests <- 50
 tests <- 3330
 unk_df <- data.frame(pos_tests, tests, sample_prev = pos_tests / tests)
 
-model <- cmdstan_model("prior-sensitivity.stan")
+model <- cmdstan_model(root("coronavirus", "prior-sensitivity.stan"))
 
 data <- list(
   K_pos = nrow(sens_df),
@@ -382,5 +366,5 @@ ggplot(ribbon_df, aes(x = sigma_spec)) +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
-ggsave("prior-sensitivity-2.pdf", width = 9, height = 2.5)
+ggsave(root("coronavirus", "prior-sensitivity-2.pdf"), width = 9, height = 2.5)
 

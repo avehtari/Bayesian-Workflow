@@ -1,3 +1,5 @@
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library("cmdstanr")
 options(mc.cores = 4)
 library("posterior")
@@ -5,7 +7,7 @@ library("MASS")
 library("arm")
 set.seed(123)
 
-dogs <- read.table("data/dogs.dat", skip = 2)
+dogs <- read.table(root("dogs", "data", "dogs.dat"), skip = 2)
 shock <- ifelse(as.matrix(dogs[, 2:26]) == "S", 1, 0)
 dogs_data <- list(y = shock, J = nrow(shock), T = ncol(shock))
 
@@ -36,32 +38,32 @@ plot_ppc <- function(fit, label){
   }
 }
 
-dogs_0 <- cmdstan_model("dogs_0.stan")
+dogs_0 <- cmdstan_model(root("dogs", "dogs_0.stan"))
 fit_0 <- dogs_0$sample(data = dogs_data, refresh = 0)
 print(fit_0)
 
-dogs_1 <- cmdstan_model("dogs_1.stan")
+dogs_1 <- cmdstan_model(root("dogs", "dogs_1.stan"))
 fit_1 <- dogs_1$sample(data = dogs_data, refresh = 0)
 print(fit_1)
 
-dogs_2 <- cmdstan_model("dogs_2.stan")
+dogs_2 <- cmdstan_model(root("dogs", "dogs_2.stan"))
 fit_2 <- dogs_2$sample(data = dogs_data, refresh = 0)
 print(fit_2)
 
-dogs_3 <- cmdstan_model("dogs_3.stan")
+dogs_3 <- cmdstan_model(root("dogs", "dogs_3.stan"))
 fit_3 <- dogs_3$sample(data = dogs_data, refresh = 0)
 print(fit_3, variables = c("mu_logit_a", "sigma_logit_a"))
 
-dogs_4 <- cmdstan_model("dogs_4.stan")
+dogs_4 <- cmdstan_model(root("dogs", "dogs_4.stan"))
 fit_4 <- dogs_4$sample(data = dogs_data, refresh = 0)
 print(fit_4, variables = c("mu_logit_ab", "Sigma_logit_ab"))
 
-dogs_5 <- cmdstan_model("dogs_5.stan")
+dogs_5 <- cmdstan_model(root("dogs", "dogs_5.stan"))
 fit_5 <- dogs_5$sample(data = dogs_data, refresh = 0)
-print(fit_5, variables=c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]", 
-                         "a[1]", "b[1]"))
+print(fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
+                           "a[1]", "b[1]"))
 
-pdf("dogs_ppc.pdf", height = 5.5, width = 5.5)
+pdf(root("dogs", "dogs_ppc.pdf"), height = 5.5, width = 5.5)
 par(mfrow = c(7, 7), mar = c(.5, .5, .5, .5))
 empty_plot("Real dogs")
 plot_dogs(shock)
@@ -77,7 +79,7 @@ plot_ppc(fit_5, "PPsims from M5:\nhier 2-par\nlog model\nwith prior")
 dev.off()
 
 post <- as_draws_rvars(fit_5$draws())
-pdf("dogs_inference.pdf", height = 3, width = 7.5)
+pdf(root("dogs", "dogs_inference.pdf"), height = 3, width = 7.5)
 par(mfrow = c(2, 5), pty = "s", 
     mar = c(2.5, 2.5, 0.5, 0.5), mgp = c(1.5, 0.2, 0), 
     tck = -0.02, oma = c(0, 0, 1, 0))
@@ -100,7 +102,7 @@ for (k in 1:2){
 dev.off()
 
 post <- as_draws_rvars(fit_5$draws())
-pdf("dogs_point_estimate.pdf", height = 4, width = 4)
+pdf(root("dogs", "dogs_point_estimate.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, .5, 0), tck = -.01)
 plot(median(post$a), median(post$b), 
      xlim = c(0.55, 1), ylim = c(0.55, 1), xaxs = "i", yaxs = "i", 
@@ -137,17 +139,10 @@ for (j in 1:J) {
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
 new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
-print(
-  new_fit_5,
-  variables = c(
-    "mu_logit_ab", "sigma_logit_ab",
-    "Omega_logit_ab[1,2]",
-    "a[1]", "a[2]",
-    "b[1]", "b[2]"
-  )
-)
+print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
+                               "a[1]", "a[2]", "b[1]", "b[2]"))
 
-pdf("new_dogs_parameters.pdf", height = 4, width = 4)
+pdf(root("dogs",  "new_dogs_parameters.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)
 plot(a, b, xlim = c(0.55, 1), ylim = c(0.55, 1), 
      xaxs = "i", yaxs = "i",  xlab = "a", ylab = "b", pch = 20, cex = 0.6, 
@@ -156,13 +151,13 @@ abline(0, 1, lwd = 0.5, col = "gray")
 dev.off()
 
 
-pdf("new_dogs_data.pdf", height = 4, width = 3)
+pdf(root("dogs", "new_dogs_data.pdf"), height = 4, width = 3)
 par(pty = "m", mar = c(1, 2, 2, 1))
 plot_dogs(new_dogs, main = "Simulated data", cex.main = 0.9)
 dev.off()
 
 post <- as_draws_rvars(new_fit_5$draws())
-pdf("new_dogs_calibration.pdf", height = 4, width = 4)
+pdf(root("dogs", "new_dogs_calibration.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)
 plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1),
      xlab = "Posterior inference", ylab = "True parameter value", 
@@ -199,15 +194,8 @@ for (j in 1:J) {
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
 new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
-print(
-  new_fit_5,
-  variables = c(
-    "mu_logit_ab", "sigma_logit_ab",
-    "Omega_logit_ab[1,2]",
-    "a[1]", "a[2]",
-    "b[1]", "b[2]"
-  )
-)
+print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
+                               "a[1]", "a[2]", "b[1]", "b[2]"))
 
 
 T <- 50
@@ -224,24 +212,17 @@ for (j in 1:J){
   }
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
-new_fit_5 <- dogs_5$sample(data=new_dogs_data, refresh = 0)
-print(
-  new_fit_5,
-  variables = c(
-    "mu_logit_ab", "sigma_logit_ab",
-    "Omega_logit_ab[1,2]",
-    "a[1]", "a[2]",
-    "b[1]", "b[2]"
-  )
-)
+new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
+print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
+                               "a[1]", "a[2]", "b[1]", "b[2]"))
 
-pdf("new_dogs_data_50.pdf", height = 4, width = 6)
+pdf(root("dogs", "new_dogs_data_50.pdf"), height = 4, width = 6)
 par(pty = "m", mar = c(1, 2, 2, 1))
 plot_dogs(new_dogs, main = "Simulated data:  50 trials", cex.main = 0.9)
 dev.off()
 
 post <- as_draws_rvars(new_fit_5$draws())
-pdf("new_dogs_calibration_50.pdf", height = 4, width = 4)
+pdf(root("dogs", "new_dogs_calibration_50.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)
 plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1), 
      xlab = "Posterior inference", ylab = "True parameter value", 

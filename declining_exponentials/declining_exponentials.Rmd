@@ -1,9 +1,4 @@
 ```{r include=FALSE, cache=FALSE}
-# LIBRARY CONFIGURATION
-
-library(cmdstanr)
-options(mc.cores = 4)
-
 library(knitr)
 knitr::opts_chunk$set(
   cache = TRUE,
@@ -11,7 +6,7 @@ knitr::opts_chunk$set(
   comment = NA,
   dev = "png",
   dpi = 150,
-  echo = FALSE,
+  echo = TRUE,
   fig.align = "center",
   fig.width = 6,
   fig.asp = 0.618,  # 1 / phi
@@ -22,8 +17,12 @@ knitr::opts_chunk$set(
   tidy = FALSE,
   warning = FALSE
 )
+```
 
-# UTILITY FUNCTIONS
+# Declining exponentials and sums of declining exponentials 
+
+```{r cache=FALSE}
+# utility functions 
 print_file <- function(file) {
   cat(paste(readLines(file), "\n", sep=""), sep="")
 }
@@ -31,15 +30,16 @@ fround <- function(x, digits) {
   format(round(x, digits), nsmall = digits)
 }
 
-# GENERAL R CONFIGURATION
-
+# load packages and configure R
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library("cmdstanr")
+options(mc.cores = 4)
 options(digits = 2)
 options(htmltools.dir.version = FALSE)
-
 set.seed(1123)
 ```
 
-# Declining exponentials and sums of declining exponentials 
 
 * Declining exponential:  A nonlinear model that comes up in many
   science and engineering applications, also illustrating the use of
@@ -64,7 +64,7 @@ distributed: $\epsilon_i \sim \mbox{normal}(0,\sigma)$.
 Here is the model in Stan:
 
 ```{r}
-print_file("exponential.stan")
+print_file(root("declining_exponentials",  "exponential.stan"))
 ```
 
 We have given the parameters $a$, and $b$, and $\sigma$ normal prior
@@ -112,7 +112,7 @@ And then we fit the model:
 
 ```{r, results=FALSE}
 data_1 <- list(N = N, x = x, y = y)
-mod_1 <- cmdstan_model("exponential.stan")
+mod_1 <- cmdstan_model(root("declining_exponentials", "exponential.stan"))
 fit_1 <- mod_1$sample(data = data_1)
 ```
 ```{r}
@@ -138,7 +138,7 @@ Otherwise we leave the model unchanged.  In this case the results turn
 out to be very similar:
 
 ```{r, results=FALSE}
-mod_1b <- cmdstan_model("exponential_positive.stan")
+mod_1b <- cmdstan_model(root("declining_exponentials","exponential_positive.stan"))
 fit_1b <- mod_1b$sample(data = data_1)
 ```
 ```{r}
@@ -197,7 +197,7 @@ $$
 Here is the model in Stan:
 
 ```{r}
-print_file("exponential_positive_lognormal.stan")
+print_file(root("declining_exponentials", "exponential_positive_lognormal.stan"))
 ```
 
 As before, we can simulate fake data from this model:
@@ -220,7 +220,7 @@ parameters are approximately recovered:
 
 ```{r, results=FALSE}
 data_3 <- list(N = N, x = x, y = y)
-mod_3 <- cmdstan_model("exponential_positive_lognormal.stan")
+mod_3 <- cmdstan_model(root("declining_exponentials", "exponential_positive_lognormal.stan"))
 fit_3 <- mod_3$sample(data = data_3)
 ```
 ```{r}
@@ -253,7 +253,7 @@ with lognormally-distributed errors $\epsilon$.
 Here is the model in Stan:
 
 ```{r}
-print_file("sum_of_exponentials.stan")
+print_file(root("declining_exponentials", "sum_of_exponentials.stan"))
 ```
 The coefficients $a$ and the residual standard deviation $\sigma$ are
 constrained to be positive.  The parameters $b$ are also
@@ -307,7 +307,7 @@ And then we fit the model:
 
 ```{r, results=FALSE}
 data_4 <- list(N = N, x = x, y = y)
-mod_4 <- cmdstan_model("sum_of_exponentials.stan")
+mod_4 <- cmdstan_model(root("declining_exponentials", "sum_of_exponentials.stan"))
 fit_4 <- mod_4$sample(data = data_4)
 ```
 ```{r}
@@ -403,7 +403,7 @@ We now can fit this new model to our data, and the results are much
 more stable:
 
 ```{r, results=FALSE}
-mod_5_with_priors <- cmdstan_model("sum_of_exponentials_with_priors.stan")
+mod_5_with_priors <- cmdstan_model(root("declining_exponentials", "sum_of_exponentials_with_priors.stan"))
 fit_5_with_priors <- mod_5_with_priors$sample(data = data_5)
 ```
 ```{r}

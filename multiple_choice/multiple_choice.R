@@ -1,3 +1,5 @@
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library("cmdstanr")
 options(mc.cores = 4)
 library("posterior")
@@ -5,25 +7,25 @@ library("arm")
 set.seed(123)
 
 # Bring in plotting functions from separate file
-source("plot_functions.R")
+source(root("multiple_choice", "plot_functions.R"))
 
 # Compile Stan programs to use throughout the file
-logit_0 <- cmdstan_model("logit_0.stan")
-logit_prior <- cmdstan_model("logit_prior.stan")
-logit_guessing <- cmdstan_model("logit_guessing.stan")
-logit_guessing_uncentered <- cmdstan_model("logit_guessing_uncentered.stan")
-logit_threshold <- cmdstan_model("logit_threshold.stan")
-logit_threshold_prior <- cmdstan_model("logit_threshold_prior.stan")
-logit_guessing_multilevel <- cmdstan_model("logit_guessing_multilevel.stan")
-logit_guessing_uncentered_multilevel <- cmdstan_model("logit_guessing_uncentered_multilevel.stan")
-logit_guessing_multilevel_bivariate <- cmdstan_model("logit_guessing_multilevel_bivariate.stan")
-logit_guessing_multilevel_bivariate_cholesky <- cmdstan_model("logit_guessing_multilevel_bivariate_cholesky.stan")
-irt_guessing <- cmdstan_model("irt_guessing.stan")
-irt_guessing_discrimination <- cmdstan_model("irt_guessing_discrimination.stan")
+logit_0 <- cmdstan_model(root("multiple_choice", "logit_0.stan"))
+logit_prior <- cmdstan_model(root("multiple_choice", "logit_prior.stan"))
+logit_guessing <- cmdstan_model(root("multiple_choice", "logit_guessing.stan"))
+logit_guessing_uncentered <- cmdstan_model(root("multiple_choice", "logit_guessing_uncentered.stan"))
+logit_threshold <- cmdstan_model(root("multiple_choice", "logit_threshold.stan"))
+logit_threshold_prior <- cmdstan_model(root("multiple_choice", "logit_threshold_prior.stan"))
+logit_guessing_multilevel <- cmdstan_model(root("multiple_choice", "logit_guessing_multilevel.stan"))
+logit_guessing_uncentered_multilevel <- cmdstan_model(root("multiple_choice", "logit_guessing_uncentered_multilevel.stan"))
+logit_guessing_multilevel_bivariate <- cmdstan_model(root("multiple_choice", "logit_guessing_multilevel_bivariate.stan"))
+logit_guessing_multilevel_bivariate_cholesky <- cmdstan_model(root("multiple_choice", "logit_guessing_multilevel_bivariate_cholesky.stan"))
+irt_guessing <- cmdstan_model(root("multiple_choice", "irt_guessing.stan"))
+irt_guessing_discrimination <- cmdstan_model(root("multiple_choice", "irt_guessing_discrimination.stan"))
 
 # Read in data and construct score for each student
-responses <- read.csv("data/final_exam_responses.csv")
-answers <- read.csv("data/final_exam_answers.csv")
+responses <- read.csv(root("multiple_choice", "data", "final_exam_responses.csv"))
+answers <- read.csv(root("multiple_choice", "data", "final_exam_answers.csv"))
 J <- nrow(responses)  # number of students
 K <- ncol(responses)  # number of items
 correct <- array(NA, c(J,K))
@@ -44,7 +46,7 @@ item_id_0 <- LETTERS[1:J]  # Only works here because J is no more than 26!
 
 # The plots_logit function fits the model and makes plots
 plots_logit(
-  "final_exams_1",
+  root("multiple_choice", "final_exams_1"),
   "Fit to item A on exam",
   "Score on exam",
   logit_0,
@@ -55,7 +57,7 @@ plots_logit(
 
 # Add priors
 plots_logit(
-  "final_exams_2",
+  root("multiple_choice", "final_exams_2"),
   "Fit to item A:  rescaled predictor and weakly informative prior",
   "Standardized exam score",
   logit_prior,
@@ -65,7 +67,7 @@ plots_logit(
   guessprob = 0
 )
 plots_logit_grid(
-  "final_exams_2",
+  root("multiple_choice", "final_exams_2"),
   "Rescaled predictor and weakly informative prior",
   "Standardized exam score",
   logit_prior,
@@ -76,7 +78,7 @@ plots_logit_grid(
 )
 
 plots_logit(
-  "final_exams_2_challenge",
+  root("multiple_choice", "final_exams_2_challenge"),
   "Fit to item G:  rescaled predictor and weakly informative prior",
   "Standardized exam score",
   logit_prior,
@@ -100,7 +102,7 @@ data <- list(J = J, x = score, y = correct)
 item_id <- rank(colSums(correct), ties = "first")
 
 plots_logit_grid(
-  "final_exams_3",
+  root("multiple_choice", "final_exams_3"),
   "After fixing the data problem",
   "Standardized exam score",
   logit_prior,
@@ -112,7 +114,7 @@ plots_logit_grid(
 
 # Allow for guessing
 plots_logit_grid(
-  "final_exams_4",
+  root("multiple_choice", "final_exams_4"),
   "Probabilities constrained to range from 0.25 to 1",
   "Standardized exam score",
   logit_guessing,
@@ -146,7 +148,7 @@ longdata <- list(
 
 
 fit_5 <- plots_logit_grid_2(
-  "final_exams_5",
+  root("multiple_choice", "final_exams_5"),
   "Multilevel model, partially pooling across the 24 exam questions",
   "Standardized exam score",
   logit_guessing_multilevel,
@@ -162,7 +164,7 @@ fit_5 <- plots_logit_grid_2(
 print(fit_5, variables = c("mu_a", "sigma_a", "mu_b", "sigma_b"))
 
 fit_6 <- plots_logit_grid_2(
-  "final_exams_6",
+  root("multiple_choice", "final_exams_6"),
   "Multilevel model with correlation",
   "Standardized exam score",
   logit_guessing_multilevel_bivariate,
@@ -178,7 +180,7 @@ fit_6 <- plots_logit_grid_2(
 print(fit_6, variables = c("mu_ab", "sigma_ab", "Omega_ab"))
 
 fit_7 <- plots_logit_grid_2(
-  "final_exams_7",
+  root("multiple_choice", "final_exams_7"),
   "Multilevel model with correlation:  Cholesky parameterization",
   "Standardized exam score",
   logit_guessing_multilevel_bivariate_cholesky,
@@ -196,7 +198,7 @@ print(fit_7, variables = c("mu_ab", "sigma_ab", "Omega_ab"))
 
 # IRT models
 fit_11 <- plots_irt(
-  "final_exams_11",
+  root("multiple_choice", "final_exams_11"),
   "Item-response model",
   irt_guessing,
   c(longdata, list(
@@ -207,7 +209,7 @@ fit_11 <- plots_irt(
   guessprob = 0.25
 )
 fit_12 <- plots_irt(
-  "final_exams_12",
+  root("multiple_choice", "final_exams_12"),
   "Item-response model with discrimination parameters",
   irt_guessing_discrimination,
   c(longdata, list(
@@ -220,7 +222,7 @@ fit_12 <- plots_irt(
   guessprob = 0.25
 )
 fit_13 <- plots_irt(
-  "final_exams_13",
+  root("multiple_choice", "final_exams_13"),
   "Item-response model with discrimination parameters",
   irt_guessing_discrimination,
   c(longdata, list(
@@ -243,7 +245,7 @@ beta_sd <- apply(beta_sims, 2, mad)
 gamma_hat <- apply(gamma_sims, 2, median)
 gamma_sd <- apply(gamma_sims, 2, mad)
 
-pdf("irt_displays_1.pdf", height=4, width=6)
+pdf(root("multiple_choice", "irt_displays_1.pdf"), height=4, width=6)
 par(mar = c(3, 0, 0, 0), mgp = c(1.5, .2, 0), tck = -.01)
 rng <- range(
   alpha_hat - 3*alpha_sd,
@@ -266,7 +268,7 @@ for (k in 1:K){
 }
 dev.off()
 
-pdf("irt_displays_2.pdf", height = 3.2, width = 4)
+pdf(root("multiple_choice", "irt_displays_2.pdf"), height = 3.2, width = 4)
 par(mar = c(2.5, 2.5, .5, .5), mgp = c(1.5, .2, 0), tck = -.01)
 x_rng <- range(beta_hat - beta_sd, beta_hat + beta_sd)
 y_rng <- range(gamma_hat - gamma_sd, gamma_hat + gamma_sd)
@@ -308,40 +310,34 @@ prior_predictive <- function(x, x_jitt, mu_a, sigma_a, mu_b, sigma_b) {
   points(x_jitt, 0.5 + 0.96 * (y - 0.5), cex = .7, pch = 20, col = "blue")
 }
 
-pdf("multiplechoice_prior_predictive_1.pdf", height = 2.5, width = 7.5)
+pdf(root("multiple_choice", "multiplechoice_prior_predictive_1.pdf"), height = 2.5, width = 7.5)
 par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
     mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
   prior_predictive(score_adj, score_adj_jitt, 0, 0.5, 0, 0.5)
 }
-mtext(
-  "10 prior predictive simulations with a ~ normal(0, 0.5) and b ~ normal(0, 0.5)", 
-  side = 3, line = .5, outer = TRUE, cex = .7
-)
+mtext("10 prior predictive simulations with a ~ normal(0, 0.5) and b ~ normal(0, 0.5)", 
+      side = 3, line = .5, outer = TRUE, cex = .7)
 dev.off()
 
-pdf("multiplechoice_prior_predictive_2.pdf", height = 2.5, width = 7.5)
+pdf(root("multiple_choice", "multiplechoice_prior_predictive_2.pdf"), height = 2.5, width = 7.5)
 par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
     mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
   prior_predictive(score_adj, score_adj_jitt, 0, 5, 0, 5)
 }
-mtext(
-  "10 prior predictive simulations with a ~ normal(0, 5) and b ~ normal(0, 5)", 
-  side = 3, line = .5, outer = TRUE, cex = .7
-)
+mtext("10 prior predictive simulations with a ~ normal(0, 5) and b ~ normal(0, 5)", 
+      side = 3, line = .5, outer = TRUE, cex = .7)
 dev.off()
 
-pdf("multiplechoice_prior_predictive_3.pdf", height = 2.5, width = 7.5)
+pdf(root("multiple_choice", "multiplechoice_prior_predictive_3.pdf"), height = 2.5, width = 7.5)
 par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
     mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
   prior_predictive(score_adj, score_adj_jitt, 0, 50, 0, 50)
 }
-mtext(
-  "10 prior predictive simulations with a ~ normal(0, 50) and b ~ normal(0, 50)", 
-  side = 3, line = .5, outer = TRUE, cex = .7
-)
+mtext("10 prior predictive simulations with a ~ normal(0, 50) and b ~ normal(0, 50)", 
+      side = 3, line = .5, outer = TRUE, cex = .7)
 dev.off()
 
 
@@ -372,7 +368,7 @@ b <- extract_variable(break_1_fit, "b")
 n_sims <- length(a)
 
 
-pdf("break_1.pdf", height = 3, width = 4)
+pdf(root("multiple_choice", "break_1.pdf"), height = 3, width = 4)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(
   x, y,
@@ -399,7 +395,7 @@ n_sims <- length(a)
 
 
 
-pdf("break_2.pdf", height = 3, width = 4)
+pdf(root("multiple_choice", "break_2.pdf"), height = 3, width = 4)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(
   x_adj, y,
@@ -420,7 +416,7 @@ dev.off()
 
 
 plots_logit_grid_2(
-  "final_exams_break_1",
+  root("multiple_choice", "final_exams_break_1"),
   "Breaking the model",
   "Exam score",
   logit_guessing_multilevel,

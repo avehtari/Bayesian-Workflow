@@ -8,7 +8,7 @@ library(knitr)
     comment = NA,
     dev = "png",
     dpi = 150,
-    echo = FALSE,
+    echo = TRUE,
     fig.align = "center",
     fig.width = 6,
     fig.asp = 0.618,  # 1 / phi
@@ -24,6 +24,8 @@ options(htmltools.dir.version = FALSE)
 ```
 
 ```{r load-packages}
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 options(mc.cores = 4)
 library(posterior)
@@ -76,7 +78,12 @@ But also this:
 OK, now it's time to get to work.  We start by downloading and
 graphing the data.
 ```{r}
-series <- matrix(scan("data/Series1000.txt"), nrow = 1000, ncol = 135, byrow = TRUE)
+series <- matrix(
+  scan(root("timeseries", "data", "Series1000.txt")), 
+  nrow = 1000, 
+  ncol = 135,  
+  byrow = TRUE
+)
 T <- 135
 N <- 1000
 par(mar = c(3, 3, 2, 0), tck = -0.01, mgp = c(1.5, 0.5, 0))
@@ -126,8 +133,8 @@ centered at 0, -1, and 1. It looks like this might be the case.
 
 So let's fit a mixture model. That's easy.  Here's the Stan program:
 
-```{r}
-cat(paste(readLines("mixture.stan"), "\n", sep=""), sep="")
+```{r, echo=FALSE}
+cat(paste(readLines(root("timeseries", "mixture.stan")), "\n", sep=""), sep="")
 ```
 
 We now run the program and display the results:
@@ -137,7 +144,7 @@ y <- slope
 K <- 3
 mu <- c(0, -1, 1)
 data <- list(y = y, K = K, N = N, mu = mu)
-mod <- cmdstan_model("mixture.stan")
+mod <- cmdstan_model(root("timeseries", "mixture.stan"))
 fit_mix <- mod$sample(data = data, refresh = 0)
 print(fit_mix)
 ```
@@ -179,7 +186,7 @@ posterior simulations. This is made simpler using the posterior R package's
 `draws_rvars` format. 
 
 ```{r, results=FALSE}
-mod <- cmdstan_model("mixture_2.stan")
+mod <- cmdstan_model(root("timeseries", "mixture_2.stan"))
 fit_mix <- mod$sample(data = data, refresh = 0)
 prob_sims <- as_draws_rvars(fit_mix$draws())
 prob <- mean(prob_sims$p)

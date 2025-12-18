@@ -51,14 +51,16 @@ savefigs <- FALSE
 #' **Load packages**
 #| cache: FALSE
 library(rprojroot)
-root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 options(mc.cores = 4)
 library(posterior)
-options(tibble.print_max=35,
-        pillar.neg=FALSE,
-        pillar.subtle=FALSE,
-        pillar.sigfig=2)
+options(
+  tibble.print_max = 35,
+  pillar.neg = FALSE,
+  pillar.subtle = FALSE,
+  pillar.sigfig = 2
+)
 library(bayesplot)
 library(ggplot2)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size=14))
@@ -76,10 +78,10 @@ library(readr)
 #' score of 1), and then for simplicity in interpretation of the
 #' parameters we rescaled these to have mean 0 and standard deviation
 #' 1/2, to get ``prior scores'' that ranged from $-0.83$ to $+0.83$.
-powerindex <- read_csv(root("world_cup/data","soccerpowerindex.csv")) %>%
+powerindex <- read_csv(root("world_cup", "data","soccerpowerindex.csv")) %>%
   mutate(prior_score = as.vector(scale(rev(index))/2))
 teamnames <- powerindex$team
-worldcup2014 <- read_csv(root("world_cup/data","worldcup2014.csv")) %>%
+worldcup2014 <- read_csv(root("world_cup", "data","worldcup2014.csv")) %>%
     mutate(team_1 = match(team1, teamnames),
          team_2 = match(team2, teamnames))
 N_games <- nrow(worldcup2014)
@@ -185,8 +187,7 @@ fit_2$draws("a") |>
 #| fig-height: 10
 #| fig-width: 8
 ppc_intervals(y=stan_data$score_1 - stan_data$score_2,
-              yrep=fit_2$draws("y_rep",
-                               format="draws_matrix"),
+              yrep=fit_2$draws("y_rep", format="draws_matrix"),
               fatten=0, prob=1e-12) +
   scale_x_continuous(labels = gamenames, breaks=1:64)+
   labs(y="Game score differentials ncompared to 90% predictive interval\n(model with no square root)", x="") +

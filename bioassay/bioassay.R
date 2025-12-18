@@ -30,6 +30,8 @@ knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cac
 
 #' #### Load packages {.unnumbered}
 #| cache: FALSE
+library("rprojroot")
+root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 4)
@@ -39,8 +41,6 @@ library(ggdist)
 library(dplyr)
 library(tidyr)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size=16))
-library("rprojroot")
-root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 
 #' ## Data
 #'
