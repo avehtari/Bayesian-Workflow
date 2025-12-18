@@ -35,7 +35,7 @@ knitr::opts_chunk$set(cache=TRUE, message=FALSE, error=FALSE, warning=TRUE, comm
 #' **Load packages**
 #| cache: FALSE
 library("rprojroot")
-root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(ggplot2)
 library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
