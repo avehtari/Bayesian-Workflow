@@ -13,7 +13,7 @@ N <- length(y)
 movie <- rep(c(1, 2), c(length(y_1), length(y_2)))
 movie_data <- list(y = y, N = N, movie = movie)
 mod_1 <- cmdstan_model(root("movies", "ratings_1.stan"))
-fit_1 <- mod_1$sample(data = movie_data)
+fit_1 <- mod_1$sample(data = movie_data, refresh = 0)
 print(fit_1)
 
 # Extending the model to J movies
@@ -25,7 +25,7 @@ theta <- rnorm(J, 3.0, 0.5)
 y <- rnorm(N, theta[movie], 2.0)
 movie_data <- list(y = y, N = N, J = J, movie = movie)
 mod_2 <- cmdstan_model(root("movies", "ratings_2.stan"))
-fit_2 <- mod_2$sample(data = movie_data)
+fit_2 <- mod_2$sample(data = movie_data, refresh = 0)
 print(fit_2)
 
 theta_post <- fit_2$draws("theta", format = "matrix")
@@ -79,7 +79,7 @@ beta <- rnorm(K, 0, 1)
 y <- rnorm(N, mu + sigma_a * alpha[movie] - sigma_b * beta[rater], sigma_y)
 data_3 <- list(N = N, J = J, K = K, movie = movie, rater = rater, y = y)
 mod_3 <- cmdstan_model(root("movies", "ratings_3.stan"))
-fit_3 <- mod_3$sample(data = data_3)
+fit_3 <- mod_3$sample(data = data_3, refresh = 0)
 print(fit_3, variables = c("mu", "sigma_a", "sigma_b", "sigma_y"))
 
 alpha_post <- fit_3$draws("alpha", format = "matrix")
@@ -133,7 +133,7 @@ rated <- rbinom(N, 1, prob_of_rated)  == 1 # TRUE if movie was rated, FALSE if n
 data_3a <- list(N = sum(rated), J = J, K = K, 
                 movie = movie[rated], rater = rater[rated], 
                 y = y[rated])
-fit_3a <- mod_3$sample(data = data_3a)
+fit_3a <- mod_3$sample(data = data_3a, refresh = 0)
 print(fit_3a, variables = c("mu", "sigma_a", "sigma_b", "sigma_y"))
 
 alpha_post <- fit_3a$draws("alpha", format = "matrix")
