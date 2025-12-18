@@ -74,11 +74,10 @@ knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA,
 #' **Load packages**
 #| code-fold: true
 #| cache: FALSE
-Sys.setenv(PROCESSX_NOTIFY_OLD_SIGCHLD = 1) # avoid zombies
 library(brms)
 options(brms.backend="cmdstanr")
 library(cmdstanr)
-options(mc.cores = parallel::detectCores()-2)
+options(mc.cores = 4)
 library(posterior)
 options(digits=2, posterior.digits=2,
         pillar.neg = FALSE, pillar.subtle=FALSE, pillar.sigfig=2)

@@ -1,10 +1,16 @@
 library("scales")
 library("arm")
-library("cmdstanr")
 library("posterior")
+library("cmdstanr")
+options(mc.cores = 4)
 set.seed(123)
 
-series <- matrix(scan("data/Series1000.txt"), nrow=1000, ncol=135, byrow=TRUE)
+series <- matrix(
+  scan("data/Series1000.txt"),
+  nrow = 1000,
+  ncol = 135,
+  byrow = TRUE
+)
 T <- 135
 N <- 1000
 
@@ -51,12 +57,12 @@ K <- 3
 mu <- c(0, -1, 1)
 data <- list(y = y, K = K, N = N, mu = mu)
 mod <- cmdstan_model("mixture.stan")
-fit_mix <- mod$sample(data = data, parallel_chains = 4, refresh = 0)
+fit_mix <- mod$sample(data = data, refresh = 0)
 print(fit_mix)
 
 ## New model
 mod <- cmdstan_model("mixture_2.stan")
-fit_mix <- mod$sample(data = data, parallel_chains = 4, refresh = 0)
+fit_mix <- mod$sample(data = data, refresh = 0)
 prob_sims <- as_draws_rvars(fit_mix$draws())
 prob <- mean(prob_sims$p)
 

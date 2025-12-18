@@ -1,6 +1,6 @@
 library("cmdstanr")
 library("posterior")
-options(mc.cores = parallel::detectCores())
+options(mc.cores = 4)
 set.seed(1234)
 
 # Model for two movies
@@ -16,7 +16,7 @@ print(fit_1)
 
 # Extending the model to J movies
 J <- 40
-N_ratings <- sample(0:100, J, replace=TRUE)
+N_ratings <- sample(0:100, J, replace = TRUE)
 N <- sum(N_ratings)
 movie <- rep(1:J, N_ratings)
 theta <- rnorm(J, 3.0, 0.5)
@@ -57,7 +57,7 @@ plot(c(0, 1.02 * max(N_ratings)), c(0, 1.02 * max(interval_width)),
      xlab = "Number of ratings", ylab = "Width of 50% posterior interval", 
      yaxs = "i", yaxs = "i", bty = "l", type = "n")
 points(N_ratings, interval_width, pch = 20)
-mtext("Where you have more data, you have less uncertainty", side=3)
+mtext("Where you have more data, you have less uncertainty", side = 3)
 dev.off()
 
 
@@ -118,7 +118,7 @@ for (k in 1:K){
   lines(c(beta_post_quants[k, "2.5%"], beta_post_quants[k, "97.5%"]), 
         rep(beta[k], 2), lwd = 0.5)
 }
-mtext(expression(paste("Checking the ", beta[j], "'s")), side=3)
+mtext(expression(paste("Checking the ", beta[j], "'s")), side = 3)
 dev.off()
 
 
@@ -216,7 +216,7 @@ add_legend(c("Romantic comedies", "Crime movies"), pch = c(1, 20), range = rng)
 plot(rng, rng, 
      xlab = "Posterior median estimate for movie j", 
      ylab = expression(paste("True ",  a[j])), bty = "l", type = "n")
-abline(0, 1, col="gray")
+abline(0, 1, col = "gray")
 points(a_post_median[genre == "romantic"], a_true[genre == "romantic"], pch = 1, cex = 0.9)
 points(a_post_median[genre == "crime"], a_true[genre == "crime"], pch = 20)
 mtext("Model-based estimates do better", side = 3)
