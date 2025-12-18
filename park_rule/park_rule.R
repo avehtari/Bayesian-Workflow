@@ -1,8 +1,9 @@
 library("arm")
 library("posterior")
 library("rstanarm")
-library("cmdstanr")
 library("lme4")
+library("cmdstanr")
+options(mc.cores = 4)
 
 # Prepare data
 park <- read.csv("data/park.csv")
@@ -97,6 +98,10 @@ plot(respondent_avg, a_respondent_hat, pch = 20, cex = .4)
 
 
 # Fit Stan models
+order_of_response <- rep(NA, N)
+for (j in 1:J) {
+  order_of_response[respondent==j] <- 1:n_responses[j]
+}
 X <- cbind(rep(1,N), male_name, white_name, n_skipped_full, order_of_response)
 stan_data <- list(
   N = N,
@@ -110,52 +115,29 @@ stan_data <- list(
 )
 
 park_1 <- cmdstan_model("park_1.stan")
-fit_1 <- park_1$sample(
-  data = stan_data,
-  parallel_chains = 4,
-  max_treedepth = 5 # Stan's warmup can sometimes be very slow on problematic models
-)
+# max_treedepth=5: Stan's warmup can sometimes be very slow on problematic models
+fit_1 <- park_1$sample(data = stan_data, max_treedepth = 5)
 print(fit_1)
 
 park_2 <- cmdstan_model("park_2.stan")
-fit_2 <- park_2$sample(
-  data = stan_data,
-  parallel_chains = 4,
-  max_treedepth = 5
-)
+fit_2 <- park_2$sample(data = stan_data, max_treedepth = 5)
 print(fit_2)
 
 park_3 <- cmdstan_model("park_3.stan")
-fit_3 <- park_3$sample(
-  data = stan_data,
-  parallel_chains = 4,
-  max_treedepth = 5
-)
+fit_3 <- park_3$sample(data = stan_data, max_treedepth = 5)
 print(fit_3)
 
 
 # Simulated-data experiment
 stan_data_sim <- stan_data
 stan_data_sim$y <- y_sim
-fit_1_sim <- park_1$sample(
-  data = stan_data_sim,
-  parallel_chains = 4,
-  max_treedepth = 5
-)
+fit_1_sim <- park_1$sample(data = stan_data_sim, max_treedepth = 5)
 print(fit_1_sim)
 
-fit_2_sim <- park_2$sample(
-  data = stan_data_sim,
-  parallel_chains = 4,
-  max_treedepth = 5
-)
+fit_2_sim <- park_2$sample(data = stan_data_sim, max_treedepth = 5)
 print(fit_2_sim)
 
-fit_3_sim <- park_3$sample(
-  data = stan_data_sim,
-  parallel_chains = 4,
-  max_treedepth = 5
-)
+fit_3_sim <- park_3$sample(data = stan_data_sim, max_treedepth = 5)
 print(fit_3_sim)
 
 # Fit normal model
@@ -166,11 +148,7 @@ park_normal <- list(
 )
 fit_normal <- list()
 for (i in 1:3) {
-  fit_normal[[i]] <- park_normal[[i]]$sample(
-    data = stan_data,
-    parallel_chains = 4,
-    max_treedepth = 5
-  )
+  fit_normal[[i]] <- park_normal[[i]]$sample(data = stan_data, max_treedepth = 5)
   print(fit_normal[[i]])
 }
 
@@ -185,10 +163,6 @@ y_sim <- rnorm(N, a_respondent_sim[respondent] + a_item_sim[item] + X %*% b_sim,
 stan_data_sim$y <- y_sim
 fit_normal_sim <- list()
 for (i in 1:3) {
-  fit_normal_sim[[i]] <- park_normal[[i]]$sample(
-    data = stan_data_sim,
-    parallel_chains = 4,
-    max_treedepth = 5
-  )
+  fit_normal_sim[[i]] <- park_normal[[i]]$sample(data = stan_data_sim, max_treedepth = 5)
   print(fit_normal_sim[[i]])
 }
