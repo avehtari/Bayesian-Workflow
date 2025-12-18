@@ -81,8 +81,8 @@ library(readr)
 powerindex <- read_csv(root("world_cup", "data","soccerpowerindex.csv")) %>%
   mutate(prior_score = as.vector(scale(rev(index))/2))
 teamnames <- powerindex$team
-worldcup2014 <- read_csv(root("world_cup", "data","worldcup2014.csv")) %>%
-    mutate(team_1 = match(team1, teamnames),
+worldcup2014 <- read_csv(root("world_cup", "data", "worldcup2014.csv")) %>%
+  mutate(team_1 = match(team1, teamnames),
          team_2 = match(team2, teamnames))
 N_games <- nrow(worldcup2014)
 gamenames <- with(worldcup2014, rev(paste(teamnames[team_1], "vs.", teamnames[team_2])))
@@ -139,9 +139,9 @@ fit_1$summary(c("a", "b", "sigma_a", "sigma_y"))
 #| fig-height: 7
 #| fig-width: 8
 fit_1$draws("a") |>
-  mcmc_intervals(prob=0) +
-  scale_y_discrete(labels=rev(teamnames),limits=rev) +
-  labs(x="Team quality estimate with 90% intervals")
+  mcmc_intervals(prob = 0) +
+  scale_y_discrete(labels = rev(teamnames), limits = rev) +
+  labs(x = "Team quality estimate with 90% intervals")
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_1.pdf", height=7, width=8))
 
 #' ## Check fit of the first model
@@ -154,10 +154,12 @@ fit_1_rep <- model_1_rep$sample(data = stan_data, refresh = 0)
 #| label: fig-worldcup-ppc-intervals-fit_1
 #| fig-height: 10
 #| fig-width: 8
-ppc_intervals(y=stan_data$score_1 - stan_data$score_2,
-              yrep=fit_1_rep$draws("y_rep_original_scale",
-                                   format="draws_matrix"),
-              fatten=0, prob=1e-12) +
+ppc_intervals(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_1_rep$draws("y_rep_original_scale", format = "draws_matrix"),
+  fatten = 0,
+  prob = 1e-12
+) +
   scale_x_continuous(labels = gamenames, breaks=1:64)+
   labs(y="Game score differentials\ncompared to 90% predictive interval from model", x="") +
   coord_flip() 
@@ -177,20 +179,23 @@ fit_2$summary(c("a", "b", "sigma_a", "sigma_y"))
 #| fig-height: 7
 #| fig-width: 8
 fit_2$draws("a") |>
-  mcmc_intervals(prob=0) +
-  scale_y_discrete(labels=rev(teamnames),limits=rev) +
-  labs(x="Team quality estimate with 90% intervals\n(model with no square root)")
+  mcmc_intervals(prob = 0) +
+  scale_y_discrete(labels = rev(teamnames), limits = rev) +
+  labs(x = "Team quality estimate with 90% intervals\n(model with no square root)")
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_4.pdf", height=7, width=8))
 
 #' ## Check fit of the second model to data
 #| label: fig-worldcup-ppc-intervals-fit_2
 #| fig-height: 10
 #| fig-width: 8
-ppc_intervals(y=stan_data$score_1 - stan_data$score_2,
-              yrep=fit_2$draws("y_rep", format="draws_matrix"),
-              fatten=0, prob=1e-12) +
-  scale_x_continuous(labels = gamenames, breaks=1:64)+
-  labs(y="Game score differentials ncompared to 90% predictive interval\n(model with no square root)", x="") +
+ppc_intervals(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_2$draws("y_rep", format = "draws_matrix"),
+  fatten = 0,
+  prob = 1e-12
+) +
+  scale_x_continuous(labels = gamenames, breaks = 1:64)+
+  labs(y = "Game score differentials ncompared to 90% predictive interval\n(model with no square root)", x = "") +
   coord_flip() 
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_5.pdf", height=10, width=8))
 
@@ -208,9 +213,9 @@ fit_3$summary(c("a", "b", "sigma_a", "sigma_y"))
 #| fig-height: 10
 #| fig-width: 8
 fit_3$draws("a") |>
-  mcmc_intervals(prob=0) +
-  scale_y_discrete(labels=rev(teamnames),limits=rev) +
-  labs(x="Team quality estimate with 90% intervals\n(corrected model)")
+  mcmc_intervals(prob = 0) +
+  scale_y_discrete(labels = rev(teamnames), limits = rev) +
+  labs(x = "Team quality estimate with 90% intervals\n(corrected model)")
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_6.pdf", height=7, width=8))
 
 
@@ -218,12 +223,14 @@ fit_3$draws("a") |>
 #| label: fig-worldcup-ppc-intervals-fit_3
 #| fig-height: 10
 #| fig-width: 8
-ppc_intervals(y=stan_data$score_1 - stan_data$score_2,
-              yrep=fit_3$draws("y_rep_original_scale",
-                               format="draws_matrix"),
-              fatten=0, prob=1e-12) +
-  scale_x_continuous(labels = gamenames, breaks=1:64)+
-  labs(y="Game score differentials ncompared to 90% predictive interval\n(corrected model with square root)", x="") +
+ppc_intervals(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_3$draws("y_rep_original_scale", format = "draws_matrix"),
+  fatten = 0,
+  prob = 1e-12
+) +
+  scale_x_continuous(labels = gamenames, breaks = 1:64) +
+  labs(y = "Game score differentials ncompared to 90% predictive interval\n(corrected model with square root)", x = "") +
   coord_flip() 
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_7.pdf", height=10, width=8))
 
@@ -239,9 +246,9 @@ fit_3_no_prior <- model_3_no_prior$sample(data = c(stan_data, b = 0), refresh = 
 #| fig-height: 7
 #| fig-width: 8
 fit_3_no_prior$draws("a") |>
-  mcmc_intervals(prob=0) +
-  scale_y_discrete(labels=rev(teamnames),limits=rev) +
-  labs(x="Team quality estimate with 90% intervals\nModel without prior rankings")
+  mcmc_intervals(prob = 0) +
+  scale_y_discrete(labels = rev(teamnames), limits = rev) +
+  labs(x = "Team quality estimate with 90% intervals\nModel without prior rankings")
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_2.pdf", height=7, width=8))
 
 
@@ -256,7 +263,7 @@ fit_discr_z <- model_discr_z$sample(data = stan_data, refresh = 0)
 loo_discr_z <- fit_discr_z$loo()
 
 #| label: fit_discr_z_summary
-fit_discr_z$summary(c("b","sigma_a","sigma_z"))
+fit_discr_z$summary(c("b", "sigma_a", "sigma_z"))
 
 #' ## Discrete model with latent z integrated out
 #| label: fit_discr
@@ -267,7 +274,7 @@ fit_discr <- model_discr$sample(data = stan_data, refresh = 0)
 loo_discr <- fit_discr$loo()
 
 #| label: fit_discr_summary
-fit_discr$summary(c("a[1]","a[32]","b","sigma_a","sigma_z"))
+fit_discr$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_z"))
 
 #' ## Discrete model with no power score
 #| label: fit_discr_nopwer
@@ -278,7 +285,7 @@ fit_discr_nopower <- model_discr_nopower$sample(data = stan_data, refresh = 0)
 loo_discr_nopower <- fit_discr_nopower$loo()
 
 #| label: fit_discr_nopower_summary
-fit_discr_nopower$summary(c("a[1]","a[32]","sigma_a","sigma_z"))
+fit_discr_nopower$summary(c("a[1]", "a[32]", "sigma_a", "sigma_z"))
 
 
 #' ## Discrete model with power score only
@@ -290,7 +297,7 @@ fit_discr_poweronly <- model_discr_poweronly$sample(data = stan_data, refresh = 
 loo_discr_poweronly <- fit_discr_poweronly$loo()
 
 #| label: fit_discr_poweronly_summary
-fit_discr_poweronly$summary(c("b0","b","sigma_z"))
+fit_discr_poweronly$summary(c("b0", "b", "sigma_z"))
 
 #' ## Discrete model with no power score and pooled effect
 #| label: fit_discr_pooled
@@ -314,10 +321,14 @@ fit_discr_pool$summary(c("mu_z","sigma_z"))
 #' both, does decrease posterior uncertainty, but as the match
 #' outcomes still have significant randomness the difference in
 #' predictive performance is small.
-loo_compare(list("Hier. w power score"=loo_discr,
-                 "Power score only"=loo_discr_poweronly,
-                 "Hier. w/o power score"=loo_discr_nopower,
-                 "Pooled w/o power score"=loo_discr_pool))
+loo_compare(
+  list(
+    "Hier. w power score" = loo_discr,
+    "Power score only" = loo_discr_poweronly,
+    "Hier. w/o power score" = loo_discr_nopower,
+    "Pooled w/o power score" = loo_discr_pool
+  )
+)
 
 #' # Discretizing continuous models
 #' 
@@ -331,7 +342,7 @@ fit_cont_midp <- model_cont_midp$sample(data = stan_data, refresh = 0)
 loo_cont_midp <- fit_cont_midp$loo()
 
 #| label: fit_cont_midp_summary
-fit_cont_midp$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
+fit_cont_midp$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 
 #' ## Continuous model with log predictive probability using exact integration
 #' 
@@ -343,15 +354,19 @@ fit_cont <- model_cont$sample(data = stan_data, refresh = 0)
 loo_cont <- fit_cont$loo()
 
 #| label: fit_cont_summary
-fit_cont$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
+fit_cont$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 
 #' ## Model comparison
 #' 
 #' The elpd_diff's between models are small enough to be caused
 #' by Monte Carlo variation
-loo_compare(list("Discrete model"=loo_discr,
-                 "Continuous + midpoint log_lik"=loo_cont_midp,
-                 "Continuous model"=loo_cont))
+loo_compare(
+  list(
+    "Discrete model" = loo_discr,
+    "Continuous + midpoint log_lik" = loo_cont_midp,
+    "Continuous model" = loo_cont
+  )
+)
 
 #' ## More discretized continuous models
 #'
@@ -364,7 +379,7 @@ fit_sqrt_cont_noj <- model_sqrt_cont_noj$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont_noj <- fit_sqrt_cont_noj$loo()
 
 #| label: fit_sqrt_cont_noj_summary
-fit_sqrt_cont_noj$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
+fit_sqrt_cont_noj$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 
 #' Continuous sqrt model with log predictive probability using
 #' midpoint rule and Jacobian is not possible as Jacobian is infinite
@@ -380,7 +395,7 @@ fit_sqrt_cont <- model_sqrt_cont$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont <- fit_sqrt_cont$loo()
 
 #| label: fit_sqrt_cont_summary
-fit_sqrt_cont$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
+fit_sqrt_cont$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 
 #' Discrete sqrt model with log predictive probability using Jacobian
 #' and quadrature integration. The sampling is slow as the quadrature
@@ -393,36 +408,46 @@ fit_sqrt_discr <- model_sqrt_discr$sample(data = stan_data, refresh = 0)
 loo_sqrt_discr <- fit_sqrt_discr$loo()
 
 #| label: fit_sqrt_discr_summary
-fit_sqrt_discr$summary(c("a[1]","a[32]","b","sigma_a","sigma_y"))
+fit_sqrt_discr$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 
 #' ## Model comparison
 #' 
 #' Without taking Jacobian into account, the continuous model for
 #' square root of score difference looks like the best
-loo_compare(list("Discrete"=loo_discr,
-                 "Discrete sqrt"=loo_sqrt_discr,
-                 "Cont-sqrt + midp, -Jacobian"=loo_sqrt_cont_noj))
+loo_compare(
+  list(
+    "Discrete" = loo_discr,
+    "Discrete sqrt" = loo_sqrt_discr,
+    "Cont-sqrt + midp, -Jacobian" = loo_sqrt_cont_noj
+  )
+)
 
 #' Taking Jacobian into account, the square root models are worse, and
 #' the difference between continuous and discrete square root model is
 #' small enough to be explained by Monte Carlo variation.
-loo_compare(list("Discrete"=loo_discr,
-                 "Discrete sqrt"=loo_sqrt_discr,
-                 "Continuous sqrt +Jacobian"=loo_sqrt_cont))
+loo_compare(
+  list(
+    "Discrete" = loo_discr,
+    "Discrete sqrt" = loo_sqrt_discr,
+    "Continuous sqrt +Jacobian" = loo_sqrt_cont
+  )
+)
 
 #' # Posterior predictive checking
 #' 
 #' Posterior predictive checking for the discrete model looks fine
-ppc_pit_ecdf(y = stan_data$score_1-stan_data$score_2,
-             yrep = fit_discr$draws(format="matrix",
-                                    variables="y_rep"))
+ppc_pit_ecdf(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_discr$draws(format = "matrix", variables = "y_rep")
+)
 
 #' Posterior predictive checking for the continuous model indicates
 #' slight miscalibration with too many low PIT values (left tail of
 #' the predictive disttribution is shorter than expected)
-ppc_pit_ecdf(y = stan_data$score_1-stan_data$score_2,
-             yrep = fit_sqrt_cont$draws(format="matrix",
-                                        variables="y_rep"))
+ppc_pit_ecdf(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_sqrt_cont$draws(format = "matrix", variables = "y_rep")
+)
 
 #' # Bivariate Poisson and Poisson difference models
 #' 
@@ -435,7 +460,7 @@ ppc_pit_ecdf(y = stan_data$score_1-stan_data$score_2,
 #| results: hide
 #| cache: false
 model_bipois <- cmdstan_model(stan_file = root("world_cup", "worldcup_bivariate_poisson.stan"))
-fit_bipois <- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta=0.95)
+fit_bipois <- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta = 0.95)
 
 #| label: fit_bipois_summary
 fit_bipois$summary(c("a","o[1]","o[32]","d[1]","d[32]","b_o","b_d","sigma_o","sigma_d"))
@@ -448,15 +473,19 @@ model_poisdif <- cmdstan_model(stan_file = root("world_cup", "worldcup_poisson_d
 fit_poisdif <- model_poisdif$sample(data = stan_data, refresh = 0)
 
 #| label: fit_poisdif_summary
-fit_poisdif$summary(c("a[1]","a[32]","b","sigma_a"))
+fit_poisdif$summary(c("a[1]", "a[32]", "b", "sigma_a"))
 (loo_poisdif <- fit_poisdif$loo())
 
 #' The set in this case study is small, and we don't see practical
 #' difference in the predictive performance.
-loo_compare(list("Discrete"=loo_discr,
-                 "Bivariate Poisson"=loo_bipois,
-                 "Poisson difference"=loo_poisdif))
-                 
+loo_compare(
+  list(
+    "Discrete" = loo_discr,
+    "Bivariate Poisson" = loo_bipois,
+    "Poisson difference" = loo_poisdif
+  )
+)
+
 #' In this case study, we used many other models for illustration, but
 #' for real football score modeling, it is a good idea to start with
 #' the bivariate Poisson model.
