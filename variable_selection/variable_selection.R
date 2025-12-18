@@ -72,11 +72,10 @@ knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA,
 #'
 
 #' **Load packages**
-#| code-fold: true
 #| cache: FALSE
 library(brms)
-options(brms.backend="cmdstanr")
 library(cmdstanr)
+options(brms.backend="cmdstanr")
 options(mc.cores = 4)
 library(posterior)
 options(digits=2, posterior.digits=2,

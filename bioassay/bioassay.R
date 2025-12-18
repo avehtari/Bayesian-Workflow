@@ -29,7 +29,6 @@
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)
 
 #' #### Load packages {.unnumbered}
-#| code-fold: true
 #| cache: FALSE
 library(cmdstanr)
 library(brms)

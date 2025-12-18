@@ -49,11 +49,11 @@ knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cac
 savefigs <- FALSE
 
 #' **Load packages**
-#| code-fold: true
 #| cache: FALSE
 library(rprojroot)
 root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
+options(mc.cores = 4)
 library(posterior)
 options(tibble.print_max=35,
         pillar.neg=FALSE,

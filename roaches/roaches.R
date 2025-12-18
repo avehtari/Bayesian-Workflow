@@ -30,16 +30,14 @@ knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, co
 #' **Load packages**
 #| code-fold: true
 #| cache: FALSE
-Sys.setenv(PROCESSX_NOTIFY_OLD_SIGCHLD = 1) # avoid zombies
 library(loo)
 library(rstantools)
 library(brms)
 library(cmdstanr)
-options(mc.cores = 8)
+options(mc.cores = 4)
 library(ggplot2)
 library(ggdist)
 library(bayesplot)
-## theme_set(bayesplot::theme_default(base_family = "sans"))
 theme_set(bayesplot::theme_default(base_family = "sans", base_size=16))
 library(posterior)
 options(posterior.num_args=list(digits=2))

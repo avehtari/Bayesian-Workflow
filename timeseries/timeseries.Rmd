@@ -1,9 +1,6 @@
-# Some Self-Contained Examples
+# Time Series Competition
 
 ```{r include=FALSE, cache=FALSE}
-# LIBRARY CONFIGURATION
-library(cmdstanr)
-library(posterior)
 library(knitr)
   knitr::opts_chunk$set(
     cache = TRUE,
@@ -22,19 +19,17 @@ library(knitr)
     tidy = FALSE,
     warning = FALSE
   )
-
-# GENERAL R CONFIGURATION
-
 options(digits = 2)
 options(htmltools.dir.version = FALSE)
+```
 
-
+```{r load-packages}
+library(cmdstanr)
+options(mc.cores = 4)
+library(posterior)
 set.seed(1123)
 ```
-Time series competition.  A simple example in which we push through
-  all the steps from data processing, through Bayesian modeling and
-  inference, to decision analysis.  This example also demonstrates how
-  to fit a mixture model in Stan.
+
 
 A few years ago someone sent us an email about a "Global Climate
 Challenge" that he had seen online, and which was introduced as
@@ -143,7 +138,7 @@ K <- 3
 mu <- c(0, -1, 1)
 data <- list(y = y, K = K, N = N, mu = mu)
 mod <- cmdstan_model("mixture.stan")
-fit_mix <- mod$sample(data = data, parallel_chains = 4, refresh = 0)
+fit_mix <- mod$sample(data = data, refresh = 0)
 print(fit_mix)
 ```
 
@@ -185,7 +180,7 @@ posterior simulations. This is made simpler using the posterior R package's
 
 ```{r, results=FALSE}
 mod <- cmdstan_model("mixture_2.stan")
-fit_mix <- mod$sample(data = data, parallel_chains = 4, refresh = 0)
+fit_mix <- mod$sample(data = data, refresh = 0)
 prob_sims <- as_draws_rvars(fit_mix$draws())
 prob <- mean(prob_sims$p)
 ```

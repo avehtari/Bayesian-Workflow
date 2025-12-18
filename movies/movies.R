@@ -1,6 +1,6 @@
 library("cmdstanr")
-library("posterior")
 options(mc.cores = 4)
+library("posterior")
 set.seed(1234)
 
 # Model for two movies

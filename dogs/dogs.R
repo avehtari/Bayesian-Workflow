@@ -31,8 +31,8 @@
 #'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(cache=TRUE, message=FALSE, error=FALSE, warning=TRUE, comment=NA, out.width='95%')
+
 #' **Load packages**
-#| code-fold: true
 #| cache: FALSE
 library("rprojroot")
 root<-has_file(".Bayesian-Workflow-root")$make_fix_file()

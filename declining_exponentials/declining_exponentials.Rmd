@@ -2,6 +2,7 @@
 # LIBRARY CONFIGURATION
 
 library(cmdstanr)
+options(mc.cores = 4)
 
 library(knitr)
 knitr::opts_chunk$set(

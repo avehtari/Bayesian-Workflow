@@ -1,7 +1,7 @@
 library("cmdstanr")
+options(mc.cores = 4)
 library("posterior")
 library("arm")
-options(mc.cores = 4)
 set.seed(123)
 
 # Bring in plotting functions from separate file

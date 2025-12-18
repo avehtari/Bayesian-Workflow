@@ -40,8 +40,8 @@
 #' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=TRUE, comment=NA, out.width='95%')
+
 #' **Load packages**
-#| code-fold: true
 #| cache: FALSE
 library(tidyr)
 library(dplyr)

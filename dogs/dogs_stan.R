@@ -1,4 +1,5 @@
 library("cmdstanr")
+options(mc.cores = 4)
 library("posterior")
 library("MASS")
 library("arm")
@@ -36,27 +37,27 @@ plot_ppc <- function(fit, label){
 }
 
 dogs_0 <- cmdstan_model("dogs_0.stan")
-fit_0 <- dogs_0$sample(data = dogs_data, parallel_chains = 4, refresh = 0)
+fit_0 <- dogs_0$sample(data = dogs_data, refresh = 0)
 print(fit_0)
 
 dogs_1 <- cmdstan_model("dogs_1.stan")
-fit_1 <- dogs_1$sample(data = dogs_data, parallel_chains = 4, refresh = 0)
+fit_1 <- dogs_1$sample(data = dogs_data, refresh = 0)
 print(fit_1)
 
 dogs_2 <- cmdstan_model("dogs_2.stan")
-fit_2 <- dogs_2$sample(data = dogs_data, parallel_chains = 4, refresh = 0)
+fit_2 <- dogs_2$sample(data = dogs_data, refresh = 0)
 print(fit_2)
 
 dogs_3 <- cmdstan_model("dogs_3.stan")
-fit_3 <- dogs_3$sample(data = dogs_data, parallel_chains = 4, refresh = 0)
+fit_3 <- dogs_3$sample(data = dogs_data, refresh = 0)
 print(fit_3, variables = c("mu_logit_a", "sigma_logit_a"))
 
 dogs_4 <- cmdstan_model("dogs_4.stan")
-fit_4 <- dogs_4$sample(data = dogs_data, parallel_chains = 4, refresh = 0)
+fit_4 <- dogs_4$sample(data = dogs_data, refresh = 0)
 print(fit_4, variables = c("mu_logit_ab", "Sigma_logit_ab"))
 
 dogs_5 <- cmdstan_model("dogs_5.stan")
-fit_5 <- dogs_5$sample(data = dogs_data, parallel_chains = 4, refresh = 0)
+fit_5 <- dogs_5$sample(data = dogs_data, refresh = 0)
 print(fit_5, variables=c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]", 
                          "a[1]", "b[1]"))
 
@@ -135,7 +136,7 @@ for (j in 1:J) {
   }
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
-new_fit_5 <- dogs_5$sample(data = new_dogs_data, parallel_chains = 4, refresh = 0)
+new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
 print(
   new_fit_5,
   variables = c(
@@ -197,7 +198,7 @@ for (j in 1:J) {
   }
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
-new_fit_5 <- dogs_5$sample(data = new_dogs_data, parallel_chains = 4, refresh = 0)
+new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
 print(
   new_fit_5,
   variables = c(
@@ -222,8 +223,8 @@ for (j in 1:J){
     new_dogs[j,t] <- rbinom(1, 1, p)
   }
 }
-new_dogs_data <- list(y=new_dogs, J=J, T=T)
-new_fit_5 <- dogs_5$sample(data=new_dogs_data, parallel_chains=4, refresh=0)
+new_dogs_data <- list(y = new_dogs, J = J, T = T)
+new_fit_5 <- dogs_5$sample(data=new_dogs_data, refresh = 0)
 print(
   new_fit_5,
   variables = c(

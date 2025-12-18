@@ -1,4 +1,5 @@
 library("cmdstanr")
+options(mc.cores = 4)
 library("priorsense")
 library("ggplot2")
 library("bayesplot")
@@ -35,7 +36,6 @@ fit_1 <- sc_model$sample(
     n_sens = 37 + 85
   ),
   refresh = 0,
-  parallel_chains = 4,
   iter_warmup = 1e4,
   iter_sampling = 1e4
 )
@@ -91,7 +91,6 @@ fit_2 <- sc_model$sample(
     n_sens = 157
   ),
   refresh = 0,
-  parallel_chains = 4,
   iter_warmup = 1e4,
   iter_sampling = 1e4
 )
@@ -136,7 +135,6 @@ santaclara_data <- list(
 fit_3a <- sc_model_hierarchical$sample(
   data = santaclara_data,
   refresh = 0,
-  parallel_chains = 4,
   iter_warmup = 1e4,
   iter_sampling = 1e4, 
   adapt_delta = 0.99 # to reduce divergences 
@@ -180,7 +178,6 @@ santaclara_data$logit_sens_prior_scale <- 0.3
 fit_3b <- sc_model_hierarchical$sample(
   data = santaclara_data,
   refresh = 0,
-  parallel_chains = 4,
   iter_warmup = 1e4,
   iter_sampling = 1e4, 
   adapt_delta = 0.99 # not as necessary with the stronger priors, but include just in case
@@ -292,10 +289,7 @@ santaclara_mrp_data <- list(
   N_pop = N_pop
 )
 
-fit_4 <- sc_model_hierarchical_mrp$sample(
-  data = santaclara_mrp_data,
-  parallel_chains = 4
-)
+fit_4 <- sc_model_hierarchical_mrp$sample(data = santaclara_mrp_data)
 
 # Show inferences for some model parameters. In addition to p_avg, the population
 # prevalence, we also look at the inferences for the first three
@@ -357,7 +351,6 @@ for (sigma_sens in sigma_senss) {
       iter_warmup = 5e4,
       iter_sampling = 5e4,
       seed = 1234,
-      parallel_chains = 4,
       refresh = 0,
       adapt_delta = 0.95,
       show_messages = FALSE, 

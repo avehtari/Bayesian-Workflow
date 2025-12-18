@@ -28,9 +28,9 @@ knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, co
 
 #' 
 #' **Load packages**
-#| code-fold: true
 #| cache: FALSE
 library("cmdstanr")
+options(mc.cores = 4)
 library("bayesplot")
 library("loo")
 library("posterior")

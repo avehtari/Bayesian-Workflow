@@ -28,7 +28,6 @@ knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, co
 
 #' 
 #' **Load packages**
-#| code-fold: true
 #| cache: FALSE
 library("rprojroot")
 root<-has_file(".Workflow-Examples-root")$make_fix_file()
@@ -37,6 +36,7 @@ library(patchwork)
 library(dplyr)
 library(loo)
 library(brms)
+options(mc.cores = 4)
 dir.create(root("sleepstudy"),"models/")
 BRMS_MODEL_DIR <- root("sleepstudy", "models/")
 options(future.globals.maxSize = 1e9)
