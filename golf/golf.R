@@ -24,11 +24,20 @@
 #' # Setup  {.unnumbered}
 #' 
 #+ setup, include=FALSE
-knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, comment=NA, out.width='95%')
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = '95%'
+)
 
 #' 
 #' **Load packages**
 #| cache: FALSE
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library("cmdstanr")
 options(mc.cores = 4)
 library("bayesplot")
@@ -46,7 +55,8 @@ fround <- function (x, digits) format(round(x, digits), nsmall = digits)
 #' The following graph shows data from professional golfers on the proportion of successful
 #' putts as a function of distance from the hole [from @Berry:1995].  Unsurprisingly, the
 #' probability of making the shot declines as a function of distance:
-golf <- read.table("data/golf_data.txt", header = TRUE, skip = 2)
+golf <- read.table(root("golf", "data", "golf_data.txt"), 
+                   header = TRUE, skip = 2)
 x <- golf$x
 y <- golf$y
 n <- golf$n
@@ -88,7 +98,7 @@ text(x + .4,
 #' \text{ for } j=1,\dots, J.
 #' $$
 #' In Stan, this is:
-print_file("golf_logistic.stan")
+print_file(root("golf", "golf_logistic.stan"))
 
 #' The code in the above model block is (implicitly) vectorized, so
 #' that it is mathematically equivalent to modeling each data point,
@@ -101,7 +111,7 @@ print_file("golf_logistic.stan")
 #| label: golf_logistic.stan
 #| results: hide
 golf_data <- list(x = x, y = y, n = n, J = J)
-model_1 <- cmdstan_model("golf_logistic.stan")
+model_1 <- cmdstan_model(root("golf", "golf_logistic.stan"))
 fit_1 <- model_1$sample(data = golf_data, refresh = 0)
 
 #' And here is the result:
@@ -264,7 +274,7 @@ for (i in 1:length(sigma_degrees_plot)){
 #' space of $\sigma$, sampling from the posterior distribution.
 #'
 #' We now write the Stan model in preparation to estimating $\sigma$:
-print_file("golf_angle_binomial.stan")
+print_file(root("golf", "golf_angle_binomial.stan"))
 
 #' In the transformed data block above, the `./` in the calculation of
 #' p corresponds to componentwise division in this vectorized
@@ -277,8 +287,8 @@ print_file("golf_angle_binomial.stan")
 #| results: hide
 r <- (1.68/2)/12
 R <- (4.25/2)/12
-golf_data <- c(golf_data, r=r, R=R)
-model_2 <- cmdstan_model("golf_angle_binomial.stan")
+golf_data <- c(golf_data, r = r, R = R)
+model_2 <- cmdstan_model(root("golf", "golf_angle_binomial.stan"))
 fit_2 <- model_2$sample(data = golf_data, refresh = 0)
 
 #' Here is the result:
@@ -342,7 +352,8 @@ text(18.5, .24, "Geometry-based model", col="blue")
 #' data (in red), along with our earlier dataset (in blue) and the
 #' already-fit geometry-based model from before, extending to the
 #' range of the new data.
-golf_new <- read.table("data/golf_data_new.txt", header = TRUE, skip = 2)
+golf_new <- read.table(root("golf", "data", "golf_data_new.txt"), 
+                       header = TRUE, skip = 2)
 #| label: fig-golf-fit-2-new
 #| fig-width: 6
 #| fig-height: 4
@@ -447,7 +458,7 @@ arrows(0.5 * dist - 0.05, -1.5 * R_plot, 0, -1.5 * R_plot, 2, length = .1)
 #' write the new model in Stan, giving it the name
 #' `golf_angle_distance_binomial.stan` to convey that it accounts both
 #' for angle and distance:
-print_file("golf_angle_distance_binomial.stan")
+print_file(root("golf", "golf_angle_distance_binomial.stan"))
 
 #' The result is a model with two parameters, $\sigma_{\rm angle}$ and
 #' $\sigma_{\rm distance}$. Even this improved geometry-based model is
@@ -480,7 +491,7 @@ golf_new_data <- list(
   overshot = overshot,
   distance_tolerance = distance_tolerance
 )
-model_3 <- cmdstan_model("golf_angle_distance_binomial.stan")
+model_3 <- cmdstan_model(root("golf", "golf_angle_distance_binomial.stan"))
 fit_3 <- model_3$sample(data = golf_new_data, refresh = 0)
 
 #' Here is the result:
@@ -577,12 +588,12 @@ print(golf_new[1:5,])
 #' To complete the model we add $\sigma_y$ to the parameters block and
 #' assign it a weakly informative half-normal(0,1) prior
 #' distribution. Here's the new Stan program:
-print_file("golf_angle_distance_normal.stan")
+print_file(root("golf", "golf_angle_distance_normal.stan"))
 
 #' We now fit this model to the data:
 #| label: golf_angle_distance_normal.stan
 #| results: hide
-model_4 <- cmdstan_model("golf_angle_distance_normal.stan")
+model_4 <- cmdstan_model(root("golf", "golf_angle_distance_normal.stan"))
 fit_4 <- model_4$sample(data = golf_new_data, refresh = 0)
 
 #' Here is the result
@@ -639,7 +650,7 @@ points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 #' quantities block.
 #| label: golf_angle_distance_normal_with_resids.stan
 #| results: hide
-model_4_with_resids <- cmdstan_model("golf_angle_distance_normal_with_resids.stan")
+model_4_with_resids <- cmdstan_model(root("golf", "golf_angle_distance_normal_with_resids.stan"))
 fit_4_with_resids <- model_4_with_resids$sample(data = golf_new_data, refresh = 0)
 
 #' Then we compute the posterior means of the residuals, $y_j/n_j -
@@ -675,12 +686,12 @@ lines(golf_new$x, posterior_mean_residual)
 #' to keep the probabilities bounded between 0 and 1. We added an
 #' error term on the logistic scale with a scale parameter, `sigma_eta`,
 #' estimated from the data.
-print_file("golf_angle_distance_binomial_with_logit_errors.stan")
+print_file(root("golf", "golf_angle_distance_binomial_with_logit_errors.stan"))
 
 #' We fit the model to the data:
 #| label: golf_angle_distance_binomial_with_logit_errors.stan
 #| results: hide
-model_5 <- cmdstan_model("golf_angle_distance_binomial_with_logit_errors.stan")
+model_5 <- cmdstan_model(root("golf", "golf_angle_distance_binomial_with_logit_errors.stan"))
 fit_5 <- model_5$sample(data = golf_new_data, refresh = 0)
 
 #' Here is the result:
@@ -738,12 +749,12 @@ points(golf_new$x, golf_new$y/golf_new$n, pch = 20, col = "red")
 #' positive and less than 1. This eliminates the problem with the
 #' boundary and the need for the logit.  The prior distribution for
 #' `epsilon` keeps the errors under control.
-print_file("golf_angle_distance_binomial_with_proportional_errors.stan")
+print_file(root("golf", "golf_angle_distance_binomial_with_proportional_errors.stan"))
 
 #' We fit the model to the data:
 #| label: golf_angle_distance_binomial_with_proportional_errors.stan
 #| results: hide
-model_6 <- cmdstan_model("golf_angle_distance_binomial_with_proportional_errors.stan")
+model_6 <- cmdstan_model(root("golf", "golf_angle_distance_binomial_with_proportional_errors.stan"))
 fit_6 <- model_6$sample(data = golf_new_data, refresh = 0)
 
 #' Here is the result:
@@ -766,8 +777,8 @@ x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
 p_angle_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1
 p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
   pnorm(-overshot / ((x_grid + overshot)*sigma_distance_hat))
-lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col="red")
-points(golf_new$x, golf_new$y/golf_new$n, pch=20, col="red")
+lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid*p_distance_grid), col = "red")
+points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 
 #| label: fig-golf-res-6
 #| fig-width: 4.5
@@ -795,7 +806,7 @@ lines(golf_new$x, posterior_mean_residual)
 #' posterior expect for the new `distance_tolerance` parameter,
 #| label: golf_angle_distance_binomial_with_proportional_errors_2.stan
 #| results: hide
-model_7 <- cmdstan_model("golf_angle_distance_binomial_with_proportional_errors_2.stan")
+model_7 <- cmdstan_model(root("golf", "golf_angle_distance_binomial_with_proportional_errors_2.stan"))
 fit_7 <- model_7$sample(data = golf_new_data, refresh = 0, init = fit_6)
 
 #' Here is the result:
@@ -851,7 +862,7 @@ fit_7$summary(variables = "distance_tolerance")
 #' posterior expect for the new `overshot` parameter and Pathfinder,
 #| label: golf_angle_distance_binomial_with_proportional_errors_3.stan
 #| results: hide
-model_8 <- cmdstan_model("golf_angle_distance_binomial_with_proportional_errors_3.stan")
+model_8 <- cmdstan_model(root("golf", "golf_angle_distance_binomial_with_proportional_errors_3.stan"))
 pth_8 <- model_8$pathfinder(
   data = golf_new_data,
   refresh = 0,
@@ -927,7 +938,7 @@ fit_8$draws(variables = c("distance_tolerance","overshot")) |>
 #' models. As we have one `epsilon` parameter for each observation, we
 #' need to use integerated PSIS-LOO. We can compute the integrated
 #' `log_lik` with the following stand alone generated quantities code.
-gq_ll <- cmdstan_model("golf_log_lik.stan")
+gq_ll <- cmdstan_model(root("golf", "golf_log_lik.stan"))
 
 #' When calling generated quantities, we pass only the required variables which
 #' allowed us to write more compact Stan code for the `log_lik` computation.
