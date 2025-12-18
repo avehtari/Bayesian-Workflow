@@ -1,3 +1,5 @@
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library("scales")
 library("arm")
 library("posterior")
@@ -6,7 +8,7 @@ options(mc.cores = 4)
 set.seed(123)
 
 series <- matrix(
-  scan("data/Series1000.txt"),
+  scan(root("timeseries", "data", "Series1000.txt")),
   nrow = 1000,
   ncol = 135,
   byrow = TRUE
@@ -14,7 +16,7 @@ series <- matrix(
 T <- 135
 N <- 1000
 
-pdf("series_1.pdf", height=3.4, width=5.5)
+pdf(root("timeseries", "series_1.pdf"), height = 3.4, width = 5.5)
 par(mar = c(3, 3, 2, 0), tck = -.01, mgp = c(1.5, .5, 0))
 plot(c(1, T), range(series), 
      xaxs = "i", bty = "l", type = "n", 
@@ -34,14 +36,14 @@ for (n in 1:N){
   se[n] <- 100*se.coef(fit)["time"]
 }
 
-pdf("series_2.pdf", height=3.6, width=5.5)
+pdf(root("timeseries", "series_2.pdf"), height = 3.6, width = 5.5)
 par(mar = c(3, 3, 2, 0), tck = -.01, mgp = c(1.5, .5, 0))
 plot(slope, se, 
      ylim = c(0, 1.05 * max(se)), yaxs = "i", bty = "l", 
      xlab = "Estmated slope", ylab = "SE", pch = 20, cex = .5)
 dev.off()
 
-pdf("series_3.pdf", height=3.6, width=5.5)
+pdf(root("timeseries", "series_3.pdf"), height = 3.6, width = 5.5)
 par(mar = c(3, 3, 2, 0), tck = -.01, mgp = c(1.5, .5, 0))
 hist(
   slope,
@@ -56,12 +58,12 @@ y <- slope
 K <- 3
 mu <- c(0, -1, 1)
 data <- list(y = y, K = K, N = N, mu = mu)
-mod <- cmdstan_model("mixture.stan")
+mod <- cmdstan_model(root("timeseries", "mixture.stan"))
 fit_mix <- mod$sample(data = data, refresh = 0)
 print(fit_mix)
 
 ## New model
-mod <- cmdstan_model("mixture_2.stan")
+mod <- cmdstan_model(root("timeseries", "mixture_2.stan"))
 fit_mix <- mod$sample(data = data, refresh = 0)
 prob_sims <- as_draws_rvars(fit_mix$draws())
 prob <- mean(prob_sims$p)
