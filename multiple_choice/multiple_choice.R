@@ -31,6 +31,10 @@ for (k in 1:K){
   correct[,k] <- ifelse(responses[,k] == as.character(answers[k]), 1, 0)
 }
 score <- rowSums(correct)
+item <- colSums(correct)
+summary(score)
+summary(item)
+
 score_jitt <- score + jitter(rep(0, J), amount = 0.3)
 score_adj <- (score - mean(score)) / sd(score)
 score_adj_jitt <- (score_jitt - mean(score)) / sd(score)
