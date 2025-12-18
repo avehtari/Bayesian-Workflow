@@ -1,3 +1,5 @@
+library("rprojroot")
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library("arm")
 library("posterior")
 library("rstanarm")
@@ -6,7 +8,7 @@ library("cmdstanr")
 options(mc.cores = 4)
 
 # Prepare data
-park <- read.csv("data/park.csv")
+park <- read.csv(root("park_rule", "data", "park.csv"))
 N <- nrow(park)
 respondents <- sort(unique(park$submission_id))
 J <- length(respondents)
@@ -73,7 +75,7 @@ display(fit_lme4_sim)
 a_item_hat <- ranef(fit_lme4)$item
 print(a_item_hat)
 
-wordings <- read.csv("data/park.txt", header = FALSE)$V2
+wordings <- read.csv(root("park_rule", "data", "park.txt"), header = FALSE)$V2
 wordings <- substr(wordings, 2, nchar(wordings) - 1)
 a_item_hat <- unlist(a_item_hat)
 names(a_item_hat) <- wordings
@@ -114,16 +116,17 @@ stan_data <- list(
   X = X
 )
 
-park_1 <- cmdstan_model("park_1.stan")
+park_1 <- cmdstan_model(root("park_rule", "park_1.stan"))
 # max_treedepth=5: Stan's warmup can sometimes be very slow on problematic models
+# (instead of max_treedepth we could also check if initializing mcmc using pathfinder helps)
 fit_1 <- park_1$sample(data = stan_data, max_treedepth = 5)
 print(fit_1)
 
-park_2 <- cmdstan_model("park_2.stan")
+park_2 <- cmdstan_model(root("park_rule", "park_2.stan"))
 fit_2 <- park_2$sample(data = stan_data, max_treedepth = 5)
 print(fit_2)
 
-park_3 <- cmdstan_model("park_3.stan")
+park_3 <- cmdstan_model(root("park_rule", "park_3.stan"))
 fit_3 <- park_3$sample(data = stan_data, max_treedepth = 5)
 print(fit_3)
 
@@ -142,9 +145,9 @@ print(fit_3_sim)
 
 # Fit normal model
 park_normal <- list(
-  cmdstan_model("park_1_normal.stan"),
-  cmdstan_model("park_2_normal.stan"),
-  cmdstan_model("park_3_normal.stan")
+  cmdstan_model(root("park_rule", "park_1_normal.stan")),
+  cmdstan_model(root("park_rule", "park_2_normal.stan")),
+  cmdstan_model(root("park_rule", "park_3_normal.stan"))
 )
 fit_normal <- list()
 for (i in 1:3) {
