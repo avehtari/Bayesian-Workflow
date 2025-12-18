@@ -43,8 +43,7 @@ library(patchwork)
 library(tidybayes)
 library(RColorBrewer)
 library(priorsense)
-devtools::load_all("~/proj/loo/")
-#library(loo)
+library(loo)
 library(posterior)
 library(brms)
 options(brms.backend = "cmdstanr")
@@ -52,7 +51,11 @@ options(mc.cores = 4)
 library(dplyr)
 library(matrixStats)
 library(tinytable)
-options(tinytable_format_num_fmt = "significant_cell", tinytable_format_digits = 2, tinytable_tt_digits=2)
+options(
+  tinytable_format_num_fmt = "significant_cell",
+  tinytable_format_digits = 2,
+  tinytable_tt_digits = 2
+)
 library(reliabilitydiag)
 
 #' # Data
@@ -135,8 +138,8 @@ bfit_0 <- add_criterion(bfit_0, criterion = "loo")
 #| results: "hide"
 bfit_0h <- brm(shock ~ time + (time | dog), family = bernoulli(),
                prior = prior(normal(0,1)),
-               data = dogs_df, refresh=0, adapt_delta=0.95)
-bfit_0h <- add_criterion(bfit_0h, criterion = "loo", save_psis=TRUE)
+               data = dogs_df, refresh = 0, adapt_delta = 0.95)
+bfit_0h <- add_criterion(bfit_0h, criterion = "loo", save_psis = TRUE)
 
 #' ## Model comparison
 #'
@@ -161,8 +164,8 @@ plot_pred9_0h <- dogs_df |>
         stat_lineribbon(.width = c(.95), alpha = 1 / 2, color = brewer.pal(5, "Blues")[[5]]) +
   scale_fill_brewer() +
   geom_point(data = dplyr::filter(dogs_df, dog<=9), aes(x = time, y = shock, group = dog)) +
-  facet_wrap(~dog, labeller=label_both) +
-  scale_y_continuous(breaks=c(0,1)) +
+  facet_wrap( ~ dog, labeller = label_both) +
+  scale_y_continuous(breaks = c(0, 1)) +
   theme(legend.position = "none") +
   labs(y = "Shocks and predicted probability of shock", title="Model 0h")
 plot_pred9_0h
@@ -174,7 +177,7 @@ plot_pred9_0h
 #' calibrated using PAV-adjusted calibration plot
 #' [@Dimitriadis+etal:2021:reliabilitydiag] implemented in
 #' `reliabilitydiag`. Looks quite good.
-rd=reliabilitydiag(EMOS = loo_epred(bfit_0h), y = dogs_df$shock)
+rd <- reliabilitydiag(EMOS = loo_epred(bfit_0h), y = dogs_df$shock)
 plot_calib_0h <- autoplot(rd) +
         labs(
                 x = "Predicted (LOO)",
@@ -256,7 +259,7 @@ ppc_pava_residual <-
 ppc_pava_residual(dogs_df$shock,
                   loo_epred(bfit_0h),
                   jitter(dogs_df$time,0.3)) +
-  labs(x="Time")
+  labs(x = "Time")
 
 #' ## Posterior predictive checking
 #'
@@ -275,14 +278,14 @@ dogs_ppc <- function(shock, title) {
   ggplot(aes(time, dog, fill = shock)) +
   geom_tile() +
   ## coord_fixed() +
-  scale_fill_gradient(low ="#ffffc8", high="#7c0025") +
+  scale_fill_gradient(low = "#ffffc8", high = "#7c0025") +
   theme(legend.position = "none",
         axis.line = element_blank(),
         axis.text = element_blank(),
         axis.ticks = element_blank(),
         axis.title.x = element_blank(),
-        axis.title.y=element_text(angle=0,vjust=0.6)) +
-    labs(y=title)
+        axis.title.y = element_text(angle = 0, vjust = 0.6)) +
+    labs(y = title)
 }
 
 dogs_ppc(shock, "Real dogs") +
@@ -295,8 +298,8 @@ mean_switches <- function(shock) {
   shock |> rowDiffs() |> abs() |> rowSums() |> mean()
 }
 ppc_meanswitches <- function(y, yrep) {
-  data.frame(yrep=yrep) |>
-    ggplot(aes(x=yrep)) +
+  data.frame(yrep = yrep) |>
+    ggplot(aes(x = yrep)) +
     geom_histogram(aes(fill = "yrep"), 
                    color = bayesplot:::get_color("lh"),
                    linewidth = 0.25) +
@@ -316,7 +319,7 @@ ppc_meanswitches <- function(y, yrep) {
 }
 
 yrep <- replicate(100, mean_switches(pred_logit(bfit_0h)))
-ppc_meanswitches(y=mean_switches(shock), yrep=yrep)
+ppc_meanswitches(y = mean_switches(shock), yrep = yrep)
 
 #' ## Prior-likelihood sensitivity analysis
 #'
@@ -344,7 +347,7 @@ powerscale_sensitivity(bfit_0h)$sensitivity[1:6, ] |>
 bfit_1 <- brm(bf(shock ~ a^(time - 1), a ~ 1, nl = TRUE),
               family = bernoulli(link = "identity"),
               prior = prior(beta(1, 1), nlpar = "a", lb = 0, ub = 1),
-              data = dogs_df, refresh=0)
+              data = dogs_df, refresh = 0)
 bfit_1 <- add_criterion(bfit_1, criterion = "loo")
 
 #' ## Model comparison
@@ -412,7 +415,7 @@ bfit_3 <- brm(bf(shock ~ inv_logit(etaa)^(time - 1),
                  etaa ~ (1 | dog), nl = TRUE),
               family = bernoulli(link = "identity"),
               prior = prior(student_t(3, 0, 2.5), nlpar = "etaa"),
-              data = dogs_df, refresh=0)
+              data = dogs_df, refresh = 0)
 bfit_3 <- add_criterion(bfit_3, criterion = "loo")
 
 #' ## Model comparison
@@ -447,8 +450,8 @@ bfit_4 <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoid
               family = bernoulli(link = "identity"),
               prior = c(prior(student_t(3, 0, 2.5), nlpar = "etaa"),
                         prior(student_t(3, 0, 2.5), nlpar = "etab")),
-              data = dogs_df, refresh=0)
-bfit_4 <- add_criterion(bfit_4, criterion = "loo", save_psis=TRUE)
+              data = dogs_df, refresh = 0)
+bfit_4 <- add_criterion(bfit_4, criterion = "loo", save_psis = TRUE)
 
 #' ## Model comparison
 #' 
@@ -477,13 +480,15 @@ plot_pred9_4 <-dogs_df |>
   dplyr::filter(dog <= 9) |>
         add_linpred_draws(bfit_4, transform = TRUE) |>
         ggplot(aes(x = time, y = .linpred)) +
-        stat_lineribbon(.width = c(.95), alpha = 1 / 2, color = brewer.pal(5, "Blues")[[5]]) +
+        stat_lineribbon(.width = c(.95), alpha = 1 / 2, 
+                        color = brewer.pal(5, "Blues")[[5]]) +
   scale_fill_brewer() +
-  geom_point(data = dplyr::filter(dogs_df, dog<=9), aes(x = time, y = shock, group = dog)) +
-  facet_wrap(~dog, labeller=label_both) +
+  geom_point(data = dplyr::filter(dogs_df, dog <= 9), 
+             aes(x = time, y = shock, group = dog)) +
+  facet_wrap( ~ dog, labeller = label_both) +
   theme(legend.position = "none") +
-  scale_y_continuous(breaks=c(0,1)) +
-  labs(y = "Shocks and predicted probability of shock", title="Model 4")
+  scale_y_continuous(breaks = c(0, 1)) +
+  labs(y = "Shocks and predicted probability of shock", title = "Model 4")
 plot_pred9_4
   
 #' We can compare these two the predictions from the non-hierarchial
@@ -495,10 +500,12 @@ dogs_df |>
   dplyr::filter(dog <= 9) |>
         add_linpred_draws(bfit_2, transform = TRUE) |>
         ggplot(aes(x = time, y = .linpred)) +
-        stat_lineribbon(.width = c(.95), alpha = 1 / 2, color = brewer.pal(5, "Blues")[[5]]) +
+        stat_lineribbon(.width = c(.95), alpha = 1 / 2, 
+                        color = brewer.pal(5, "Blues")[[5]]) +
   scale_fill_brewer() +
-  geom_point(data = dplyr::filter(dogs_df, dog<=9), aes(x = time, y = shock, group = dog)) +
-  facet_wrap(~dog, labeller=label_both) +
+  geom_point(data = dplyr::filter(dogs_df, dog<=9), 
+             aes(x = time, y = shock, group = dog)) +
+  facet_wrap( ~ dog, labeller = label_both) +
   theme(legend.position = "none") +
   labs(y = "Shocks and predicted probability of shock")
 
@@ -507,12 +514,12 @@ dogs_df |>
 #' 
 #' Examine how well the leave-one-out predictive probabilities from
 #' hierarchical 2-parameter log model are calibrated. Looks quite good.
-rd=reliabilitydiag(EMOS = loo_epred(bfit_4), y = dogs_df$shock)
-plot_calib_4 <- autoplot(rd)+
-  labs(x="Predicted (LOO)",
-       y="Conditional event probabilities",
-       title="Model 4")+
-  bayesplot::theme_default(base_family = "sans", base_size=16)
+rd <- reliabilitydiag(EMOS = loo_epred(bfit_4), y = dogs_df$shock)
+plot_calib_4 <- autoplot(rd) +
+  labs(x = "Predicted (LOO)", 
+       y = "Conditional event probabilities", 
+       title = "Model 4")+
+  bayesplot::theme_default(base_family = "sans", base_size = 16)
 plot_calib_4
 
 #' ## Residual plots
@@ -542,7 +549,7 @@ dogs_ppc(pred_log(bfit_4), "PPsims from M4:\nhier logit model")
 #' Posterior predictive checking using mean number of switches between
 #' shocks and avoidances as the test statistic.
 yrep <- replicate(100, mean_switches(pred_log(bfit_4)))
-ppc_meanswitches(y=mean_switches(shock), yrep=yrep)
+ppc_meanswitches(y = mean_switches(shock), yrep = yrep)
 
 #' ## Prior-likelihood sensitivity analysis
 #'
@@ -552,7 +559,7 @@ ppc_meanswitches(y=mean_switches(shock), yrep=yrep)
 #' available strong prior information.
 powerscale_sensitivity(bfit_4)$sensitivity[1:5, ] |>
                                 tt() |>
-                                format_tt(num_fmt="decimal")
+                                format_tt(num_fmt = "decimal")
 
 
 #' # Comparing posterior predictions
@@ -565,9 +572,9 @@ dogs_df |>
   mutate(epred_0h = colMeans(posterior_epred(bfit_0h)),
          epred_4 = colMeans(posterior_epred(bfit_4))) |>
   ggplot(aes(x = time, group = dog)) +
-  geom_line(aes(y = epred_0h, color = "Model 0h"), alpha=0.5) +
-  geom_line(aes(y = epred_4, color = "Model 4"), alpha=0.5) +
-  scale_y_continuous(lim=c(0,1)) +
+  geom_line(aes(y = epred_0h, color = "Model 0h"), alpha = 0.5) +
+  geom_line(aes(y = epred_4, color = "Model 4"), alpha = 0.5) +
+  scale_y_continuous(lim = c(0, 1)) +
   labs(x="Time",y="Posterior predictive probability")
 
 #' # Leave-future-out cross-validation
@@ -622,7 +629,7 @@ pred_shock_0 <- matrix(c(rep(1, 30), posterior_predict(bfit_0, ndraws = 1) |> as
 dogs_df_pred_0$prev_shock_0 <- as.numeric(rowCumsums(pred_shock_0)[, 1:(ncol(pred_shock_0) - 1)])
 dogs_df_pred_0$prev_avoid <- as.numeric(rowCumsums(1-pred_shock_0)[, 1:(ncol(pred_shock_0) - 1)])
 bfit_4s <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoid,
-                 mvbind(etaa, etab) ~ (1 |p| dog), nl=TRUE),
+                 mvbind(etaa, etab) ~ (1 |p| dog), nl = TRUE),
               family = bernoulli(link = "identity"),
               data = dogs_df_pred_0, refresh=0)
 #' The posterior for a and b are different!
@@ -639,16 +646,16 @@ pred_shock_0h <- matrix(c(rep(1, 30), posterior_predict(bfit_0h, ndraws = 1) |> 
 dogs_df_pred_0h$prev_shock_0h <- as.numeric(rowCumsums(pred_shock_0h)[, 1:(ncol(pred_shock_0h) - 1)])
 dogs_df_pred_0h$prev_avoid <- as.numeric(rowCumsums(1-pred_shock_0h)[, 1:(ncol(pred_shock_0h) - 1)])
 bfit_4sh <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoid,
-                 mvbind(etaa, etab) ~ (1 |p| dog), nl=TRUE),
-              family = bernoulli(link = "identity"),
-              data = dogs_df_pred_0h, refresh=0)
+                mvbind(etaa, etab) ~ (1 |p| dog), nl=TRUE),
+                family = bernoulli(link = "identity"),
+                data = dogs_df_pred_0h, refresh = 0)
 
 #' The posterior for a and b are different!
 as_draws_df(bfit_4sh) |>
   mutate(a = inv_logit(b_etaa_Intercept),
          b = inv_logit(b_etab_Intercept)) |>
   mcmc_areas(pars = c("a", "b")) +
-  labs(title="Model 4: hier. logit, simulated data from Model 0h")
+  labs(title = "Model 4: hier. logit, simulated data from Model 0h")
 
 #' # Conclusion
 #'
