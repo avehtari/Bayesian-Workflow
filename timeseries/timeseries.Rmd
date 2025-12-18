@@ -8,7 +8,7 @@ library(knitr)
     comment = NA,
     dev = "png",
     dpi = 150,
-    echo = FALSE,
+    echo = TRUE,
     fig.align = "center",
     fig.width = 6,
     fig.asp = 0.618,  # 1 / phi
@@ -133,7 +133,7 @@ centered at 0, -1, and 1. It looks like this might be the case.
 
 So let's fit a mixture model. That's easy.  Here's the Stan program:
 
-```{r}
+```{r, echo=FALSE}
 cat(paste(readLines(root("timeseries", "mixture.stan")), "\n", sep=""), sep="")
 ```
 
