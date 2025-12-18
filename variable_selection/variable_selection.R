@@ -78,8 +78,8 @@ library(cmdstanr)
 options(brms.backend="cmdstanr")
 options(mc.cores = 4)
 library(posterior)
-options(digits=2, posterior.digits=2,
-        pillar.neg = FALSE, pillar.subtle=FALSE, pillar.sigfig=2)
+options(digits = 2, posterior.digits = 2, 
+        pillar.neg = FALSE, pillar.subtle = FALSE, pillar.sigfig = 2)
 library(loo)
 library(projpred)
 if (interactive()) {
@@ -94,7 +94,8 @@ set1 <- RColorBrewer::brewer.pal(7, "Set1")
 library(khroma)
 library(latex2exp)
 library(tinytable)
-options(tinytable_format_num_fmt = "significant_cell", tinytable_format_digits = 2, tinytable_tt_digits=2)
+options(tinytable_format_num_fmt = "significant_cell", tinytable_format_digits = 2,
+        tinytable_tt_digits = 2)
 library(dplyr)
 library(matrixStats)
 library(patchwork)
@@ -102,29 +103,30 @@ library(ggdist)
 library(doFuture)
 library(tictoc)
 
-#' Set random seed for reproducibility
-SEED <- 2132
 
 #' ## Data preparation and visualization
 #'
 #' Get the data from Regression and Other Stories R package.
 student <- read.csv(url('https://raw.githubusercontent.com/avehtari/ROS-Examples/master/Student/data/student-merged-all.csv'))
 #' List the predictors to be used.
-predictors <- c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","traveltime","studytime","failures","schoolsup","famsup","paid","activities", "nursery", "higher", "internet", "romantic","famrel","freetime","goout","Dalc","Walc","health","absences")
+predictors <- c("school","sex","age","address","famsize","Pstatus", "Medu","Fedu",
+                "traveltime","studytime","failures","schoolsup", "famsup","paid",
+                "activities", "nursery", "higher", "internet",  "romantic","famrel",
+                "freetime","goout","Dalc","Walc","health", "absences")
 p <- length(predictors)
 
 #' The data includes 3 grades for both mathematics and Portuguese.  To
 #' reduce the variability in the outcome we use median grades based on
 #' those three exams for each topic. We select only students with
 #' non-zero grades.
-grades <- c("G1mat","G2mat","G3mat","G1por","G2por","G3por")
+grades <- c("G1mat", "G2mat", "G3mat", "G1por", "G2por", "G3por")
 student <- student %>%
   mutate(across(matches("G[1-3]..."), ~na_if(.,0))) %>%
-  mutate(Gmat = rowMedians(as.matrix(select(.,matches("G.mat"))), na.rm=TRUE),
-         Gpor = rowMedians(as.matrix(select(.,matches("G.por"))), na.rm=TRUE))
-student_Gmat <- subset(student, is.finite(Gmat), select=c("Gmat",predictors))
+  mutate(Gmat = rowMedians(as.matrix(select(., matches("G.mat"))), na.rm = TRUE), 
+         Gpor = rowMedians(as.matrix(select(., matches("G.por"))), na.rm = TRUE))
+student_Gmat <- subset(student, is.finite(Gmat), select = c("Gmat", predictors))
 student_Gmat <- student_Gmat[is.finite(rowMeans(student_Gmat)),]
-student_Gpor <- subset(student, is.finite(Gpor), select=c("Gpor",predictors))
+student_Gpor <- subset(student, is.finite(Gpor), select = c("Gpor", predictors))
 (nmat <- nrow(student_Gmat))
 head(student_Gmat) |> tt()
 (npor <- nrow(student_Gpor))
@@ -135,9 +137,13 @@ head(student_Gpor) |> tt()
 #| label: fig-data-histograms
 #| fig-height: 4
 #| fig-width: 8
-p1 <- ggplot(student_Gmat, aes(x=Gmat)) + geom_dots() + labs(x='Median math exam score')
-p2 <- ggplot(student_Gpor, aes(x=Gpor)) + geom_dots() + labs(x='Median Portuguese exam score')
-(p1 + p2) * scale_x_continuous(lim=c(0,20)) *
+p1 <- ggplot(student_Gmat, aes(x=Gmat)) + 
+  geom_dots() + 
+  labs(x = "Median math exam score")
+p2 <- ggplot(student_Gpor, aes(x=Gpor)) + 
+  geom_dots() + 
+  labs(x = "Median Portuguese exam score")
+(p1 + p2) * scale_x_continuous(lim = c(0, 20)) * 
   theme(axis.line.y = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks.y = element_blank())
@@ -188,10 +194,9 @@ loo_R2(fitm_u) |> as.data.frame() |> tt()
 #| fig-height: 6
 #| fig-width: 8
 #| cache: false
-drawsmu <- as_draws_df(fitm_u, variable=paste0('b_',predictors)) |>
+drawsmu <- as_draws_df(fitm_u, variable = paste0("b_",predictors)) |>
   set_variables(predictors)
-p <- mcmc_areas(drawsmu,
-                 prob_outer=0.98, area_method = "scaled height") +
+p <- mcmc_areas(drawsmu, prob_outer = 0.98, area_method = "scaled height") +
   xlim(c(-1.5,1.5))
 p <- p + scale_y_discrete(limits = rev(levels(p$data$parameter)))
 p
@@ -283,17 +288,17 @@ fitm_n1p <- update(fitm_n1, sample_prior = "only")
 # we also sample from a truncated prior to get more draws in the
 # interesting region of R^2<0.5 needed for zoomed plot
 fitm_n1pt <- update(fitm_n1, sample_prior = "only",
-                    prior=c(prior(normal(0, 2.5), class = b),
-                            prior(student_t(3, 0, 3), lb=5, class = sigma)),
+                    prior = c(prior(normal(0, 2.5), class = b),
+                              prior(student_t(3, 0, 3), lb=5, class = sigma)),
                     refresh = 0)
 
 # normal(0, sqrt(0.3/26)*sd(y))
-scale_b <- sqrt(0.3/26)*sd(studentstd_Gmat$Gmat)
+scale_b <- sqrt(0.3/26) * sd(studentstd_Gmat$Gmat)
 fitm_n2 <- brm(Gmat ~ ., data = studentstd_Gmat,
                prior=c(prior(normal(0, scale_b), class = b)),
                warmup = 1000, iter = 5000,
-               stanvars = stanvar(scale_b, name='scale_b'),
-            refresh = 0)
+               stanvars = stanvar(scale_b, name = "scale_b"), 
+               refresh = 0)
 fitm_n2p <- update(fitm_n2, sample_prior = "only")
 
 # horseshoe
@@ -302,16 +307,15 @@ p0 <- 6
 scale_slab <- sd(studentstd_Gmat$Gmat)/sqrt(p0)*sqrt(0.3)
 scale_global <- p0 / (p - p0) / sqrt(nrow(studentstd_Gmat))
 fitm_hs <- brm(Gmat ~ ., data = studentstd_Gmat,
-               prior=c(prior(horseshoe(scale_global = scale_global,
-                                       scale_slab = scale_slab),
-                             class = b)),
+               prior = c(prior(horseshoe(scale_global = scale_global,
+                                         scale_slab = scale_slab), class = b)),
                warmup = 1000, iter = 5000,
                refresh = 0)
 fitm_hsp <- update(fitm_hs, sample_prior = "only")
 
 # R2D2
 fitm <- brm(Gmat ~ ., data = studentstd_Gmat,
-            prior=c(prior(R2D2(mean_R2 = 1/3, prec_R2 = 3, cons_D2 = 1/2), class=b)),
+            prior = c(prior(R2D2(mean_R2 = 1/3, prec_R2 = 3, cons_D2 = 1/2), class = b)), 
             warmup = 1000, iter = 5000,
             refresh = 0)
 fitmp <- update(fitm, sample_prior = "only")
@@ -319,90 +323,124 @@ fitmp <- update(fitm, sample_prior = "only")
 #| label: prior-plots
 #| cache: true
 # plot prior on R^2 in (0,1)
-types=rep(factor(c("Prior","Posterior"),levels=c("Prior","Posterior")), times=4)
-priornames=rep(factor(c("Wide normal","Scaled normal","RHS","R2D2"),
-                      levels=c(c("Wide normal","Scaled normal","RHS","R2D2"))), each=2)
-clr<-colour("bright",names=FALSE)(7)
-fits=list(fitm_n1p, fitm_n1, fitm_n2p, fitm_n2, fitm_hsp, fitm_hs, fitmp, fitm)
-pp1 <- lapply(1:8, \(i) data.frame(R2=as.numeric(bayes_R2(fits[[i]], summary=FALSE)), type=types[i], priorname=priornames[i])) |>
+types <- factor(c("Prior", "Posterior"), levels = c("Prior", "Posterior"))
+types <- rep(types, times = 4)
+priornames <- factor(c("Wide normal","Scaled normal","RHS","R2D2"), 
+                     levels = c("Wide normal", "Scaled normal", "RHS", "R2D2"))
+priornames <- rep(priornames, each = 2)
+clr <- colour("bright", names = FALSE)(7)
+fits <- list(fitm_n1p, fitm_n1, fitm_n2p, fitm_n2, fitm_hsp, fitm_hs, fitmp, fitm)
+pp1 <- lapply(1:8, \(i) data.frame(
+                R2 = as.numeric(bayes_R2(fits[[i]], summary = FALSE)),
+                type = types[i],
+                priorname = priornames[i]
+              )) |> 
   bind_rows() |>
   filter(type=="Prior") |>
   ggplot(aes(x=R2, color=priorname)) +
-  stat_slab(expand=TRUE, trim=FALSE, alpha=.6, fill=NA, adjust=2) +
+  stat_slab(expand = TRUE, trim = FALSE, alpha = .6, fill = NA, adjust = 2) +
   xlim(c(0,1)) +
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),
-        axis.line.y=element_blank(),
-        axis.title.y=element_blank(),
-        plot.title = element_text(size=16),
-        legend.position="none") +
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        plot.title = element_text(size = 16), 
+        legend.position = "none") +
   scale_color_bright() +
-  labs(x=TeX("$R^2$"), title=TeX("a) Implied prior on $R^2$")) +
-  annotate(geom="text", x=0.94, y=0.33, label="Wide normal", hjust=1, color=clr[1], size=5) + 
-  annotate(geom="text", x=0.85, y=0.12, label="Scaled normal", hjust=1, color=clr[2], size=5) +
-  annotate(geom="text", x=0.06, y=0.33, label="Horseshoe", hjust=0, color=clr[3], size=5) +
-  annotate(geom="text", x=0.15, y=0.12, label="R2D2", hjust=0, color=clr[4], size=5) 
+  labs(x = TeX("$R^2$"), title = TeX("a) Implied prior on $R^2$")) +
+  annotate(geom = "text", x = 0.94, y = 0.33, label = "Wide normal", 
+           hjust = 1, color = clr[1], size = 5) + 
+  annotate(geom = "text", x = 0.85, y = 0.12, label = "Scaled normal", 
+           hjust = 1, color = clr[2], size = 5) +
+  annotate(geom = "text", x = 0.06, y = 0.33, label = "Horseshoe", 
+           hjust = 0, color = clr[3], size = 5) +
+  annotate(geom = "text", x = 0.15, y = 0.12, label = "R2D2", 
+           hjust = 0, color = clr[4], size = 5) 
 
 # plot prior on R^2 in narrower range
-fits=list(fitm_n1pt, fitm_n1, fitm_n2p, fitm_n2, fitm_hsp, fitm_hs, fitmp, fitm)
-pp2 <- lapply(1:8, \(i) data.frame(R2=as.numeric(bayes_R2(fits[[i]], summary=FALSE)), type=types[i], priorname=priornames[i])) |>
+fits <- list(fitm_n1pt, fitm_n1, fitm_n2p, fitm_n2, fitm_hsp, fitm_hs, fitmp, fitm)
+pp2 <- lapply(1:8, \(i) data.frame(
+                R2 = as.numeric(bayes_R2(fits[[i]], summary = FALSE)),
+                type = types[i],
+                priorname = priornames[i]
+              )) |> 
   bind_rows() |>
-  filter(type=="Prior") |>
-  ggplot(aes(x=R2, color=priorname)) +
-  stat_slab(expand=TRUE, trim=FALSE, alpha=0.5, fill=NA, adjust=2) +
+  filter(type == "Prior") |> 
+  ggplot(aes(x = R2, color = priorname)) +
+  stat_slab(expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
   xlim(c(0.04,.419)) +
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),
-        axis.line.y=element_blank(),
-        axis.title.y=element_blank(),
-        plot.title = element_text(size=16),
-        legend.position="none") +
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        plot.title = element_text(size = 16), 
+        legend.position = "none") +
   scale_color_bright() +
-  labs(x=TeX("$R^2$"), title=TeX("b) Implied prior on $R^2$")) +
-  annotate(geom="text", x=0.415, y=0.61, label="Wide normal", hjust=1, color=clr[1], size=5) + 
-  annotate(geom="text", x=0.415, y=0.34, label="Scaled normal", hjust=1, color=clr[2], size=5) +
-  annotate(geom="text", x=0.06, y=0.87, label="Horseshoe", hjust=0, color=clr[3], size=5) +
-  annotate(geom="text", x=0.06, y=0.28, label="R2D2", hjust=0, color=clr[4], size=5) 
+  labs(x = TeX("$R^2$"), title = TeX("b) Implied prior on $R^2$")) +
+  annotate(geom = "text", x = 0.415, y = 0.61, label = "Wide normal", 
+           hjust = 1, color = clr[1], size = 5) + 
+  annotate(geom = "text", x = 0.415, y = 0.34, label = "Scaled normal", 
+           hjust = 1, color = clr[2], size = 5) +
+  annotate(geom = "text", x = 0.06, y = 0.87, label = "Horseshoe", 
+           hjust = 0, color = clr[3], size = 5) +
+  annotate(geom = "text", x = 0.06, y = 0.28, label = "R2D2", 
+           hjust = 0, color = clr[4], size = 5) 
 
 # plot R^2 posterior in narrower range
-pp3 <- lapply(1:8, \(i) data.frame(R2=as.numeric(bayes_R2(fits[[i]], summary=FALSE)), type=types[i], priorname=priornames[i])) |>
+pp3 <- lapply(1:8, \(i) data.frame(
+                R2 = as.numeric(bayes_R2(fits[[i]], summary = FALSE)),
+                type = types[i],
+                priorname = priornames[i]
+              )) |> 
   bind_rows() |>
-  filter(type=="Posterior") |>
-  ggplot(aes(x=R2, color=priorname)) +
-  stat_slab(expand=TRUE, trim=FALSE, alpha=0.5, fill=NA, adjust=2) +
+  filter(type == "Posterior") |> 
+  ggplot(aes(x = R2, color = priorname)) +
+  stat_slab(expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
   xlim(c(0.04,.42)) +
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),
-        axis.line.y=element_blank(),
-        axis.title.y=element_blank(),
-        plot.title = element_text(size=16),
-        legend.position="none") +
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        plot.title = element_text(size = 16), 
+        legend.position = "none") +
   scale_color_bright() +
-  labs(x=TeX("$R^2$"), title=TeX("c) Posterior-$R^2$")) +
-  annotate(geom="text", x=0.28, y=0.95, label="Wide normal", hjust=0, color=clr[1], size=5) + 
-  annotate(geom="text", x=0.26, y=0.95, label="Scaled normal", hjust=1, color=clr[2], size=5) +
-  annotate(geom="text", x=0.19, y=0.73, label="Horseshoe", hjust=1, color=clr[3], size=5) +
-  annotate(geom="text", x=0.21, y=0.84, label="R2D2", hjust=1, color=clr[4], size=5) 
+  labs(x = TeX("$R^2$"), title = TeX("c) Posterior-$R^2$")) +
+  annotate(geom = "text", x = 0.28, y = 0.95, label = "Wide normal", 
+           hjust = 0, color = clr[1], size = 5) + 
+  annotate(geom = "text", x = 0.26, y = 0.95, label = "Scaled normal", 
+           hjust = 1, color = clr[2], size = 5) +
+  annotate(geom = "text", x = 0.19, y = 0.73, label = "Horseshoe", 
+           hjust = 1, color = clr[3], size = 5) +
+  annotate(geom = "text", x = 0.21, y = 0.84, label = "R2D2", 
+           hjust = 1, color = clr[4], size = 5) 
 
 # plot LOO-R^2 in narrower range
-looR2 <- lapply(1:8, \(i) data.frame(R2=as.numeric(loo_R2(fits[[i]], summary=FALSE)), type=types[i], priorname=priornames[i])) |> bind_rows()
+looR2 <- lapply(1:8, \(i) data.frame(
+                  R2 = as.numeric(loo_R2(fits[[i]], summary = FALSE)),
+                  type = types[i],
+                  priorname = priornames[i]
+                )) |> bind_rows()
 pp4 <- looR2 |>
-    filter(type=="Posterior") |>
-  ggplot(aes(x=R2, color=priorname)) +
-  stat_slab(expand=TRUE, trim=FALSE, alpha=0.5, fill=NA, adjust=2) +
+  filter(type == "Posterior") |> 
+  ggplot(aes(x = R2, color = priorname)) +
+  stat_slab(expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
   xlim(c(0.04,.42)) +
-  theme(axis.text.y=element_blank(),
-        axis.ticks.y=element_blank(),
-        axis.line.y=element_blank(),
-        axis.title.y=element_blank(),
-        plot.title = element_text(size=16),
-        legend.position="none") +
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank(), 
+        axis.line.y = element_blank(), 
+        axis.title.y = element_blank(), 
+        plot.title = element_text(size = 16), 
+        legend.position = "none") +
   scale_color_bright() +
-  labs(x=TeX("$R^2$"), title=TeX("d) LOO-$R^2$")) +
-  annotate(geom="text", x=0.175, y=0.72, label="Wide normal", hjust=1, color=clr[1], size=5) + 
-  annotate(geom="text", x=0.235, y=0.72, label="Scaled normal", hjust=0, color=clr[2], size=5) +
-  annotate(geom="text", x=0.175, y=0.9, label="Horseshoe", hjust=1, color=clr[3], size=5) +
-  annotate(geom="text", x=0.23, y=0.9, label="R2D2", hjust=0, color=clr[4], size=5) 
+  labs(x = TeX("$R^2$"), title = TeX("d) LOO-$R^2$")) +
+  annotate(geom = "text", x = 0.175, y = 0.72, label = "Wide normal", 
+           hjust = 1, color = clr[1], size = 5) + 
+  annotate(geom = "text", x = 0.235, y = 0.72, label = "Scaled normal", 
+           hjust = 0, color = clr[2], size = 5) +
+  annotate(geom = "text", x = 0.175, y = 0.9, label = "Horseshoe", 
+           hjust = 1, color = clr[3], size = 5) +
+  annotate(geom = "text", x = 0.23, y = 0.9, label = "R2D2", 
+           hjust = 0, color = clr[4], size = 5) 
 
 #' ::: {.content-visible when-format="html"}
 #| label: fig-implied-R2-prior-posterior-loo-html
@@ -457,10 +495,12 @@ pp1 + pp2 + pp3 + pp4 + plot_layout(ncol = 4)
 #' performance is better than with wide normal prior with probability
 #' 0.94. The difference to scaled normal and horseshoe prior is
 #' smaller.
-loo_compare(list(`Wide normal`=loo(fitm_n1),
-                 `Scaled normal`=loo(fitm_n2),
-                 `Horseshoe`=loo(fitm_hs),
-                 `R2D2`=loo(fitm)))
+loo_compare(list(
+  `Wide normal` = loo(fitm_n1),
+  `Scaled normal` = loo(fitm_n2),
+  `Horseshoe` = loo(fitm_hs),
+  `R2D2` = loo(fitm)
+))
 
 #' ## Marginal posteriors of coefficients
 #' 
@@ -471,15 +511,14 @@ loo_compare(list(`Wide normal`=loo(fitm_n1),
 #| results: hide
 #| cache: true
 # refit with fewer posterior draws
-fitm <- update(fitm, iter=2000)
+fitm <- update(fitm, iter = 2000)
 
 #| label: fig-fitm-mcmc_areas
 #| fig-height: 6
 #| fig-width: 8
-drawsm <- as_draws_df(fitm, variable=paste0('b_',predictors)) |>
+drawsm <- as_draws_df(fitm, variable = paste0('b_', predictors)) |> 
   set_variables(predictors)
-p <- mcmc_areas(drawsm,
-                 prob_outer=0.98, area_method = "scaled height") +
+p <- mcmc_areas(drawsm, prob_outer=0.98, area_method = "scaled height") +
   xlim(c(-1.5,1.5))
 p <- p + scale_y_discrete(limits = rev(levels(p$data$parameter)))
 p
@@ -492,9 +531,9 @@ p
 #| label: fig-fitm-mcmc_scatter-Fedu-Medu
 #| fig-height: 3
 #| fig-width: 3
-mcmc_scatter(drawsm, pars = c("Fedu","Medu"), size=1, alpha=0.1) +
-  vline_0(linetype='dashed') +
-  hline_0(linetype='dashed')
+mcmc_scatter(drawsm, pars = c("Fedu","Medu"), size = 1, alpha = 0.1) +
+  vline_0(linetype = "dashed") +
+  hline_0(linetype = "dashed")
 
 #' ## Model checking
 #'
@@ -505,14 +544,14 @@ mcmc_scatter(drawsm, pars = c("Fedu","Medu"), size=1, alpha=0.1) +
 #| label: fig-fitm-ppc-hist
 #| fig-height: 3
 #| fig-width: 6
-pp_check(fitm, type="hist", ndraws=5)
+pp_check(fitm, type = "hist", ndraws = 5)
 
 #' LOO-PIT-ECDF plots shows that otherwise the normal model is quite well
 #' calibrated.
 #| label: fig-fitm-ppc-pitecdf
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fitm, type="loo_pit_ecdf")
+pp_check(fitm, type = "loo_pit_ecdf")
 
 #' We could use truncated normal as more accurate model, but for
 #' example beta-binomial model cannot be used for median exam scores
@@ -550,9 +589,9 @@ vselm_fast <- cv_varsel(fitm, nterms_max = 27, validate_search = FALSE)
 #| fig-height: 6
 #| out-width: "100%"
 #| cache: false
-plot(vselm_fast, stats=c("elpd", "R2"), deltas="mixed",
-     text_angle = 45, alpha = 0.1, 
-     size_position = "primary_x_top", show_cv_proportions=FALSE) +
+plot(vselm_fast, stats = c("elpd", "R2"), deltas = "mixed", 
+     text_angle = 45, alpha = 0.1,  size_position = "primary_x_top", 
+     show_cv_proportions = FALSE) +
   geom_vline(xintercept = seq(0, 25, by = 5), colour = "black", alpha = 0.1)
 
 
@@ -589,10 +628,10 @@ plan(sequential)
 #| fig-height: 5
 #| out-width: "100%"
 #| cache: false
-plot(vselm, stats=c("elpd","R2"), deltas='mixed',
-     text_angle=45, alpha=0.1, 
-     size_position = 'primary_x_top', show_cv_proportions=FALSE) +
-  geom_vline(xintercept=seq(0,10,by=5), colour='black', alpha=0.1)
+plot(vselm, stats = c("elpd", "R2"), deltas = "mixed", 
+     text_angle = 45, alpha = 0.1, size_position = "primary_x_top", 
+     show_cv_proportions = FALSE) +
+  geom_vline(xintercept = seq(0, 10, by = 5), colour = "black", alpha = 0.1)
 
 #' `projpred` can also provide suggestion for the sufficient model size.
 (nselm <- suggest_size(vselm))
@@ -601,17 +640,17 @@ plot(vselm, stats=c("elpd","R2"), deltas='mixed',
 #' 
 #| results: hide
 #| cache: true
-rankm <- ranking(vselm, nterms=nselm)
-projm <- project(vselm, nterms=nselm)
+rankm <- ranking(vselm, nterms = nselm)
+projm <- project(vselm, nterms = nselm)
 drawsm_proj <- as_draws_df(projm) |>
-  subset_draws(variable=paste0('b_',rankm$fulldata[1:nselm])) |>
-  set_variables(variable=rankm$fulldata[1:nselm])
+  subset_draws(variable = paste0('b_', rankm$fulldata[1:nselm])) |> 
+  set_variables(variable = rankm$fulldata[1:nselm])
 
 #' The marginals of the projected posterior are all clearly away from 0.
 #| label: fig-fitm-proj-mcmc_areas
 #| fig-height: 2
 #| fig-width: 8
-mcmc_areas(drawsm_proj, prob_outer=0.98, area_method = "scaled height")
+mcmc_areas(drawsm_proj, prob_outer = 0.98, area_method = "scaled height")
 
 #' The following plot shows the stability of the search over the
 #' different LOO-CV folds. The numbers indicate the proportion of
@@ -621,7 +660,7 @@ mcmc_areas(drawsm_proj, prob_outer=0.98, area_method = "scaled height")
 #| fig-width:  8
 #| fig-height: 5
 #| out-width: "95%"
-plot(cv_proportions(rankm, cumulate=TRUE))
+plot(cv_proportions(rankm, cumulate = TRUE))
 
 #' ### Portuguese exam scores
 #'
@@ -631,7 +670,7 @@ plot(cv_proportions(rankm, cumulate=TRUE))
 #| results: hide
 #| cache: true
 fitp <- brm(Gpor ~ ., data = studentstd_Gpor,
-            prior=c(prior(R2D2(mean_R2 = 1/3, prec_R2 = 3, cons_D2 = 1/2), class=b)),
+            prior = c(prior(R2D2(mean_R2 = 1/3, prec_R2 = 3, cons_D2 = 1/2), class = b)),
             refresh = 0)
 
 #' Compare posterior-$R^2$ and LOO-$R^2$. We see that Portuguese grade
@@ -639,7 +678,7 @@ fitp <- brm(Gpor ~ ., data = studentstd_Gpor,
 #' of unexplained variance).
 #' 
 #| cache: TRUE
-fitp <- add_criterion(fitp, criterion='loo')
+fitp <- add_criterion(fitp, criterion = "loo")
 #+
 bayes_R2(fitp) |> round(2)
 loo_R2(fitp) |> round(2)
@@ -648,9 +687,9 @@ loo_R2(fitp) |> round(2)
 #| label: fig-fitp-mcmc_areas
 #| fig-height: 6
 #| fig-width: 8
-drawsp <- as_draws_df(fitp, variable=paste0('b_',predictors)) |>
+drawsp <- as_draws_df(fitp, variable = paste0("b_",predictors)) |>
   set_variables(predictors)
-p <- mcmc_areas(drawsp, prob_outer=0.98, area_method = "scaled height") +
+p <- mcmc_areas(drawsp, prob_outer = 0.98, area_method = "scaled height") +
   xlim(c(-1.5,1.5))
 p <- p + scale_y_discrete(limits = rev(levels(p$data$parameter)))
 p
@@ -660,7 +699,7 @@ p
 #| label: vselp_fast
 #| results: hide
 #| cache: true
-vselp_fast <- cv_varsel(fitp, nterms_max=27, validate_search=FALSE)
+vselp_fast <- cv_varsel(fitp, nterms_max = 27, validate_search = FALSE)
 
 #' The following plot shows the relevance order of the predictors and
 #' estimated predictive performance given those variables. As there is
@@ -673,10 +712,10 @@ vselp_fast <- cv_varsel(fitp, nterms_max=27, validate_search=FALSE)
 #| fig-height: 6
 #| out-width: "100%"
 #| cache: false
-plot(vselp_fast, stats = c("elpd","R2"), deltas="mixed", 
-     text_angle=45, alpha=0.1, 
-     size_position = 'primary_x_top', show_cv_proportions=FALSE) +
-  geom_vline(xintercept=seq(0,25,by=5), colour='black', alpha=0.1)
+plot(vselp_fast, stats = c("elpd","R2"), deltas = "mixed", 
+     text_angle = 45, alpha = 0.1,  size_position = "primary_x_top", 
+     show_cv_proportions = FALSE) +
+  geom_vline(xintercept = seq(0, 25, by = 5), colour = "black", alpha = 0.1)
 
 #' Next we repeat the search, but now cross-validate the search,
 #' too. We repeat the search with PSIS-LOO-CV criterion only for
@@ -694,9 +733,9 @@ plot(vselp_fast, stats = c("elpd","R2"), deltas="mixed",
 registerDoFuture()
 plan(multisession, workers = 8)
 tic()
-vselp <- cv_varsel(fitp, nterms_max=10, validate_search=TRUE,
-                   refit_prj=TRUE, nloo=50,
-                   parallel=TRUE)
+vselp <- cv_varsel(fitp, nterms_max = 10, validate_search = TRUE, 
+                   refit_prj = TRUE, nloo = 50, 
+                   parallel = TRUE)
 toc()
 plan(sequential)
 
@@ -711,10 +750,10 @@ plan(sequential)
 #| fig-height: 5
 #| out-width: "100%"
 #| cache: false
-plot(vselp, stats=c("elpd", "R2"), deltas="mixed",
-     text_angle=45, alpha=0.1,
-     size_position = 'primary_x_top', show_cv_proportions=FALSE) +
-   geom_vline(xintercept=seq(0,10,by=5), colour='black', alpha=0.1)
+plot(vselp, stats = c("elpd", "R2"), deltas = "mixed", 
+     text_angle = 45, alpha = 0.1, size_position = "primary_x_top", 
+     show_cv_proportions = FALSE) +
+  geom_vline(xintercept = seq(0, 10, by = 5), colour = "black", alpha = 0.1)
 
 #' `projpred` can also provide suggestion for the sufficient model size.
 (nselp <- suggest_size(vselp))
@@ -723,17 +762,17 @@ plot(vselp, stats=c("elpd", "R2"), deltas="mixed",
 #' 
 #| results: hide
 #| cache: true
-rankp <- ranking(vselp, nterms=nselp)
-projp <- project(vselp, nterms=nselp)
+rankp <- ranking(vselp, nterms = nselp)
+projp <- project(vselp, nterms = nselp)
 drawsp_proj <- as_draws_df(projp) |>
-  subset_draws(variable=paste0('b_',rankp$fulldata[1:nselp])) |>
-  set_variables(variable=rankp$fulldata[1:nselp])
+  subset_draws(variable = paste0("b_", rankp$fulldata[1:nselp])) |>
+  set_variables(variable = rankp$fulldata[1:nselp])
 
 #' The marginals of the projected posterior are all clearly away from 0.
 #| label: fig-fitp-proj-mcmc_areas
 #| fig-height: 2.5
 #| fig-width: 8
-mcmc_areas(drawsp_proj, prob_outer=0.98, area_method = "scaled height")
+mcmc_areas(drawsp_proj, prob_outer = 0.98, area_method = "scaled height")
 
 #' The following plot shows the stability of the search over the
 #' different LOO-CV folds. The numbers indicate the proportion of
@@ -743,7 +782,7 @@ mcmc_areas(drawsp_proj, prob_outer=0.98, area_method = "scaled height")
 #| fig-width: 8
 #| fig-height: 5
 #| out-width: "95%"
-plot(cv_proportions(rankp, cumulate=TRUE))
+plot(cv_proportions(rankp, cumulate = TRUE))
 
 #' ### Using the selected model
 #' 
