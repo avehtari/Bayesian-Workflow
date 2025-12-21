@@ -109,6 +109,7 @@ dogs_df$prev_avoid <- as.numeric(rowCumsums(1 - shock)[, 1:(ncol(shock) - 1)])
 #' \beta & \sim \mathrm{normal}(0, 1).
 #' \end{aligned}
 #' $$
+#| label: bfit_0
 #| results: "hide"
 bfit_0 <- brm(shock ~ time, family = bernoulli(),
               prior = prior(normal(0,1)),
@@ -135,6 +136,7 @@ bfit_0 <- add_criterion(bfit_0, criterion = "loo")
 #' Q_{\alpha,\beta} & \sim \mathrm{LKJ}(1).
 #' \end{aligned}
 #' $$
+#| label: bfit_0h
 #| results: "hide"
 bfit_0h <- brm(shock ~ time + (time | dog), family = bernoulli(),
                prior = prior(normal(0,1)),
@@ -157,6 +159,7 @@ loo_compare(bfit_0, bfit_0h) |>
 #'
 #' Visualize the model fit for 9 first dogs with some help from
 #' `tidybayes` [@Kay:2023:tidybayes].
+#| label: fig-pred9-0h
 plot_pred9_0h <- dogs_df |>
   dplyr::filter(dog <= 9) |>
         add_linpred_draws(bfit_0h, transform = TRUE) |>
@@ -177,6 +180,7 @@ plot_pred9_0h
 #' calibrated using PAV-adjusted calibration plot
 #' [@Dimitriadis+etal:2021:reliabilitydiag] implemented in
 #' `reliabilitydiag`. Looks quite good.
+#| label: fig-calib-0h
 rd <- reliabilitydiag(EMOS = loo_epred(bfit_0h), y = dogs_df$shock)
 plot_calib_0h <- autoplot(rd) +
         labs(
@@ -255,7 +259,7 @@ ppc_pava_residual <-
   }
 
 #' PAV-adjusted residual plot looks reasonable.
-#'
+#| label: fig-ppc_pava_residual-0h
 ppc_pava_residual(dogs_df$shock,
                   loo_epred(bfit_0h),
                   jitter(dogs_df$time,0.3)) +
@@ -272,7 +276,7 @@ pred_logit <- function(fit) {
            posterior_predict(fit, ndraws = 1) |>
              as.numeric()), nrow = 30, ncol = 25)
 }
-dogs_ppc <- function(shock, title) {
+ppc_shocks <- function(shock, title) {
   expand.grid(dog = rev(1:30), time = 1:25) |>
     mutate(shock = as.numeric(shock[order(apply(shock, 1, \(x) max(which(x == 1)))), ])) |>
   ggplot(aes(time, dog, fill = shock)) +
@@ -288,38 +292,18 @@ dogs_ppc <- function(shock, title) {
     labs(y = title)
 }
 
-dogs_ppc(shock, "Real dogs") +
-  dogs_ppc(pred_logit(bfit_0h), "Model 0h: hier. logit")
+#| label: fig-ppc_shocks-0h
+ppc_shocks(shock, "Real dogs") +
+  ppc_shocks(pred_logit(bfit_0h), "Model 0h: hier. logit")
 
 #' Posterior predictive checking using mean number of switches between
 #' shocks and avoidances as the test statistic.
-#| code-fold: true
 mean_switches <- function(shock) {
   shock |> rowDiffs() |> abs() |> rowSums() |> mean()
 }
-ppc_meanswitches <- function(y, yrep) {
-  data.frame(yrep = yrep) |>
-    ggplot(aes(x = yrep)) +
-    geom_histogram(aes(fill = "yrep"), 
-                   color = bayesplot:::get_color("lh"),
-                   linewidth = 0.25) +
-    geom_vline(aes(xintercept = y, color = "y"), 
-               linewidth = 1.5) +
-    bayesplot:::scale_color_ppc(values = bayesplot:::get_color("dh"), 
-                                labels = bayesplot:::Ty_label()) +
-    bayesplot:::scale_fill_ppc(values = bayesplot:::get_color("l"), 
-                               labels = bayesplot:::Tyrep_label()) +
-    guides(color = guide_legend(title = NULL), 
-           fill = guide_legend(order = 1)) +
-    bayesplot:::dont_expand_y_axis() + 
-    bayesplot_theme_get() +
-    bayesplot:::no_legend_spacing() + xaxis_title(FALSE) + 
-    yaxis_text(FALSE) + yaxis_ticks(FALSE) + yaxis_title(FALSE) +
-    theme(axis.line.y = element_blank())
-}
-
 yrep <- replicate(100, mean_switches(pred_logit(bfit_0h)))
-ppc_meanswitches(y = mean_switches(shock), yrep = yrep)
+#| label: fig-ppc-mean_switches-0h
+ppc_stat(mean_switches(shock), matrix(yrep, nrow=length(yrep)), stat="identity")
 
 #' ## Prior-likelihood sensitivity analysis
 #'
@@ -328,7 +312,7 @@ ppc_meanswitches(y = mean_switches(shock), yrep = yrep)
 #' the data are informative and there is no need to think more about
 #' priors unless we do happen to have easily available strong prior
 #' information.
-powerscale_sensitivity(bfit_0h)$sensitivity[1:6, ] |>
+powerscale_sensitivity(bfit_0h, variable = variables(as_draws(bfit_0h))[1:6]) |>
         tt() |>
         format_tt(num_fmt = "decimal")
 
@@ -343,6 +327,7 @@ powerscale_sensitivity(bfit_0h)$sensitivity[1:6, ] |>
 #' a & \sim \mathrm{uniform}(0,1).
 #' \end{aligned}
 #' $$
+#| label: bfit_1
 #| results: "hide"
 bfit_1 <- brm(bf(shock ~ a^(time - 1), a ~ 1, nl = TRUE),
               family = bernoulli(link = "identity"),
@@ -372,6 +357,7 @@ loo_compare(bfit_0, bfit_0h, bfit_1) |>
 #' $$
 #' where $x_{1jt}$ and $x_{1jt}$ are the number of previous shocks and
 #' avoidances, respectively, in trials $1,\ldots,t-1$ for dog $j$.
+#| label: bfit_2
 #| results: "hide"
 bfit_2 <- brm(bf(shock ~ a^prev_shock * b^prev_avoid,
                 a ~ 1, b ~ 1, nl = TRUE),
@@ -409,6 +395,7 @@ loo_compare(bfit_0h, bfit_2) |>
 #' \end{aligned}
 #' $$
 #' where $a_j$ is parameter for dog $j$.
+#| label: bfit_3
 #| results: "hide"
 inv_logit <- function(x) 1 / (1 + exp(-x))
 bfit_3 <- brm(bf(shock ~ inv_logit(etaa)^(time - 1),
@@ -444,6 +431,7 @@ loo_compare(bfit_0h, bfit_2, bfit_3) |>
 #' Q_{\mathrm{logit}(a),\mathrm{logit}(b)} & \sim \mathrm{LKJ}(1).
 #' \end{aligned}
 #' $$
+#| label: bfit_4
 #| results: "hide"
 bfit_4 <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoid,
                  mvbind(etaa, etab) ~ (1 |p| dog), nl=TRUE),
@@ -476,6 +464,7 @@ loo_compare(bfit_0h, bfit_2, bfit_4) |>
 #' after the first avoidance, which makes sense as the magnitude of
 #' drop in probability after repeated shocks diminishes, but the first
 #' avoidance provides another big drop.
+#| label: fig-pred9-4
 plot_pred9_4 <-dogs_df |>
   dplyr::filter(dog <= 9) |>
         add_linpred_draws(bfit_4, transform = TRUE) |>
@@ -496,6 +485,7 @@ plot_pred9_4
 #' non-hierarchical, dog-specific number of shocks and avoidances do
 #' make the model fit to vary by dog. This can explain why adding
 #' hierarchy to the model does not improve the predictive performance.
+#| label: fig-pred9-2
 dogs_df |>
   dplyr::filter(dog <= 9) |>
         add_linpred_draws(bfit_2, transform = TRUE) |>
@@ -514,6 +504,7 @@ dogs_df |>
 #' 
 #' Examine how well the leave-one-out predictive probabilities from
 #' hierarchical 2-parameter log model are calibrated. Looks quite good.
+#| label: fig-calib-4
 rd <- reliabilitydiag(EMOS = loo_epred(bfit_4), y = dogs_df$shock)
 plot_calib_4 <- autoplot(rd) +
   labs(x = "Predicted (LOO)", 
@@ -525,8 +516,11 @@ plot_calib_4
 #' ## Residual plots
 #' 
 #' PAV-adjusted residual plot looks reasonable.
-#'
-plot_residuals(loo_epred(bfit_4), dogs_df$shock)
+#| label: fig-ppc_pava_residual-4
+ppc_pava_residual(dogs_df$shock,
+                  loo_epred(bfit_4),
+                  jitter(dogs_df$time,0.3)) +
+  labs(x="Time")
 
 #' ## Posterior predictive checking
 #'
@@ -544,12 +538,14 @@ pred_log <- function(fit) {
   }
   pred_shock
 }
-dogs_ppc(pred_log(bfit_4), "PPsims from M4:\nhier logit model") 
+#| label: fig-ppc_shocks-4
+ppc_shocks(pred_log(bfit_4), "PPsims from M4:\nhier logit model") 
 
 #' Posterior predictive checking using mean number of switches between
 #' shocks and avoidances as the test statistic.
+#| label: fig-ppc_mean_switches-4
 yrep <- replicate(100, mean_switches(pred_log(bfit_4)))
-ppc_meanswitches(y = mean_switches(shock), yrep = yrep)
+ppc_stat(mean_switches(shock), matrix(yrep, nrow=length(yrep)), stat="identity")
 
 #' ## Prior-likelihood sensitivity analysis
 #'
@@ -557,9 +553,9 @@ ppc_meanswitches(y = mean_switches(shock), yrep = yrep)
 #' analysis shows that the data are informative and there is no need
 #' to think more about priors unless we do happen to have easily
 #' available strong prior information.
-powerscale_sensitivity(bfit_4)$sensitivity[1:5, ] |>
-                                tt() |>
-                                format_tt(num_fmt = "decimal")
+powerscale_sensitivity(bfit_4, variable = variables(as_draws(bfit_4))[1:5]) |>
+  tt() |>
+  format_tt(num_fmt="decimal")
 
 
 #' # Comparing posterior predictions
@@ -568,6 +564,7 @@ powerscale_sensitivity(bfit_4)$sensitivity[1:5, ] |>
 #' same plot. We see the biggest difference is visible in time $t=2$,
 #' but the differences are that small that given the small size of the
 #' data, there is no clear preference for either model.
+#| label: fig-pred-0h-4
 dogs_df |>
   mutate(epred_0h = colMeans(posterior_epred(bfit_0h)),
          epred_4 = colMeans(posterior_epred(bfit_4))) |>
@@ -610,7 +607,8 @@ loo_compare(list(bfit_0h=elpd(ll_0h),bfit_4=elpd(ll_4))) |>
 #'
 #' One assumption about the 2-parameter log model is that if the
 #' posteriors of $a$ and $b$ are different, then the dogs learn a
-#' different amount from shocks and avoidances. 
+#' different amount from shocks and avoidances.
+#| label: fig-mcmc_areas-4
 as_draws_df(bfit_4) |>
   mutate(a = inv_logit(b_etaa_Intercept),
          b = inv_logit(b_etab_Intercept)) |>
@@ -622,6 +620,7 @@ as_draws_df(bfit_4) |>
 #' about different learning rates from shocks and avoidances.
 #'
 #' Generate shocks and avoidances using the simple logistic regression
+#| label: bfit_4s
 #| results: "hide"
 dogs_df_pred_0 <- dogs_df
 pred_shock_0 <- matrix(c(rep(1, 30), posterior_predict(bfit_0, ndraws = 1) |> as.numeric()),
@@ -633,12 +632,14 @@ bfit_4s <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoi
               family = bernoulli(link = "identity"),
               data = dogs_df_pred_0, refresh=0)
 #' The posterior for a and b are different!
+#| label: fig-mcmc_areas-4s
 as_draws_df(bfit_4s) |>
   mutate(a = inv_logit(b_etaa_Intercept),
          b = inv_logit(b_etab_Intercept)) |>
   mcmc_areas(pars = c("a", "b"))
 
 #' Generate shocks and avoidances using the hierarchical logistic regression
+#| label: bfit_4sh
 #| results: "hide"
 dogs_df_pred_0h <- dogs_df
 pred_shock_0h <- matrix(c(rep(1, 30), posterior_predict(bfit_0h, ndraws = 1) |> as.numeric()),
@@ -651,6 +652,7 @@ bfit_4sh <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avo
                 data = dogs_df_pred_0h, refresh = 0)
 
 #' The posterior for a and b are different!
+#| label: fig-mcmc_areas-4sh
 as_draws_df(bfit_4sh) |>
   mutate(a = inv_logit(b_etaa_Intercept),
          b = inv_logit(b_etab_Intercept)) |>
@@ -673,5 +675,5 @@ as_draws_df(bfit_4sh) |>
 #'
 #' ## Licenses {.unnumbered}
 #'
-#' * Code &copy; 2023-2024, Aki Vehtari and Andrew Gelman, licensed under BSD-3.
-#' * Text &copy; 2023-2024, Aki Vehtari and Andrew Gelman, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2023-2025, Aki Vehtari and Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2023-2025, Aki Vehtari and Andrew Gelman, licensed under CC-BY-NC 4.0.
