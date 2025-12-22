@@ -98,31 +98,37 @@
 #' anyone from writing a big model in one go.
 #' 
 #' ## Setup
-#+ setup, include=FALSE
-knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, comment=NA, out.width='95%')
+#+ setup, include = FALSE
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = "95%"
+)
 #'
 #' Let's setup and get our hands dirty.
 library("rprojroot")
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 # remotes::install_github("hyunjimoon/SBC")
 library(SBC)
+options(SBC.min_chunk_size = 5)
 library(cmdstanr)
 library(posterior)
 options(pillar.neg = FALSE,
-        pillar.subtle=FALSE,
-        pillar.sigfig=2)
+        pillar.subtle = FALSE,
+        pillar.sigfig = 2)
 library(ggplot2)
 library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans"))
-library(patchwork) #Needed only for saving plots for the book
+library(patchwork) # Needed only for saving plots for the book
 library(future)
 plan(multisession) 
 
-options(SBC.min_chunk_size = 5)
-
 # Setup caching of results
-cache_dir <- root("sbc","_cache")
-if(!dir.exists(cache_dir)) {
+cache_dir <- root("sbc", "_cache")
+if (!dir.exists(cache_dir)) {
   dir.create(cache_dir)
 }
 
@@ -134,9 +140,9 @@ if(!dir.exists(cache_dir)) {
 #' it - and we'll see the problems can be discovered via simulations.
 #' 
 #' So this is our first try at implementing the mixture submodel:
-cat(readLines(root("sbc","models/mixture_first.stan")), sep = "\n")
+cat(readLines(root("sbc", "models/mixture_first.stan")), sep = "\n")
 #| label: model_first
-model_first <- cmdstan_model(root("sbc","models/mixture_first.stan"))
+model_first <- cmdstan_model(root("sbc", "models/mixture_first.stan"))
 backend_first <- SBC_backend_cmdstan_sample(model_first) 
 
 #' And this is our code to simulate data for this model:
@@ -147,7 +153,7 @@ generator_func_first <- function(N) {
   
   y <- numeric(N)
   for (n in 1:N) {
-    if(runif(1) < theta) {
+    if (runif(1) < theta) {
       y[n] <- rpois(1, exp(mu1))
     } else {
       y[n] <- rpois(1, exp(mu2))
@@ -165,15 +171,15 @@ generator_first <- SBC_generator_function(generator_func_first, N = 50)
 set.seed(68455554)
 datasets_first <- generate_datasets(generator_first, 1)
 results_first <- compute_SBC(datasets_first, backend_first, 
-                    cache_mode = "results", 
-                    cache_location = file.path(cache_dir, "mixture_first"))
+                             cache_mode = "results", 
+                             cache_location = file.path(cache_dir, "mixture_first"))
 
 #' Let's examine the MCMC pairs plots
 #| label: fig-sbcworkflow_mixture_first_pairs
 # Fixing the condition for above/over diagonal chains, in a minority
 # of runs the plot shows the problem less clearly, as discussed at
 # https://github.com/stan-dev/bayesplot/issues/132
-p_cond <- pairs_condition(chains = list(c(1,3), c(2,4)))
+p_cond <- pairs_condition(chains = list(c(1, 3), c(2, 4)))
 mixture_first_pairs <- mcmc_pairs(results_first$fits[[1]]$draws(),
                                   condition = p_cond,
                                   np = nuts_params(results_first$fits[[1]]))
@@ -201,8 +207,8 @@ mixture_first_pairs
 #' 
 #' We make a new model fixing the `log_mix` problem.
 #| label: model_fixed_log_mix
-cat(readLines(root("sbc","models/mixture_fixed_log_mix.stan")), sep = "\n")
-model_fixed_log_mix <- cmdstan_model(root("sbc","models/mixture_fixed_log_mix.stan"))
+cat(readLines(root("sbc", "models/mixture_fixed_log_mix.stan")), sep = "\n")
+model_fixed_log_mix <- cmdstan_model(root("sbc", "models/mixture_fixed_log_mix.stan"))
 backend_fixed_log_mix <- SBC_backend_cmdstan_sample(model_fixed_log_mix)
 
 #' So let's try once again with the same single simulation:
@@ -212,7 +218,7 @@ results_fixed_log_mix <- compute_SBC(datasets_first,
                                      cache_location = file.path(cache_dir, "mixture_fixed_log_mix"))
 
 #' No warnings this time. We look at the stats:
-print(results_fixed_log_mix$stats, digits=2)
+print(results_fixed_log_mix$stats, digits = 2)
 
 #' We see nothing obviously wrong, the posterior means are relatively
 #' close to simulated values (as summarised by the z-scores) - no
@@ -246,8 +252,8 @@ mixture_fixed_log_mix_pairs
 #' 
 #' We can easily fix the ordering of the `mu`s by using the `ordered` built-in type.
 #| label: model_fixed_ordered
-cat(readLines(root("sbc","models/mixture_fixed_ordered.stan")), sep = "\n")
-model_fixed_ordered <- cmdstan_model(root("sbc","models/mixture_fixed_ordered.stan"))
+cat(readLines(root("sbc", "models/mixture_fixed_ordered.stan")), sep = "\n")
+model_fixed_ordered <- cmdstan_model(root("sbc", "models/mixture_fixed_ordered.stan"))
 backend_fixed_ordered <- SBC_backend_cmdstan_sample(model_fixed_ordered) 
 
 #' We also need to update the generator to match the new names and ordering constant:
@@ -259,7 +265,7 @@ generator_func_ordered <- function(N) {
   theta <- runif(1)
   y <- numeric(N)
   for (n in 1:N) {
-    if(runif(1) < theta) {
+    if (runif(1) < theta) {
       y[n] <- rpois(1, exp(mu[1]))
     } else {
       y[n] <- rpois(1, exp(mu[2]))
@@ -283,7 +289,7 @@ results_fixed_ordered <- compute_SBC(datasets_ordered_10,
 #' transitions, let's browse the `$backend_diagnostics` (which contain
 #' Stan-specific diagnostic values) to see which simulations are
 #' causing problems:
-print(results_fixed_ordered$backend_diagnostics, digits=2)
+print(results_fixed_ordered$backend_diagnostics, digits = 2)
 
 #' One of the fits has quite a lot of divergent transitions. Let's
 #' look at the pairs plot for the model:
@@ -362,11 +368,11 @@ plot_coverage(results_fixed_ordered_subset)
 #'
 #' Or investigate numerically.
 coverage <- empirical_coverage(results_fixed_ordered_subset$stats,
-                               width = c(0.5,0.9,0.95))
+                               width = c(0.5, 0.9, 0.95))
 coverage
 
 theta_90_coverage_string <- paste0(round(100 * as.numeric(
-  coverage[coverage$variable == "theta" & coverage$width == 0.9, c("ci_low","ci_high")])),
+  coverage[coverage$variable == "theta" & coverage$width == 0.9, c("ci_low", "ci_high")])),
   "%",
   collapse = " - ")
 
@@ -434,8 +440,8 @@ plot_coverage(results_fixed_ordered_combined)
 #'
 #' Let's move to the logistic regression submodel of our model.
 #| label: model_logistic_first
-cat(readLines(root("sbc","models/logistic_first.stan")), sep = "\n")
-model_logistic_first <- cmdstan_model(root("sbc","models/logistic_first.stan"))
+cat(readLines(root("sbc", "models/logistic_first.stan")), sep = "\n")
+model_logistic_first <- cmdstan_model(root("sbc", "models/logistic_first.stan"))
 backend_logistic_first <- SBC_backend_cmdstan_sample(model_logistic_first) 
 
 #' If you are good at reading code, you may notice there is a fatal
@@ -446,7 +452,7 @@ backend_logistic_first <- SBC_backend_cmdstan_sample(model_logistic_first)
 #' in the model is correct.
 generator_func_logistic_first <- function(N_obs, N_predictors) {
   alpha <- rnorm(1, 0, 2)
-  beta <- rnorm(N_predictors , 0, 1)
+  beta <- rnorm(N_predictors, 0, 1)
   X <- matrix(rnorm(N_predictors * N_obs, 0, 1), nrow = N_obs, ncol = N_predictors)
   linpred <- array(alpha, N_obs)
   for (p in 1:N_predictors) {
@@ -534,7 +540,7 @@ results_dq_loglik_only
 #' to have all 1's in its column of \texttt{X} and has a different
 #' prior. This is also how most common regression modelling packages
 #' handle the situation. We thus modify our Stan code to:
-cat(readLines(root("sbc","models/logistic_merged_intercept.stan")), sep = "\n")
+cat(readLines(root("sbc", "models/logistic_merged_intercept.stan")), sep = "\n")
 
 #' This looks cleaner, but you may notice one additional issue that we
 #' created during the rewrite. We will see that it will quickly
@@ -543,12 +549,12 @@ cat(readLines(root("sbc","models/logistic_merged_intercept.stan")), sep = "\n")
 #' keep the explicit loop to decrease chances of having the same
 #' problem in both R and Stan.
 #| label: model_logistic_merged_intercept
-model_logistic_merged_intercept <- cmdstan_model(root("sbc","models/logistic_merged_intercept.stan"))
+model_logistic_merged_intercept <- cmdstan_model(root("sbc", "models/logistic_merged_intercept.stan"))
 backend_logistic_merged_intercept <- SBC_backend_cmdstan_sample(model_logistic_merged_intercept, chains = 2) 
 
 #' We now update the generator code to match:
 generator_func_logistic_merged_intercept <- function(N_obs, N_predictors) {
-  beta <- c(rnorm(1, 0, 2), rnorm(N_predictors - 1 , 0, 1))
+  beta <- c(rnorm(1, 0, 2), rnorm(N_predictors - 1, 0, 1))
   X <- matrix(rnorm(N_predictors * N_obs, 0, 1), nrow = N_obs, ncol = N_predictors)
   X[, 1] <- 1 # Intercept
   y <- array(NA_real_, N_obs)
@@ -601,8 +607,8 @@ logistic_merged_intercept_ranks / logistic_merged_intercept_ecdf
 #' ```
 #' so the full model now is:
 #| label: model_logistic_fixed_prior
-cat(readLines(root("sbc","models/logistic_fixed_prior.stan")), sep = "\n")
-model_logistic_fixed_prior <- cmdstan_model(root("sbc","models/logistic_fixed_prior.stan"))
+cat(readLines(root("sbc", "models/logistic_fixed_prior.stan")), sep = "\n")
+model_logistic_fixed_prior <- cmdstan_model(root("sbc", "models/logistic_fixed_prior.stan"))
 backend_logistic_fixed_prior <- SBC_backend_cmdstan_sample(model_logistic_fixed_prior, chains = 2) 
 
 #' The results for ten simulations are:
@@ -643,8 +649,8 @@ plot_sim_estimated(results_logistic_fixed_prior_200)
 #'
 #' We are finally ready to make a first attempt at the full model:
 #| label: model_combined_first
-cat(readLines(root("sbc","models/combined_first.stan")), sep = "\n")
-model_combined <- cmdstan_model(root("sbc","models/combined_first.stan"))
+cat(readLines(root("sbc", "models/combined_first.stan")), sep = "\n")
+model_combined <- cmdstan_model(root("sbc", "models/combined_first.stan"))
 backend_combined <- SBC_backend_cmdstan_sample(model_combined)
 
 #' And this is our generator for the full model:
@@ -653,7 +659,7 @@ generator_func_combined <- function(N_obs, N_predictors) {
   # then just sorting the result of a generator is enough to create
   # a valid draw from the ordered vector prior
   mu <- sort(rnorm(2, 3, 1)) 
-  beta <- beta <- c(rnorm(1, 0, 2), rnorm(N_predictors - 1 , 0, 1))
+  beta <- c(rnorm(1, 0, 2), rnorm(N_predictors - 1, 0, 1))
   X <- matrix(rnorm(N_predictors * N_obs, 0, 1), nrow = N_obs, ncol = N_predictors)
   X[, 1] <- 1 # Intercept
   y <- array(NA_real_, N_obs)
@@ -663,7 +669,7 @@ generator_func_combined <- function(N_obs, N_predictors) {
       linpred <- linpred + X[n, p] * beta[p]
     }
     theta <- plogis(linpred)
-    if(runif(1) < theta) {
+    if (runif(1) < theta) {
       y[n] <- rpois(1, exp(mu[1]))
     } else {
       y[n] <- rpois(1, exp(mu[2]))
@@ -751,7 +757,7 @@ fanos_plot
 #' loop and break from the loop only when the generated data meet our
 #' criteria (i.e. is not rejected). This is our code:
 generator_func_combined_reject <- function(N_obs, N_predictors) {
-  if(N_obs < 5) {
+  if (N_obs < 5) {
     stop("Too low N_obs for this simulator")
   }
   repeat {
@@ -759,7 +765,7 @@ generator_func_combined_reject <- function(N_obs, N_predictors) {
     # then just sorting the result of a generator is enough to create
     # a valid draw from the ordered vector prior
     mu <- sort(rnorm(2, 3, 1)) 
-    beta <- c(rnorm(1, 0, 2), rnorm(N_predictors - 1 , 0, 1))
+    beta <- c(rnorm(1, 0, 2), rnorm(N_predictors - 1, 0, 1))
     X <- matrix(rnorm(N_predictors * N_obs, 0, 1), nrow = N_obs, ncol = N_predictors)
     X[, 1] <- 1 # Intercept
     y <- array(NA_real_, N_obs)
@@ -769,14 +775,14 @@ generator_func_combined_reject <- function(N_obs, N_predictors) {
         linpred <- linpred + X[n, p] * beta[p]
       }
       theta <- plogis(linpred)
-      if(runif(1) < theta) {
+      if (runif(1) < theta) {
         y[n] <- rpois(1, exp(mu[1]))
       } else {
         y[n] <- rpois(1, exp(mu[2]))
       }
       
     }
-    if(var(y) / mean(y) > fano_threshold) {
+    if (var(y) / mean(y) > fano_threshold) {
       break;
     }
   }
@@ -813,8 +819,8 @@ plot_coverage(results_combined_reject)
 #' Below we show the uncertainty for two variables and some widths of
 #' central posterior intervals numerically:
 stats_subset <- results_combined_reject$stats[
-  results_combined_reject$stats$variable %in% c("beta[1]", "mu[1]"),]
-empirical_coverage(stats_subset, c(0.25,0.5,0.9,0.95))
+  results_combined_reject$stats$variable %in% c("beta[1]", "mu[1]"), ]
+empirical_coverage(stats_subset, c(0.25, 0.5, 0.9, 0.95))
 
 #' Maybe we think the remaining uncertainty is too big, so we'll run
 #' 300 more simulations, just to be sure:
@@ -843,8 +849,8 @@ combined_reject_coverage <- plot_coverage_diff(results_combined_reject_more)
 combined_reject_coverage
 
 stats_subset <- results_combined_reject_more$stats[
-  results_combined_reject_more$stats$variable %in% c("beta[1]", "mu[2]"),]
-empirical_coverage(stats_subset, c(0.25,0.5,0.9,0.95))
+  results_combined_reject_more$stats$variable %in% c("beta[1]", "mu[2]"), ]
+empirical_coverage(stats_subset, c(0.25, 0.5, 0.9, 0.95))
 
 #' This actually shows a limitation of the coverage results - for
 #' `mu[1]` the approximate CI for coverage excludes exact calibration
