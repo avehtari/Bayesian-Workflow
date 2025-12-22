@@ -1,10 +1,10 @@
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library("arm")
-library("posterior")
-library("rstanarm")
-library("lme4")
-library("cmdstanr")
+library(arm)
+library(posterior)
+library(rstanarm)
+library(lme4)
+library(cmdstanr)
 options(mc.cores = 4)
 
 # Prepare data

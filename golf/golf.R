@@ -36,13 +36,13 @@ knitr::opts_chunk$set(
 #' 
 #' **Load packages**
 #| cache: FALSE
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library("cmdstanr")
+library(cmdstanr)
 options(mc.cores = 4)
-library("bayesplot")
-library("loo")
-library("posterior")
+library(bayesplot)
+library(loo)
+library(posterior)
 print_file <- function(file) {
   cat(paste(readLines(file), "\n", sep=""), sep="")
 }

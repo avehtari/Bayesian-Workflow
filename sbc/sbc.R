@@ -109,7 +109,7 @@ knitr::opts_chunk$set(
 )
 #'
 #' Let's setup and get our hands dirty.
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 # remotes::install_github("hyunjimoon/SBC")
 library(SBC)
@@ -487,7 +487,8 @@ logistic_first_ranks / logistic_first_ecdf
 #' simulated values against posterior estimates, which can be done via
 #' the [plot_sim_estimated()] function.
 #| label: fig-sbcworkflow_logistic_first_sim_estimated
-logistic_first_sim_estimated <- plot_sim_estimated(results_logistic_first_10) + labs(x = "Simulated value", y = "Mean, 95% CI")
+logistic_first_sim_estimated <- plot_sim_estimated(results_logistic_first_10) + 
+  labs(x = "Simulated value", y = "Mean, 95% CI")
 logistic_first_sim_estimated
 
 #' One thing that immediately stands out is that the posterior

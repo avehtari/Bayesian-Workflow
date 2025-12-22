@@ -1,5 +1,5 @@
 
-library("rprojroot")
+library(rprojroot)
 root<-has_file(".ARMM-Examples-root")$make_fix_file()
 
 # read mathematics and Portuguese language results

@@ -1,8 +1,8 @@
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library("cmdstanr")
+library(cmdstanr)
 options(mc.cores = 4)
-library("posterior")
+library(posterior)
 set.seed(1234)
 
 # Model for two movies

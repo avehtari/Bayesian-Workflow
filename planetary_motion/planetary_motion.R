@@ -51,7 +51,7 @@ knitr::opts_chunk$set(
 #' 
 #' **Load packages**
 #| cache: false
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 library(posterior)

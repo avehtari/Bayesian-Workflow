@@ -44,7 +44,7 @@ knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cac
 
 #' #### Load packages {.unnumbered}
 #| cache: FALSE
-library("rprojroot")
+library(rprojroot)
 root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(tidyverse)
 library(tictoc)

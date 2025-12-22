@@ -36,7 +36,7 @@ knitr::opts_chunk$set(
 #' 
 #' **Load packages**
 #| cache: FALSE
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(ggplot2)
 library(bayesplot)
