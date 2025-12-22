@@ -29,7 +29,7 @@ knitr::opts_chunk$set(
   warning = FALSE,
   comment = NA,
   out.width = "90%",
-  cache = FALSE
+  cache = TRUE
 )
 
 #' ## Portugal students data
@@ -108,6 +108,7 @@ library(matrixStats)
 library(patchwork)
 library(ggdist)
 library(doFuture)
+library(doRNG)
 library(tictoc)
 
 
