@@ -802,6 +802,44 @@ cu_df_b |>
   pull("p") |>
   mean()
 
+#' # Prior and likelihood sensitivity of treatment effect posteriors
+#'
+#' Examining the prior and likelihood sensitivity of parameter
+#' posteriors is quick and easy, but eventually we want to examine
+#' prior and likelihood sensitivity of our main quantity of interest,
+#' which in this case is the treatment effect in different
+#' weeks. Making this analysis requires a bit more code as we need to
+#' compute the treatment effect posteriors and combine that
+#' information with log prior density and log likelihood for the
+#' corresponding posterior draws.
+#' 
+#' Prior-likelihood sensitivity analysis using powerscaling approach
+#' for the treatment effect posteriors at weeks 4, 8, and 12
+trt_effect_draws <- cu_df_b |>
+  data_grid(group, week, cu_baseline=28, id=129, set=28) |>
+  add_epred_draws(fit_betabinomial2b, re_formula=NA, allow_new_levels=TRUE) |>
+  compare_levels(.epred, by=group) |>
+  pivot_wider(names_from = c(group,week), values_from = .epred, names_sep = " week ") |>
+  select(!c(cu_baseline,id,set,.chain,.iteration)) |>
+  left_join(as_draws_df(log_lik_draws(fit_betabinomial2b)), by=".draw") |>
+  as_draws_df() |>
+  bind_draws(log_prior_draws(fit_betabinomial2b)) |>
+  rename_variables(`nabiximols - placebo week  4`=`nabiximols - placebo week 4`,
+                   `nabiximols - placebo week  8`=`nabiximols - placebo week 8`,) |>
+  subset_draws(variable=c("nabiximols - placebo week  4",
+                          "nabiximols - placebo week  8",
+                          "nabiximols - placebo week 12",
+                          "log_lik",
+                          "lprior"))
+
+#| label: fig-priorsense-diff-betabinomial2b
+trt_effect_draws |> powerscale_plot_dens(help_text=FALSE)
+
+trt_effect_draws |> powerscale_sensitivity()
+
+#' The treatment effect posteriors are not sensitive to prior and are
+#' informed by the likelihood.
+#' 
 #' # Sensitivity to model choice
 #'
 #' Finally we check how much there is difference in the conclusions,
