@@ -49,6 +49,7 @@ library(brms)
 options(brms.backend = "cmdstanr")
 options(mc.cores = 4)
 library(dplyr)
+library(tibble)
 library(matrixStats)
 library(tinytable)
 options(
@@ -57,6 +58,8 @@ options(
   tinytable_tt_digits = 2
 )
 library(reliabilitydiag)
+library(Iso)
+library(assertthat)
 
 #' # Data
 #'

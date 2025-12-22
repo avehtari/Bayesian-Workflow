@@ -40,7 +40,9 @@ library(ggplot2)
 library(ggdist)
 library(dplyr)
 library(tidyr)
-theme_set(bayesplot::theme_default(base_family = "sans", base_size=16))
+library(bayesplot)
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
+library(marginaleffects)
 
 #' ## Data
 #'
@@ -60,7 +62,7 @@ df_bioassay <- data.frame(
 #| fig-width: 7
 with(df_bioassay,
      plot(dose, deaths, xlab = "Dose log(g/ml)", ylab = "# of deaths",
-          pch=19, cex=1.5, bty="l"))
+          pch = 19, cex = 1.5, bty = "l"))
 
 #' Data plotted with ggplot
 #| label: fig-bioassay-data-ggplot
@@ -266,8 +268,8 @@ p1
 #| fig-height: 4
 #| fig-width: 8
 p2 <- marginaleffects::plot_predictions(bfit1,
-                                  condition = "dose",
-                                  transform = \(x) x/5) +
+                                        condition = "dose",
+                                        transform = \(x) x/5) +
   labs(x = "Dose log(g/ml)", y = "Pr(death)") +
   geom_point(data = df_bioassay,
              inherit.aes = FALSE,

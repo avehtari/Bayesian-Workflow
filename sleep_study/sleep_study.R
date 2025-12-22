@@ -39,6 +39,8 @@ knitr::opts_chunk$set(
 library("rprojroot")
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(ggplot2)
+library(bayesplot)
+theme_set(bayesplot::theme_default(base_family = "sans"))
 library(patchwork)
 library(dplyr)
 library(loo)
@@ -49,7 +51,6 @@ BRMS_MODEL_DIR <- root("sleep_study", "models/")
 options(future.globals.maxSize = 1e9)
 library(priorsense)
 options(priorsense.plot_help_text = FALSE)
-theme_set(bayesplot::theme_default(base_family = "sans"))
 
 #' # Main Story and Messages
 #'

@@ -67,7 +67,8 @@ library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans"))
 library(patchwork)
 library(ggrepel)
-set1 <- RColorBrewer::brewer.pal(7, "Set1")
+library(RColorBrewer)
+set1 <- brewer.pal(7, "Set1")
 #' Use English for names of weekdays and months
 Sys.setlocale("LC_TIME", "en_GB.utf8")
 

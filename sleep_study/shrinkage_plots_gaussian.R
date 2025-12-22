@@ -2,6 +2,7 @@
 # Sleepstudy example
 library(brms)
 library(tidyverse)
+library(ggrepel)
 
 #-------------  Sleepstudy
 # Reaction times (ms) to a series of tests after sleep deprivation.
