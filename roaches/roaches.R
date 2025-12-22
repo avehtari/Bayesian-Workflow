@@ -24,7 +24,14 @@
 #' # Setup  {.unnumbered}
 #' 
 #+ setup, include=FALSE
-knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, comment=NA, out.width='95%')
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = "95%"
+)
 
 #' 
 #' **Load packages**
@@ -37,9 +44,9 @@ options(mc.cores = 4)
 library(ggplot2)
 library(ggdist)
 library(bayesplot)
-theme_set(bayesplot::theme_default(base_family = "sans", base_size=16))
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
 library(posterior)
-options(posterior.num_args=list(digits=2))
+options(posterior.num_args = list(digits = 2))
 library(priorsense)
 library(dplyr)
 library(tibble)
@@ -75,7 +82,7 @@ library(reliabilitydiag)
 #' Load data
 data(roaches, package = "rstanarm")
 roaches$sqrt_roach1 <- sqrt(roaches$roach1)
-head(roaches) |> print(digits=2)
+head(roaches) |> print(digits = 2)
 
 #' # Poisson model
 #' 
@@ -83,17 +90,17 @@ head(roaches) |> print(digits=2)
 #| results: hide
 #| cache: true
 fit_p <- brm(y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
-                data = roaches,
-                family = poisson,
-                prior = prior(normal(0,1), class = b),
-                refresh = 0)
+             data = roaches,
+             family = poisson,
+             prior = prior(normal(0, 1), class = b),
+             refresh = 0)
 
 #' Plot posterior
 #| label: fig-posterior-poisson
 #| fig-height: 3
 #| fig-width: 6
-mcmc_areas(fit_p, prob_outer = .999,
-           regex_pars = c("sqrt_roach1", "treatment", "senior")) +
+mcmc_areas(fit_p, regex_pars = c("sqrt_roach1", "treatment", "senior"), 
+           prob_outer = 0.999) +
   coord_cartesian(xlim = c(-0.65, 0.25))
 
 #' 
@@ -140,7 +147,7 @@ pp_check(fit_p, type = "rootogram", style = "discrete") +
 #' 
 #' We use Pareto-smoothed importance sampling leave-one-out (PSIS-LOO)
 #' cross-validation [@Vehtari+etal:PSIS-LOO:2017] as it is very fast to compute.
-fit_p <- add_criterion(fit_p, criterion="loo")
+fit_p <- add_criterion(fit_p, criterion = "loo")
 # store the result for later use
 loo_p1 <- loo(fit_p)
 
@@ -182,14 +189,11 @@ fit_p_m3 <- update(fit_p, formula = y ~ sqrt_roach1 + treatment) |>
 #' 
 #' Moment matching is able to assist PSIS-LOO computation and all
 #' Pareto $\hat{k}$ values are good.
-loo_compare(fit_p,
-            fit_p_m1,
-            fit_p_m2,
-            fit_p_m3,
-            model_names=c("Poisson full model",
-                          "Poisson w/o sqrt(roach1)",
-                          "Poisson w/o treatment",
-                          "Poisson w/o senior"))
+loo_compare(fit_p, fit_p_m1, fit_p_m2, fit_p_m3,
+            model_names = c("Poisson full model",
+                            "Poisson w/o sqrt(roach1)",
+                            "Poisson w/o treatment",
+                            "Poisson w/o senior"))
 
 #' Based on `elpd_diff` and `se_diff` the roaches covariate would be
 #' relevant, but although dropping treatment or senior covariate will
@@ -225,8 +229,8 @@ fit_nb <- update(fit_p, family = negbinomial)
 #| label: fig-posterior-nb
 #| fig-height: 3
 #| fig-width: 6
-mcmc_areas(fit_nb, prob_outer = .999,
-           regex_pars = c("sqrt_roach1", "treatment", "senior"))
+mcmc_areas(fit_nb, regex_pars = c("sqrt_roach1", "treatment", "senior"), 
+           prob_outer = 0.999)
 
 #' 
 #' Treatment effect is much closer to zero, and senior effect has lot
@@ -339,10 +343,7 @@ pp_check(fit_nb, type = "loo_pit_ecdf", moment_match = TRUE)
 #' As we guessed, there is not much difference between LOO and
 #' posterior inervals, and LOO-PIT-ECDF and PIT-ECDF.
 #'
-loo_compare(fit_p,
-            fit_nb,
-            model_names=c("Poisson",
-                          "Neg-bin"))
+loo_compare(fit_p, fit_nb, model_names = c("Poisson", "Neg-bin"))
 
 #' In LOO model comparison the negative binomial model is much better
 #' than the Poisson model. The diagnostic `diag_diff` indicates the
@@ -356,8 +357,7 @@ loo_compare(fit_p,
 #'
 #' The next comparison shows the result without moment matching
 #' improved computation.
-loo_compare(list(`Poisson`=loo_p1,
-                 `Neg-bin`= loo_nb1))
+loo_compare(list(`Poisson` = loo_p1, `Neg-bin` = loo_nb1))
 
 #' The difference is now a bit smaller, but still the difference is
 #' huge. The column `diag_elpd` is reminding us that there were high
@@ -375,7 +375,7 @@ loo_compare(list(`Poisson`=loo_p1,
 #| label: fig-posterior-nb_dispersion
 #| fig-height: 2
 #| fig-width: 6
-mcmc_areas(fit_nb, prob_outer = .999, pars = "shape")
+mcmc_areas(fit_nb, pars = "shape", prob_outer = 0.999)
 
 #' Posterior predictive rootogram and LOO-PIT-ECDF looked good, but
 #' for discrete models where some discrete values have relatively high
@@ -445,8 +445,8 @@ fit_pvi <- brm(y ~ sqrt_roach1 + treatment + senior + (1 | id) + offset(log(expo
 #| label: fig-posterior-poisson_varying
 #| fig-height: 3
 #| fig-width: 6
-mcmc_areas(as.matrix(fit_pvi), prob_outer = .999,
-    regex_pars = c("sqrt_roach1", "treatment", "senior"))
+mcmc_areas(fit_pvi, regex_pars = c("sqrt_roach1", "treatment", "senior"), 
+           prob_outer = .999)
 
 #' 
 #' The marginals are similar as with negative-binomial model, but
@@ -455,7 +455,7 @@ mcmc_areas(as.matrix(fit_pvi), prob_outer = .999,
 #' ## Cross-validation checking
 #' 
 #' Compute LOO using PSIS-LOO.
-fit_pvi <- add_criterion(fit_pvi, criterion="loo")
+fit_pvi <- add_criterion(fit_pvi, criterion = "loo")
 loo(fit_pvi)
 
 #' `p_loo` is about 164, which is less than the number of parameters
@@ -473,7 +473,7 @@ loo(fit_pvi)
 #| results: hide
 #| cache: true
 fit_pvi <- update(fit_pvi, save_pars = save_pars(all = TRUE))
-fit_pvi <- add_criterion(fit_pvi, criterion="loo", moment_match = TRUE, overwrite = TRUE)
+fit_pvi <- add_criterion(fit_pvi, criterion = "loo", moment_match = TRUE, overwrite = TRUE)
 loo(fit_pvi)
 
 #' Moment matching is able to reduce the number of high
@@ -495,8 +495,7 @@ loo(fit_pvi)
 #' 
 #' loo package allows comparing PSIS-LOO and $K$-fold-CV results
 #| cache: false
-loo_compare(list(`Neg-bin`=loo(fit_nb),
-                 `Poisson var. int.`=kcvpvi))
+loo_compare(list(`Neg-bin` = loo(fit_nb), `Poisson var. int.` = kcvpvi))
 
 #' 
 #' There is not much difference, and the uncertainty is big. The
@@ -508,10 +507,9 @@ loo_compare(list(`Neg-bin`=loo(fit_nb),
 #' To verify, that we can compare PSIS-LOO and $K$-fold-CV results, we
 #' can run $K$-fold-CV also for negative-binomial model.
 #| cache: true
-(kcvnb <- kfold(fit_nb, K=10))
+(kcvnb <- kfold(fit_nb, K = 10))
 #| cache: false
-loo_compare(list(`Neg-bin`=kcvnb,
-                 `Poisson var. int.`=kcvpvi))
+loo_compare(list(`Neg-bin` = kcvnb, `Poisson var. int.` = kcvpvi))
 
 #' 
 #' The difference in predictive performance is very similar, and the
@@ -641,7 +639,7 @@ mod_p_vi <- cmdstan_model(stan_file = poisson_vi_int)
 datap <- list(N = dim(roaches)[1],
               P = 3,
               offsett = log(roaches$exposure2),
-              X = roaches[,c("sqrt_roach1", "treatment", "senior")],
+              X = roaches[, c("sqrt_roach1", "treatment", "senior")],
               y = roaches$y,
               integrate_1d_reltol = 1e-6)
 fit_p_vi <- mod_p_vi$sample(
@@ -666,8 +664,7 @@ mcmc_areas(as_draws_matrix(fit_p_vi$draws(variables = c("beta", "sigmaz"))),
 #' Now the PSIS-LOO doesn't give warnings and the result is close to K-fold-CV.
 (loo_p_vi <- fit_p_vi$loo(save_psis = TRUE))
 
-loo_compare(list(`Poisson var. int. int-LOO` = loo_p_vi,
-            `Neg-bin` = loo_nb))
+loo_compare(list(`Poisson var. int. int-LOO` = loo_p_vi, `Neg-bin` = loo_nb))
 
 #' Comparing to the negative binomial model there is not much
 #' difference, and the difference in `elpd_diff` compared to
@@ -699,7 +696,7 @@ ppc_loo_pit_ecdf(
 #| fig-height: 4
 #| fig-width: 5
 rd <- reliabilitydiag(
-  EMOS = E_loo((fit_p_vi$draws(variables="y_loorep", format = "matrix")>0)+0, 
+  EMOS = E_loo((fit_p_vi$draws(variables = "y_loorep", format = "matrix") > 0) + 0,
                loo_p_vi$psis_object)$value,
   y = as.numeric(roaches$y > 0)
 )
@@ -745,7 +742,7 @@ fit_zinb <- add_criterion(fit_zinb, criterion = "loo", save_psis = TRUE,
 #' Zero-inflated negative binomial (ZINB) model has clearly better predictive
 #' performance than the negative binomial (and all diagnostics are good).
 loo_compare(fit_nb, fit_zinb,
-            model_names=c("Neg-bin",
+            model_names = c("Neg-bin",
                           "ZINB"))
 
 #' Posterior predictive checking looks good, but there is no clear difference
@@ -753,7 +750,7 @@ loo_compare(fit_nb, fit_zinb,
 #| label: fig-ppc_dens-zinb
 #| fig-height: 4
 #| fig-width: 7
-pp_check(fit_zinb, type='dens_overlay', ndraws = 20) +
+pp_check(fit_zinb, type = "dens_overlay", ndraws = 20) +
   scale_x_sqrt(breaks = c(0, 1, 3, 10, 30, 100, 300),
                lim = c(0, 400))
 
@@ -763,20 +760,20 @@ pp_check(fit_zinb, type='dens_overlay', ndraws = 20) +
 #| out-width: 100%
 pp_check(fit_zinb, type = "rootogram", style = "discrete") +
   scale_x_sqrt() +
-  coord_cartesian(xlim=c(0, 400)) +
+  coord_cartesian(xlim = c(0, 400)) +
   theme(legend.position = "inside",
         legend.position.inside = c(0.8, 0.8))
 
 #| label: fig-ppc_pit-zinb
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fit_zinb, type= "pit_ecdf")
+pp_check(fit_zinb, type = "pit_ecdf")
 
 #' LOO-PIT-ECDF
 #| label: fig-ppc_loopit-zinb
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fit_zinb, type= "loo_pit_ecdf", moment_match = TRUE)
+pp_check(fit_zinb, type = "loo_pit_ecdf", moment_match = TRUE)
 
 #' Reliability diagram assessing the calibration of predicted
 #' probabilities of zero vs non-zero looks clearly better than the one
@@ -785,13 +782,13 @@ pp_check(fit_zinb, type= "loo_pit_ecdf", moment_match = TRUE)
 #| fig-height: 4
 #| fig-width: 5
 rd <- reliabilitydiag(
-  EMOS = E_loo((posterior_predict(fit_zinb)>0)+0, loozinb$psis_object)$value,
+  EMOS = E_loo((posterior_predict(fit_zinb) > 0) + 0, loozinb$psis_object)$value,
   y = as.numeric(roaches$y > 0)
 )
 autoplot(rd) +
-  labs(x = "Predicted probability of non-zero", 
+  labs(x = "Predicted probability of non-zero",
        y = "Conditional event probabilities") +
-  bayesplot::theme_default(base_family = "sans", base_size=16)
+  bayesplot::theme_default(base_family = "sans", base_size = 16)
 
 #' Although the models are different, with finite data and wide LOO
 #' predictive distributions, there is a limit in which differences can
@@ -807,7 +804,7 @@ autoplot(rd) +
 #| label: fig-posterior-zinb
 #| fig-height: 4
 #| fig-width: 8
-mcmc_areas(as.matrix(fit_zinb)[, 3:8], prob_outer = .999)
+mcmc_areas(as.matrix(fit_zinb)[, 3:8], prob_outer = 0.999)
 
 #' 
 #' The posterior marginals for negative-binomial part are similar to marginals
@@ -833,18 +830,18 @@ pred_zinb <- posterior_epred(fit_zinb,
 ratio_zinb <- array(rowMeans(pred_zinb[, 263:524] / pred_zinb[, 1:262]), 
                     c(1000, 4, 1)) |>
   as_draws_df() |>
-  set_variables(variables= "ratio")
+  set_variables(variables = "ratio")
 ratio_zinb |>
   ggplot(aes(x = ratio)) +
   stat_dots(quantiles = 100) +
   stat_slab(density = "unbounded", trim = FALSE, fill = NA, color = "gray") +
   coord_cartesian(expand = FALSE) +
-  labs(x= "Ratio of roaches with vs without treatment", y = NULL) +
+  labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
   xlim(c(0, 1)) +
-  ## geom_hline(yintercept=0, alpha=0.3) +
-  geom_vline(xintercept=1, linetype = "dotted")
+  ## geom_hline(yintercept = 0, alpha = 0.3) +
+  geom_vline(xintercept = 1, linetype = "dotted")
 
 #' The treatment clearly reduces the expected number of roaches.
 #'
@@ -856,18 +853,18 @@ ratio_zinb |>
 pred_p <- posterior_epred(fit_p,
                            newdata = rbind(mutate(roaches, treatment = 0),
                                            mutate(roaches, treatment = 1)))
-ratio_p <- array(rowMeans(pred_p[, 263:524] / pred_p[, 1:262]), 
+ratio_p <- array(rowMeans(pred_p[, 263:524] / pred_p[, 1:262]),
                  c(1000, 4, 1)) |>
   as_draws_df() |>
-  set_variables(variables= "ratio")
+  set_variables(variables = "ratio")
 
 pred_nb <- posterior_epred(fit_nb,
                            newdata = rbind(mutate(roaches, treatment = 0),
                                            mutate(roaches, treatment = 1)))
-ratio_nb <- array(rowMeans(pred_nb[, 263:524] / pred_nb[, 1:262]), 
+ratio_nb <- array(rowMeans(pred_nb[, 263:524] / pred_nb[, 1:262]),
                   c(1000, 4, 1)) |>
   as_draws_df() |>
-  set_variables(variables= "ratio")
+  set_variables(variables = "ratio")
 
 #| label: fig-effect-p-nb-zinb
 #| fig-height: 3
@@ -912,7 +909,7 @@ ratio_zinb |>
 #' expected number of roaches with vs without treatment.
 #| label: fig-priorsense-zinb
 powerscale_sensitivity(fit_zinb, prediction = \(x, ...) ratio_zinb) |>
-                         filter(variable== "ratio") |>
+                         filter(variable == "ratio") |>
                          mutate(across(where(is.double),  ~num(.x, digits = 2)))
 #'
 #' There is no prior sensitivity and the likelihood is informative.
@@ -931,10 +928,8 @@ fit_zinb_m2 <-
                       zi ~ sqrt_roach1 + senior + offset(log(exposure2)))) |>
   add_criterion(criterion = "loo", moment_match = TRUE)
 #+
-loo_compare(fit_zinb,
-            fit_zinb_m2,
-            model_names = c("ZINB full model",
-                            "ZINB w/o treatment"))
+loo_compare(fit_zinb, fit_zinb_m2,
+            model_names = c("ZINB full model", "ZINB w/o treatment"))
 
 #' Treatment effect improves the predictive performance with 96%
 #' probability. However, as the distribution of the pointwise
