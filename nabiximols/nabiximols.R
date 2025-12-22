@@ -57,6 +57,7 @@ library(modelr)
 library(loo)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 4)
+library(rstan)
 library(posterior)
 options(posterior.num_args = list(digits = 2))
 library(pillar)
@@ -227,7 +228,7 @@ pn
 #' (1.5,2.5),\ldots,(27.5,28.5))$. The following plot shows the
 #' vertical lines for the edges of these intervals.
 ll2 <- log_lik(fit_normal, newdata = cu_df[i, ] |> select(!cu) |> expand_grid(cu = seq(-0.5, 28.5, by = 1)))
-p2 <- exp(colLogSumExps(ll) - log(S))
+p2 <- exp(colLogSumExps(ll2) - log(S))
 pn +
   annotate(geom = "segment", x = seq(-0.5, 28.5, by = 1), y = 0, 
            xend = seq(-0.5, 28.5, by = 1), yend = p2, color = "blue") +
