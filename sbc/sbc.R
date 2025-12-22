@@ -24,8 +24,8 @@
 #' # Introduction
 #'
 #' This notebook includes the code for the Bayesian Workflow book
-#' chapter 31 Simulation-based calibration checking in model
-#' development workflow.
+#' Chapter 31 *Simulation-based calibration checking in model
+#' development workflow*.
 #' 
 #' Here we describe a complete process to iteratively build and
 #' validate the _implementation_ of a non-trivial, but still
