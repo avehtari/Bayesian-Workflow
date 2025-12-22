@@ -837,11 +837,13 @@ ratio_zinb <- array(rowMeans(pred_zinb[, 263:524] / pred_zinb[, 1:262]),
 ratio_zinb |>
   ggplot(aes(x = ratio)) +
   stat_dots(quantiles = 100) +
-  stat_slab(fill=NA, color="gray") +
+  stat_slab(density = "unbounded", trim = FALSE, fill = NA, color = "gray") +
+  coord_cartesian(expand = FALSE) +
   labs(x= "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
   xlim(c(0, 1)) +
+  ## geom_hline(yintercept=0, alpha=0.3) +
   geom_vline(xintercept=1, linetype = "dotted")
 
 #' The treatment clearly reduces the expected number of roaches.
@@ -851,7 +853,6 @@ ratio_zinb |>
 #' (passes posterior and LOO predictive, and calibration checking).
 #' For illustration purposes, we compare the posteriors using Poisson,
 #' negative binomial and zero-inflated negative binomial.
-#'
 pred_p <- posterior_epred(fit_p,
                            newdata = rbind(mutate(roaches, treatment = 0),
                                            mutate(roaches, treatment = 1)))
@@ -874,11 +875,15 @@ ratio_nb <- array(rowMeans(pred_nb[, 263:524] / pred_nb[, 1:262]),
 clr <- khroma::colour("bright", names = FALSE)(7)
 ratio_zinb |>
   ggplot(aes(x = ratio)) +
-  stat_slab(data = ratio_p, fill = NA, color = clr[1], alpha = 0.6) +
-  stat_slab(data = ratio_nb, fill = NA, color = clr[2], alpha = 0.6) +
-  stat_slab(fill = NA, color = clr[3], alpha = 0.6) +
+  stat_slab(data = ratio_p, density = "unbounded", trim = FALSE,
+            fill = NA, color = clr[1], alpha = 0.6) +
+  stat_slab(data = ratio_nb, density = "unbounded", trim = FALSE,
+            fill = NA, color = clr[2], alpha = 0.6) +
+  stat_slab(density = "unbounded", trim = FALSE,
+            fill = NA, color = clr[3], alpha = 0.6) +
   labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
+  coord_cartesian(expand = FALSE) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
   xlim(c(0, 1)) +
   geom_vline(xintercept = 1, linetype = "dotted") +
