@@ -23,6 +23,10 @@
 
 #' # Introduction
 #'
+#' This notebook includes the code for the Bayesian Workflow book
+#' chapter 31 Simulation-based calibration checking in model
+#' development workflow.
+#' 
 #' Here we describe a complete process to iteratively build and
 #' validate the _implementation_ of a non-trivial, but still
 #' relatively small model using simulation based calibration checking
@@ -894,6 +898,10 @@ mean(sign(stats_beta2$q5) == sign(stats_beta2$q95))
 #' that your model is at least pretty close to your simulator.
 #'
 #' 
+#' ## References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
 #' ## Original Computing Environment {.unnumbered}
 #' 
 sessionInfo()
