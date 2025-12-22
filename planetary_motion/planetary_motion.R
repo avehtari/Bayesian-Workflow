@@ -40,7 +40,14 @@
 #' # Setup  {.unnumbered}
 #' 
 #+ setup, include=FALSE
-knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=FALSE, comment=NA, out.width='95%')
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = '95%'
+)
 #' 
 #' **Load packages**
 #| cache: false

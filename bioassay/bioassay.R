@@ -31,7 +31,7 @@ knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cac
 #' #### Load packages {.unnumbered}
 #| cache: FALSE
 library("rprojroot")
-root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 4)

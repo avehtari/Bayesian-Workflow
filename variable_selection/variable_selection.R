@@ -23,8 +23,14 @@
 
 #| label: setup
 #| include: FALSE
-knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, 
-                      out.width='90%', cache=FALSE)
+knitr::opts_chunk$set(
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = "90%",
+  cache = FALSE
+)
 
 #' ## Portugal students data
 #'
@@ -75,7 +81,7 @@ knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA,
 #| cache: FALSE
 library(brms)
 library(cmdstanr)
-options(brms.backend="cmdstanr")
+options(brms.backend = "cmdstanr")
 options(mc.cores = 4)
 library(posterior)
 options(digits = 2, posterior.digits = 2, 
@@ -89,8 +95,9 @@ if (interactive()) {
 }
 library(ggplot2)
 library(bayesplot)
-theme_set(bayesplot::theme_default(base_family = "sans", base_size=16))
-set1 <- RColorBrewer::brewer.pal(7, "Set1")
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
+library(RColorBrewer)
+set1 <- brewer.pal(7, "Set1")
 library(khroma)
 library(latex2exp)
 library(tinytable)
@@ -111,7 +118,7 @@ student <- read.csv(url('https://raw.githubusercontent.com/avehtari/ROS-Examples
 #' List the predictors to be used.
 predictors <- c("school","sex","age","address","famsize","Pstatus", "Medu","Fedu",
                 "traveltime","studytime","failures","schoolsup", "famsup","paid",
-                "activities", "nursery", "higher", "internet",  "romantic","famrel",
+                "activities", "nursery", "higher", "internet", "romantic","famrel",
                 "freetime","goout","Dalc","Walc","health", "absences")
 p <- length(predictors)
 
@@ -137,10 +144,10 @@ head(student_Gpor) |> tt()
 #| label: fig-data-histograms
 #| fig-height: 4
 #| fig-width: 8
-p1 <- ggplot(student_Gmat, aes(x=Gmat)) + 
+p1 <- ggplot(student_Gmat, aes(x = Gmat)) +
   geom_dots() + 
   labs(x = "Median math exam score")
-p2 <- ggplot(student_Gpor, aes(x=Gpor)) + 
+p2 <- ggplot(student_Gpor, aes(x = Gpor)) +
   geom_dots() + 
   labs(x = "Median Portuguese exam score")
 (p1 + p2) * scale_x_continuous(lim = c(0, 20)) * 
@@ -152,9 +159,9 @@ p2 <- ggplot(student_Gpor, aes(x=Gpor)) +
 #' comparison of relevances easier and also to make the definition of
 #' priors easier.
 studentstd_Gmat <- student_Gmat
-studentstd_Gmat[,predictors] <-scale(student_Gmat[,predictors])
+studentstd_Gmat[, predictors] <- scale(student_Gmat[, predictors])
 studentstd_Gpor <- student_Gpor
-studentstd_Gpor[,predictors] <-scale(student_Gpor[,predictors])
+studentstd_Gpor[, predictors] <- scale(student_Gpor[, predictors])
 
 #' ## Default uniform prior on coefficients
 #'
