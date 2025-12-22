@@ -293,6 +293,8 @@ ppc_shocks <- function(shock, title) {
 }
 
 #| label: fig-ppc_shocks-0h
+#| fig-height: 3
+#| fig-width: 8
 ppc_shocks(shock, "Real dogs") +
   ppc_shocks(pred_logit(bfit_0h), "Model 0h: hier. logit")
 
@@ -539,6 +541,8 @@ pred_log <- function(fit) {
   pred_shock
 }
 #| label: fig-ppc_shocks-4
+#| fig-height: 4
+#| fig-width: 5
 ppc_shocks(pred_log(bfit_4), "PPsims from M4:\nhier logit model") 
 
 #' Posterior predictive checking using mean number of switches between
