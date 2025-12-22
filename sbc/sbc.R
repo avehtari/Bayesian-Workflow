@@ -1,5 +1,5 @@
 #' ---
-#' title: "Small model implementation workflow"
+#' title: "Simulation based calibration checking workflow"
 #' author: "Martin Modrák"
 #' date: 2022-12-16
 #' date-modified: today
