@@ -600,7 +600,7 @@ loo(fit4, fit5)
 #'
 #' - Parameters for standard deviations on the log or log-log scale
 #'   or hard to understand and hence set priors on.
-#' - This is specifically true for standard deviations of standard deviatons
+#' - This is specifically true for standard deviations of standard deviations
 #'   on the log or log-log scale.
 #' - In theory, we would not need the
 #'   exponential link on sigma but then we had to care for the positivity of the

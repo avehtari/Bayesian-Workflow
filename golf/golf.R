@@ -887,7 +887,7 @@ draws_8 <- fit_8$draws(format = "df")
 sigma_angle_hat <- mean(draws_8$sigma_angle)
 sigma_distance_hat <- mean(draws_8$sigma_distance)
 distance_tolerance <- mean(draws_8$distance_tolerance)
-ovseshot <- mean(draws_8$overshot)
+overshot <- mean(draws_8$overshot)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
      xaxs = "i", yaxs = "i", pch = 20, bty = "l", 
@@ -936,7 +936,7 @@ fit_8$draws(variables = c("distance_tolerance","overshot")) |>
 #' As we can expect the residual standard deviation to decrease when
 #' we add more parameters, we also use cross-validation to compare the
 #' models. As we have one `epsilon` parameter for each observation, we
-#' need to use integerated PSIS-LOO. We can compute the integrated
+#' need to use integrated PSIS-LOO. We can compute the integrated
 #' `log_lik` with the following stand alone generated quantities code.
 gq_ll <- cmdstan_model(root("golf", "golf_log_lik.stan"))
 

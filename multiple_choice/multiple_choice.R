@@ -256,7 +256,7 @@ rng <- range(
 plot(
   x = rng, 
   y = c(-1, 1),  
-  xlab = "Posterior distributions for student abilitites (above) and item difficulties (below)",
+  xlab = "Posterior distributions for student abilities (above) and item difficulties (below)",
   ylab = "", yaxt = "n",
   bty = "n", type = "n"
 )

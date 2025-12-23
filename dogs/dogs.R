@@ -128,7 +128,7 @@ bfit_0 <- add_criterion(bfit_0, criterion = "loo")
 #' $$
 #' \Pr(\mathrm{shock}) = {\mathrm{logit}^{-1}(\alpha_j + \beta_j t)},
 #' $$
-#' where $\alpha_j$ and $\beta_j$ are the parameters for dog $j$. `brms` uses following default priors, excpet we added the weakly informative normal prior for $\beta_0$.
+#' where $\alpha_j$ and $\beta_j$ are the parameters for dog $j$. `brms` uses following default priors, except we added the weakly informative normal prior for $\beta_0$.
 #' $$
 #' \begin{aligned}
 #' \left(\begin{array}{c}\alpha_j \\ \beta_j\end{array} \right) & \sim \mathrm{MVN}(\mu_{\alpha,\beta}, \Sigma_{\alpha,\beta})\\
@@ -323,7 +323,7 @@ powerscale_sensitivity(bfit_0h, variable = variables(as_draws(bfit_0h))[1:6]) |>
 
 #' # Model 1: 1-parameter log model
 #'
-#' Instead of going straigth to the 2-parameter log model by @Bush+Mosteller:1955,
+#' Instead of going straight to the 2-parameter log model by @Bush+Mosteller:1955,
 #' we test one parameter model which by construction gives probability 1 at time $t=1$.
 #' We assign a uniform prior ($\matrhm{beta}(1,1) is uniform from $0$ to $1$) on $a$.
 #' $$
@@ -375,9 +375,9 @@ bfit_2 <- add_criterion(bfit_2, criterion = "loo")
 #' ## Model comparison
 #'
 #' PSIS-LOO-CV comparison shows that the 2-parameter log model is worse
-#' than the hierarchcial logistic regression model, but not
+#' than the hierarchical logistic regression model, but not
 #' significantly. We don't examine this model further, as we can make
-#' the comparison more fair by using hierarchcial 2-parameter log
+#' the comparison more fair by using hierarchical 2-parameter log
 #' model.
 loo_compare(bfit_0h, bfit_2) |>
         as.data.frame() |>
@@ -388,7 +388,7 @@ loo_compare(bfit_0h, bfit_2) |>
 #' # Model 3: hierarchical 1-parameter log model
 #'
 #' We could go directly to hierarchical 2-parameter log model, but for
-#' completness compared to Andrew's analysis, we include hierarchical
+#' completeness compared to Andrew's analysis, we include hierarchical
 #' 1-parameter log model, too. Each dog has now it's own parameter $a_j$
 #' with a normal hierarchical prior on $\mathrm{logit}(a_j)$.
 #' $$

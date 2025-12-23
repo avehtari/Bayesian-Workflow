@@ -480,7 +480,7 @@ pp1 + pp2 + pp3 + pp4 + plot_layout(ncol = 4)
 #' normal prior favors larger $R^2$ values which then pushes the
 #' posterior towards higher $R^2$ values and makes the model ovefit
 #' which causes LOO-$R^2$ to be lower than with priors that do not
-#' favor higher $R^2$ values. Scaled normal, regularized horseshe and
+#' favor higher $R^2$ values. Scaled normal, regularized horseshoe and
 #' R2D2 priors all slightly favor smaller $R^2$ values, which is a
 #' sensible prior assumption, and the posterior have not been pushed
 #' towards higher $R^2$ values. LOO-$R^2$ results are quite similar

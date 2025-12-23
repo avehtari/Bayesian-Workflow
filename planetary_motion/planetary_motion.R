@@ -85,7 +85,7 @@ set.seed(1954)
 #' great details the concepts that arise in workflows, provide usable
 #' code, and also raise new questions.  The specific concepts we
 #' encounter in this article include why our inference fails way more
-#' slowly than it succeeds, why the behavior of an ODE changes wildely
+#' slowly than it succeeds, why the behavior of an ODE changes wildly
 #' across the parameter space, and what to do when chains drift into
 #' "unreasonable" modes of the posterior distribution.
 #' 
@@ -794,7 +794,7 @@ ppc_plot2D(fit2p, data_pred = data_pred, plot_star = TRUE)
 #' which is manageable and still exhibits the pathology we wish to
 #' understand.  A straightforward way of simplifying is to fix some of
 #' the model parameters.  When the model has more structure, such as
-#' in multilevel models, more elaborate simplificartions can be
+#' in multilevel models, more elaborate simplifications can be
 #' considered.
 #' 
 #' In the planetary motion example, we are confronted with a

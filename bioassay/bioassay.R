@@ -94,7 +94,7 @@ mod0 <- cmdstan_model(bioassay_stan_file, pedantic = TRUE)
 bioassay_stan_file <- root("bioassay","bioassay1.stan")
 writeLines(readLines(bioassay_stan_file))
 
-#' Compile the uodated Stan model code using pedantic mode
+#' Compile the updated Stan model code using pedantic mode
 #| label: mod1
 mod1 <- cmdstan_model(bioassay_stan_file, pedantic = TRUE)
 
@@ -249,7 +249,7 @@ p1 +
 
 #' We can draw also individual posterior curves with `spaghetti=TRUE,
 #' ndraws=20`, but then the posterior mean would be computed only from
-#' 20 curves. Increasinf `ndraws` would make the plotted posterior
+#' 20 curves. Increasing `ndraws` would make the plotted posterior
 #' mean more accurate, but would make the spaghetti plot more messy.
 #| label: fig-bioassay-posterior-conditional_effects-spaghetti-brms
 #| fig-height: 4

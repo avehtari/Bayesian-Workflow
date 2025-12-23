@@ -60,10 +60,10 @@
 #' there are two sub-species of an animal that are hard to observe directly, but leave
 #' droppings (poop) behind, that we can find. Further, we know the subspecies differ in the 
 #' average number of droppings they leave at one place. So we can take the number of droppings as a noisy
-#' information about which subspecie was present at given location.
+#' information about which subspecies was present at given location.
 #' We observe the number of droppings at multiple locations and record some environmental covariates about the locations
 #' (e.g. temperature, altitude) and want to learn something about the association between
-#' those covariates and the prevalence of either subspecie.
+#' those covariates and the prevalence of either subspecies.
 #' 
 #' A mathematical description would be:
 #' 
@@ -836,7 +836,7 @@ results_combined_reject_more <- bind_results(
               cache_location = file.path(cache_dir, "combined_reject_more")))
 
 #' We get some very small number of problematic fits, which we can
-#' ignore in this volume (but probably more aggresive rejection
+#' ignore in this volume (but probably more aggressive rejection
 #' sampling would remove those as well).
 #'
 #' Our plots and coverage are now pretty decent:
@@ -875,7 +875,7 @@ sim_estimated_final <- plot_sim_estimated(results_combined_reject_more, alpha = 
 sim_estimated_final
 
 #' We see that we get very precise information about `mu` and a decent
-#' picture about all `beta` elements, but the reamining uncertainty is
+#' picture about all `beta` elements, but the remaining uncertainty is
 #' large. We could for example compute the probability that the
 #' posterior 90% interval for `beta[2]` excludes zero, i.e. that we
 #' learn something about the sign of the association with a continuous

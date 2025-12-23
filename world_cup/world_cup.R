@@ -443,7 +443,7 @@ ppc_pit_ecdf(
 
 #' Posterior predictive checking for the continuous model indicates
 #' slight miscalibration with too many low PIT values (left tail of
-#' the predictive disttribution is shorter than expected)
+#' the predictive distribution is shorter than expected)
 ppc_pit_ecdf(
   y = stan_data$score_1 - stan_data$score_2,
   yrep = fit_sqrt_cont$draws(format = "matrix", variables = "y_rep")

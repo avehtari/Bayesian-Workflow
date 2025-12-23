@@ -204,7 +204,7 @@ loo_compare(fit_p, fit_p_m1, fit_p_m2, fit_p_m3,
 #' the model, but cross-validation is more cautious by not using any
 #' model for the future data distribution. The column `p_worse`
 #' provides a normal approximation base probability that the model is
-#' wrose than the model with the best performance. The column
+#' worse than the model with the best performance. The column
 #' `diag_diff` indicates that the distributions of the pointwise
 #' performance differences are likely to have so thick tails that the
 #' normal approximation based on `elpd_diff` and `diff_se` is not well
@@ -254,7 +254,7 @@ pp_check(fit_nb, type = "dens_overlay", ndraws = 20) +
 #' We see that the negative-binomial model is much better although it
 #' seems that the model predictive distribution has more mass for
 #' small counts than the real data. This discrepancy can also be an
-#' artefact from the kernel density estimate, and it is better to
+#' artifact from the kernel density estimate, and it is better to
 #' examine discrete rootogram
 #| label: fig-ppc_rootogram-nb
 #| fig-height: 4
@@ -342,7 +342,7 @@ pp_check(fit_nb, "loo_intervals", moment_match = TRUE) +
 pp_check(fit_nb, type = "loo_pit_ecdf", moment_match = TRUE)
 #'
 #' As we guessed, there is not much difference between LOO and
-#' posterior inervals, and LOO-PIT-ECDF and PIT-ECDF.
+#' posterior intervals, and LOO-PIT-ECDF and PIT-ECDF.
 #'
 loo_compare(fit_p, fit_nb, model_names = c("Poisson", "Neg-bin"))
 
@@ -353,7 +353,7 @@ loo_compare(fit_p, fit_nb, model_names = c("Poisson", "Neg-bin"))
 #' underdispersed. As we have made the model checking, we know that
 #' the Poisson model is misspecified and could be dropped just based
 #' on that fact. As the difference is very big and many times bigger
-#' than `diff_se`, we can also be certain that negative binomiasl
+#' than `diff_se`, we can also be certain that negative binomials
 #' model has better predictive performance.
 #'
 #' The next comparison shows the result without moment matching
@@ -466,7 +466,7 @@ loo(fit_pvi)
 #' each observation. Removing one observation changes the posterior
 #' for that intercept so much that importance sampling fails (even
 #' with Pareto smoothing).  Also the very large number of high $k$
-#' values is probaly due to having very flexible model.
+#' values is probably due to having very flexible model.
 #' We can try to improve computation with moment matching.
 #' By default `brm()` does not store the varying coefficients and
 #' we need to re-run with `save_pars = save_pars(all = TRUE)` before
@@ -622,7 +622,7 @@ writeLines(readLines(poisson_vi_int))
 #' integration $N$ times for each leapfrog step in Hamiltonian Monte
 #' Carlo sampling will increase the sampling time more than what would
 #' be the benefit from the simpler marginal posterior. When we do the
-#' integration in the generetad quantities, the quadrature is computed
+#' integration in the generated quantities, the quadrature is computed
 #' only for each saved iteration making the computation faster.
 #' 
 #' Next we compile the model, prepare the data, and sample. `integrate_1d_reltol`

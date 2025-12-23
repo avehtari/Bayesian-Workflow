@@ -690,7 +690,7 @@ autoplot(rd) +
 #' We can examine the effect of the treatment by looking at the
 #' posterior predictive distribution and the expectation of the
 #' posterior predictive distribution for a new person (new `id`).  For
-#' each person we can compare the prediction to the counterfactul
+#' each person we can compare the prediction to the counterfactual
 #' case, that is, what if that person would have been in the other
 #' treatment group. We can compare the difference from being in the
 #' placebo to being in the Nabiximols group.
@@ -877,7 +877,7 @@ trt_effect_draws |> powerscale_sensitivity()
 #' # Sensitivity to model choice
 #'
 #' Finally we check how much there is difference in the conclusions,
-#' if we had used the continuos normal model.  We include also models
+#' if we had used the continuous normal model.  We include also models
 #' that are closer to the model reported by
 #' @Lintzeris+etal:2019:Nabiximols, which used sum of days of cannabis
 #' use across the 12-week trial (the follow-up paper by
@@ -1087,7 +1087,7 @@ pnorm(0, mean(ae2-ae3), sd(ae2-ae3)/sqrt(257)) |> round(2)
 #' 
 #' 
 #' We don't usually use Bayes factors for many reasons, but for
-#' completness we used `bridgesampling`
+#' completeness we used `bridgesampling`
 #' [@Gronau:2020:bridgesampling] to get estimated Bayes factor.
 (br2b <- bridgesampling::bridge_sampler(fit_betabinomial2b, silent = TRUE))
 (br3b <- bridgesampling::bridge_sampler(fit_betabinomial3b, silent = TRUE))
