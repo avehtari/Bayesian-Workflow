@@ -602,7 +602,7 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2 = mean(Ef2)) |> 
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |> 
   ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -623,7 +623,7 @@ pf / (pf1 + pf2)
 tic('MCMC sampling from model 2 posterior with Pathfinder initialization')
 fit2 <- model2$sample(data = standata2, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init=pth2, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth2, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -716,13 +716,13 @@ model3 <- cmdstan_model(stan_file = root("birthdays", "gpbf3.stan"),
                         include_paths = root("birthdays"))
 
 #' Data to be passed to Stan
-standata3 <- list(x=birthdays$id,
-                  y=log(birthdays$births_relative100),
-                  N=length(birthdays$id),
-                  c_f1=1.5, # factor c of basis functions for GP for f1
-                  M_f1=20,  # number of basis functions for GP for f1
-                  J_f2=20,  # number of basis functions for periodic f2
-                  day_of_week=birthdays$day_of_week)
+standata3 <- list(x = birthdays$id,
+                  y = log(birthdays$births_relative100),
+                  N = length(birthdays$id),
+                  c_f1 = 1.5, # factor c of basis functions for GP for f1
+                  M_f1 = 20,  # number of basis functions for GP for f1
+                  J_f2 = 20,  # number of basis functions for periodic f2
+                  day_of_week = birthdays$day_of_week)
 
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
@@ -757,7 +757,7 @@ Ef1 <- apply(subset(draws3, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws3, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws3, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws3, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 pf <- birthdays |>
   mutate(Ef = Ef) |>
@@ -775,14 +775,14 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
@@ -798,7 +798,7 @@ pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
 tic('MCMC sampling from model 3 posterior with Pathfinder initialization')
 fit3 <- model3$sample(data = standata3, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init=pth3, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth3, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -806,7 +806,7 @@ mytoc()
 draws3 <- fit3$draws()
 summarise_draws(subset(draws3, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE)) |>
   tt()
-summarise_draws(subset(draws3, variable=c('beta_f3'))) |>
+summarise_draws(subset(draws3, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
@@ -818,7 +818,7 @@ Ef1 <- apply(subset(draws3, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws3, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws3, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws3, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 pf <- birthdays |>
   mutate(Ef = Ef) |>
@@ -836,14 +836,14 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "2 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
@@ -858,16 +858,16 @@ pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
 #| code-fold: true
 #| label: fig-births-pth3-vs-fit3
 variables <- names(model3$variables()$parameters)
-sp<-summarise_draws(subset(pdraws3, variable=variables))
-sm<-summarise_draws(subset(draws3, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pdraws3, variable = variables))
+sm <- summarise_draws(subset(draws3, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
   geom_text_repel() +
-  geom_abline(linetype='dotted') +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
  
 #' ### Model 4: long term smooth + seasonal + weekday with increasing magnitude
@@ -901,15 +901,15 @@ model4 <- cmdstan_model(stan_file = root("birthdays", "gpbf4.stan"),
                         include_paths = root("birthdays"))
 
 #' Data to be passed to Stan
-standata4 <- list(x=birthdays$id,
-                  y=log(birthdays$births_relative100),
-                  N=length(birthdays$id),
-                  c_f1=1.5, # factor c of basis functions for GP for f1
-                  M_f1=20,  # number of basis functions for GP for f1
-                  J_f2=20,  # number of basis functions for periodic f2
-                  c_g3=1.5, # factor c of basis functions for GP for g3
-                  M_g3=5,   # number of basis functions for GP for g3
-                  day_of_week=birthdays$day_of_week) 
+standata4 <- list(x = birthdays$id,
+                  y = log(birthdays$births_relative100),
+                  N = length(birthdays$id),
+                  c_f1 = 1.5, # factor c of basis functions for GP for f1
+                  M_f1 = 20,  # number of basis functions for GP for f1
+                  J_f2 = 20,  # number of basis functions for periodic f2
+                  c_g3 = 1.5, # factor c of basis functions for GP for g3
+                  M_g3 = 5,   # number of basis functions for GP for g3
+                  day_of_week = birthdays$day_of_week) 
 
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
@@ -918,7 +918,7 @@ standata4 <- list(x=birthdays$id,
 tic('Sampling from Pathfinder approximation of model 4 posterior')
 pth4 <- model4$pathfinder(data = standata4, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
@@ -944,9 +944,9 @@ Ef1 <- apply(subset(draws4, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws4, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws4, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws4, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef3 <- apply(subset(draws4, variable='f3'), 2, median)
+Ef3 <- apply(subset(draws4, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
 pf <- birthdays |>
   mutate(Ef = Ef) |>
@@ -965,14 +965,14 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
@@ -980,7 +980,7 @@ pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
   labs(x = "Date", y = "Relative number of births")
 pf3b <- birthdays |>
   mutate(Ef3 = Ef3) |>
-  ggplot(aes(x=date, y=births_relative100/Ef1/Ef2*100*100)) +
+  ggplot(aes(x = date, y = births_relative100 / Ef1 / Ef2 * 100 * 100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
   geom_hline(yintercept = 100, color = "gray") +
@@ -995,7 +995,7 @@ pf3b <- birthdays |>
 tic('MCMC sampling from model 4 posterior with Pathfinder initialization')
 fit4 <- model4$sample(data = standata4, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init=pth4, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth4, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -1003,7 +1003,7 @@ mytoc()
 draws4 <- fit4$draws()
 summarise_draws(subset(draws4, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE)) |>
   tt()
-summarise_draws(subset(draws4, variable=c('beta_f3'))) |>
+summarise_draws(subset(draws4, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
@@ -1015,9 +1015,9 @@ Ef1 <- apply(subset(draws4, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws4, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws4, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws4, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef3 <- apply(subset(draws4, variable='f3'), 2, median)
+Ef3 <- apply(subset(draws4, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
 pf <- birthdays |>
   mutate(Ef = Ef) |>
@@ -1036,14 +1036,14 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "2 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
@@ -1051,7 +1051,7 @@ pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
   labs(x = "Date", y = "Relative number of births")
 pf3b <- birthdays |>
   mutate(Ef3 = Ef3) |>
-  ggplot(aes(x=date, y=births_relative100/Ef1/Ef2*100*100)) +
+  ggplot(aes(x = date, y = births_relative100 / Ef1 / Ef2 * 100 * 100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
   geom_hline(yintercept = 100, color = "gray") +
@@ -1066,8 +1066,8 @@ pf3b <- birthdays |>
 #| code-fold: true
 #| label: fig-births-pth4-vs-fit4
 variables <- names(model4$variables()$parameters)
-sp<-summarise_draws(subset(pdraws4, variable=variables))
-sm<-summarise_draws(subset(draws4, variable=variables))
+sp <- summarise_draws(subset(pdraws4, variable = variables))
+sm <- summarise_draws(subset(draws4, variable = variables))
 ggplot(data = NULL, aes(
         x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
         y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
@@ -1120,17 +1120,17 @@ model5 <- cmdstan_model(stan_file = root("birthdays", "gpbf5.stan"),
                         include_paths = root("birthdays"))
 
 #' Data to be passed to Stan
-standata5 <- list(x=birthdays$id,
-                  y=log(birthdays$births_relative100),
-                  N=length(birthdays$id),
-                  c_f1=1.5, # factor c of basis functions for GP for f1
-                  M_f1=20,  # number of basis functions for GP for f1
-                  J_f2=20,  # number of basis functions for periodic f2
-                  c_g3=1.5, # factor c of basis functions for GP for g3
-                  M_g3=5,   # number of basis functions for GP for g3
-                  scale_global=0.1, # global scale for RHS prior
-                  day_of_week=birthdays$day_of_week,
-                  day_of_year=birthdays$day_of_year2) # 1st March = 61 every year
+standata5 <- list(x = birthdays$id,
+                  y = log(birthdays$births_relative100),
+                  N = length(birthdays$id),
+                  c_f1 = 1.5, # factor c of basis functions for GP for f1
+                  M_f1 = 20,  # number of basis functions for GP for f1
+                  J_f2 = 20,  # number of basis functions for periodic f2
+                  c_g3 = 1.5, # factor c of basis functions for GP for g3
+                  M_g3 = 5,   # number of basis functions for GP for g3
+                  scale_global = 0.1, # global scale for RHS prior
+                  day_of_week = birthdays$day_of_week,
+                  day_of_year = birthdays$day_of_year2) # 1st March = 61 every year
 
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
@@ -1139,7 +1139,7 @@ standata5 <- list(x=birthdays$id,
 tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
@@ -1155,7 +1155,7 @@ summarise_draws(subset(pdraws5, variable = c("lp__")), n_distinct) |>
 summarise_draws(subset(pdraws5, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE),
                 default_summary_measures()) |>
   tt()
-summarise_draws(subset(pdraws5, variable=c('beta_f3')),
+summarise_draws(subset(pdraws5, variable = c("beta_f3")),
                 default_summary_measures()) |>
   tt()
 
@@ -1167,9 +1167,9 @@ summarise_draws(subset(pdraws5, variable=c('beta_f3')),
 #| fig-width: 8
 #| fig-height: 7
 draws5 <- as_draws_matrix(pdraws5)
-Ef4 <- apply(subset(draws5, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1181,10 +1181,10 @@ Ef1 <- apply(subset(draws5, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws5, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws5, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws5, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws5, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
+Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
 pf <- birthdays |>
   mutate(Ef = Ef) |>
   ggplot(aes(x = date, y = births_relative100)) +
@@ -1201,21 +1201,21 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1242,7 +1242,7 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
 tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                           psis_resample = FALSE)
 #'
@@ -1255,9 +1255,9 @@ summarise_draws(subset(pdraws5, variable = c("lp__")), n_distinct) |>
 
 #' Do Pareto smoothing of importance weights (with automatic diagnostic).
 pdraws5 <- pdraws5 |>
-  mutate_variables(lw=lp__-lp_approx__,
-                   w=exp(lw-max(lw)),
-                   ws=pareto_smooth(w, tail = "right"))
+  mutate_variables(lw = lp__ - lp_approx__,
+                   w = exp(lw - max(lw)),
+                   ws = pareto_smooth(w, tail = "right"))
 
 #' Do importance resampling without replacement. When Pareto-$\hat{k}$
 #' is not too big, for inference we prefer resampling with
@@ -1283,7 +1283,7 @@ summarise_draws(subset(pdraws5, variable = c("lp__")), n_distinct) |>
 tic('MCMC sampling from model 5 posterior with Pathfinder initialization')
 fit5 <- model5$sample(data = standata5, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init=pth5, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth5, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -1298,7 +1298,7 @@ mytoc()
 draws5 <- fit5$draws()
 summarise_draws(subset(draws5, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE)) |>
   tt()
-summarise_draws(subset(draws5, variable=c('beta_f3'))) |>
+summarise_draws(subset(draws5, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
@@ -1307,9 +1307,9 @@ summarise_draws(subset(draws5, variable=c('beta_f3'))) |>
 #| fig-width: 8
 #| fig-height: 7
 draws5 <- as_draws_matrix(draws5)
-Ef4 <- apply(subset(draws5, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1321,10 +1321,10 @@ Ef1 <- apply(subset(draws5, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws5, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws5, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws5, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws5, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
+Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
 pf <- birthdays |>
   mutate(Ef = Ef) |>
   ggplot(aes(x = date, y = births_relative100)) +
@@ -1341,21 +1341,21 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1380,16 +1380,16 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
 #| code-fold: true
 #| label: fig-births-pth5-vs-fit5
 variables <- names(model5$variables()$parameters)
-sp<-summarise_draws(subset(pth5$draws(), variable=variables))
-sm<-summarise_draws(subset(draws5, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pth5$draws(), variable = variables))
+sm <- summarise_draws(subset(draws5, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
   geom_text_repel() +
-  geom_abline(linetype='dotted') +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
 #' ### Model 6: long term smooth + seasonal + weekday + day of year
@@ -1418,14 +1418,14 @@ model6 <- cmdstan_model(stan_file = root("birthdays", "gpbf6.stan"),
                         include_paths = root("birthdays"))
 
 #' Data to be passed to Stan
-standata6 <- list(x=birthdays$id,
-                  y=log(birthdays$births_relative100),
-                  N=length(birthdays$id),
-                  c_f1=1.5, # factor c of basis functions for GP for f1
-                  M_f1=20, # number of basis functions for GP for f1
-                  J_f2=20, # number of basis functions for periodic f2
-                  day_of_week=birthdays$day_of_week,
-                  day_of_year=birthdays$day_of_year2) # 1st March = 61 every year
+standata6 <- list(x = birthdays$id,
+                  y = log(birthdays$births_relative100),
+                  N = length(birthdays$id),
+                  c_f1 = 1.5, # factor c of basis functions for GP for f1
+                  M_f1 = 20, # number of basis functions for GP for f1
+                  J_f2 = 20, # number of basis functions for periodic f2
+                  day_of_week = birthdays$day_of_week,
+                  day_of_year = birthdays$day_of_year2) # 1st March = 61 every year
 
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
@@ -1434,7 +1434,7 @@ standata6 <- list(x=birthdays$id,
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
@@ -1449,7 +1449,7 @@ summarise_draws(subset(pdraws6, variable = c("lp__")), n_distinct) |>
 summarise_draws(subset(pdraws6, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE),
                 default_summary_measures()) |>
   tt()
-summarise_draws(subset(pdraws6, variable=c('beta_f3')),
+summarise_draws(subset(pdraws6, variable = c("beta_f3")),
                 default_summary_measures()) |>
   tt()
 
@@ -1463,9 +1463,9 @@ summarise_draws(subset(pdraws6, variable=c('beta_f3')),
 #| fig-width: 8
 #| fig-height: 7
 draws6 <- as_draws_matrix(pdraws6)
-Ef4 <- apply(subset(draws6, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1477,10 +1477,10 @@ Ef1 <- apply(subset(draws6, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws6, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws6, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws6, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws6, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
+Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
 pf <- birthdays |>
   mutate(Ef = Ef) |>
   ggplot(aes(x = date, y = births_relative100)) +
@@ -1497,21 +1497,21 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1539,7 +1539,7 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                           psis_resample = FALSE)
 #'
@@ -1553,7 +1553,7 @@ mytoc()
 tic('MCMC sampling from model 6 posterior with Pathfinder initialization')
 fit6 <- model6$sample(data = standata6, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init=pth6, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth6, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -1561,7 +1561,7 @@ mytoc()
 draws6 <- fit6$draws()
 summarise_draws(subset(draws6, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE)) |>
   tt()
-summarise_draws(subset(draws6, variable=c('beta_f3'))) |>
+summarise_draws(subset(draws6, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
@@ -1570,9 +1570,9 @@ summarise_draws(subset(draws6, variable=c('beta_f3'))) |>
 #| fig-width: 8
 #| fig-height: 7
 draws6 <- as_draws_matrix(draws6)
-Ef4 <- apply(subset(draws6, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1584,10 +1584,10 @@ Ef1 <- apply(subset(draws6, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws6, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws6, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws6, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws6, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
+Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
 pf <- birthdays |>
   mutate(Ef = Ef) |>
   ggplot(aes(x = date, y = births_relative100)) +
@@ -1604,21 +1604,21 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1651,16 +1651,16 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4) |>
 #| code-fold: true
 #| label: fig-births-pth6-vs-fit6
 variables <- names(model6$variables()$parameters)
-sp<-summarise_draws(subset(pth6$draws(), variable=variables))
-sm<-summarise_draws(subset(draws6, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pth6$draws(), variable = variables))
+sm <- summarise_draws(subset(draws6, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
   geom_text_repel() +
-  geom_abline(linetype='dotted') +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
 #' ### Model 7: long term smooth + seasonal + weekday + day of year normal + floating special days
@@ -1683,26 +1683,26 @@ model7 <- cmdstan_model(stan_file = root("birthdays", "gpbf7.stan"),
 
 #' Floating special days
 # Memorial day
-memorial_days <- with(birthdays,which(month==5&day_of_week==1&day>=25))
+memorial_days <- with(birthdays, which(month == 5 & day_of_week == 1 & day >= 25))
 # Labor day
-labor_days <- with(birthdays,which(month==9&day_of_week==1&day<=7))
-labor_days <- c(labor_days, labor_days+1)
+labor_days <- with(birthdays, which(month == 9 & day_of_week == 1 & day <= 7))
+labor_days <- c(labor_days, labor_days + 1)
 # Thanksgiving
-thanksgiving_days <- with(birthdays,which(month==11&day_of_week==4&day>=22&day<=28))
-thanksgiving_days <- c(thanksgiving_days, thanksgiving_days+1)
+thanksgiving_days <- with(birthdays, which(month == 11 & day_of_week == 4 & day >= 22 & day <= 28))
+thanksgiving_days <- c(thanksgiving_days, thanksgiving_days + 1)
 
 #' Data to be passed to Stan
-standata7 <- list(x=birthdays$id,
-                  y=log(birthdays$births_relative100),
-                  N=length(birthdays$id),
-                  c_f1=1.5, # factor c of basis functions for GP for f1
-                  M_f1=20,  # number of basis functions for GP for f1
-                  J_f2=20,  # number of basis functions for periodic f2
-                  day_of_week=birthdays$day_of_week,
-                  day_of_year=birthdays$day_of_year2, # 1st March = 61 every year
-                  memorial_days=memorial_days,
-                  labor_days=labor_days,
-                  thanksgiving_days=thanksgiving_days)
+standata7 <- list(x = birthdays$id,
+                  y = log(birthdays$births_relative100),
+                  N = length(birthdays$id),
+                  c_f1 = 1.5, # factor c of basis functions for GP for f1
+                  M_f1 = 20,  # number of basis functions for GP for f1
+                  J_f2 = 20,  # number of basis functions for periodic f2
+                  day_of_week = birthdays$day_of_week,
+                  day_of_year = birthdays$day_of_year2, # 1st March = 61 every year
+                  memorial_days = memorial_days,
+                  labor_days = labor_days,
+                  thanksgiving_days = thanksgiving_days)
 
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
@@ -1711,7 +1711,7 @@ standata7 <- list(x=birthdays$id,
 tic('Sampling from Pathfinder approximation of model 7 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
 mytoc()
 
@@ -1722,7 +1722,7 @@ summarise_draws(subset(pdraws7, variable = c("lp__")), n_distinct) |>
 summarise_draws(subset(pdraws7, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE),
                 default_summary_measures()) |>
   tt()
-summarise_draws(subset(pdraws7, variable=c('beta_f3')),
+summarise_draws(subset(pdraws7, variable = c("beta_f3")),
                 default_summary_measures()) |>
   tt()
 
@@ -1739,12 +1739,12 @@ Ef1 <- apply(subset(draws7, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws7, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws7, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws7, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws7, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-Efloats <- apply(subset(draws7, variable='beta_f5'), 2, median)*sd(log(birthdays$births_relative100))
-Efloats <- exp(Efloats)*100
+Ef4 <- apply(subset(draws7, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+Efloats <- apply(subset(draws7, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
@@ -1764,21 +1764,21 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1802,7 +1802,7 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                           psis_resample = FALSE)
 #'
@@ -1816,7 +1816,7 @@ mytoc()
 tic('MCMC sampling from model 7 posterior with Pathfinder initialization')
 fit7 <- model7$sample(data = standata7, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init=pth7, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth7, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -1824,7 +1824,7 @@ mytoc()
 draws7 <- fit7$draws()
 summarise_draws(subset(draws7, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE)) |>
   tt()
-summarise_draws(subset(draws7, variable=c('beta_f3'))) |>
+summarise_draws(subset(draws7, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
@@ -1838,12 +1838,12 @@ Ef1 <- apply(subset(draws7, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws7, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws7, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws7, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws7, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-Efloats <- apply(subset(draws7, variable='beta_f5'), 2, median)*sd(log(birthdays$births_relative100))
-Efloats <- exp(Efloats)*100
+Ef4 <- apply(subset(draws7, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+Efloats <- apply(subset(draws7, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
@@ -1863,21 +1863,21 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -1905,16 +1905,16 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
 #| code-fold: true
 #| label: fig-births-pth7-vs-fit7
 variables <- names(model7$variables()$parameters)
-sp<-summarise_draws(subset(pth7$draws(), variable=variables))
-sm<-summarise_draws(subset(draws7, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pth7$draws(), variable = variables))
+sm <- summarise_draws(subset(draws7, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
   geom_text_repel() +
-  geom_abline(linetype='dotted') +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
 #' ### Model 8: long term smooth + seasonal + weekday with time dependent magnitude + day of year + special
@@ -1930,28 +1930,28 @@ model8 <- cmdstan_model(stan_file = root("birthdays", "gpbf8.stan"),
 
 #' Floating special days
 # Memorial day
-memorial_days <- with(birthdays,which(month==5&day_of_week==1&day>=25))
+memorial_days <- with(birthdays, which(month == 5 & day_of_week == 1 & day >= 25))
 # Labor day
-labor_days <- with(birthdays,which(month==9&day_of_week==1&day<=7))
-labor_days <- c(labor_days, labor_days+1)
+labor_days <- with(birthdays, which(month == 9 & day_of_week == 1 & day <= 7))
+labor_days <- c(labor_days, labor_days + 1)
 # Thanksgiving
-thanksgiving_days <- with(birthdays,which(month==11&day_of_week==4&day>=22&day<=28))
-thanksgiving_days <- c(thanksgiving_days, thanksgiving_days+1)
+thanksgiving_days <- with(birthdays, which(month == 11 & day_of_week == 4 & day >= 22 & day <= 28))
+thanksgiving_days <- c(thanksgiving_days, thanksgiving_days + 1)
 
 #' Data to be passed to Stan
-standata8 <- list(x=birthdays$id,
-                  y=log(birthdays$births_relative100),
-                  N=length(birthdays$id),
-                  c_f1=1.5, # factor c of basis functions for GP for f1
-                  M_f1=20,  # number of basis functions for GP for f1
-                  J_f2=20,  # number of basis functions for periodic f2
-                  c_g3=1.5, # factor c of basis functions for GP for g3
-                  M_g3=5,   # number of basis functions for GP for g3
-                  day_of_week=birthdays$day_of_week,
-                  day_of_year=birthdays$day_of_year2, # 1st March = 61 every year
-                  memorial_days=memorial_days,
-                  labor_days=labor_days,
-                  thanksgiving_days=thanksgiving_days)
+standata8 <- list(x = birthdays$id,
+                  y = log(birthdays$births_relative100),
+                  N = length(birthdays$id),
+                  c_f1 = 1.5, # factor c of basis functions for GP for f1
+                  M_f1 = 20,  # number of basis functions for GP for f1
+                  J_f2 = 20,  # number of basis functions for periodic f2
+                  c_g3 = 1.5, # factor c of basis functions for GP for g3
+                  M_g3 = 5,   # number of basis functions for GP for g3
+                  day_of_week = birthdays$day_of_week,
+                  day_of_year = birthdays$day_of_year2, # 1st March = 61 every year
+                  memorial_days = memorial_days,
+                  labor_days = labor_days,
+                  thanksgiving_days = thanksgiving_days)
 
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
@@ -1960,7 +1960,7 @@ standata8 <- list(x=birthdays$id,
 tic('Sampling from Pathfinder approximation of model 8 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
@@ -1972,7 +1972,7 @@ summarise_draws(subset(pdraws8, variable = c("lp__")), n_distinct) |>
 summarise_draws(subset(pdraws8, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE),
                 default_summary_measures()) |>
   tt()
-summarise_draws(subset(pdraws8, variable=c('beta_f3')),
+summarise_draws(subset(pdraws8, variable = c("beta_f3")),
                 default_summary_measures()) |>
   tt()
 
@@ -1989,14 +1989,14 @@ Ef1 <- apply(subset(draws8, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws8, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws8, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws8, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef3 <- apply(subset(draws8, variable='f3'), 2, median)
+Ef3 <- apply(subset(draws8, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws8, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-Efloats <- apply(subset(draws8, variable='beta_f5'), 2, median)*sd(log(birthdays$births_relative100))
-Efloats <- exp(Efloats)*100
+Ef4 <- apply(subset(draws8, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+Efloats <- apply(subset(draws8, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
@@ -2016,22 +2016,22 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-N=length(birthdays$id)
+N <- length(birthdays$id)
 pf3b <- birthdays |>
-  mutate(Ef3 = Ef3*Ef1/100) |>
+  mutate(Ef3 = Ef3 * Ef1 / 100) |>
   ggplot(aes(x = date, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
@@ -2039,7 +2039,7 @@ pf3b <- birthdays |>
   labs(x = "Date", y = "Relative number of births") +
   annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -2063,7 +2063,7 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
-                          history_size=50, max_lbfgs_iters = 100,
+                          history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                           psis_resample = FALSE)
 #'
@@ -2077,7 +2077,7 @@ mytoc()
 tic('MCMC sampling from model 8 posterior with Pathfinder initialization')
 fit8 <- model8$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init=pth8, refresh=10, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth8, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -2085,7 +2085,7 @@ mytoc()
 draws8 <- fit8$draws()
 summarise_draws(subset(draws8, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE)) |>
   tt()
-summarise_draws(subset(draws8, variable=c('beta_f3'))) |>
+summarise_draws(subset(draws8, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
@@ -2099,14 +2099,14 @@ Ef1 <- apply(subset(draws8, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws8, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws8, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws8, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef3 <- apply(subset(draws8, variable='f3'), 2, median)
+Ef3 <- apply(subset(draws8, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws8, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-Efloats <- apply(subset(draws8, variable='beta_f5'), 2, median)*sd(log(birthdays$births_relative100))
-Efloats <- exp(Efloats)*100
+Ef4 <- apply(subset(draws8, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+Efloats <- apply(subset(draws8, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
@@ -2126,22 +2126,22 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-N=length(birthdays$id)
+N <- length(birthdays$id)
 pf3b <- birthdays |>
-  mutate(Ef3 = Ef3*Ef1/100) |>
+  mutate(Ef3 = Ef3 * Ef1 / 100) |>
   ggplot(aes(x = date, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
@@ -2149,7 +2149,7 @@ pf3b <- birthdays |>
   labs(x = "Date", y = "Relative number of births") +
   annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -2180,16 +2180,16 @@ pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
 #| code-fold: true
 #| label: fig-births-pth8-vs-fit8
 variables <- names(model8$variables()$parameters)
-sp<-summarise_draws(subset(pth8$draws(), variable=variables))
-sm<-summarise_draws(subset(draws8, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pth8$draws(), variable = variables))
+sm <- summarise_draws(subset(draws8, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
   geom_text_repel() +
-  geom_abline(linetype='dotted') +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
 #'
@@ -2209,7 +2209,7 @@ model8tnu <- cmdstan_model(stan_file = root("birthdays", "gpbf8tnu.stan"),
 tic('Sampling from Pathfinder approximation of model 8tnu posterior')
 pth8tnu <- model8tnu$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
-                                history_size=50, max_lbfgs_iters = 100,
+                                history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                                 psis_resample = FALSE)
 #'
@@ -2223,7 +2223,7 @@ mytoc()
 tic('MCMC sampling from model 8tnu posterior with Pathfinder initialization')
 fit8tnu <- model8tnu$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
-                            init=pth8tnu, refresh=10, output_dir = CMDSTANR_OUTPUT_DIR)
+                            init = pth8tnu, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -2253,14 +2253,14 @@ Ef1 <- apply(subset(draws8, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws8, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws8, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws8, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef3 <- apply(subset(draws8, variable='f3'), 2, median)
+Ef3 <- apply(subset(draws8, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws8, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-Efloats <- apply(subset(draws8, variable='beta_f5'), 2, median)*sd(log(birthdays$births_relative100))
-Efloats <- exp(Efloats)*100
+Ef4 <- apply(subset(draws8, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+Efloats <- apply(subset(draws8, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
@@ -2280,22 +2280,22 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-N=length(birthdays$id)
+N <- length(birthdays$id)
 pf3b <- birthdays |>
-  mutate(Ef3 = Ef3*Ef1/100) |>
+  mutate(Ef3 = Ef3 * Ef1 / 100) |>
   ggplot(aes(x = date, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
@@ -2303,7 +2303,7 @@ pf3b <- birthdays |>
   labs(x = "Date", y = "Relative number of births") +
   annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -2358,16 +2358,16 @@ loo_compare(list(`Model 8 normal` = loo8, `Model 8 Student's t` = loo8tnu)) |>
 #| code-fold: true
 #| label: fig-births--pth8tnu-vs-fit8tnu
 variables <- names(model8tnu$variables()$parameters)
-sp<-summarise_draws(subset(pth8tnu$draws(), variable=variables))
-sm<-summarise_draws(subset(draws8tnu, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pth8tnu$draws(), variable = variables))
+sm <- summarise_draws(subset(draws8tnu, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
   geom_text_repel() +
-  geom_abline(linetype='dotted') +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
 #' ### Model 8+RHS: day of year effect with RHS prior
@@ -2400,7 +2400,7 @@ model8rhs <- cmdstan_model(stan_file = root("birthdays", "gpbf8rhs.stan"),
 
 #' Add a global scale for RHS prior
 standata8 <- c(standata8,
-               scale_global=0.1) # global scale for RHS prior
+               scale_global = 0.1) # global scale for RHS prior
 
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
@@ -2409,7 +2409,7 @@ standata8 <- c(standata8,
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
-                                history_size=50, max_lbfgs_iters = 100,
+                                history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                                 psis_resample = FALSE)
 #'
@@ -2423,7 +2423,7 @@ mytoc()
 tic('MCMC sampling from model 8rhs posterior with Pathfinder initialization')
 fit8rhs <- model8rhs$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
-                            init=pth8rhs, refresh=10, output_dir = CMDSTANR_OUTPUT_DIR)
+                            init = pth8rhs, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
 #'
 mytoc()
 
@@ -2449,14 +2449,14 @@ Ef1 <- apply(subset(draws8, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws8, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-Ef_day_of_week <- apply(subset(draws8, variable='f_day_of_week'), 2, median)
+Ef_day_of_week <- apply(subset(draws8, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-Ef3 <- apply(subset(draws8, variable='f3'), 2, median)
+Ef3 <- apply(subset(draws8, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
-Ef4 <- apply(subset(draws8, variable='beta_f4'), 2, median)*sd(log(birthdays$births_relative100))
-Ef4 <- exp(Ef4)*100
-Efloats <- apply(subset(draws8, variable='beta_f5'), 2, median)*sd(log(birthdays$births_relative100))
-Efloats <- exp(Efloats)*100
+Ef4 <- apply(subset(draws8, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4) * 100
+Efloats <- apply(subset(draws8, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
@@ -2476,22 +2476,22 @@ pf1 <- birthdays |>
 pf2 <- birthdays |>
   mutate(Ef2 = Ef2) |>
   group_by(day_of_year2) |>
-  summarise(meanbirths=mean(births_relative100), meanEf2=mean(Ef2)) |>
-  ggplot(aes(x=as.Date("1987-12-31")+day_of_year2, y=meanbirths)) +
+  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
+  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   geom_line(aes(y = meanEf2), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data=birthdays, aes(x=day_of_week, y=births_relative100)) +
+pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative number of births")
-N=length(birthdays$id)
+N <- length(birthdays$id)
 pf3b <- birthdays |>
-  mutate(Ef3 = Ef3*Ef1/100) |>
+  mutate(Ef3 = Ef3 * Ef1 / 100) |>
   ggplot(aes(x = date, y = births_relative100)) +
   geom_point(color = set1[2], alpha = 0.2) +
   geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
@@ -2499,7 +2499,7 @@ pf3b <- birthdays |>
   labs(x = "Date", y = "Relative number of births") +
   annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
 f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <-data.frame(x=as.Date("1988-01-01")+0:365, y=Ef4float) |>
+pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
   ggplot(aes(x = x, y = y)) +
   geom_line(color = set1[1]) +
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
@@ -2533,16 +2533,16 @@ loo_compare(list(`Model 8 Student's t` = loo8tnu, `Model 8 RHS` = loo8rhs)) |>
 #| code-fold: true
 #| label: fig-births-pth8rhs-vs-fit8rhs
 variables <- names(model8rhs$variables()$parameters)
-sp<-summarise_draws(subset(pth8rhs$draws(), variable=variables))
-sm<-summarise_draws(subset(draws8rhs, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pth8rhs$draws(), variable = variables))
+sm <- summarise_draws(subset(draws8rhs, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
   geom_text_repel() +
-  geom_abline(linetype='dotted') +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
 #' `lambda_f4` is a vector parameter for scale mixture presentation of
@@ -2604,7 +2604,7 @@ draws8 <- as_draws_matrix(draws8rhs)
 Ef <- exp(apply(subset(draws8, variable = "f"), 2, median))
 birthdays |>
   mutate(Ef = Ef) |>
-  ggplot(aes(x=date, y=log(births_relative100/Ef))) +
+  ggplot(aes(x = date, y = log(births_relative100 / Ef))) +
   geom_point(color = set1[2]) +
   geom_hline(yintercept = 0, color = "gray") +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
@@ -2623,7 +2623,7 @@ draws8 <- as_draws_matrix(draws8rhs)
 f <- exp(subset(draws8, variable = "f"))
 loo8tnu <- fit8tnu$loo(save_psis = TRUE)
 Efloo <- E_loo(f, psis_object = loo8tnu$psis_object)$value
-LOOR2 <- 1-var(log(birthdays$births_relative100/Efloo))/var(log(birthdays$births_relative100))
+LOOR2 <- 1 - var(log(birthdays$births_relative100 / Efloo)) / var(log(birthdays$births_relative100))
 data.frame(Model = "Model 8 Student's t", `LOO-R2` = LOOR2) |>
   tt()
 #' As it seems we could still improve by adding more structure and
@@ -2649,9 +2649,9 @@ model8rhs_nogq <- cmdstan_model(stan_file = root("birthdays", "gpbf8rhs_nogq.sta
 #+ pth8rhs_nogq
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
-                                num_threads=10,
+                                num_threads = 10,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
-                                history_size=50, max_lbfgs_iters = 100,
+                                history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                                 psis_resample = FALSE)
 #'
@@ -2671,9 +2671,9 @@ mytoc()
 #+ pth8rhs_nogq_10draws
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
-                                num_threads=10,
-                                num_paths = 10, single_path_draws=1, draws=10,
-                                history_size=50, max_lbfgs_iters = 100,
+                                num_threads = 10,
+                                num_paths = 10, single_path_draws = 1, draws = 10,
+                                history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                                 psis_resample = FALSE)
 #'
@@ -2688,9 +2688,9 @@ mytoc()
 #+ pth8rhs_nogq_4draws
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
-                                num_threads=4,
-                                num_paths=4, single_path_draws=1, draws=4,
-                                history_size=50, max_lbfgs_iters = 100,
+                                num_threads = 4,
+                                num_paths = 4, single_path_draws = 1, draws = 4,
+                                history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                                 psis_resample = FALSE)
 #'
@@ -2705,9 +2705,9 @@ mytoc()
 #+ pth8rhs_nogq_single
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
-                                num_threads=4,
-                                num_paths=1, single_path_draws=4, draws=4,
-                                history_size=50, max_lbfgs_iters = 100,
+                                num_threads = 4,
+                                num_paths = 1, single_path_draws = 4, draws = 4,
+                                history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                                 psis_resample = FALSE)
 #'
@@ -2725,9 +2725,9 @@ mytoc()
 #+ pth8rhs_nogq_4000draws
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
-                                     num_threads=10,
-                                     num_paths=40, single_path_draws=100, draws = 4000,
-                                     history_size=50, max_lbfgs_iters = 100,
+                                     num_threads = 10,
+                                     num_paths = 40, single_path_draws = 100, draws = 4000,
+                                     history_size = 50, max_lbfgs_iters = 100,
                                      refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
                                      psis_resample = FALSE)
 #'
@@ -2738,16 +2738,16 @@ mytoc()
 #| code-fold: true
 #| label: fig-births-pth8rhs-vs-fit8rhs-2
 variables <- names(model8rhs$variables()$parameters)
-sp<-summarise_draws(subset(pth8rhs$draws(), variable=variables))
-sm<-summarise_draws(subset(draws8rhs, variable=variables))
-ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
-                      y=sp$mean, ymin=sp$mean-sp$sd, ymax=sp$mean+sp$sd,
-                      label = sm$variable)) +
+sp <- summarise_draws(subset(pth8rhs$draws(), variable = variables))
+sm <- summarise_draws(subset(draws8rhs, variable = variables))
+ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
+                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
+                        label = sm$variable)) +
   geom_point(color = 4) +
   geom_errorbar(width = 0, color = 4) +
   geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel(max.overlaps=20) +
-  geom_abline(linetype='dotted') +
+  geom_text_repel(max.overlaps = 20) +
+  geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
 #' Plot the sd from Pathfinder divided by sd from MCMC. We see that
@@ -2756,11 +2756,11 @@ ggplot(data=NULL, aes(x=sm$mean, xmin=sm$mean-sm$sd, xmax=sm$mean+sm$sd,
 #' estimates bad for initializing the mass matrix.
 #| code-fold: true
 #| label: fig-births-pth8rhs-vs-fit8rhs-sd-ratio
-data.frame(varid=1:nrow(sp), sd_ratio=sp$sd/sm$sd) |>
-  ggplot(aes(x=varid, y=sd_ratio)) +
+data.frame(varid = 1:nrow(sp), sd_ratio = sp$sd / sm$sd) |>
+  ggplot(aes(x = varid, y = sd_ratio)) +
   geom_point() +
   scale_y_log10() +
-  labs(x='Variable number', y='sd(pathfinder) / sd(MCMC)') +
+  labs(x = "Variable number", y = "sd(pathfinder) / sd(MCMC)") +
   geom_hline(yintercept = 1, color = "gray")
  
 #' In case of simpler models, Pathfinder estimates can be much
@@ -2770,11 +2770,11 @@ data.frame(varid=1:nrow(sp), sd_ratio=sp$sd/sm$sd) |>
 variables <- names(model1b$variables()$parameters)
 sp <- summarise_draws(subset(pth1b$draws(), variable = variables))
 sm <- summarise_draws(subset(draws1b, variable = variables))
-data.frame(varid=1:nrow(sp), sd_ratio=sp$sd/sm$sd) |>
-  ggplot(aes(x=varid, y=sd_ratio)) +
+data.frame(varid = 1:nrow(sp), sd_ratio = sp$sd / sm$sd) |>
+  ggplot(aes(x = varid, y = sd_ratio)) +
   geom_point() +
   scale_y_log10() +
-  labs(x='Variable number', y='sd(pathfinder) / sd(MCMC)') +
+  labs(x = "Variable number", y = "sd(pathfinder) / sd(MCMC)") +
   geom_hline(yintercept = 1, color = "gray")
 
 #' ### More accurate inference
@@ -2794,7 +2794,7 @@ data.frame(varid=1:nrow(sp), sd_ratio=sp$sd/sm$sd) |>
 #' re-parameterization, better data or more informative priors could
 #' help).
 ## fit8rhs <- model8rhs$sample(data = standata8, chains = 4, parallel_chains = 4,
-##                             adapt_delta=0.95, max_treedepth=15)
+##                             adapt_delta = 0.95, max_treedepth = 15)
 
 #'
 #' ## References {.unnumbered}
