@@ -17,4 +17,3 @@ generated quantities {
   real lprior = binomial_lpmf(y_spec | n_spec, spec) +
        	        binomial_lpmf(y_sens | n_sens, sens);   
 }
-
