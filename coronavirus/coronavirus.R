@@ -44,18 +44,18 @@ knitr::opts_chunk$set(
 #' 
 #' **Load packages**
 #| cache: FALSE
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library("cmdstanr")
+library(cmdstanr)
 options(mc.cores = 4)
-library("priorsense")
-library("ggplot2")
-library("bayesplot")
+library(priorsense)
+library(ggplot2)
+library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
-library("dplyr")
-library("ggh4x")
+library(dplyr)
+library(ggh4x)
 
-#' Define functuon to compute shortest posterior interval (SPIN; @Liu-Gelman-Zheng:2015)
+#' Define function to compute shortest posterior interval (SPIN; @Liu-Gelman-Zheng:2015)
 spin <- function(x, lower=NULL, upper=NULL, conf=0.95) {
   x <- sort(as.vector(x))
   if (!is.null(lower)) {
@@ -110,7 +110,7 @@ powerscale_plot_dens(
   help_text = FALSE
 )
 
-#' Inference for the population prevalance
+#' Inference for the population prevalence
 subset <- sample(1e4, 1e3)
 x <- as.vector(draws_1[subset, , "spec"])
 y <- as.vector(draws_1[subset, , "p"])
@@ -292,7 +292,7 @@ n <- rep(1, 3330)
 
 #' Here are the counts of each sex, ethnicity, and age from @Bendavid-Mulaney-Sood-etal:2020b.  
 #' We don't have zip code distribution but we looked it up and there are 58 zip codes 
-#' in Santa Clara County; for simplicity we asssume all zip codes are equally likely.  
+#' in Santa Clara County; for simplicity we assume all zip codes are equally likely.  
 #' We then assign these traits to people at random.  
 #' This is wrong--actually, these variable are correlated in various ways--but, again,
 #' now we have fake data we can use to fit the model.
