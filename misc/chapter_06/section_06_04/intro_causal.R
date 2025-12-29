@@ -1,4 +1,6 @@
-library("rstanarm")
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(rstanarm)
 SEED <- 123
 set.seed(SEED)
 
@@ -16,7 +18,9 @@ a <- 50 - 50 * b
 fit_1 <- stan_glm(final ~ midterm, data = exams, refresh = 0, seed = SEED)
 print(fit_1)
 
-pdf("students_1a.pdf", width = 4, height = 4)
+
+pdf(root("misc", "chapter_06", "section_06_04", "students_1a.pdf"), 
+    width = 4, height = 4)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, 0.5, 0), tck = -.01)
 par(pty = "s")
 plot(midterm, final, xlab = "Midterm exam score", ylab = "Final exam score", 
@@ -38,7 +42,8 @@ exams <- data.frame(midterm, z, y)
 fit_2 <- stan_glm(y ~ midterm + z, data = exams, refresh = 0, seed = SEED)
 print(fit_2)
 
-pdf("students_1b.pdf", width = 4, height = 4)
+pdf(root("misc", "chapter_06", "section_06_04", "students_1b.pdf"), 
+    width = 4, height = 4)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.01)
 par(pty = "s")
 plot(midterm, y, xlab = "Midterm exam score", ylab = "Final exam score",
@@ -63,7 +68,8 @@ print(round(c(diff, se_diff), 1))
 z_unbalanced <- rbinom(n, 1, invlogit(-(midterm - 50) / 10))
 z <- z_unbalanced
 
-pdf("students_2a.pdf", width = 4.5, height = 3.5)
+pdf(root("misc", "chapter_06", "section_06_04", "students_2a.pdf"), 
+    width = 4.5, height = 3.5)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.01)
 par(pty = "m")
 plot(midterm, ifelse(z == 1, .99, .01), ylim = c(0, 1), 
@@ -85,7 +91,8 @@ exams <- data.frame(midterm, z, y)
 fit_3 <- stan_glm(y ~ midterm + z, data = exams, refresh = 0, seed = SEED)
 print(fit_3)
 
-pdf("students_2b.pdf", width = 4, height = 4)
+pdf(root("misc", "chapter_06", "section_06_04", "students_2b.pdf"), 
+    width = 4, height = 4)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.01)
 par(pty = "s")
 plot(midterm, y, xlab = "Midterm exam score", ylab = "Final exam score", 
@@ -120,7 +127,8 @@ exams <- data.frame(midterm, z, y)
 fit_4 <- stan_glm(y ~ midterm + z, data = exams, refresh = 0, seed = SEED)
 print(fit_4)
 
-pdf("students_3a.pdf", width = 4, height = 4)
+pdf(root("misc", "chapter_06", "section_06_04", "students_3a.pdf"), 
+    width = 4, height = 4)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.01)
 par(pty = "s")
 plot(midterm, y, xlab = "Midterm exam score", ylab = "Final exam score", 
@@ -140,7 +148,8 @@ exams <- data.frame(midterm, z, y)
 fit_5 <- stan_glm(y ~ midterm + z, data = exams, refresh = 0, seed = SEED)
 print(fit_5)
 
-pdf("students_3b.pdf", width = 4, height = 4)
+pdf(root("misc", "chapter_06", "section_06_04", "students_3b.pdf"), 
+    width = 4, height = 4)
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.01)
 par(pty = "s")
 plot(midterm, y, xlab = "Midterm exam score", ylab = "Final exam score", 

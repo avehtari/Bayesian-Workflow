@@ -1,6 +1,8 @@
-library("cmdstanr")
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(cmdstanr)
 options(mc.cores = 4)
-library("posterior")
+library(posterior)
 set.seed(123)
 
 a <- 50; b <- 2; sigma <- 10
@@ -8,14 +10,15 @@ N <- 100
 x <- runif(N, 0, 10)
 y <- rnorm(N, a + b * x, sigma)
 fake <- list(N = N, x = x, y = y)
-linear <- cmdstan_model("linear.stan")
+linear <- cmdstan_model(root("misc", "chapter_06", "section_06_01", "linear.stan"))
 fit <- linear$sample(data = fake)
 sims <- as_draws_rvars(fit$draws())
 print(quantile(sims$a, c(0.1, 0.9)))
 print(quantile(sims$b, c(0.1, 0.9)))
 print(quantile(sims$a / sims$b, c(0.1, 0.9)))
 
-pdf("linear_case_study_1a.pdf", width = 5, height = 4)
+pdf(root("misc", "chapter_06", "section_06_01", "linear_case_study_1a.pdf"), 
+    width = 5, height = 4)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .3, 0), tck = -.01)
 intervals <- quantile(sims$y_tilde, c(0.1, 0.9))
 plot(x, y, pch = 20, cex = .5, xlab = "x", ylab = "y", bty = "l", 
@@ -32,7 +35,7 @@ x_tilde <- 20
 sims$y_tilde <- rvar_rng(rnorm, 1, mean = sims$a + sims$b * x_tilde, sd = sims$sigma)
 print(quantile(sims$y_tilde, c(0.1, 0.9)))
 
-linear_with_pred <- cmdstan_model("linear_with_pred.stan")
+linear_with_pred <- cmdstan_model(root("misc", "chapter_06", "section_06_01", "linear_with_pred.stan"))
 fake_2 <- list(N = N, x = x, y = y, N_tilde = 1, x_tilde = 20)
 fit_2 <- linear_with_pred$sample(data = fake_2)
 sims_2 <- as_draws_rvars(fit_2$draws())
@@ -45,7 +48,8 @@ fit_3 <- linear_with_pred$sample(data = fake_3)
 sims_3 <- as_draws_rvars(fit_3$draws())
 print(quantile(sims_3$y_tilde, c(0.1, 0.9)))
 
-pdf("linear_case_study_1b.pdf", width = 5, height = 4)
+pdf(root("misc", "chapter_06", "section_06_01", "linear_case_study_1b.pdf"), 
+    width = 5, height = 4)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .3, 0), tck = -.01)
 intervals <- quantile(sims_3$y_tilde, c(0.1, 0.9))
 plot(range(x_tilde), range(intervals), 

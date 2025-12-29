@@ -1,12 +1,18 @@
-library("cmdstanr")
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(cmdstanr)
 options(mc.cores = 4)
-logistic_1 <- cmdstan_model("logistic_1.stan", pedantic = TRUE)
-logistic_2 <- cmdstan_model("logistic_2.stan", pedantic = TRUE)
-logistic_3 <- cmdstan_model("logistic_3.stan", pedantic = TRUE)
+
+logistic_1 <- cmdstan_model(root("misc", "chapter_06", "section_06_02", "logistic_1.stan"),
+                            pedantic = TRUE)
+logistic_2 <- cmdstan_model(root("misc", "chapter_06", "section_06_02", "logistic_2.stan"),
+                            pedantic = TRUE)
+logistic_3 <- cmdstan_model(root("misc", "chapter_06", "section_06_02", "logistic_3.stan"),
+                            pedantic = TRUE)
 
 set.seed(123)
 
-rats <- read.table("rats.txt", header = TRUE)
+rats <- read.table(root("misc", "chapter_06", "section_06_02", "rats.txt"), header = TRUE)
 x <- rats$dose
 n <- rats$n
 y <- rats$y
@@ -23,7 +29,8 @@ sims_1 <- fit_1$draws(format = "df")
 logit <- qlogis
 invlogit <- plogis
 
-pdf("rats_1.pdf", height = 3, width = 5)
+pdf(root("misc", "chapter_06", "section_06_02", "rats_1.pdf"),
+    height = 3, width = 5)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(range(x), c(0, 1), 
      xlab = "dose (log g/ml)", ylab = "Pr (death)", 
@@ -49,7 +56,8 @@ fit_2 <- logistic_2$sample(
 print(fit_2)
 sims_2 <- fit_2$draws(format = "df")
 
-pdf("rats_2.pdf", height = 3, width = 5)
+pdf(root("misc", "chapter_06", "section_06_02", "rats_2.pdf"), 
+    height = 3, width = 5)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(range(x), c(0, 1), 
      xlab = "dose (log g/ml)", ylab = "Pr (death)", 
@@ -76,7 +84,8 @@ fit_3 <- logistic_3$sample(
 print(fit_3)
 sims_3 <- fit_3$draws(format = "df")
 
-pdf("rats_3.pdf", height = 3, width = 5)
+pdf(root("misc", "chapter_06", "section_06_02", "rats_3.pdf"), 
+    height = 3, width = 5)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(range(x), c(0, 1), 
      xlab = "dose (log g/ml)", ylab = "Pr (death)", 
@@ -103,7 +112,8 @@ for (i in 1:n_grid){
   Ey_grid[i] <- mean(invlogit(sims_3$a + sims_3$b * x_grid[i]))
 }
 
-pdf("rats_3_scatterplot.pdf", height = 3, width = 3)
+pdf(root("misc", "chapter_06", "section_06_02", "rats_3_scatterplot.pdf"), 
+    height = 3, width = 3)
 par(pty = "s", mar = c(3, 3, 1, 1), mgp = c(1.7, .5, 0), tck = -.01, bty = "l")
 plot(sims_3$a, sims_3$b, 
      xlab = "a", ylab = "b", 
@@ -115,7 +125,8 @@ points(mean(sims_3$a), mean(sims_3$b), pch = 20, col = "blue", cex = 1)
 dev.off()
 
 
-pdf("rats_3_curves.pdf", height = 3, width = 5)
+pdf(root("misc", "chapter_06", "section_06_02", "rats_3_curves.pdf"), 
+    height = 3, width = 5)
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(range(x), c(0, 1), 
      xlab = "dose (log g/ml)", ylab = "Pr (death)", 
