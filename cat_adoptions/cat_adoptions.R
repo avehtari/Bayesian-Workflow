@@ -503,15 +503,15 @@ plot(sfit, lty = 1, lwd = 0.1, col = c("black", "orange"), xlim = c(0, 90),
      xlab = "Days", ylab = "Proportion un-adopted") 
 
 #' Simulate and draw
-# cols <- c(col.alpha("black",0.5), col.alpha("orange",0.5))
+# cols <- c(col.alpha("black", 0.5), col.alpha("orange", 0.5))
 # n <- 12
 # for (i in 1:n) {
-#   days_rep <- sim_cats2(n=1e3, p=post2$p[i,], cens=200)
+#   days_rep <- sim_cats2(n = 1e3, p = post2$p[i, ], cens = 200)
 #   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
-#   lines(xfit, lwd=1, col=cols)
+#   lines(xfit, lwd = 1, col = cols)
 # }
 
 #' Overlay empirical curves
 #| label: fig-km-3
-# lines(sfit, lwd=5, col=c("white", "white"))
-# lines(sfit, lwd=3, col=c("black", "orange"))
+# lines(sfit, lwd = 5, col = c("white", "white"))
+# lines(sfit, lwd = 3, col = c("black", "orange"))
