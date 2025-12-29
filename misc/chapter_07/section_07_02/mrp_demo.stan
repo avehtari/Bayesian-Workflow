@@ -18,5 +18,6 @@ model {
 }
 generated quantities {
   real SATE = mean(Ey(b, x, rep_vector(1, N)) - Ey(b, x, rep_vector(0, N)));
-  real PATE = sum(n_pop .* (Ey(b, x_pop, rep_vector(1, N_pop)) - Ey(b, x_pop, rep_vector(0, N_pop)))) / sum(n_pop);
+  real PATE = sum(n_pop .* (Ey(b, x_pop, rep_vector(1, N_pop)) - 
+                            Ey(b, x_pop, rep_vector(0, N_pop)))) / sum(n_pop);
 }

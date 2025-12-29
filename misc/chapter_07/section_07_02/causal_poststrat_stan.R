@@ -1,12 +1,15 @@
-library("cmdstanr")
-library("arm")
-library("rstanarm")
-library("posterior")
-model <- cmdstan_model("mrp_demo.stan")
-model_quadratic <- cmdstan_model("mrp_demo_quadratic.stan")
-model_logit <- cmdstan_model("mrp_demo_logit.stan")
-set.seed(123)
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(cmdstanr)
+library(arm)
+library(rstanarm)
+library(posterior)
 
+model <- cmdstan_model(root("misc", "chapter_07", "section_07_02", "mrp_demo.stan"))
+model_quadratic <- cmdstan_model(root("misc", "chapter_07", "section_07_02", "mrp_demo_quadratic.stan"))
+model_logit <- cmdstan_model(root("misc", "chapter_07", "section_07_02", "mrp_demo_logit.stan"))
+
+set.seed(123)
 N <- 200
 x <- runif(N, 0, 10)
 z <- rbinom(N, 1, invlogit(x - 5))
@@ -15,9 +18,12 @@ b <- c(0.1, 0.2, -3, 0.4)
 sigma <- 0.5
 y <- rnorm(N, b[1] + b[2] * x + b[3] * z + b[4] * x * z, sigma)
 
-pdf("causal_poststrat_1.pdf", height = 4, width = 5)
+pdf(root("misc", "chapter_07", "section_07_02", "causal_poststrat_1.pdf"), 
+    height = 4, width = 5)
 par(mar = c(3, 3, 1, 1), mgp = c(1.7, .5, 0), tck = -.01)
-plot(x, y, xlab = "Pre-treatment predictor, x", ylab = "Outcome, y", cex = .8, pch = ifelse(z == 0, 20, 1), bty = "l")
+plot(x, y, 
+     xlab = "Pre-treatment predictor, x", ylab = "Outcome, y", 
+     cex = .8, pch = ifelse(z == 0, 20, 1), bty = "l")
 dev.off()
 
 # Population info for poststratification
@@ -26,7 +32,8 @@ x_pop <- rnorm(N_pop, 6, 2)  # purposely choosing a population that looks differ
 n_pop <- rep(1, N_pop)
 
 # Fit model
-data <- list(N = N, K = 4, x = x, y = y, z = z, N_pop = N_pop, x_pop = x_pop, n_pop = n_pop)
+data <- list(N = N, K = 4, x = x, y = y, z = z, 
+             N_pop = N_pop, x_pop = x_pop, n_pop = n_pop)
 fit <- model$sample(data = data, parallel_chains = 4, refresh = 0)
 print(fit)
 
@@ -38,13 +45,22 @@ print(fit_quadratic)
 
 draws <- as_draws_df(fit_quadratic)
 
-pdf("causal_poststrat_2.pdf", height = 3, width = 7.5)
+pdf(root("misc", "chapter_07", "section_07_02", "causal_poststrat_2.pdf"), 
+    height = 3, width = 7.5)
 par(mfrow = c(1, 2))
 par(mar = c(3, 5, 1, 3), mgp = c(1.7, .5, 0), tck = -.01)
-plot(draws$"b[6]", draws$SATE, ylim = c(-1.6, -0.5), xlab = expression(beta[6]), ylab = "SATE", xaxt = "n", yaxt = "n", pch = 20, cex = .2, bty = "l", col = "blue")
+plot(draws$"b[6]", draws$SATE, 
+     ylim = c(-1.6, -0.5), 
+     xlab = expression(beta[6]), ylab = "SATE", 
+     xaxt = "n", yaxt = "n", 
+     pch = 20, cex = .2, bty = "l", col = "blue")
 axis(1, c(-.05, 0, .05))
 axis(2, c(-1.5, -1, -.5))
-plot(draws$"b[6]", draws$PATE, ylim = c(-1.1, 0), xlab = expression(beta[6]), ylab = "PATE", xaxt = "n", yaxt = "n", pch = 20, cex = .2, bty = "l", col = "red")
+plot(draws$"b[6]", draws$PATE, 
+     ylim = c(-1.1, 0), 
+     xlab = expression(beta[6]), ylab = "PATE", 
+     xaxt = "n", yaxt = "n", 
+     pch = 20, cex = .2, bty = "l", col = "red")
 axis(1, c(-.05, 0, .05))
 axis(2, c(-1, -.5, 0))
 dev.off()
@@ -85,9 +101,13 @@ for (i in 1:length(fit)){
 
 print(ate)
 
-pdf("causal_extrap_1.pdf", height = 4, width = 6)
+pdf(root("misc", "chapter_07", "section_07_02", "causal_extrap_1.pdf"), 
+    height = 4, width = 6)
 par(mar = c(3, 3, 1, 1), mgp = c(1.7, .5, 0), tck = -.01)
-plot(c(1, 4), range(ate[, , "est"]), ylim = c(-0.5, 0.5), xlab = "Model", ylab = "Estimated treatment effects", xaxt = "n", bty = "l", type = "n")
+plot(c(1, 4), range(ate[, , "est"]), 
+     ylim = c(-0.5, 0.5), 
+     xlab = "Model", ylab = "Estimated treatment effects", 
+     xaxt = "n", bty = "l", type = "n")
 axis(1, 1:4)
 colors <- c("blue", "red")
 x_shift <- c(-.01, .01)
