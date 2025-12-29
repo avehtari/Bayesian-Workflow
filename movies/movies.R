@@ -223,9 +223,6 @@ points(a_post_median[genre == "romantic"], a_true[genre == "romantic"], pch = 1,
 points(a_post_median[genre == "crime"], a_true[genre == "crime"], pch = 20)
 mtext("Model-based estimates do better", side = 3)
 add_legend(c("Romantic comedies", "Crime movies"), pch = c(1, 20), range = rng)
-mtext(
-  "Problems with raw averages when difficult reviewers were more likely to rate certain genres",
-  side = 3,
-  outer = TRUE
-)
+mtext("Problems with raw averages when difficult reviewers were more likely to rate certain genres",
+      side = 3, outer = TRUE)
 dev.off()
