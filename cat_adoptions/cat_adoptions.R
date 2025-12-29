@@ -35,7 +35,7 @@ knitr::opts_chunk$set(
   error = FALSE,
   warning = FALSE,
   comment = NA,
-  out.width = '95%'
+  out.width = "95%"
 )
 
 #' 
@@ -48,6 +48,13 @@ library("posterior")
 library("survival")
 library("rethinking")
 library("dplyr")
+library("readr")
+library("stringr")
+library("ggplot2")
+library("bayesplot")
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
+library("ggdist")
+library("ggsurvfit")
 
 #' Utility functions for sampling using cmdstanr and plotting
 cstan <- function(f, data=list(), seed=123, chains=4) {
@@ -61,21 +68,15 @@ cstan <- function(f, data=list(), seed=123, chains=4) {
   )
   return(fit)
 }
-as_list_of_arrays <- function(draws) {
-  pr <- as_draws_rvars(draws)
-  p <- list()
-  for (i in 1:length(pr))
-    p[[names(pr)[i]]] <- draws_of(pr[[i]])
-  return(p)
-}
-dens <- function (x, adj = 0.5, norm.comp = FALSE, main = "", show.HPDI = FALSE, add = FALSE, ...) {
+dens <- function(x, adj = 0.5, norm.comp = FALSE, main = "", show.HPDI = FALSE, add = FALSE, ...) {
   thed <- density(x, adjust = adj)
   if (add == FALSE) {
     plot(thed, main = main, ...)
+  } else {
+    lines(thed$x, thed$y, ...)
   }
-  else lines(thed$x, thed$y, ...)
 }
-colalpha <- function (acol, alpha = 0.5)  {
+colalpha <- function(acol, alpha = 0.5)  {
   acol <- col2rgb(acol)
   acol <- rgb(acol[1]/255, acol[2]/255, acol[3]/255, alpha)
   acol
@@ -87,15 +88,17 @@ colalpha <- function (acol, alpha = 0.5)  {
 #' data from github, so there is no need to install the rethinking
 #' package.
 urlfile <- "https://raw.githubusercontent.com/rmcelreath/rethinking/master/data/AustinCats.csv"
-d <- read.csv2(urlfile)
+d <- read_delim(urlfile, delim=";")
 glimpse(d)
+d <- d |> mutate(days = days_to_event,
+                 adopted = ifelse(out_event=="Adoption", 1, 0),
+                 color = ifelse(color=="Black", 1, 2))
 
 #' Prepare data for Stan models
-dat <- list(
-  N = nrow(d),
-  days = d$days_to_event,
-  adopted = ifelse(d$out_event=="Adoption", 1, 0),
-  color = ifelse(d$color=="Black", 1, 2))
+dat <- list(N = nrow(d),
+            days = d$days,
+            adopted = d$adopted,
+            color = d$color)
 
 #' Plot individual cats as lines
 ## command below makes the plot window with right aspect ratio
@@ -112,6 +115,17 @@ for (i in 1:n) {
   if (dat$adopted[j]==1) points(dat$days[j], i, pch=16, cex=1.5, col=cat_color)
 }
 
+#' ggplot version
+#| label: fig-gg-cats-data
+d[sample(dat$N, 100),] |> 
+  ggplot(aes(y = seq_along(days), x = days, color = factor(color))) +
+  geom_segment(aes(yend = seq_along(days), xend = 0), size = 1) +
+  geom_point(aes(shape = factor(adopted)), size = 3) +
+  scale_shape_manual(values = c(1, 16), labels = c("Other", "Adopted")) +
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  labs(y = "Cat", x = "Days observed", color = "Color", shape = "Event") +
+  coord_cartesian(expand = c(TRUE,TRUE,TRUE,FALSE))
+
 #' # Generative models
 #'
 #' How should we model these data? Think about how they were
@@ -123,7 +137,7 @@ cat_adopt <- function(day, prob) {
     # keep waiting...
     day <- cat_adopt(day+1, prob)
   }
-  return(day) # adopted
+  day # adopted
 }
 sim_cats1 <- function(n=10, p=c(0.1,0.2)) {
   color <- rep(NA, n)
@@ -150,6 +164,21 @@ synth_cats <- sim_cats1(1e3)
 sfit <- survfit(Surv(days, adopted) ~ color, data = synth_cats)
 plot(sfit, lty = 1, lwd=3, col=c("black", "orange"), xlab="Days", ylab="Proportion un-adopted") 
 
+#' Plot empirical K-M curves using ggplot
+#| label: fig-gg-cats-km-curves
+#| fig-height: 3.5
+#| fig-width: 6
+synth_cats |>
+  survfit2(formula = Surv(days, adopted) ~ color, data = _) |> # ggsurvfit version
+  tidy_survfit() |>
+  ggplot(aes(x = time, y = estimate, color = strata)) +
+  geom_step(linewidth = 1) +
+  xlim(c(0,50)) +
+  scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  labs(x = "Days", y = "Proportion un-adopted", color = "Color")
+
+
 #' ## First Stan model
 cat_code1 <- root("cat_adoptions", "adoptions_observed.stan")
 writeLines(readLines(cat_code1))
@@ -168,6 +197,22 @@ for (i in 1:n) {
   lines(xfit, lwd=2, col=cols)
 }
 
+#' Prior predictive simulation with ggplot
+#| label: fig-gg-prior-predictive-1
+#| fig-height: 3.5
+#| fig-width: 6
+lapply(1:n, \(i) sim_cats1(n=1e3, p=sim_prior[,i]) |> as.data.frame() |> mutate(sim=i)) |>
+  bind_rows() |>
+  survfit2(formula = Surv(days, adopted) ~ color + sim, data = _) |> # ggsurvfit version
+  tidy_survfit() |>
+  mutate(color = str_split_i(strata, ", ", 1),
+         sim = str_split_i(strata, ", ", 2)) |>
+  ggplot(aes(x = time, y = estimate, color = color, group = interaction(color, sim))) +
+  geom_step() +
+  xlim(c(0,50)) +
+  scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
 #' Test the first model code using simulated data
 p <- c(0.1, 0.15)
@@ -180,12 +225,27 @@ print(fit1s)
 
 #' Posterior with simulated data
 #| label: fig-post1-sim
-post1s <- as_list_of_arrays(fit1s$draws())
-plot(density(post1s$p[,1]), lwd=3, xlab="Probability of adoption", xlim=c(0.07,0.2), main="")
-k <- density(post1s$p[,2])
+post1s <- fit1s$draws(format="df")
+plot(density(post1s$`p[1]`), lwd=3, xlab="Probability of adoption", xlim=c(0.07,0.2), main="")
+k <- density(post1s$`p[2]`)
 lines(k$x, k$y, lwd=3, col="orange")
 abline(v=p[1], lwd=2)
 abline(v=p[2], lwd=2, col="orange")
+
+#' Posterior with simulated data with ggplot
+#| label: fig-gg-post1-sim
+#| fig-height: 3.5
+#| fig-width: 6
+post1s |>
+  ggplot() +
+  stat_slab(aes(x = `p[1]`), density = "unbounded", trim = FALSE, fill = NA, color = "black") +
+  stat_slab(aes(x = `p[2]`), density = "unbounded", trim = FALSE, fill = NA, color = "orange") +
+  scale_y_continuous(breaks = NULL) +
+  theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
+  coord_cartesian(expand = FALSE) +
+  xlim(c(0.07, 0.2)) +
+  labs(x="Probability of adoption", y="") +
+  geom_vline(xintercept=p, color=c("black","orange"))
 
 #' Sample from the posterior using the real data
 #| results: hide
@@ -196,17 +256,35 @@ print(fit1)
 
 #' Kaplan-Meier posterior simulations
 #| label: fig-post1-km
-post1 <- as_list_of_arrays(fit1$draws())
+post1 <- fit1$draws(format="df")
 cols <- c(colalpha("black"), colalpha("orange"))
 # rethinking::blank2(w=1.2)
-plot(NULL, xlab="days", ylab="Proportion un-adopted", xlim=c(0,50), ylim=c(0,1))
+plot(NULL, xlab="Days", ylab="Proportion un-adopted", xlim=c(0,50), ylim=c(0,1))
 mtext("Posterior predictive distribution (1000 cats)")
 n <- 12
 for (i in 1:n) {
-  days_rep <- sim_cats1(n=1e3,p=post1$p[i,])
+  days_rep <- sim_cats1(n=1e3, p=post1[i,c("p[1]","p[2]")])
   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
   lines(xfit, lwd=2, col=cols)
 }
+
+#' Posterior Kaplan-Meier with ggplot
+#| label: fig-gg-post1-km
+#| fig-height: 3.5
+#| fig-width: 6
+lapply(1:n, \(i) sim_cats1(n=1e3, p=post1[i,c("p[1]","p[2]")]) |>
+                   as.data.frame() |> mutate(sim=i)) |>
+  bind_rows() |>
+  survfit2(formula = Surv(days, adopted) ~ color + sim, data = _) |> # ggsurvfit version
+  tidy_survfit() |>
+  mutate(color = str_split_i(strata, ", ", 1),
+         sim = str_split_i(strata, ", ", 2)) |>
+  ggplot(aes(x = time, y = estimate, color = color, group = interaction(color, sim))) +
+  geom_step(alpha = 0.5) +
+  xlim(c(0,50)) +
+  scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
 #' ## Add observation (censoring) model
 #'
@@ -227,7 +305,7 @@ cat_code2 <- root("cat_adoptions", "adoptions_censored.stan")
 writeLines(readLines(cat_code2))
 
 #' Test censoring model using simulated data
-sim_dat <- sim_cats2(n=1e3, p=c(0.01,0.03))
+sim_dat <- sim_cats2(n=1e3, p=c(0.01,0.02))
 #| results: hide
 fit2s <- cstan(cat_code2, data=sim_dat)
 
@@ -235,10 +313,25 @@ fit2s <- cstan(cat_code2, data=sim_dat)
 print(fit2s)
 
 #| label: fig-post2-sim
-post2s <- as_list_of_arrays(fit2s$draws())
-dens(post2s$p[,1], lwd=3, xlab="Probability of adoption", xlim=c(0,0.03), ylim=c(0,600))
-dens(post2s$p[,2], add=TRUE, lwd=3, col="orange")
+post2s <- fit2s$draws(format="df")
+dens(post2s$`p[1]`, lwd=3, xlab="Probability of adoption", xlim=c(0,0.03), ylim=c(0,600))
+dens(post2s$`p[2]`, add=TRUE, lwd=3, col="orange")
 abline(v=0.01, lwd=2); abline(v=0.02, lwd=2, col="orange")
+
+#' Posterior with simulated data with ggplot
+#| label: fig-gg-post2-sim
+#| fig-height: 3.5
+#| fig-width: 6
+post2s |>
+  ggplot() +
+  stat_slab(aes(x = `p[1]`), density = "unbounded", trim = FALSE, fill = NA, color = "black") +
+  stat_slab(aes(x = `p[2]`), density = "unbounded", trim = FALSE, fill = NA, color = "orange") +
+  scale_y_continuous(breaks = NULL) +
+  theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
+  coord_cartesian(expand = FALSE) +
+  xlim(c(0.005, 0.025)) +
+  labs(x="Probability of adoption", y="") +
+  geom_vline(xintercept=c(0.01, 0.02), color=c("black","orange"))
 
 #' Test previous model with new censored data
 #| results: hide
@@ -247,40 +340,73 @@ fit1s <- cstan(cat_code1, data=sim_dat)
 print(fit1s)
 
 #| label: fig-post1-sim2
-post1s <- as_list_of_arrays(fit1s)
-dens(post1s$p[,1], lwd=3, xlab="Probability of adoption", xlim=c(0,0.06), ylim=c(0,170))
-dens(post1s$p[,2], add=TRUE, lwd=3, col="orange")
+post1s <- fit1s$draws(format="df")
+dens(post1s$`p[1]`, lwd=3, xlab="Probability of adoption", xlim=c(0,0.06), ylim=c(0,170))
+dens(post1s$`p[2]`, add=TRUE, lwd=3, col="orange")
 abline(v=0.01, lwd=2); abline(v=0.02, lwd=2, col="orange")
 
+#' Posterior with simulated data with ggplot
+#| label: fig-gg-post1-sim2
+#| fig-height: 3.5
+#| fig-width: 6
+post1s |>
+  ggplot() +
+  stat_slab(aes(x = `p[1]`), density = "unbounded", trim = FALSE, fill = NA, color = "black") +
+  stat_slab(aes(x = `p[2]`), density = "unbounded", trim = FALSE, fill = NA, color = "orange") +
+  scale_y_continuous(breaks = NULL) +
+  theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
+  coord_cartesian(expand = FALSE) +
+  xlim(c(0.008, 0.062)) +
+  labs(x="Probability of adoption", y="") +
+  geom_vline(xintercept=c(0.01, 0.02), color=c("black","orange"))
+
 #' Sample using real data
+#| results: hide
 fit1 <- cstan(cat_code1, data=dat)
 fit2 <- cstan(cat_code2, data=dat)
 
 #' Kaplan-meier posterior simulations
 #| label: fig-post1-post2-km
 # rethinking::blank2(w=1.2)
-post1 <- as_list_of_arrays(fit1$draws())
-post2 <- as_list_of_arrays(fit2$draws())
+post1 <- fit1$draws(format="df")
+post2 <- fit2$draws(format="df")
 plot(NULL, xlab="Days", ylab="Proportion un-adopted", xlim=c(0,50), ylim=c(0,1))
 mtext("Posterior predictive distribution (1000 cats)")
 n <- 12
 # New estimates
 cols <- c(colalpha("black"), colalpha("orange"))
 for (i in 1:n) {
-  days_rep <- sim_cats1(n=1e3,p=post2$p[i,])
+  days_rep <- sim_cats1(n=1e3, p=post2[i,c("p[1]","p[2]")])
   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
   lines(xfit, lwd=2, col=cols)
 }
 # Add a few simulations from first model, to show impact of censoring
 n <- 1
 for (i in 1:n) {
-  days_rep <- sim_cats1(n=1e4,p=post1$p[i,])
+  days_rep <- sim_cats1(n=1e4, p=post1[i,c("p[1]","p[2]")])
   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
   lines(xfit, lwd=4, col=cols)
 }
 
-#' ## Model that uses parameters for censored observations
+#| label: fig-gg-post2-km
+#| fig-height: 3.5
+#| fig-width: 6
+n <- 12
+lapply(1:n, \(i) sim_cats1(n=1e3, p=post2[i,c("p[1]","p[2]")]) |>
+                   as.data.frame() |> mutate(sim=i)) |>
+  bind_rows() |>
+  survfit2(formula = Surv(days, adopted) ~ color + sim, data = _) |> # ggsurvfit version
+  tidy_survfit() |>
+  mutate(color = str_split_i(strata, ", ", 1),
+         sim = str_split_i(strata, ", ", 2)) |>
+  ggplot(aes(x = time, y = estimate, color = color, group = interaction(color, sim))) +
+  geom_step(alpha = 0.5) +
+  xlim(c(0,50)) +
+  scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
+#' ## Model that uses parameters for censored observations
 cat_code3 <- root("cat_adoptions", "adoptions_imputation.stan")
 writeLines(readLines(cat_code3))
 
@@ -321,14 +447,15 @@ sim_cats3 <- function(n=10,p=c(0.1,0.2),cens=50,xsd=c(0.1,0.2)) {
   }
   adopted <- ifelse(days < cens, 1, 0)
   days <- ifelse(adopted==1, days, cens)
-  return(list(N=n,days=days,color=color,adopted=adopted))
+  return(list(N=n, days=days, color=color, adopted=adopted))
 }
-sim_dat <- sim_cats3(n=1000,p=c(0.2,0.1),xsd=c(0.1,0.1))
+sim_dat <- sim_cats3(n=1000, p=c(0.2,0.1), xsd=c(0.1,0.1))
 
 #' Varying effects model
 cat_code5 <- root("cat_adoptions", "adoptions_varying.stan")
 writeLines(readLines(cat_code5))
 
+#| results: hide
 fit2s <- cstan(cat_code2, data=sim_dat)
 fit5s <- cstan(cat_code5, data=sim_dat)
 
