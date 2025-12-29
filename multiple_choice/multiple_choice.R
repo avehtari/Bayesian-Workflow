@@ -1,3 +1,59 @@
+#' ---
+#' title: "Sensitivity and specificity in coronavirus testing"
+#' author: "Andrew Gelman"
+#' date: 2022-08-22
+#' date-modified: today
+#' date-format: iso
+#' format:
+#'   html:
+#'     toc: true
+#'     toc-location: left
+#'     toc-depth: 2
+#'     number-sections: true
+#'     smooth-scroll: true
+#'     theme: readable
+#'     code-copy: true
+#'     code-download: true
+#'     code-tools: true
+#'     embed-resources: true
+#'     anchor-sections: true
+#'     html-math-method: katex
+#' bibliography: ../casestudies.bib
+#' ---
+#'
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 4 *Introduction to workflow: Modeling performance on a
+#' multiple choice exam*.
+#'
+#' # Introduction
+#'
+#' We analyze data from a 24-question final exam from a class of 32
+#' students, where our applied goal is to check that the individual
+#' test questions are doing a good job at discriminating between
+#' poorly- and well-performing students.  No external data are
+#' available on the students, so we assess their abilities using their
+#' total score on the exam.
+#'
+#' Each item is a multiple choice question with 4 possible answers and
+#' is scored either 1 (correct) or 0 (incorrect). The total scores
+#' across the 24 question exam range from 12 to 21, with an average of
+#' 16. Across the questions the hardest question has 4 of the 32
+#' students answering it correctly, while all students manage to
+#' answer the easiest question correctly.
+#' 
+#+ setup, include=FALSE
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = '95%'
+)
+
+#' 
+#' **Load packages**
+#| cache: FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
@@ -5,11 +61,13 @@ options(mc.cores = 4)
 library(posterior)
 library(arm)
 set.seed(123)
-
-# Bring in plotting functions from separate file
+# Bring in plotting functions from a separate file
 source(root("multiple_choice", "plot_functions.R"))
 
-# Compile Stan programs to use throughout the file
+#' # Stan models
+#' 
+#' Compile all Stan programs to use throughout the file
+#| label: compile-stan-models
 logit_0 <- cmdstan_model(root("multiple_choice", "logit_0.stan"))
 logit_prior <- cmdstan_model(root("multiple_choice", "logit_prior.stan"))
 logit_guessing <- cmdstan_model(root("multiple_choice", "logit_guessing.stan"))
@@ -23,7 +81,9 @@ logit_guessing_multilevel_bivariate_cholesky <- cmdstan_model(root("multiple_cho
 irt_guessing <- cmdstan_model(root("multiple_choice", "irt_guessing.stan"))
 irt_guessing_discrimination <- cmdstan_model(root("multiple_choice", "irt_guessing_discrimination.stan"))
 
-# Read in data and construct score for each student
+#' # Data
+#' 
+#' Read in data and construct score for each student
 responses <- read.csv(root("multiple_choice", "data", "final_exam_responses.csv"))
 answers <- read.csv(root("multiple_choice", "data", "final_exam_answers.csv"))
 J <- nrow(responses)  # number of students
@@ -44,9 +104,15 @@ data <- list(J = J, x = score, y = correct)
 
 item_id_0 <- LETTERS[1:J]  # Only works here because J is no more than 26!
 
-# The plots_logit function fits the model and makes plots
-plots_logit(
-  root("multiple_choice", "final_exams_1"),
+#' # Simple models
+#' 
+#' ## Base model logit_0
+logit_0
+
+#| label: fig-final_exams_1
+#| fig-height: 4
+#| fig-width: 9
+plot_logit(
   "Fit to item A on exam",
   "Score on exam",
   logit_0,
@@ -55,9 +121,13 @@ plots_logit(
   guessprob = 0
 )
 
-# Add priors
-plots_logit(
-  root("multiple_choice", "final_exams_2"),
+#' ## Add priors
+logit_prior
+
+#| label: fig-final_exams_2
+#| fig-height: 4
+#| fig-width: 9
+plot_logit(
   "Fit to item A:  rescaled predictor and weakly informative prior",
   "Standardized exam score",
   logit_prior,
@@ -66,8 +136,11 @@ plots_logit(
   score_adj_jitt,
   guessprob = 0
 )
-plots_logit_grid(
-  root("multiple_choice", "final_exams_2"),
+
+#| label: fig-final_exams_2b
+#| fig-height: 6
+#| fig-width: 11
+plot_logit_grid(
   "Rescaled predictor and weakly informative prior",
   "Standardized exam score",
   logit_prior,
@@ -77,9 +150,11 @@ plots_logit_grid(
   guessprob = 0
 )
 
-plots_logit(
-  root("multiple_choice", "final_exams_2_challenge"),
-  "Fit to item G:  rescaled predictor and weakly informative prior",
+#| label: fig-final_exams_2_challenge
+#| fig-height: 4
+#| fig-width: 9
+plot_logit(
+  "Fit to item G: rescaled predictor and weakly informative prior",
   "Standardized exam score",
   logit_prior,
   list(J = data$J, x = data$x, y = data$y[, 7], 
@@ -88,7 +163,7 @@ plots_logit(
   guessprob = 0
 )
 
-# Fix the data problems
+#' ## Fix the data problems
 answers[c(5, 14, 17)] <- c("d", "d", "c")
 correct <- array(NA, c(J,K))
 for (k in 1:K){
@@ -101,8 +176,10 @@ score_adj_jitt <- (score_jitt - mean(score)) / sd(score)
 data <- list(J = J, x = score, y = correct)
 item_id <- rank(colSums(correct), ties = "first")
 
-plots_logit_grid(
-  root("multiple_choice", "final_exams_3"),
+#| label: fig-final_exams_3
+#| fig-height: 6
+#| fig-width: 11
+plot_logit_grid(
   "After fixing the data problem",
   "Standardized exam score",
   logit_prior,
@@ -112,9 +189,13 @@ plots_logit_grid(
   guessprob = 0
 )
 
-# Allow for guessing
-plots_logit_grid(
-  root("multiple_choice", "final_exams_4"),
+#' ## Allow for guessing
+logit_guessing
+
+#| label: fig-final_exams_4
+#| fig-height: 6
+#| fig-width: 11
+plot_logit_grid(
   "Probabilities constrained to range from 0.25 to 1",
   "Standardized exam score",
   logit_guessing,
@@ -124,7 +205,9 @@ plots_logit_grid(
   guessprob = 0.25
 )
 
-# In preparation for multilevel model, create long dataset
+#' # Multilevel models
+#' 
+#' In preparation for multilevel model, create long dataset
 N <- J*K
 y <- rep(NA, N)
 student <- rep(NA, N)
@@ -146,9 +229,13 @@ longdata <- list(
   x = score
 )
 
+#' ## Multilevel model
+logit_guessing_multilevel
 
-fit_5 <- plots_logit_grid_2(
-  root("multiple_choice", "final_exams_5"),
+#| label: fig-final_exams_5
+#| fig-height: 6
+#| fig-width: 11
+fit_5 <- plot_logit_grid_2(
   "Multilevel model, partially pooling across the 24 exam questions",
   "Standardized exam score",
   logit_guessing_multilevel,
@@ -161,10 +248,16 @@ fit_5 <- plots_logit_grid_2(
   item_id,
   guessprob = 0.25
 )
+
 print(fit_5, variables = c("mu_a", "sigma_a", "mu_b", "sigma_b"))
 
-fit_6 <- plots_logit_grid_2(
-  root("multiple_choice", "final_exams_6"),
+#' ## Multilevel model with correlation
+logit_guessing_multilevel_bivariate
+
+#| label: fig-final_exams_6
+#| fig-height: 6
+#| fig-width: 11
+fit_6 <- plot_logit_grid_2(
   "Multilevel model with correlation",
   "Standardized exam score",
   logit_guessing_multilevel_bivariate,
@@ -177,10 +270,16 @@ fit_6 <- plots_logit_grid_2(
   item_id,
   guessprob = 0.25
 )
+
 print(fit_6, variables = c("mu_ab", "sigma_ab", "Omega_ab"))
 
-fit_7 <- plots_logit_grid_2(
-  root("multiple_choice", "final_exams_7"),
+#' ## Multilevel model with correlation using Cholesky
+logit_guessing_multilevel_bivariate_cholesky
+
+#| label: fig-final_exams_7
+#| fig-height: 6
+#| fig-width: 11
+fit_7 <- plot_logit_grid_2(
   "Multilevel model with correlation:  Cholesky parameterization",
   "Standardized exam score",
   logit_guessing_multilevel_bivariate_cholesky,
@@ -193,12 +292,19 @@ fit_7 <- plots_logit_grid_2(
   item_id,
   guessprob = 0.25
 )
+
 print(fit_7, variables = c("mu_ab", "sigma_ab", "Omega_ab"))
 
 
-# IRT models
-fit_11 <- plots_irt(
-  root("multiple_choice", "final_exams_11"),
+#' # Item-response theory (IRT) models
+#'
+#' ## Item-response model
+irt_guessing
+
+#| label: fig-final_exams_11
+#| fig-height: 6
+#| fig-width: 11
+fit_11 <- plot_irt(
   "Item-response model",
   irt_guessing,
   c(longdata, list(
@@ -208,8 +314,14 @@ fit_11 <- plots_irt(
   item_id,
   guessprob = 0.25
 )
-fit_12 <- plots_irt(
-  root("multiple_choice", "final_exams_12"),
+
+#' ## Item-response model with discrimination parameters
+irt_guessing_discrimination
+
+#| label: fig-final_exams_12
+#| fig-height: 6
+#| fig-width: 11
+fit_12 <- plot_irt(
   "Item-response model with discrimination parameters",
   irt_guessing_discrimination,
   c(longdata, list(
@@ -221,8 +333,12 @@ fit_12 <- plots_irt(
   item_id,
   guessprob = 0.25
 )
-fit_13 <- plots_irt(
-  root("multiple_choice", "final_exams_13"),
+
+#' ## Item-response model with discrimination parameters with init
+#| label: fig-final_exams_13
+#| fig-height: 6
+#| fig-width: 11
+fit_13 <- plot_irt(
   "Item-response model with discrimination parameters",
   irt_guessing_discrimination,
   c(longdata, list(
@@ -235,6 +351,7 @@ fit_13 <- plots_irt(
   init = 0.1
 )
 
+#' IRT plots
 alpha_sims <- as.matrix(fit_13$draws("alpha", format = "df"))[, 1:J]
 beta_sims <- as.matrix(fit_13$draws("beta", format = "df"))[, 1:K]
 gamma_sims <- as.matrix(fit_13$draws("gamma", format = "df"))[, 1:K]
@@ -245,7 +362,9 @@ beta_sd <- apply(beta_sims, 2, mad)
 gamma_hat <- apply(gamma_sims, 2, median)
 gamma_sd <- apply(gamma_sims, 2, mad)
 
-pdf(root("multiple_choice", "irt_displays_1.pdf"), height=4, width=6)
+#| label: fig-irt_displays_1
+#| fig-height: 4
+#| fig-width: 6
 par(mar = c(3, 0, 0, 0), mgp = c(1.5, .2, 0), tck = -.01)
 rng <- range(
   alpha_hat - 3*alpha_sd,
@@ -266,9 +385,10 @@ for (j in 1:J){
 for (k in 1:K){
   curve(-dnorm(x, beta_hat[k], beta_sd[k]), col = "red", add = TRUE)
 }
-dev.off()
 
-pdf(root("multiple_choice", "irt_displays_2.pdf"), height = 3.2, width = 4)
+#| label: fig-irt_displays_2
+#| fig-height: 3.2
+#| fig-width: 4
 par(mar = c(2.5, 2.5, .5, .5), mgp = c(1.5, .2, 0), tck = -.01)
 x_rng <- range(beta_hat - beta_sd, beta_hat + beta_sd)
 y_rng <- range(gamma_hat - gamma_sd, gamma_hat + gamma_sd)
@@ -292,9 +412,8 @@ for (k in 1:K) {
   )
 }
 text(beta_hat, gamma_hat, item_id, col = "blue", cex = .9)
-dev.off()
 
-# Prior predictive simulations
+#' # Prior predictive simulations
 prior_predictive <- function(x, x_jitt, mu_a, sigma_a, mu_b, sigma_b) {
   a <- rnorm(1, mu_a, sigma_a)
   b <- rnorm(1, mu_b, sigma_b)
@@ -310,7 +429,9 @@ prior_predictive <- function(x, x_jitt, mu_a, sigma_a, mu_b, sigma_b) {
   points(x_jitt, 0.5 + 0.96 * (y - 0.5), cex = .7, pch = 20, col = "blue")
 }
 
-pdf(root("multiple_choice", "multiplechoice_prior_predictive_1.pdf"), height = 2.5, width = 7.5)
+#| label: fig-multiplechoice_prior_predictive_1
+#| fig-height: 2.5
+#| fig-width: 7.5
 par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
     mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
@@ -318,9 +439,10 @@ for (loop in 1:10) {
 }
 mtext("10 prior predictive simulations with a ~ normal(0, 0.5) and b ~ normal(0, 0.5)", 
       side = 3, line = .5, outer = TRUE, cex = .7)
-dev.off()
 
-pdf(root("multiple_choice", "multiplechoice_prior_predictive_2.pdf"), height = 2.5, width = 7.5)
+#| label: fig-multiplechoice_prior_predictive_2
+#| fig-height: 2.5
+#| fig-width: 7.5
 par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
     mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
@@ -328,9 +450,10 @@ for (loop in 1:10) {
 }
 mtext("10 prior predictive simulations with a ~ normal(0, 5) and b ~ normal(0, 5)", 
       side = 3, line = .5, outer = TRUE, cex = .7)
-dev.off()
 
-pdf(root("multiple_choice", "multiplechoice_prior_predictive_3.pdf"), height = 2.5, width = 7.5)
+#| label: fig-multiplechoice_prior_predictive_3
+#| fig-height: 2.5
+#| fig-width: 7.5
 par(oma = c(0, 0, 1.5, 0), mfrow = c(2, 5), mar = c(3, 3, 1, 1), 
     mgp = c(1.3, .2, 0), tck = -.01)
 for (loop in 1:10) {
@@ -338,10 +461,12 @@ for (loop in 1:10) {
 }
 mtext("10 prior predictive simulations with a ~ normal(0, 50) and b ~ normal(0, 50)", 
       side = 3, line = .5, outer = TRUE, cex = .7)
-dev.off()
 
 
-# Breaking the model
+#' # Breaking the model
+logit_guessing_uncentered
+
+#' Simulate data
 set.seed(123)
 J <- 32
 x <- runif(J, 10, 20)
@@ -361,14 +486,18 @@ break_data <- list(
   mu_b = 0,
   sigma_b = 1000
 )
+#| results: hide
 break_1_fit <- logit_guessing_uncentered$sample(data = break_data, refresh = 0)
+
 print(break_1_fit)
+
 a <- extract_variable(break_1_fit, "a")
 b <- extract_variable(break_1_fit, "b")
 n_sims <- length(a)
 
-
-pdf(root("multiple_choice", "break_1.pdf"), height = 3, width = 4)
+#| label: fig-break_1
+#| fig-height: 3
+#| fig-width: 4
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(
   x, y,
@@ -384,18 +513,19 @@ for (s in sample(n_sims, 20)) {
 }
 points(x, 0.5 + 0.985 * (y - 0.5), cex = .7, pch = 20)
 curve(0.25 + 0.75 * invlogit(a_ + b_ * x), add = TRUE)
-dev.off()
 
-
+#| results: hide
 break_2_fit <- logit_guessing$sample(data = break_data, refresh = 0)
+
 print(break_2_fit)
+
 a <- extract_variable(break_2_fit, "a")
 b <- extract_variable(break_2_fit, "b")
 n_sims <- length(a)
 
-
-
-pdf(root("multiple_choice", "break_2.pdf"), height = 3, width = 4)
+#| label: fig-break_2
+#| fig-height: 3
+#| fig-width: 4
 par(mar = c(3, 3, 1, 1), mgp = c(1.5, .5, 0), tck = -.01)
 plot(
   x_adj, y,
@@ -412,11 +542,11 @@ for (s in sample(n_sims, 20)) {
 }
 points(x_adj, 0.5 + 0.985 * (y - 0.5), cex = .7, pch = 20)
 curve(0.25 + 0.75 * invlogit(a_ + b_ * (m_x + s_x * x)), add = TRUE)
-dev.off()
 
-
-plots_logit_grid_2(
-  root("multiple_choice", "final_exams_break_1"),
+#| label: fig-final_exams_break_1
+#| fig-height: 6
+#| fig-width: 11
+plot_logit_grid_2(
   "Breaking the model",
   "Exam score",
   logit_guessing_multilevel,
@@ -429,4 +559,3 @@ plots_logit_grid_2(
   item_id,
   guessprob = 0.25
 )
-
