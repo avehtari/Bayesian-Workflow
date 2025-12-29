@@ -1,7 +1,9 @@
 ## Reverse-engineering the Fivethirtyeight forecast
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(rjson)
 
-library("rjson")
-sims_538 <- fromJSON(file="simmed-maps.json")
+sims_538 <- fromJSON(file= root("misc", "chapter_08", "section_08_01", "simmed-maps.json"))
 states <- sims_538$states
 n_sims <- length(sims_538$maps)
 sims <- array(NA, c(n_sims, 59), dimnames=list(NULL, c("", "Trump", "Biden", states)))
@@ -22,8 +24,8 @@ round(apply(biden_wins[condition,], 2, mean), 2)
 
 ## New Jersey and Alaska
 
-round(mean(biden_wins[,"AK"] [biden_loses[,"NJ"]]), 2)
-round(mean(biden_wins[,"AK"] [biden_wins[,"NJ"]]), 2)
+round(mean(biden_wins[,"AK"][biden_loses[,"NJ"]]), 2)
+round(mean(biden_wins[,"AK"][biden_wins[,"NJ"]]), 2)
 
 par(mar=c(3,3,1,1), mgp=c(1.7, .5, 0), tck=-.01)
 par(pty="s")
@@ -46,8 +48,8 @@ round(cor(trump_share[,"AK"], trump_share[,"NJ"]), 2)
 
 ## New Jersey and Pennsylvania
 
-round(mean(biden_wins[,"PA"] [biden_loses[,"NJ"]]), 2)
-round(mean(biden_wins[,"PA"] [biden_wins[,"NJ"]]), 2)
+round(mean(biden_wins[,"PA"][biden_loses[,"NJ"]]), 2)
+round(mean(biden_wins[,"PA"][biden_wins[,"NJ"]]), 2)
 
 par(mar=c(3,3,1,1), mgp=c(1.7, .5, 0), tck=-.01)
 par(pty="s")
@@ -71,8 +73,8 @@ round(cor(trump_share[,"PA"], trump_share[,"NJ"]), 2)
 
 ## Alabama and Mississippi
 
-round(mean(biden_wins[,"MS"] [biden_loses[,"AL"]]), 2)
-round(mean(biden_wins[,"MS"] [biden_wins[,"AL"]]), 2)
+round(mean(biden_wins[,"MS"][biden_loses[,"AL"]]), 2)
+round(mean(biden_wins[,"MS"][biden_wins[,"AL"]]), 2)
 
 par(mar=c(3,3,1,1), mgp=c(1.7, .5, 0), tck=-.01)
 par(pty="s")
@@ -96,8 +98,8 @@ round(cor(trump_share[,"MS"], trump_share[,"AL"]), 2)
 
 ## Wisconsin and Pennsylvania
 
-round(mean(trump_wins[,"PA"] [trump_wins[,"WI"]]), 2)
-round(mean(trump_wins[,"PA"] [biden_wins[,"WI"]]), 2)
+round(mean(trump_wins[,"PA"][trump_wins[,"WI"]]), 2)
+round(mean(trump_wins[,"PA"][biden_wins[,"WI"]]), 2)
 
 par(mar=c(3,3,1,1), mgp=c(1.7, .5, 0), tck=-.01)
 par(pty="s")
@@ -130,9 +132,11 @@ round(cor(trump_share[,"WA"], trump_share[,"MS"]), 2)
 
 
 ## Washington and Mississippi
+round(mean(trump_wins[,"MS"] [trump_wins[,"WA"]]), 2)
+round(mean(trump_wins[,"MS"] [biden_wins[,"WA"]]), 2)
 
-round(mean(biden_wins[,"MS"] [biden_loses[,"WA"]]), 2)
-round(mean(biden_wins[,"MS"] [biden_wins[,"WA"]]), 2)
+round(mean(biden_wins[,"MS"][biden_loses[,"WA"]]), 2)
+round(mean(biden_wins[,"MS"][biden_wins[,"WA"]]), 2)
 
 par(mar=c(3,3,1,1), mgp=c(1.7, .5, 0), tck=-.01)
 par(pty="s")
@@ -165,9 +169,9 @@ round(mean(cor(trump_share)), 2)
 
 ## New York and Pennsylvania
 
-round(mean(trump_wins[,"PA"] [trump_wins[,"NY"]]), 2)
-round(mean(trump_wins[,"PA"] [biden_wins[,"NY"]]), 2)
-round(mean(trump_wins[,"PA"] [trump_share[,"NY"] > 0.45]), 2)
+round(mean(trump_wins[,"PA"][trump_wins[,"NY"]]), 2)
+round(mean(trump_wins[,"PA"][biden_wins[,"NY"]]), 2)
+round(mean(trump_wins[,"PA"][trump_share[,"NY"] > 0.45]), 2)
 
 
 par(mar=c(3,3,1,1), mgp=c(1.7, .5, 0), tck=-.01)
