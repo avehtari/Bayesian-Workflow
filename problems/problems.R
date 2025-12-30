@@ -109,6 +109,7 @@ fit_logit <- mod_logit$sample(data = data_logit, seed = SEED, refresh = 0)
 fit_logit$diagnostic_summary()
 
 #' We can also check $\widehat{R}$ end effective sample size (ESS) diagnostics
+#' [@Vehtari-Gelman-Simpson-etal:2021]
 draws <- as_draws_rvars(fit_logit$draws())
 summarize_draws(draws)
 
@@ -278,7 +279,8 @@ fit_logit4$diagnostic_summary()
 
 draws <- as_draws_rvars(fit_logit4$draws())
 summarize_draws(draws)
-#' ESS estimates are above the recommended diagnostic thresholds, but
+#' ESS estimates are above the recommended diagnostic thresholds
+#' [@Vehtari-Gelman-Simpson-etal:2021], but
 #' lower than what we would expect in general from Stan for such a
 #' lower dimensional problem.
 #' 
@@ -324,7 +326,8 @@ mod_logit4$check_syntax(pedantic = TRUE)
 #'
 #' ## Data
 #' 
-#' The data are Kilpisjärvi summer month temperatures 1952-2013.
+#' The data are Kilpisjärvi summer month temperatures 1952-2013
+#' measured by Finnish Meteorological Institute.
 data_kilpis <- read.delim(root("problems/data","kilpisjarvi-summer-temp.csv"), sep = ";")
 data_lin <-list(M=1,
                 N = nrow(data_kilpis),
@@ -513,9 +516,10 @@ mcmc_hist(as_draws_array(draws), pars=c("mu"))
 #| fig-width: 7
 mcmc_trace(as_draws_array(draws), pars=c("mu"))
 
-#' Rank ECDF plot indicates good mixing as all chains have their lines
-#' inside the envelope (the envelope assumes no autocorrelation, which
-#' is the reason to thin the draws here)
+#' Rank ECDF plot [@Sailynoja+etal:2022:PIT-ECDF] indicates good
+#' mixing as all chains have their lines inside the envelope (the
+#' envelope assumes no autocorrelation, which is the reason to thin
+#' the draws here)
 #| label: fig-bimodal2_rank_ecdf_diff
 #| fig-height: 4
 #| fig-width: 6
@@ -790,3 +794,13 @@ summarize_draws(draws2)
 #' with the model code without the constraint, but it is difficult to
 #' diagnose without running the fixed model.
 #'
+#' <br />
+#' 
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#' 
+#' # Licenses {.unnumbered}
+#' 
+#' * Code &copy; 2021-2025, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2021-2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
