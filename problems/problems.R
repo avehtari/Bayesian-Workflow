@@ -33,28 +33,29 @@
 #' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
-  cache=FALSE,
-  message=FALSE,
-  error=FALSE,
-  warning=FALSE,
-  comment=NA,
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
   out.width = "90%"
 )
 
 #' *Load packages*
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr) 
 library(posterior)
 options(pillar.neg = FALSE,
-        pillar.subtle=FALSE,
-        pillar.sigfig=2)
-options(width=90)
+        pillar.subtle = FALSE,
+        pillar.sigfig = 2)
+options(width = 90)
 library(tidyr) 
 library(dplyr) 
 library(ggplot2)
 library(bayesplot)
-theme_set(bayesplot::theme_default(base_family = "sans", base_size=14))
+library(RColorBrewer)
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
 set1 <- RColorBrewer::brewer.pal(7, "Set1")
 SEED <- 48927 # set random seed for reproducibility
 
@@ -74,19 +75,19 @@ SEED <- 48927 # set random seed for reproducibility
 #' Univariate continous predictor $x$, binary target $y$, and the two
 #' classes are completely separable, which leads to unbounded
 #' likelihood.
-set.seed(SEED+4)
-M=1;
-N=10;
-x=matrix(sort(rnorm(N)),ncol=M)
-y=rep(c(0,1), each=N/2)
-data_logit <-list(M = M, N = N, x = x, y = y)
+set.seed(SEED + 4)
+M <- 1
+N <- 10
+x <- matrix(sort(rnorm(N)), ncol = M)
+y <- rep(c(0, 1), each = N / 2)
+data_logit <- list(M = M, N = N, x = x, y = y)
 #| label: fig-separable_data
 #| fig-height: 4
 #| fig-width: 6
 data.frame(data_logit) |>
   ggplot(aes(x, y)) +
-  geom_point(size = 3, shape=1, alpha=0.6) +
-  scale_y_continuous(breaks=c(0,1))
+  geom_point(size = 3, shape = 1, alpha = 0.6) +
+  scale_y_continuous(breaks = c(0, 1))
 
 #'
 #' ## Model
@@ -134,7 +135,7 @@ summarize_draws(draws)
 #| label: fig-separable_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 
 #'
 #' ## Stan compiler pedantic check
@@ -177,7 +178,7 @@ summarize_draws(draws)
 #| label: fig-separable_prior_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 
 #'
 #' # A model with unused parameter
@@ -219,7 +220,7 @@ summarize_draws(draws)
 #| label: fig-unusedparam_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta","gamma"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta", "gamma"))
 
 #' Non-mixing is well diagnosed by $\widehat{R}$ and ESS, but the
 #' following Figure shows one of the rare cases where trace plots are
@@ -228,7 +229,7 @@ mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta","gamma"))
 #| label: fig-unusedparam_trace
 #| fig-height: 4
 #| fig-width: 7
-mcmc_trace(as_draws_array(draws), pars=c("gamma"))
+mcmc_trace(as_draws_array(draws), pars = c("gamma"))
 
 #' ## Stan compiler pedantic check
 #'
@@ -248,11 +249,11 @@ mod_logit3$check_syntax(pedantic = TRUE)
 #' term `alpha`, and this redundancy will lead to problems.
 #'
 #' ## Data
-M=2;
-N=1000;
-x=matrix(c(rep(1,N),sort(rnorm(N))),ncol=M)
-y=((x[,1]+rnorm(N)/2)>0)+0
-data_logit4 <-list(M = M, N = N, x = x, y = y)
+M <- 2
+N <- 1000
+x <- matrix(c(rep(1, N), sort(rnorm(N))), ncol = M)
+y <- ((x[, 1] + rnorm(N) / 2) > 0) + 0
+data_logit4 <- list(M = M, N = N, x = x, y = y)
 
 #'
 #' ## Model
@@ -290,11 +291,11 @@ summarize_draws(draws)
 #| label: fig-competing_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta[1]","beta[2]"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta[1]", "beta[2]"))
 
 
 #' We can compute the correlation.
-cor(as_draws_matrix(draws)[,c("alpha","beta[1]")])[1,2]
+cor(as_draws_matrix(draws)[, c("alpha", "beta[1]")])[1, 2]
 
 #' The numerical value for the correlation is $-0.999$. The
 #' correlation close to 1 can happen also from other reasons (see the
@@ -328,11 +329,11 @@ mod_logit4$check_syntax(pedantic = TRUE)
 #' 
 #' The data are Kilpisjärvi summer month temperatures 1952-2013
 #' measured by Finnish Meteorological Institute.
-data_kilpis <- read.delim(root("problems/data","kilpisjarvi-summer-temp.csv"), sep = ";")
-data_lin <-list(M=1,
-                N = nrow(data_kilpis),
-                x = matrix(data_kilpis$year, ncol=1),
-                y = data_kilpis[,5])
+data_kilpis <- read.delim(root("problems/data", "kilpisjarvi-summer-temp.csv"), sep = ";")
+data_lin <- list(M = 1,
+                 N = nrow(data_kilpis),
+                 x = matrix(data_kilpis$year, ncol = 1),
+                 y = data_kilpis[, 5])
 
 #| label: fig-kilpisjarvi_data
 #| fig-height: 4
@@ -340,7 +341,7 @@ data_lin <-list(M=1,
 data.frame(data_lin) |>
   ggplot(aes(x, y)) +
   geom_point(size = 1) +
-  labs(y = 'Summer temp. @Kilpisjärvi', x= "Year") +
+  labs(y = 'Summer temp. @Kilpisjärvi', x = "Year") +
   guides(linetype = "none")
 
 #' ## Model
@@ -372,7 +373,7 @@ summarize_draws(draws)
 #| label: fig-correlating_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 
 #' Here the reason is that the $x$ values are in the range 1952--2013,
 #' and the intercept `alpha` denotes the temperature at year 0, which
@@ -386,10 +387,10 @@ mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
 #' ## Centered data
 #'
 data_lin <- list(
-  M=1,
+  M = 1,
   N = nrow(data_kilpis),
-  x = matrix(data_kilpis$year-1982.5, ncol=1),
-  y = data_kilpis[,5]
+  x = matrix(data_kilpis$year - 1982.5, ncol = 1),
+  y = data_kilpis[, 5]
 )
 
 #+ message=FALSE, error=FALSE, warning=FALSE
@@ -408,7 +409,7 @@ summarize_draws(draws)
 #| label: fig-uncorrelating_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 
 #'
 #' With this change, there is no posterior correlation, Bulk-ESS
@@ -432,9 +433,9 @@ mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
 #' ## Data
 #'
 #' Bimodally distributed data
-N=20
-y=c(rnorm(N/2, mean=-5, sd=1),rnorm(N/2, mean=5, sd=1));
-data_tt <-list(N = N, y = y)
+N <- 20
+y <- c(rnorm(N / 2, mean = -5, sd = 1), rnorm(N / 2, mean = 5, sd = 1))
+data_tt <- list(N = N, y = y)
 
 #' ## Model
 #'
@@ -463,7 +464,7 @@ summarize_draws(draws)
 #| label: fig-bimodal1_hist
 #| fig-height: 4
 #| fig-width: 6
-mcmc_hist(as_draws_array(draws), pars=c("mu"))
+mcmc_hist(as_draws_array(draws), pars = c("mu"))
 
 #' In this toy example, with random initialization each chains has
 #' 50\% probability of ending in either mode. We used Stan's default
@@ -487,9 +488,9 @@ mcmc_hist(as_draws_array(draws), pars=c("mu"))
 #' If the modes in the bimodal distribution are not strongly
 #' separated, MCMC can jump from one mode to another and there are no
 #' convergence issues.
-N=20
-y=c(rnorm(N/2, mean=-3, sd=1),rnorm(N/2, mean=3, sd=1));
-data_tt <-list(N = N, y = y)
+N <- 20
+y <- c(rnorm(N / 2, mean = -3, sd = 1), rnorm(N / 2, mean = 3, sd = 1))
+data_tt <- list(N = N, y = y)
 
 #| label: fit_tt_easy
 #| results: hide
@@ -506,7 +507,7 @@ summarize_draws(draws)
 #| label: fig-bimodal2_hist
 #| fig-height: 4
 #| fig-width: 6
-mcmc_hist(as_draws_array(draws), pars=c("mu"))
+mcmc_hist(as_draws_array(draws), pars = c("mu"))
 
 #' Trace plot is not very useful. It shows the chains are jumping
 #' between modes, but it's difficult to see whether the jumps happen
@@ -514,7 +515,7 @@ mcmc_hist(as_draws_array(draws), pars=c("mu"))
 #| label: fig-bimodal2_trace
 #| fig-height: 4
 #| fig-width: 7
-mcmc_trace(as_draws_array(draws), pars=c("mu"))
+mcmc_trace(as_draws_array(draws), pars = c("mu"))
 
 #' Rank ECDF plot [@Sailynoja+etal:2022:PIT-ECDF] indicates good
 #' mixing as all chains have their lines inside the envelope (the
@@ -523,8 +524,8 @@ mcmc_trace(as_draws_array(draws), pars=c("mu"))
 #| label: fig-bimodal2_rank_ecdf_diff
 #| fig-height: 4
 #| fig-width: 6
-draws |> thin_draws(ndraws(draws)/ess_basic(draws$mu)) |>
-  mcmc_rank_ecdf(pars=c("mu"), plot_diff=TRUE)
+draws |> thin_draws(ndraws(draws) / ess_basic(draws$mu)) |>
+  mcmc_rank_ecdf(pars = c("mu"), plot_diff = TRUE)
 
 #' # Initial value issues
 #'
@@ -549,11 +550,11 @@ draws |> thin_draws(ndraws(draws)/ess_basic(draws$mu)) |>
 #'
 #' ## Data
 set.seed(SEED)
-M=1;
-N=20;
-x=1e3*matrix(c(sort(rnorm(N))),ncol=M)
-y=rpois(N,exp(1e-3*x[,1]))
-data_pois <-list(M = M, N = N, x = x, y = y)
+M <- 1
+N <- 20
+x <- 1e3 * matrix(c(sort(rnorm(N))), ncol = M)
+y <- rpois(N, exp(1e-3 * x[, 1]))
+data_pois <- list(M = M, N = N, x = x, y = y)
 
 #| label: fig-poisson_data
 #| fig-height: 4
@@ -600,7 +601,7 @@ summarize_draws(draws)
 #| label: fig-poisson_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 
 #' The reason for the issue is that the initial values for
 #' `beta` are sampled from $(-2, 2)$ and `x` has some
@@ -616,7 +617,7 @@ mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
 #' drawn from the range $(-0.001, 0.001)$. Alternatively we can scale
 #' `x` to have scale close to unit scale. After this scaling, the
 #' computation is fast and all convergence diagnostics look good.
-data_pois <-list(M = M, N = N, x = x/1e3, y = y)
+data_pois <- list(M = M, N = N, x = x / 1e3, y = y)
 #| label: fig-poisson_data2
 #| fig-height: 4
 #| fig-width: 6
@@ -672,7 +673,7 @@ summarize_draws(draws)
 #| label: fig-thick_tail_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 
 #'
 #' The dynamic HMC algorithm used by Stan, along with many other MCMC
@@ -685,13 +686,13 @@ mcmc_pairs(as_draws_array(draws), pars=c("alpha","beta"))
 #| label: fig-thick_tail_rank_ecdf_diff
 #| fig-height: 4
 #| fig-width: 6
-draws |> thin_draws(ndraws(draws)/ess_bulk(draws$alpha)) |>
-  mcmc_rank_ecdf(pars=c("alpha"), plot_diff=TRUE)
+draws |> thin_draws(ndraws(draws) / ess_bulk(draws$alpha)) |>
+  mcmc_rank_ecdf(pars = c("alpha"), plot_diff = TRUE)
 
 #' More iterations confirm a reasonable mixing.
 #| results: hide
 fit_logit_glm4 <- mod_logit_glm4$sample(data = data_logit, seed = SEED, refresh = 0,
-                                        iter_sampling=4000)
+                                        iter_sampling = 4000)
 
 draws <- as_draws_rvars(fit_logit_glm4$draws())
 summarize_draws(draws)
@@ -699,8 +700,8 @@ summarize_draws(draws)
 #| label: fig-thick_tail_rank_ecdf_diff_more
 #| fig-height: 4
 #| fig-width: 6
-draws |> thin_draws(ndraws(draws)/ess_bulk(draws$alpha)) |>
-  mcmc_rank_ecdf(pars=c("alpha"), plot_diff=TRUE)
+draws |> thin_draws(ndraws(draws) / ess_bulk(draws$alpha)) |>
+  mcmc_rank_ecdf(pars = c("alpha"), plot_diff = TRUE)
 
 #'
 #' # Variance parameter that is not constrained to be positive
@@ -715,12 +716,12 @@ draws |> thin_draws(ndraws(draws)/ess_bulk(draws$alpha)) |>
 #' normal(0,1) and normal(0,0.1) respectively. As $N=8$ is small,
 #' there will be a lot of uncertainty about the parameters including
 #' the scale sigma.
-M=1;
-N=8;
+M <- 1
+N <- 8
 set.seed(SEED)
-x=matrix(rnorm(N),ncol=M)
-y=rnorm(N)/10
-data_lin <-list(M = M, N = N, x = x, y = y)
+x <- matrix(rnorm(N), ncol = M)
+y <- rnorm(N) / 10
+data_lin <- list(M = M, N = N, x = x, y = y)
 
 #' ## Model
 #' 
