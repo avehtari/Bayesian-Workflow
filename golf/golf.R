@@ -21,8 +21,10 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' # Setup  {.unnumbered}
-#' 
+#' This notebook includes the code for Bayesian Workflow book chapter
+#' 26 ``Model building with latent variables: Markov models for animal
+#' movement''
+#'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
   cache = FALSE,
