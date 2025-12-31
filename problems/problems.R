@@ -778,7 +778,7 @@ mod_lin$check_syntax(pedantic = TRUE)
 #' model code without the constraint, but it is difficult to diagnose
 #' without running the fixed model.
 #' 
-#' Fixed model inlcudes <lower=0> constraint for sigma.
+#' Fixed model includes <lower=0> constraint for sigma.
 code_lin2 <- root("problems", "linear_glm2.stan")
 writeLines(readLines(code_lin2))
 #' Sample
