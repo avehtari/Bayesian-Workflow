@@ -48,9 +48,9 @@ knitr::opts_chunk$set(
 
 #' **Load packages and set options**
 #| cache: FALSE
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library("cmdstanr")
+library(cmdstanr)
 options(mc.cores = 4)
 options(digits = 2)
 ## options(htmltools.dir.version = FALSE)
