@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -59,6 +60,18 @@ theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
 set1 <- RColorBrewer::brewer.pal(7, "Set1")
 SEED <- 48927 # set random seed for reproducibility
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 #'
 #' # Improper posterior
 #' 
@@ -95,7 +108,9 @@ data.frame(data_logit) |>
 #' We use the following Stan logistic regression model, where we have
 #' ``forgot'' to include prior for the coefficient `beta`.
 code_logit <- root("problems", "logit_glm.stan")
-writeLines(readLines(code_logit))
+#| output: asis
+print_stan_file(code_logit)
+
 #' Sample
 #| label: fit_logit
 #| results: hide
@@ -155,7 +170,8 @@ mod_logit$check_syntax(pedantic = TRUE)
 #'
 #' We add proper weak priors and rerun inference.
 code_logit2 <- root("problems", "logit_glm2.stan")
-writeLines(readLines(code_logit2))
+#| output: asis
+print_stan_file(code_logit2)
 #' Sample
 #| label: fit_logit2
 #| results: hide
@@ -194,7 +210,8 @@ mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 #'
 #' ## Model
 code_logit3 <- root("problems", "logit_glm3.stan")
-writeLines(readLines(code_logit3))
+#| output: asis
+print_stan_file(code_logit3)
 #' Sample
 #| label: fit_logit3
 #| results: hide
@@ -262,7 +279,8 @@ data_logit4 <- list(M = M, N = N, x = x, y = y)
 #' (and no extra `gamma`).
 #'
 code_logit2 <- root("problems", "logit_glm2.stan")
-writeLines(readLines(code_logit2))
+#| output: asis
+print_stan_file(code_logit2)
 #' Sample
 #| label: fit_logit4
 #| results: hide
@@ -348,7 +366,8 @@ data.frame(data_lin) |>
 #' 
 #' We use the following Stan linear regression model
 code_lin <- root("problems", "linear_glm_kilpis.stan")
-writeLines(readLines(code_lin))
+#| output: asis
+print_stan_file(code_lin)
 
 #| label: fit_lin_kilpis
 #| results: hide
@@ -441,7 +460,8 @@ data_tt <- list(N = N, y = y)
 #'
 #' Unimodal Student's $t$ model:
 code_tt <- root("problems", "student.stan")
-writeLines(readLines(code_tt))
+#| output: asis
+print_stan_file(code_tt)
 #' Sample
 #| label: fit_tt_hard
 #| results: hide
@@ -572,7 +592,8 @@ data.frame(data_pois) |>
 #' `alpha + beta * x` but is implemented with better computational
 #' efficiency.
 code_pois <- root("problems", "pois_glm.stan")
-writeLines(readLines(code_pois))
+#| output: asis
+print_stan_file(code_pois)
 #' Sample
 #| label: fit_pois
 #| results: hide
@@ -652,7 +673,8 @@ summarize_draws(draws)
 #'
 #' ## Model
 code_logit_glm4 <- root("problems", "logit_glm4.stan")
-writeLines(readLines(code_logit_glm4))
+#| output: asis
+print_stan_file(code_logit_glm4)
 #' Sample
 #| label: fit_logit_glm4
 #| results: hide
@@ -727,7 +749,8 @@ data_lin <- list(M = M, N = N, x = x, y = y)
 #' 
 #' We use linear regression model with proper priors.
 code_lin <- root("problems", "linear_glm.stan")
-writeLines(readLines(code_lin))
+#| output: asis
+print_stan_file(code_lin)
 #' Sample
 #| label: fit_lin
 #| results: hide
@@ -780,7 +803,8 @@ mod_lin$check_syntax(pedantic = TRUE)
 #' 
 #' Fixed model includes <lower=0> constraint for sigma.
 code_lin2 <- root("problems", "linear_glm2.stan")
-writeLines(readLines(code_lin2))
+#| output: asis
+print_stan_file(code_lin2)
 #' Sample
 #| label: fit_lin2
 #| results: hide
