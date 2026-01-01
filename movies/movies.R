@@ -49,6 +49,11 @@ root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 options(mc.cores = 4)
 library(posterior)
+library(ggplot2)
+theme_set(bayesplot::theme_default(base_family = "sans"))
+library(ggdist)
+library(patchwork)
+library(dplyr)
 set.seed(1234)
 
 #' # Model for two movies
@@ -111,11 +116,30 @@ for (j in 1:J) {
 mtext(expression(paste("Comparing parameters ", theta[j], 
                        " to their posterior inferences")), side = 3)
 
-interval_width <- theta_post_quants[,"75%"] - theta_post_quants[,"25%"]
+#' ggplot version
+#| label: fig-gg-movies_1
+#| fig-height: 4.5
+#| fig-width: 4.5
+#| out-width: 70%
+draws <- as_draws_rvars(fit_2$draws("theta"))
+rng <- range(summarize_draws(
+  draws, ~quantile(.x, probs = c(0.025, 0.975)))[,c("2.5%","97.5%")])
+ggplot(data = NULL) +
+  coord_fixed(xlim = rng, ylim = rng) +
+  geom_abline(color = "gray") +
+  stat_pointinterval(aes(y = theta, xdist = draws$theta),
+                     .width = c(0.5, 0.95),
+                     interval_size_range = c(0.4, 0.8),
+                     alpha = 0.5) +
+  labs(x = "Posterior median, 50%, and 95% interval",
+       y = "True parameter value",
+       subtitle = expression(paste("Comparing parameters ", theta[j], 
+                                " to their posterior inferences")))
 
 #| label: fig-movies_2
 #| fig-height: 4
 #| fig-width: 6
+interval_width <- theta_post_quants[,"75%"] - theta_post_quants[,"25%"]
 par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
 plot(c(0, 1.02 * max(N_ratings)), c(0, 1.02 * max(interval_width)), 
      xlab = "Number of ratings", ylab = "Width of 50% posterior interval", 
@@ -123,6 +147,19 @@ plot(c(0, 1.02 * max(N_ratings)), c(0, 1.02 * max(interval_width)),
 points(N_ratings, interval_width, pch = 20)
 mtext("Where you have more data, you have less uncertainty", side = 3)
 
+#' ggplot version
+#| label: fig-gg-movies_2
+#| fig-height: 4
+#| fig-width: 6
+bind_cols(tibble(N = N_ratings),
+          summarize_draws(draws, ~quantile(.x, probs = c(0.025, 0.975)))) |>
+  mutate(interval_width = `97.5%` - `2.5%`) |>
+  ggplot(aes(x = N, y = interval_width)) +
+  geom_point() +
+  ylim(c(0, NA)) +
+  labs(x = "Number of ratings",
+       y = "Width of 50% posterior interval",
+       title = "Where you have more data, you have less uncertainty")
 
 #' # Item-response model with parameters for raters and for movies
 #' 
@@ -176,7 +213,6 @@ for (j in 1:J){
         rep(alpha[j], 2), lwd = 0.5)
 }
 mtext(expression(paste("Checking the ", alpha[j], "'s")), side = 3)
-
 rng <- range(beta_post_quants, beta)
 plot(rng, rng, 
      xlab = "Posterior median, 50%, and 95% interval", 
@@ -192,6 +228,37 @@ for (k in 1:K){
 }
 mtext(expression(paste("Checking the ", beta[j], "'s")), side = 3)
 
+#' ggplot version
+#| label: fig-gg-movies_3
+#| fig-height: 4
+#| fig-width: 8
+drawsa <- as_draws_rvars(fit_3$draws(c("alpha")))
+rnga <- range(summarize_draws(
+  drawsa, ~quantile(.x, probs = c(0.025, 0.975)))[,c("2.5%","97.5%")])
+p3a <- ggplot(data = NULL) +
+  coord_fixed(xlim = rnga, ylim = rnga) +
+  geom_abline(color = "gray") +
+  stat_pointinterval(aes(y = alpha, xdist = drawsa$alpha),
+                     .width = c(0.5, 0.95),
+                     interval_size_range = c(0.4, 0.8),
+                     alpha = 0.5) +
+  labs(x = "Posterior median, 50%, and 95% interval",
+       y = "True parameter value",
+       title = expression(paste("Checking the ", alpha[j], "'s")))
+drawsb <- as_draws_rvars(fit_3$draws(c("beta")))
+rngb <- range(summarize_draws(
+  drawsb, ~quantile(.x, probs = c(0.025, 0.975)))[,c("2.5%","97.5%")])
+p3b <- ggplot(data = NULL) +
+  coord_fixed(xlim = rngb, ylim = rngb) +
+  geom_abline(color = "gray") +
+  stat_pointinterval(aes(y = beta, xdist = drawsb$beta),
+                     .width = c(0.5, 0.95),
+                     interval_size_range = c(0.4, 0.8),
+                     alpha = 0.5) +
+  labs(x = "Posterior median, 50%, and 95% interval",
+       y = "True parameter value",
+       title = expression(paste("Checking the ", beta[j], "'s")))
+p3a + p3b
 
 #' ## Unbalanced data
 genre <- rep(c("romantic", "crime"), c(round(J / 2), J - round(J / 2)))
@@ -267,6 +334,49 @@ mtext(expression(paste("Checking the ", beta[j], "'s")), side = 3)
 mtext("Checking fits for model when difficult reviewers were more likely to rate certain genres",
       side = 3, outer = TRUE)
 
+
+#' ggplot version
+#| label: fig-gg-movies_4
+#| fig-height: 4
+#| fig-width: 8
+drawsa <- as_draws_rvars(fit_3a$draws(c("alpha")))
+rnga <- range(summarize_draws(
+  drawsa, ~quantile(.x, probs = c(0.025, 0.975)))[,c("2.5%","97.5%")])
+p4a <- ggplot(data = NULL) +
+  coord_fixed(xlim = rnga, ylim = rnga) +
+  geom_abline(color = "gray") +
+  stat_pointinterval(aes(y = alpha, xdist = drawsa$alpha, shape = genre),
+                     .width = c(0.5, 0.95),
+                     interval_size_range = c(0.4, 0.8),
+                     point_size = 2,
+                     alpha = 0.5) +
+  scale_shape_manual(values = c(1, 19), labels = c("Romantic comedies", "Crime movies")) +
+  labs(x = "Posterior median, 50%, and 95% interval",
+       y = "True parameter value",
+       title = expression(paste("Checking the ", alpha[j], "'s"))) +
+  guides(shape = guide_legend(position = "inside")) +
+  theme(legend.justification.inside = c(0.5, 0),
+        legend.title = element_blank())
+drawsb <- as_draws_rvars(fit_3a$draws(c("beta")))
+rngb <- range(summarize_draws(
+  drawsb, ~quantile(.x, probs = c(0.025, 0.975)))[,c("2.5%","97.5%")])
+p4b <- ggplot(data = NULL) +
+  coord_fixed(xlim = rngb, ylim = rngb) +
+  geom_abline(color = "gray") +
+  stat_pointinterval(aes(y = beta, xdist = drawsb$beta, shape = factor(beta>0)),
+                     .width = c(0.5, 0.95),
+                     interval_size_range = c(0.4, 0.8),
+                     point_size = 2,
+                     alpha = 0.5) +
+  scale_shape_manual(values = c(1, 19), labels = c("Nice raters", "Difficult raters")) +
+  labs(x = "Posterior median, 50%, and 95% interval",
+       y = "True parameter value",
+       title = expression(paste("Checking the ", beta[j], "'s"))) +
+  guides(shape = guide_legend(position = "inside")) +
+  theme(legend.justification.inside = c(0.5, 0),
+        legend.title = element_blank())
+p4a + p4b
+
 #' # Comparison to naive data averaging
 ybar <- rep(NA, J)
 for (j in 1:J) {
@@ -301,3 +411,32 @@ mtext("Model-based estimates do better", side = 3)
 add_legend(c("Romantic comedies", "Crime movies"), pch = c(1, 20), range = rng)
 mtext("Problems with raw averages when difficult reviewers were more likely to rate certain genres",
       side = 3, outer = TRUE)
+
+#' ggplot version
+#| label: fig-gg-movies_5
+#| fig-height: 4
+#| fig-width: 8
+rng <- range(a_post_median, ybar, a_true)
+p5a <- ggplot(data = NULL, aes(x = ybar, y = a_true, shape = genre)) +
+  coord_fixed(xlim = rng, ylim = rng) +
+  geom_abline(color = "gray") +
+  geom_point(size = 2) +
+  scale_shape_manual(values = c(1, 19), labels = c("Romantic comedies", "Crime movies")) +
+  labs(x = "Raw average rating for movie j",
+       y = expression(paste("True ",  a[j])),
+       title = "Problems with raw averaging") +
+  guides(shape = guide_legend(position = "inside")) +
+  theme(legend.justification.inside = c(0.5, 0),
+        legend.title = element_blank())
+p5b <- ggplot(data = NULL, aes(x = a_post_median, y = a_true, shape = genre)) +
+  coord_fixed(xlim = rng, ylim = rng) +
+  geom_abline(color = "gray") +
+  geom_point(size = 2) +
+  scale_shape_manual(values = c(1, 19), labels = c("Romantic comedies", "Crime movies")) +
+  labs(x = "Posterior median estimate for movie j",
+       y = expression(paste("True ",  a[j])),
+       title = "Model-based estimates do better") +
+  guides(shape = guide_legend(position = "inside")) +
+  theme(legend.justification.inside = c(0.5, 0),
+        legend.title = element_blank())
+p5a + p5b
