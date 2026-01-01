@@ -20,7 +20,7 @@
 #'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
+#'
 #' This notebook includes the code for the Bayesian Workflow book
 #' Chapter 19 *Incremental development and testing: Black cat adoptions*
 #'
@@ -43,6 +43,7 @@ knitr::opts_chunk$set(
 #| cache: FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(scales)
 library(cmdstanr)
 library(posterior)
 library(survival)
@@ -76,11 +77,6 @@ dens <- function(x, adj = 0.5, norm.comp = FALSE, main = "",
   } else {
     lines(thed$x, thed$y, ...)
   }
-}
-colalpha <- function(acol, alpha = 0.5)  {
-  acol <- col2rgb(acol)
-  acol <- rgb(acol[1]/255, acol[2]/255, acol[3]/255, alpha)
-  acol
 }
 
 #' # Data
@@ -191,7 +187,6 @@ writeLines(readLines(cat_code1))
 #' Prior predictive simulation
 n <- 12
 sim_prior <- replicate(n, rbeta(2, 1, 10))
-cols <- c("black", "orange")
 #| label: fig-prior-predictive-1
 # rethinking::blank2(w=1.2)
 plot(NULL, xlab = "Days", ylab = "Proportion un-adopted", 
@@ -200,7 +195,7 @@ mtext("Prior predictive distribution")
 for (i in 1:n) {
   days_rep <- sim_cats1(n = 1e3, p = sim_prior[, i])
   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
-  lines(xfit, lwd = 2, col = cols)
+  lines(xfit, lwd = 2, col = c("black", "orange"))
 }
 
 #' Prior predictive simulation with ggplot
@@ -265,7 +260,6 @@ print(fit1)
 #' Kaplan-Meier posterior simulations
 #| label: fig-post1-km
 post1 <- fit1$draws(format = "df")
-cols <- c(colalpha("black"), colalpha("orange"))
 # rethinking::blank2(w=1.2)
 plot(NULL, xlab = "Days", ylab = "Proportion un-adopted", xlim = c(0, 50), ylim = c(0, 1))
 mtext("Posterior predictive distribution (1000 cats)")
@@ -273,7 +267,7 @@ n <- 12
 for (i in 1:n) {
   days_rep <- sim_cats1(n = 1e3, p = post1[i, c("p[1]", "p[2]")])
   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
-  lines(xfit, lwd = 2, col = cols)
+  lines(xfit, lwd = 2, col = alpha(c("black", "orange"), 0.5))
 }
 
 #' Posterior Kaplan-Meier with ggplot
@@ -383,18 +377,17 @@ plot(NULL, xlab = "Days", ylab = "Proportion un-adopted", xlim = c(0, 50), ylim 
 mtext("Posterior predictive distribution (1000 cats)")
 n <- 12
 # New estimates
-cols <- c(colalpha("black"), colalpha("orange"))
 for (i in 1:n) {
   days_rep <- sim_cats1(n = 1e3, p = post2[i, c("p[1]", "p[2]")])
   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
-  lines(xfit, lwd = 2, col = cols)
+  lines(xfit, lwd = 2, col = alpha(c("black", "orange"), 0.5))
 }
 # Add a few simulations from first model, to show impact of censoring
 n <- 1
 for (i in 1:n) {
   days_rep <- sim_cats1(n = 1e4, p = post1[i, c("p[1]", "p[2]")])
   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
-  lines(xfit, lwd = 4, col = cols)
+  lines(xfit, lwd = 4, col = alpha(c("black", "orange"), 0.5))
 }
 
 #| label: fig-gg-post2-km
@@ -503,12 +496,11 @@ plot(sfit, lty = 1, lwd = 0.1, col = c("black", "orange"), xlim = c(0, 90),
      xlab = "Days", ylab = "Proportion un-adopted") 
 
 #' Simulate and draw
-# cols <- c(col.alpha("black", 0.5), col.alpha("orange", 0.5))
 # n <- 12
 # for (i in 1:n) {
 #   days_rep <- sim_cats2(n = 1e3, p = post2$p[i, ], cens = 200)
 #   xfit <- survfit(Surv(days, adopted) ~ color, data = days_rep)
-#   lines(xfit, lwd = 1, col = cols)
+#   lines(xfit, lwd = 1, col = alpha(c("black", "orange"), 0.5))
 # }
 
 #' Overlay empirical curves
