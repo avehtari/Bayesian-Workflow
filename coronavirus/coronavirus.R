@@ -1,6 +1,6 @@
 #' ---
 #' title: "Sensitivity and specificity in coronavirus testing"
-#' author: "Andrew Gelman"
+#' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2022-08-22
 #' date-modified: today
 #' date-format: iso
@@ -23,7 +23,7 @@
 #'
 #' This notebook includes the code for the Bayesian Workflow book
 #' Chapter 19 *Building up to a hierarchical model: Coronavirus
-#' testing*
+#' testing*.
 #'
 #' # Introduction
 #'
@@ -48,6 +48,7 @@ library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
 options(mc.cores = 4)
+library(posterior)
 library(priorsense)
 library(ggplot2)
 library(bayesplot)
@@ -95,28 +96,28 @@ fit_1 <- sc_model$sample(
   iter_sampling = 1e4
 )
 print(fit_1, digits = 3)
-draws_1 <- fit_1$draws()
 
 #' Check prior-likelihood sensitivity using powerscaling
 powerscale_sensitivity(fit_1)
-powerscale_sequence(draws_1, lower_alpha = 0.5, length = 3)
 #| label: fig-specificity_priorsense_1
 #| fig-height: 6.5
 #| fig-width: 12
 powerscale_plot_dens(
-  draws_1,
+  fit_1,
   variables = c("p", "spec", "sens"),
   lower_alpha = 0.5,
   help_text = FALSE
 )
 
 #' Inference for the population prevalence
+draws_1 <- fit_1$draws()
 subset <- sample(1e4, 1e3)
 x <- as.vector(draws_1[subset, , "spec"])
 y <- as.vector(draws_1[subset, , "p"])
 #| label: fig-scatter
 #| fig-height: 3.5
 #| fig-width: 4.5
+#| out-width: 70%
 par(mar = c(3, 3, 0, 1), mgp = c(2, .7, 0), tck = -.02)
 plot(x, y, 
      xlim = c(min(x), 1), ylim = c(0, max(y)), 
@@ -125,14 +126,37 @@ plot(x, y,
      ylab = expression(paste("Prevalence, ", pi)), bty = "l", 
      pch=20, cex=.3)
 
+#' ggplot version
+#| label: fig-gg-scatter
+#| fig-height: 3.5
+#| fig-width: 4.5
+#| out-width: 70%
+fit_1$draws() |>
+  resample_draws(ndraws = 1e3) |>
+  mcmc_scatter(pars = c("spec", "p"), size = 1, alpha = 0.5) +
+  lims(x = c(NA, 1), y = c(0, NA)) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
+  labs(x = expression(paste("Specificity, ", gamma)), 
+       y = expression(paste("Prevalence, ", pi)))
+
 #| label: fig-hist
 #| fig-height: 3.5
 #| fig-width: 5.5
+#| out-width: 70%
 par(mar = c(3, 3, 0, 1), mgp = c(2, .7, 0), tck = -.02)
 hist(y, 
      yaxt = "n", yaxs = "i", 
      xlab = expression(paste("Prevalence, ", pi)), 
      ylab = "", main = "")
+
+#| label: fig-gg-hist
+#| fig-height: 3.5
+#| fig-width: 5.5
+#| out-width: 70%
+fit_1$draws() |>
+  mcmc_hist(pars = c("p"), breaks = seq(0, 0.03, length.out = 30)) +
+  theme(axis.line.y = element_blank()) + 
+  labs(x = expression(paste("Prevalence, ", pi)))
 
 #' Use the shortest posterior interval, which makes more sense than a central 
 #' interval because of the skewness of the posterior and the hard boundary at 0.
@@ -162,14 +186,10 @@ print(spin(draws_2[, , "p"], lower = 0, upper = 1, conf = 0.95), digits = 2)
 
 
 #' Check prior-likelihood sensitivity using powerscaling
-draws_2 <- fit_2$draws(format = "df") |>
-  mutate(prevalence = p,
-         specificity = spec,
-         sensitivity = sens)
 powerscale_sensitivity(fit_2)
 #| label: fig-specificity_priorsense_x
 powerscale_plot_dens(
-  draws_2,
+  fit_2,
   variables = c("p", "spec", "sens"),
   lower_alpha = 0.5,
   help_text = FALSE
@@ -219,7 +239,7 @@ powerscale_sensitivity(fit_3a, variable = c("p", "sens", "spec")) |>
 #| fig-height: 6.5
 #| fig-width: 12
 powerscale_plot_dens(
-  draws_3a,
+  fit_3a,
   variables = c("p", "spec[1]", "sens[1]"),
   lower_alpha = 0.5,
   help_text = FALSE
@@ -233,10 +253,10 @@ powerscale_plot_dens(
 #' Compute posterior using data from @Bendavid-Mulaney-Sood-etal:2020b
 #' 27 April 2020 and stronger priors
 #' 
-#| label: fit_3b
-#| results: hide
 santaclara_data$logit_spec_prior_scale <- 0.3
 santaclara_data$logit_sens_prior_scale <- 0.3
+#| label: fit_3b
+#| results: hide
 #' MCMC gets sometimes stuck on minor mode, so we initialize with Pathfinder
 pth_3b <- sc_model_hierarchical$pathfinder(
   data = santaclara_data,
