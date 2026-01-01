@@ -27,7 +27,7 @@
 #' # Introduction
 #'
 #' Intro text
-#' 
+#'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
   cache = FALSE,
@@ -38,7 +38,7 @@ knitr::opts_chunk$set(
   out.width = "95%"
 )
 
-#' 
+#'
 #' **Load packages**
 #| cache: FALSE
 library(rprojroot)
@@ -69,7 +69,7 @@ cstan <- function(f, data = list(), seed = 123, chains = 4) {
   )
   return(fit)
 }
-dens <- function(x, adj = 0.5, norm.comp = FALSE, main = "", 
+dens <- function(x, adj = 0.5, norm.comp = FALSE, main = "",
                  show.HPDI = FALSE, add = FALSE, ...) {
   thed <- density(x, adjust = adj)
   if (add == FALSE) {
@@ -104,9 +104,9 @@ dat <- list(N = nrow(d),
 n <- 100
 idx <- sample(1:dat$N, size = n)
 ymax <- max(dat$days[idx])
-plot(NULL, xlim = c(0, ymax), ylim = c(1, n), 
+plot(NULL, xlim = c(0, ymax), ylim = c(1, n),
      xlab = "Days observed", ylab = "Cat")
-for (i in 1:n) { 
+for (i in 1:n) {
   j <- idx[i]
   cat_color <- ifelse(dat$color[j] == 1, "black", "orange")
   lines(c(0, dat$days[j]), c(i, i), lwd = 4, col = cat_color)
@@ -117,12 +117,12 @@ for (i in 1:n) {
 
 #' ggplot version
 #| label: fig-gg-cats-data
-d[sample(dat$N, 100), ] |> 
+d[sample(dat$N, 100), ] |>
   ggplot(aes(y = seq_along(days), x = days, color = factor(color))) +
   geom_segment(aes(yend = seq_along(days), xend = 0), size = 1) +
   geom_point(aes(shape = factor(adopted)), size = 3) +
   scale_shape_manual(values = c(1, 16), labels = c("Other", "Adopted")) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
   labs(y = "Cat", x = "Days observed", color = "Color", shape = "Event") +
   coord_cartesian(expand = c(left = FALSE))
 
@@ -159,11 +159,11 @@ sim_cats1 <- function(n = 10, p = c(0.1, 0.2)) {
 #' Simulate using the generative model
 synth_cats <- sim_cats1(1e3)
 
-#' Plot empirical K-M curves 
+#' Plot empirical K-M curves
 #| label: fig-cats-km-curves
 sfit <- survfit(Surv(days, adopted) ~ color, data = synth_cats)
-plot(sfit, lty = 1, lwd = 3, col = c("black", "orange"), 
-     xlab = "Days", ylab = "Proportion un-adopted") 
+plot(sfit, lty = 1, lwd = 3, col = c("black", "orange"),
+     xlab = "Days", ylab = "Proportion un-adopted")
 
 #' Plot empirical K-M curves using ggplot
 #| label: fig-gg-cats-km-curves
@@ -176,7 +176,7 @@ synth_cats |>
   geom_step(linewidth = 1) +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
   labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
 
@@ -189,7 +189,7 @@ n <- 12
 sim_prior <- replicate(n, rbeta(2, 1, 10))
 #| label: fig-prior-predictive-1
 # rethinking::blank2(w=1.2)
-plot(NULL, xlab = "Days", ylab = "Proportion un-adopted", 
+plot(NULL, xlab = "Days", ylab = "Proportion un-adopted",
      xlim = c(0, 50), ylim = c(0, 1))
 mtext("Prior predictive distribution")
 for (i in 1:n) {
@@ -202,7 +202,7 @@ for (i in 1:n) {
 #| label: fig-gg-prior-predictive-1
 #| fig-height: 3.5
 #| fig-width: 6
-lapply(1:n, \(i) sim_cats1(n = 1e3, p = sim_prior[, i]) |> 
+lapply(1:n, \(i) sim_cats1(n = 1e3, p = sim_prior[, i]) |>
          as.data.frame() |> mutate(sim = i)) |>
   bind_rows() |>
   survfit2(formula = Surv(days, adopted) ~ color + sim, data = _) |> # ggsurvfit version
@@ -213,7 +213,7 @@ lapply(1:n, \(i) sim_cats1(n = 1e3, p = sim_prior[, i]) |>
   geom_step() +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
   labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
 #' Test the first model code using simulated data
@@ -228,7 +228,7 @@ print(fit1s)
 #' Posterior with simulated data
 #| label: fig-post1-sim
 post1s <- fit1s$draws(format = "df")
-plot(density(post1s$`p[1]`), lwd = 3, xlab = "Probability of adoption", 
+plot(density(post1s$`p[1]`), lwd = 3, xlab = "Probability of adoption",
      xlim = c(0.07, 0.2), main = "")
 k <- density(post1s$`p[2]`)
 lines(k$x, k$y, lwd = 3, col = "orange")
@@ -274,7 +274,7 @@ for (i in 1:n) {
 #| label: fig-gg-post1-km
 #| fig-height: 3.5
 #| fig-width: 6
-lapply(1:n, \(i) sim_cats1(n = 1e3, p = post1[i, c("p[1]", "p[2]")]) |> 
+lapply(1:n, \(i) sim_cats1(n = 1e3, p = post1[i, c("p[1]", "p[2]")]) |>
          as.data.frame() |> mutate(sim = i)) |>
   bind_rows() |>
   survfit2(formula = Surv(days, adopted) ~ color + sim, data = _) |> # ggsurvfit version
@@ -285,7 +285,7 @@ lapply(1:n, \(i) sim_cats1(n = 1e3, p = post1[i, c("p[1]", "p[2]")]) |>
   geom_step(alpha = 0.5) +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
   labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
 #' ## Add observation (censoring) model
@@ -343,7 +343,7 @@ print(fit1s)
 
 #| label: fig-post1-sim2
 post1s <- fit1s$draws(format = "df")
-dens(post1s$`p[1]`, lwd = 3, xlab = "Probability of adoption", 
+dens(post1s$`p[1]`, lwd = 3, xlab = "Probability of adoption",
      xlim = c(0, 0.06), ylim = c(0, 170))
 dens(post1s$`p[2]`, add = TRUE, lwd = 3, col = "orange")
 abline(v = 0.01, lwd = 2); abline(v = 0.02, lwd = 2, col = "orange")
@@ -405,7 +405,7 @@ lapply(1:n, \(i) sim_cats1(n = 1e3, p = post2[i, c("p[1]", "p[2]")]) |>
   geom_step(alpha = 0.5) +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
+  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
   labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
 #' ## Model that uses parameters for censored observations
@@ -424,7 +424,7 @@ print(fit3s)
 #' Model that uses Poisson count outcomes instead of duration outcomes
 #' to handle censoring. This depends upon constant hazard function
 #' though?
-#' 
+#'
 
 cat_code4 <- root("cat_adoptions", "adoptions_poisson.stan")
 writeLines(readLines(cat_code4))
@@ -480,20 +480,20 @@ sim_cats2 <- function(n = 1e3, p = c(0.01, 0.02), cens = 50) {
   return(list(N = n, days = days, color = color, adopted = adopted))
 }
 prior_days <- sapply(1:n, function(i) sim_cats2(1, p = c(p1[i], p2[i]))$days)
-plot(prior_days, xlab = "simulated cat", ylab = "days", 
+plot(prior_days, xlab = "simulated cat", ylab = "days",
      pch = ifelse(prior_days == 50, 1, 16))
 
 #' ## Posterior predictive distribution
-#' 
+#'
 #' Sample from posterior, simulate observations.
 #' Problem with this example: need to impute censored values
 #' so we'll simulate Kaplan-Meier curves to compare to empirical curve.
 
-#' Plot empirical K-M curves 
+#' Plot empirical K-M curves
 #| label: fig-km-2
 sfit <- survfit(Surv(days, adopted) ~ color, data = dat)
-plot(sfit, lty = 1, lwd = 0.1, col = c("black", "orange"), xlim = c(0, 90), 
-     xlab = "Days", ylab = "Proportion un-adopted") 
+plot(sfit, lty = 1, lwd = 0.1, col = c("black", "orange"), xlim = c(0, 90),
+     xlab = "Days", ylab = "Proportion un-adopted")
 
 #' Simulate and draw
 # n <- 12
