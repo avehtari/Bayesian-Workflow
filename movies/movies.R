@@ -1,6 +1,6 @@
 #' ---
 #' title: "Simulated data of movie ratings"
-#' author: "Andrew Gelman"
+#' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2022-08-15
 #' date-modified: today
 #' date-format: iso

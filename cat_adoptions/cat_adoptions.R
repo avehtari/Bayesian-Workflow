@@ -1,6 +1,6 @@
 #' ---
 #' title: "Survival Analysis and Black Cat Adoptions"
-#' author: "Richard McElreath"
+#' author: "Richard McElreath and Aki Vehtari"
 #' date: 2025-12-27
 #' date-modified: today
 #' date-format: iso
@@ -128,7 +128,7 @@ d[sample(dat$N, 100), ] |>
   scale_shape_manual(values = c(1, 16), labels = c("Other", "Adopted")) +
   scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) + 
   labs(y = "Cat", x = "Days observed", color = "Color", shape = "Event") +
-  coord_cartesian(expand = c(TRUE,TRUE,TRUE,FALSE))
+  coord_cartesian(expand = c(left = FALSE))
 
 #' # Generative models
 #'
