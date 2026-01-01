@@ -20,7 +20,10 @@
 #'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
+#' 
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 18 *Predictive model checking and comparison:  Clinical trial*.
+#' 
 #' # Introduction
 #' 
 #' This notebook was inspired by [a question by Llew Mills in Stan
