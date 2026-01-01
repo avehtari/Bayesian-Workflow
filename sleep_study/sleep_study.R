@@ -1,5 +1,5 @@
 #' ---
-#' title: "Sleepstudy: Prior Specification and model checking"
+#' title: "Sleepstudy: Prior specification and model checking"
 #' author: "Paul Bürkner and Aki Vehtari"
 #' date: 2025-10-22
 #' date-modified: today
@@ -56,7 +56,7 @@ options(future.globals.maxSize = 1e9)
 library(priorsense)
 options(priorsense.plot_help_text = FALSE)
 
-#' # Main Story and Messages
+#' # Main story and messages
 #'
 #' Prior distributions are at the heart of Bayesian statistics and are
 #' mentioned as one of its defining features in almost all
@@ -69,7 +69,7 @@ options(priorsense.plot_help_text = FALSE)
 #' research directions to make prior specification easier for
 #' everyone.
 #' 
-#' Main Messages:
+#' Main messages:
 #' 
 #' - Priors specification can follow different purposes.
 #' - Prior specification is hard for everyone, as is statistical modeling in general.
@@ -77,7 +77,7 @@ options(priorsense.plot_help_text = FALSE)
 #' - We need a lot of further research in the areas of prior specification and elicitation.
 #' 
 #' 
-#' ## The Sleepstudy Data
+#' ## The sleep study data
 #' 
 #' Reasons for choosing the `sleepstudy` data set:
 #' 
@@ -111,7 +111,7 @@ sleepstudy |>
   labs(y = "Reaction time (ms)")
 #ggsave("plots/sleepstudy_data.pdf", height = 4, width = 8)
 
-#' ## Simple Linear Model
+#' ## Simple linear model
 #'
 #' Prior base
 prior_lin_base <- prior(normal(200, 100), class = b, coef = "Intercept") +
@@ -141,7 +141,7 @@ plot(conditional_effects(fit_lin_base), points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
   
 
-#' ## Simple Linear Model (centered predictors)
+#' ## Simple linear model (centered predictors)
 #' 
 #' Points to discuss:
 #' 
@@ -208,7 +208,7 @@ powerscale_plot_dens(fit1, variable = c("b_Intercept", "b_Days", "sigma"),
                      component = "prior")
 ## ggsave("plots/sleep_priorsense_weak.pdf", width = 7, height = 3)
 
-#' ## Simple Linear Model (informative priors)
+#' ## Simple linear model (informative priors)
 #' 
 #' Points to discuss:
 #' 
@@ -248,7 +248,7 @@ powerscale_plot_dens(fit2, variable = c("b_Intercept", "b_Days", "sigma"),
                      component = "prior")
 ## ggsave("plots/sleep_priorsense_strong.pdf", width = 7, height = 3)
 
-#' ## Simple Linear Model (informative priors with fat tails)
+#' ## Simple linear model (informative priors with fat tails)
 #' 
 #' Points to discuss:
 #' - tails of the priors (normal vs. student-t)
@@ -306,7 +306,7 @@ data.frame(
 #' Compute CI-bound for an exponential prior:
 qexp(c(0.025, 0.975), 0.02)
 
-#' ## Linear Varying Intercept Model
+#' ## Linear varying intercept model
 #' 
 #' Points to discuss:
 #' 
@@ -347,7 +347,7 @@ plot(conditional_effects(fit3, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-#' ## Linear Varying Intercept and Slope Model
+#' ## Linear varying intercept and slope model
 #' 
 #' Points to discuss:
 #' 
@@ -416,7 +416,7 @@ data.frame(x = rep(seq(-0.999, 0.999, 0.001), 3)) |>
   xlab(expression(rho))
 ## ggsave("plots/LKJ_1_density.pdf", height = 2.5, width = 5)
 
-#' ## Log-Linear Prior-Only Model
+#' ## Log-Linear prior-only model
 #'
 #' Reuse priors from the normal linear model: Prior ln1
 prior_ln1 <- prior(normal(250, 100), class = Intercept) +
@@ -520,7 +520,7 @@ powerscale_plot_dens(fit_ln2, variable = c("b_Intercept", "b_Days", "sigma"),
                      component = "prior")
 ## ggsave("plots/sleep_priorsense_ln_reg.pdf", width = 7, height = 3)
 
-#' ## Log-Linear Varying Intercept and Slope Model
+#' ## Log-linear varying intercept and slope model
 #' 
 #' Points to discuss:
 #' 
@@ -598,7 +598,7 @@ powerscale_plot_dens(fit5, variable = vars5, component = "prior")
 #' having a little better predictive performance.
 loo(fit4, fit5)
 
-#' ## Log-Linear Distributional Multilevel Model
+#' ## log-linear distributional multilevel model
 
 #' ## Points to discuss:
 #'
@@ -643,7 +643,7 @@ plot(conditional_effects(fit6, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-## ## Exgaussian Distributional Multilevel Model
+## ## Exgaussian distributional multilevel model
 
 #' ## Points to discuss:
 #'
@@ -690,8 +690,8 @@ plot(conditional_effects(fit7, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-## ## Exgaussian Distributional Multilevel Model (default priors)
-
+#' ## Exgaussian distributional multilevel model (default priors)
+#' 
 #' Points to discuss:
 #' 
 #' - some parameters are better informed by the data than others
@@ -722,7 +722,7 @@ plot(conditional_effects(fit8, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-#' ## Exgaussian Distributional Multilevel Model (flat priors)
+#' ## Exgaussian distributional multilevel model (flat priors)
 #' 
 #' Points to discuss:
 #'
@@ -789,7 +789,7 @@ pp_check(fit4, type = "loo_intervals") +
 #' There are clearly some outliers.
 #'
 #' Create varying intercept (fit3t) and varying intercept and slope
-#' (fit4t) models with Student's t data model
+#' (fit4t) models with Student's $t$ data model
 #| results: hide
 #| cache: true
 fit3t <- update(fit3, family = student())
@@ -818,21 +818,21 @@ pp_check(fit4, type = "loo_pit_ecdf", ndraws = 4000) +
 
 #' We see that normal and log-normal models have too wide predictive
 #' distribution for most observations, which is due to a few outliers
-#' inflating the residual scale. LOO-PIT plot for Student's t model
+#' inflating the residual scale. LOO-PIT plot for Student's $t$ model
 #' looks better.
 
-#' Compare normal and Student's t models
+#' Compare normal and Student's $t$ models
 loo_compare(fit4, fit4t)
 
-#' Student's t model has much better predictive performance.
+#' Student's $t$ model has much better predictive performance.
 #' 
 #' Examine how much adding varying slope improved predictive performance in case of normal data model:
 loo_compare(fit3, fit4)
 
 #' Examine how much adding varying slope improved predictive
-#' performance in case of Student's t data model:
+#' performance in case of Student's $t$ data model:
 loo_compare(fit3t, fit4t)
 
-#' When using Student's t model, the predictive performance difference
+#' When using Student's $t$ model, the predictive performance difference
 #' between not using or using varying slope is bigger.
 #' 
