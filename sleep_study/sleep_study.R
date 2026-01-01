@@ -20,7 +20,11 @@
 #'     anchor-sections: true
 #'     html-math-method: katex
 #' ---
-
+#' 
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 17 *Prior specification for regression models: Reanalysis
+#' of sleep study*.
+#'
 #' # Setup  {.unnumbered}
 #' 
 #+ setup, include=FALSE
