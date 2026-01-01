@@ -1,5 +1,5 @@
 #' ---
-#' title: "Survival Analysis and Black Cat Adoptions"
+#' title: "Survival analysis and black cat adoptions"
 #' author: "Richard McElreath and Aki Vehtari"
 #' date: 2025-12-27
 #' date-modified: today
@@ -22,7 +22,7 @@
 #' ---
 #'
 #' This notebook includes the code for the Bayesian Workflow book
-#' Chapter 19 *Incremental development and testing: Black cat adoptions*
+#' Chapter 22 *Incremental development and testing: Black cat adoptions*
 #'
 #' # Introduction
 #'
