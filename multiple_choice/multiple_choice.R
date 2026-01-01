@@ -1,5 +1,5 @@
 #' ---
-#' title: "Sensitivity and specificity in coronavirus testing"
+#' title: "Modeling performance on a multiple choice exam"
 #' author: "Andrew Gelman"
 #' date: 2022-08-22
 #' date-modified: today
