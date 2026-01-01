@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -56,6 +57,18 @@ library(patchwork)
 library(dplyr)
 set.seed(1234)
 
+print_stan_code <- function(code) {
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
+
 #' # Model for two movies
 y_1 <- c(3, 5)
 y_2 <- rep(c(2, 3, 4, 5), c(10, 20, 30, 40))
@@ -65,7 +78,8 @@ movie <- rep(c(1, 2), c(length(y_1), length(y_2)))
 movie_data <- list(y = y, N = N, movie = movie)
 mod_1 <- cmdstan_model(root("movies", "ratings_1.stan"))
 #' Stan model code
-mod_1
+#| results: asis
+print_stan_code(mod_1$code())
 #' Sample
 #| label: fit_1
 #| results: hide
@@ -83,7 +97,8 @@ y <- rnorm(N, theta[movie], 2.0)
 movie_data <- list(y = y, N = N, J = J, movie = movie)
 mod_2 <- cmdstan_model(root("movies", "ratings_2.stan"))
 #' Stan model code
-mod_2
+#| results: asis
+print_stan_code(mod_2$code())
 
 #' Sample
 #| label: fit_2
@@ -179,7 +194,8 @@ y <- rnorm(N, mu + sigma_a * alpha[movie] - sigma_b * beta[rater], sigma_y)
 data_3 <- list(N = N, J = J, K = K, movie = movie, rater = rater, y = y)
 mod_3 <- cmdstan_model(root("movies", "ratings_3.stan"))
 #' Stan model code
-mod_3
+#| results: asis
+print_stan_code(mod_3$code())
 #' Sample
 #| label: fit_3
 #| results: hide
