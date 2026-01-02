@@ -12,6 +12,8 @@
 #'     toc-location: left
 #'     number-sections: true
 #'     smooth-scroll: true
+#'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
