@@ -836,7 +836,7 @@ ratio_zinb |>
   ggplot(aes(x = ratio)) +
   stat_dots(quantiles = 100) +
   stat_slab(density = "unbounded", trim = FALSE, fill = NA, color = "gray") +
-  coord_cartesian(expand = FALSE) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
@@ -881,7 +881,7 @@ ratio_zinb |>
             fill = NA, color = clr[3], alpha = 0.6) +
   labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
-  coord_cartesian(expand = FALSE) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
   xlim(c(0, 1)) +
   geom_vline(xintercept = 1, linetype = "dotted") +
