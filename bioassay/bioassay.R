@@ -21,14 +21,19 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #'
-#' The code for Bioassay example illustrating some tools for a simple
-#' Bayesian workflow. See Chapter 3 in Bayesian Workflow book.
-#' 
-
+#' This notebook includes the code for Bayesian Workflow book section
+#' 3.5 "A simple example of probabilistic programming".
+#'
+#' # Introduction
+#'
+#' We demonstrate the role of statistical programming environments and
+#' probabilistic programming by going through the steps of data
+#' analysis and computation in the context of a simple example.
+#'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)
 
-#' #### Load packages {.unnumbered}
+#' *Load packages*
 #| cache: FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
@@ -44,11 +49,23 @@ library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
 library(marginaleffects)
 
-#' ## Data
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
+#' # Bioassay data
 #'
 #' Read the data from csv
 # df_bioassay <- read.csv("bioassay/data/bioassay.csv")
-#' 
+#'
 #' Data as data frame
 df_bioassay <- data.frame(
   dose = c(-0.86, -0.30, -0.05, 0.73),
@@ -80,11 +97,12 @@ bioassay_data <- with(df_bioassay,
                            N = batch_size,
                            y = deaths))
 
-#' ## Stan model and inference
-#' 
+#' # Stan models and inference
+#'
 #' Stan model 0 (without priors)
 bioassay_stan_file <- root("bioassay","bioassay0.stan")
-writeLines(readLines(bioassay_stan_file))
+#| output: asis
+print_stan_file(bioassay_stan_file)
 
 #' Compile the Stan model code using pedantic mode
 #| label: mod0
@@ -92,7 +110,8 @@ mod0 <- cmdstan_model(bioassay_stan_file, pedantic = TRUE)
 
 #' Stan model 1 (with priors)
 bioassay_stan_file <- root("bioassay","bioassay1.stan")
-writeLines(readLines(bioassay_stan_file))
+#| output: asis
+print_stan_file(bioassay_stan_file)
 
 #' Compile the updated Stan model code using pedantic mode
 #| label: mod1
@@ -100,9 +119,10 @@ mod1 <- cmdstan_model(bioassay_stan_file, pedantic = TRUE)
 
 #' Sample with default settings (expect no progress output)
 #| label: fit1
+#| results: hide
 fit1 <- mod1$sample(data = bioassay_data, refresh = 0)
 
-#' ## Posterior summary
+#' # Posterior summary
 #'
 #' Posterior summary and MCMC diagnostics
 fit1
@@ -144,20 +164,20 @@ draws1 |>
                 linewidth = 1) +
   labs(x = "Dose log(g/ml)", y = "Pr(death)")
 
-#' ## Derived quantities
-#' 
+#' # Derived quantities
+#'
 #' Compute posterior draws for LD50 in log(g/ml) and in mg/ml
 draws1 <- draws1 |>
   mutate_variables(LD50_log_g_ml = -a / b,
-                   LD50_mg_ml = 1000 * exp(LD50_log_g_ml)) 
+                   LD50_mg_ml = 1000 * exp(LD50_log_g_ml))
 
 #' Alternatively using base R (as posterior package draws object is
 #' more than just plain data frame, it is better to use
 #' `mutate_variables()`, which will also work for all other posterior
 #' draws objects (`draws_list`, `draws_array`, `draws_rvars`))
-#' 
+#'
 #| eval: false
-draws1$LD50_log_g_ml <- -draws1$a /  draws1$b 
+draws1$LD50_log_g_ml <- -draws1$a /  draws1$b
 draws1$LD50_mg_ml <- 1000 * exp(draws1$LD50_log_g_ml)
 
 #' Summarise LD50 posterior
@@ -179,24 +199,27 @@ ggplot_LD50_mg_ml <-
                                         ticks = element_blank(),
                                         title = element_blank())
 
-#' Quantile dot plot of the LD50 (mg/ml) posterior 
+#' Quantile dot plot of the LD50 (mg/ml) posterior
 #| label: fig-bioassay-LD50-quantile-dots
 #| fig-height: 4
 #| fig-width: 8
 ggplot_LD50_mg_ml +
-  stat_dots(data = draws1, quantiles = 100)
+  stat_dots(data = draws1, quantiles = 100) +
+  coord_cartesian(expand = c(bottom = FALSE))
 
-#' Kernel density plot of the LD50 (mg/ml) posterior 
+#' Kernel density plot of the LD50 (mg/ml) posterior
 #| label: fig-bioassay-LD50-KDE
 #| fig-height: 4
 #| fig-width: 8
 ggplot_LD50_mg_ml +
-  stat_slab(data = draws1, color = "gray", fill = NA)
+  stat_slab(data = draws1, color = "gray", fill = NA) +
+  coord_cartesian(expand = c(bottom = FALSE))
 
-#' ## brms model and inference
+#' # brms model and inference
 #'
-#' The same model with brms
+#' The same model with `brms`
 #| label: bfit1
+#| results: hide
 bfit1 <- brm(deaths | trials(batch_size) ~ dose,
              family = binomial(),
              prior = c(prior(normal(0, 5), class = Intercept),
@@ -227,17 +250,17 @@ bdraws1 |>
                 linewidth = 1) +
   labs(x = "Dose log(g/ml)", y = "Pr(death)")
 
-#' brms provides also shortcut for plotting the posterior mean and
-#' uncertainty. We use `plot=FALSE` to return a ggplot object, so that
-#' we can modify the axes labels.
+#' `brms` provides also shortcut for plotting the posterior mean and
+#' uncertainty. We use `plot=FALSE` and `[[1]]` to return a ggplot
+#' object, so that we can modify the axes labels.
 #| label: fig-bioassay-posterior-conditional_effects-brms
 #| fig-height: 4
 #| fig-width: 8
 p1 <- plot(conditional_effects(bfit1), plot=FALSE)[[1]] +
   labs(x = "Dose log(g/ml)", y = "Pr(death)")
-p1 
+p1
 
-#' We can add data points with ggplot::geom_point
+#' We can add data points with `ggplot::geom_point()`.
 #| label: fig-bioassay-posterior-conditional_effects-data-brms
 #| fig-height: 4
 #| fig-width: 8
@@ -257,13 +280,13 @@ p1 +
 p1 <- plot(conditional_effects(bfit1, spaghetti=TRUE, ndraws=20),
            plot=FALSE)[[1]] +
   labs(x = "Dose log(g/ml)", y = "Pr(death)")
-p1 
+p1
 
-#' marginaleffects package also provides function for plotting the
+#' `marginaleffects` package also provides function for plotting the
 #' posterior prediction and uncertainty. By default it predicts on the
 #' scale of actual outcome, but as all batch sizes are equal we can
 #' transform to the interval from 0 to 1. We need to add the observed
-#' proportions of deaths with geom_point().
+#' proportions of deaths with `geom_point()`.
 #| label: fig-bioassay-posterior-marginaleffects-brms
 #| fig-height: 4
 #| fig-width: 8
@@ -277,31 +300,36 @@ p2 <- marginaleffects::plot_predictions(bfit1,
              size = 3)
 p2
 
-#' The brms and marginaleffects plotting functions demonstrate that
+#' The `brms` and `marginaleffects` plotting functions demonstrate that
 #' often shortcut functions can provide quick plot or summary, but to
 #' have more control you may still need write more code to get what
 #' you really want.
-
-#' Compute posterior draws for LD50 in log(g/ml) and in mg/ml
+#'
+#' # LD50 posterior
+#'
+#' Compute posterior draws for lethal dose 50 (LD50) in log(g/ml) and
+#' in mg/ml
 bdraws1 <- bdraws1 |>
   mutate_variables(LD50_log_g_ml = -b_Intercept/b_dose,
-                   LD50_mg_ml = 1000 * exp(LD50_log_g_ml)) 
+                   LD50_mg_ml = 1000 * exp(LD50_log_g_ml))
 
-#' Summarise LD50 posterior
+#' Posterior summary
 bdraws1 |>
   subset_draws(variable = "LD50_log_g_ml") |>
   summarize_draws()
 
-#' Quantile dot plot of the LD50 (mg/ml) posterior 
+#' Quantile dot plot of the LD50 (mg/ml) posterior.
 #| label: fig-bioassay-LD50-quantile-dots-brms
 #| fig-height: 4
 #| fig-width: 8
 ggplot_LD50_mg_ml +
-  stat_dots(data = bdraws1, quantiles = 100)
+  stat_dots(data = bdraws1, quantiles = 100) +
+  coord_cartesian(expand = c(bottom = FALSE))
 
-#' Kernel density plot of the LD50 (mg/ml) posterior 
+#' Kernel density plot of the LD50 (mg/ml) posterior.
 #| label: fig-bioassay-LD50-KDE-brms
 #| fig-height: 4
 #| fig-width: 8
 ggplot_LD50_mg_ml +
-  stat_slab(data = bdraws1, color = "gray", fill = NA)
+  stat_slab(data = bdraws1, color = "gray", fill = NA) +
+  coord_cartesian(expand = c(bottom = FALSE))
