@@ -21,9 +21,9 @@
 #' bibliography: references.bib
 #' ---
 #'
-#' This notebook includes the code for Bayesian Workflow book chapter
-#' 30 "Computational challenge of multimodality: Differential equation
-#' for planetary motion".
+#' This notebook includes the code for Bayesian Workflow book Chapter
+#' 30 *Computational challenge of multimodality: Differential equation
+#' for planetary motion*.
 #'
 #' # Introduction
 #' 
