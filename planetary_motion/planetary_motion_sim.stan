@@ -16,7 +16,7 @@ functions {
   }
 }
 data {
-  int n;
+  int N;
   real<lower=0> sigma_x;
   real<lower=0> sigma_y;
 }
@@ -33,12 +33,12 @@ transformed data {
   real k = 1.0;
   
   // exact motion
-  array[n] real t;
-  for (i in 1 : n) {
-    t[i] = (i * 1.0) / 10;
+  array[N] real t;
+  for (n in 1 : N) {
+    t[n] = (n * 1.0) / 10;
   }
   array[2] real x_r = {m, k};
-  array[n] vector[n_coord * 2] y = ode_rk45(ode, y0, t0, t, m, k);
+  array[N] vector[n_coord * 2] y = ode_rk45(ode, y0, t0, t, m, k);
 }
 parameters {
   real phi;
@@ -47,7 +47,7 @@ model {
   phi ~ normal(0, 1);
 }
 generated quantities {
-  array[n, 2] real q_obs;
+  array[N, 2] real q_obs;
   
   q_obs[ : , 1] = normal_rng(y[ : , 1], sigma_x);
   q_obs[ : , 2] = normal_rng(y[ : , 2], sigma_y);
