@@ -1,0 +1,31 @@
+project:
+  type: website
+
+execute:
+  freeze: auto
+
+website:
+  title: "Bayesian Workflow book"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: casestudies.html
+        text: "Case studies"
+      - href: errata.html
+        text: Errata
+    right:
+      - icon: github
+        href: https://github.com/avehtari/Bayesian-Workflow
+        text: GitHub
+
+format:
+  html:
+    theme: readble
+    css: _styles.css
+    toc: true
+    toc-depth: 2
+    toc-location: left
+    smooth-scroll: true
+    embed-resources: true
+    anchor-sections: true
