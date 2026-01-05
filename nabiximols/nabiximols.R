@@ -20,7 +20,10 @@
 #'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
+#' 
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 18 *Predictive model checking and comparison:  Clinical trial*.
+#' 
 #' # Introduction
 #' 
 #' This notebook was inspired by [a question by Llew Mills in Stan
@@ -853,18 +856,19 @@ trt_effect_draws <- cu_df_b |>
   data_grid(group, week, cu_baseline = 28, id = 129, set = 28) |>
   add_epred_draws(fit_betabinomial2b, re_formula = NA, allow_new_levels = TRUE) |>
   compare_levels(.epred, by = group) |>
-  pivot_wider(names_from = c(group, week), values_from = .epred, names_sep = " week ") |>
-  select(!c(cu_baseline, id, set, .chain, .iteration)) |>
+  ungroup() |>
+  pivot_wider(names_from = c(group,week), values_from = .epred, names_sep = " week ") |>
+  select(!c(.chain,.iteration)) |>
   left_join(as_draws_df(log_lik_draws(fit_betabinomial2b)), by = ".draw") |>
+  left_join(as_draws_df(log_prior_draws(fit_betabinomial2b)), by = ".draw") |>
   as_draws_df() |>
-  bind_draws(log_prior_draws(fit_betabinomial2b)) |>
-  rename_variables(`nabiximols - placebo week  4` = `nabiximols - placebo week 4`,
-                   `nabiximols - placebo week  8` = `nabiximols - placebo week 8`,) |>
+  rename_variables(`nabiximols - placebo week  4`=`nabiximols - placebo week 4`,
+                   `nabiximols - placebo week  8`=`nabiximols - placebo week 8`,) |>
   subset_draws(variable = c("nabiximols - placebo week  4",
-                          "nabiximols - placebo week  8",
-                          "nabiximols - placebo week 12",
-                          "log_lik",
-                          "lprior"))
+                            "nabiximols - placebo week  8",
+                            "nabiximols - placebo week 12",
+                            "log_lik",
+                            "lprior"))
 
 #| label: fig-priorsense-diff-betabinomial2b
 trt_effect_draws |> powerscale_plot_dens(help_text = FALSE)

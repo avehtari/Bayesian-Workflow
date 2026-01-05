@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -21,7 +22,17 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' # Setup  {.unnumbered}
+#' This notebook includes the the code code for the Bayesian Workflow
+#' book Chapter 24 *Leave-one-out cross validation model checking and
+#' comparison: Roaches*.
+#' 
+#' 
+#' # Introduction
+#' 
+#' This case study demonstrates cross-validation model comparison, and
+#' posterior and cross-validation predictive checking of
+#' models. Furthermore the notebook demonstrates how to use integrated
+#' PSIS-LOO with varying intercept ("random effect") models.
 #' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
@@ -53,13 +64,19 @@ library(dplyr)
 library(tibble)
 library(reliabilitydiag)
 
-#' 
-#' # Introduction
-#' 
-#' This case study demonstrates cross-validation model comparison, and
-#' posterior and cross-validation predictive checking of
-#' models. Furthermore the notebook demonstrates how to use integrated
-#' PSIS-LOO with varying intercept ("random effect") models.
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
+#' # Data
 #' 
 #' The roaches data example comes from Chapter 8.3 of [Gelman and Hill
 #' (2007)](http://www.stat.columbia.edu/~gelman/arm/).
@@ -614,7 +631,8 @@ pp_check(fit_pvi, type = "loo_pit_ecdf")
 #' needed to get the correct LOO predictive distributions when
 #' combined with integrated PSIS-LOO.
 poisson_vi_int <- "poisson_vi_integrate.stan"
-writeLines(readLines(poisson_vi_int))
+#| output: asis
+print_stan_file(poisson_vi_int)
 
 #' We could also move the integrated likelihood to the model block and
 #' not use MCMC to sample the varying intercepts at all. This would
@@ -836,7 +854,7 @@ ratio_zinb |>
   ggplot(aes(x = ratio)) +
   stat_dots(quantiles = 100) +
   stat_slab(density = "unbounded", trim = FALSE, fill = NA, color = "gray") +
-  coord_cartesian(expand = FALSE) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
@@ -881,7 +899,7 @@ ratio_zinb |>
             fill = NA, color = clr[3], alpha = 0.6) +
   labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
-  coord_cartesian(expand = FALSE) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
   xlim(c(0, 1)) +
   geom_vline(xintercept = 1, linetype = "dotted") +

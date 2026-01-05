@@ -1,5 +1,5 @@
 #' ---
-#' title: "Stochastic Learning in Dogs"
+#' title: "Stochastic learning in dogs"
 #' author: "Aki Vehtari and Andrew Gelman"
 #' date: 2024-04-20
 #' date-modified: today
@@ -20,7 +20,10 @@
 #'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
+#' 
+#' This notebook includes the `brms` code code for the Bayesian Workflow book
+#' Chapter 18 *Posterior predictive checking: Stochastic learning in dogs*.
+#' 
 #' # Introduction
 #'
 #' This notebook is a remake of the Andrew Gelman's analysis of
@@ -30,7 +33,14 @@
 #' [@Buerkner:2017:brms] and add some further diagnostics.
 #'
 #+ setup, include=FALSE
-knitr::opts_chunk$set(cache=TRUE, message=FALSE, error=FALSE, warning=TRUE, comment=NA, out.width='95%')
+knitr::opts_chunk$set(
+  cache=FALSE,
+  message=FALSE,
+  error=FALSE,
+  warning=TRUE,
+  comment=NA,
+  out.width='95%'
+)
 
 #' **Load packages**
 #| cache: FALSE

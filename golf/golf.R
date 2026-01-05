@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -21,8 +22,9 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' # Setup  {.unnumbered}
-#' 
+#' This notebook includes the code for Bayesian Workflow book chapter
+#' 25 "Model building and expansion: Golf putting"
+#'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
   cache = FALSE,
@@ -43,8 +45,17 @@ options(mc.cores = 4)
 library(bayesplot)
 library(loo)
 library(posterior)
-print_file <- function(file) {
-  cat(paste(readLines(file), "\n", sep=""), sep="")
+
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
 }
 logit <- qlogis
 invlogit <- plogis
@@ -98,7 +109,8 @@ text(x + .4,
 #' \text{ for } j=1,\dots, J.
 #' $$
 #' In Stan, this is:
-print_file(root("golf", "golf_logistic.stan"))
+#| output: asis
+print_stan_file(root("golf", "golf_logistic.stan"))
 
 #' The code in the above model block is (implicitly) vectorized, so
 #' that it is mathematically equivalent to modeling each data point,
@@ -274,7 +286,8 @@ for (i in 1:length(sigma_degrees_plot)){
 #' space of $\sigma$, sampling from the posterior distribution.
 #'
 #' We now write the Stan model in preparation to estimating $\sigma$:
-print_file(root("golf", "golf_angle_binomial.stan"))
+#| output: asis
+print_stan_file(root("golf", "golf_angle_binomial.stan"))
 
 #' In the transformed data block above, the `./` in the calculation of
 #' p corresponds to componentwise division in this vectorized
@@ -458,7 +471,8 @@ arrows(0.5 * dist - 0.05, -1.5 * R_plot, 0, -1.5 * R_plot, 2, length = .1)
 #' write the new model in Stan, giving it the name
 #' `golf_angle_distance_binomial.stan` to convey that it accounts both
 #' for angle and distance:
-print_file(root("golf", "golf_angle_distance_binomial.stan"))
+#| output: asis
+print_stan_file(root("golf", "golf_angle_distance_binomial.stan"))
 
 #' The result is a model with two parameters, $\sigma_{\rm angle}$ and
 #' $\sigma_{\rm distance}$. Even this improved geometry-based model is
@@ -577,18 +591,19 @@ print(golf_new[1:5,])
 #'   is indicated using the `%*%` operator.
 #'
 #' We implement these via the following new code in the transformed data block:
-#' ```
+#' ```stan
 #'   vector[J] raw_proportions = to_vector(y) ./ to_vector(n);
 #' ```
 #' And then in the model block:
-#' ```
+#' ```stan
 #'   raw_proportions ~ normal(p, sqrt(p .* (1-p) ./ to_vector(n) + sigma_y^2));
 #' ```
 #'
 #' To complete the model we add $\sigma_y$ to the parameters block and
 #' assign it a weakly informative half-normal(0,1) prior
 #' distribution. Here's the new Stan program:
-print_file(root("golf", "golf_angle_distance_normal.stan"))
+#| output: asis
+print_stan_file(root("golf", "golf_angle_distance_normal.stan"))
 
 #' We now fit this model to the data:
 #| label: golf_angle_distance_normal.stan
@@ -686,7 +701,8 @@ lines(golf_new$x, posterior_mean_residual)
 #' to keep the probabilities bounded between 0 and 1. We added an
 #' error term on the logistic scale with a scale parameter, `sigma_eta`,
 #' estimated from the data.
-print_file(root("golf", "golf_angle_distance_binomial_with_logit_errors.stan"))
+#| output: asis
+print_stan_file(root("golf", "golf_angle_distance_binomial_with_logit_errors.stan"))
 
 #' We fit the model to the data:
 #| label: golf_angle_distance_binomial_with_logit_errors.stan
@@ -749,7 +765,8 @@ points(golf_new$x, golf_new$y/golf_new$n, pch = 20, col = "red")
 #' positive and less than 1. This eliminates the problem with the
 #' boundary and the need for the logit.  The prior distribution for
 #' `epsilon` keeps the errors under control.
-print_file(root("golf", "golf_angle_distance_binomial_with_proportional_errors.stan"))
+#| output: asis
+print_stan_file(root("golf", "golf_angle_distance_binomial_with_proportional_errors.stan"))
 
 #' We fit the model to the data:
 #| label: golf_angle_distance_binomial_with_proportional_errors.stan
@@ -943,18 +960,21 @@ gq_ll <- cmdstan_model(root("golf", "golf_log_lik.stan"))
 #' When calling generated quantities, we pass only the required variables which
 #' allowed us to write more compact Stan code for the `log_lik` computation.
 #| results: hide
-loo_6 <- gq_ll$generate_quantities(fit_6$draws(variables = c("sigma_epsilon",
-                                                             "p_angle",
-                                                             "p_distance")),
-                                   data = golf_new_data)$draws(variables = "log_lik") |> loo()
-loo_7 <- gq_ll$generate_quantities(fit_7$draws(variables = c("sigma_epsilon",
-                                                             "p_angle",
-                                                             "p_distance")),
-                                   data = golf_new_data)$draws(variables = "log_lik") |> loo()
-loo_8 <- gq_ll$generate_quantities(fit_8$draws(variables = c("sigma_epsilon",
-                                                             "p_angle",
-                                                             "p_distance")),
-                                   data = golf_new_data)$draws(variables = "log_lik") |> loo()
+loo_6 <- gq_ll$generate_quantities(
+  fit_6$draws(variables = c("sigma_epsilon",
+                            "p_angle",
+                            "p_distance")),
+  data = golf_new_data)$draws(variables = "log_lik") |> loo()
+loo_7 <- gq_ll$generate_quantities(
+  fit_7$draws(variables = c("sigma_epsilon",
+                            "p_angle",
+                            "p_distance")),
+  data = golf_new_data)$draws(variables = "log_lik") |> loo()
+loo_8 <- gq_ll$generate_quantities(
+  fit_8$draws(variables = c("sigma_epsilon",
+                            "p_angle",
+                            "p_distance")),
+  data = golf_new_data)$draws(variables = "log_lik") |> loo()
 
 #' As we have integrated out the `epsilon` parameters, the effective
 #' number of parameters match the number of remaining parameters,
@@ -987,5 +1007,5 @@ loo_compare(
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2019-2025, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2019-2025, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2019-2026, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2019-2026, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.

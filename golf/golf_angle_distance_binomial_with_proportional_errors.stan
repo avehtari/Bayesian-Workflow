@@ -20,8 +20,9 @@ parameters {
 }
 transformed parameters {
   vector[J] p_angle = 2*Phi(threshold_angle / sigma_angle) - 1;
-  vector[J] p_distance = Phi((distance_tolerance - overshot) ./ ((x + overshot)*sigma_distance)) -
-               Phi(-overshot ./ ((x + overshot)*sigma_distance));
+  vector[J] p_distance =
+    Phi((distance_tolerance - overshot) ./ ((x + overshot)*sigma_distance)) -
+    Phi(-overshot ./ ((x + overshot)*sigma_distance));
   vector[J] p = p_angle .* p_distance .* (1 - epsilon);
 }
 model {

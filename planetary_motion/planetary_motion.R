@@ -21,53 +21,10 @@
 #' bibliography: references.bib
 #' ---
 #'
-#' **Abstract**: The Bayesian model of planetary motion is a simple
-#' but powerful example that illustrates important concepts, as well
-#' as gaps, in prescribed modeling workflows. Our focus is on Bayesian
-#' inference using Markov chains Monte Carlo for a model based on an
-#' ordinary differential equations (ODE). Our example presents
-#' unexpected multimodality, causing our inference to be unreliable
-#' and what is more, dramatically slowing down our ODE
-#' integrators. What do we do when our chains do not mix and do not
-#' forget their starting points? Reasoning about the computational
-#' statistics at hand and the physics of the modeled phenomenon, we
-#' diagnose how the modes arise and how to improve our inference. Our
-#' process for fitting the model is iterative, starting with a
-#' simplification and building the model back up, and makes extensive
-#' use of visualization. We also illustrate the benefits of Pathfinder
-#' algorithm in case of multimodal posterior.
-#' 
-#' # Setup  {.unnumbered}
-#' 
-#+ setup, include=FALSE
-knitr::opts_chunk$set(
-  cache = FALSE,
-  message = FALSE,
-  error = FALSE,
-  warning = FALSE,
-  comment = NA,
-  out.width = '95%'
-)
-#' 
-#' **Load packages**
-#| cache: false
-library(rprojroot)
-root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library(cmdstanr)
-library(posterior)
-library(ggplot2)
-library(dplyr)
-library(plyr)
-library(tidyr)
-library(boot)
-library(latex2exp)
-dir.create(root("planetary_motion","saved_fit"))
-source(root("planetary_motion", "tools.R"))
-library(bayesplot)
-bayesplot::color_scheme_set("viridisC")
-theme_set(bayesplot::theme_default(base_family = "sans"))
-set.seed(1954)
-
+#' This notebook includes the code for Bayesian Workflow book chapter
+#' 30 "Computational challenge of multimodality: Differential equation
+#' for planetary motion".
+#'
 #' # Introduction
 #' 
 #' As developers of statistical software^[One of the software we work
@@ -119,7 +76,47 @@ set.seed(1954)
 #' presentation, we try to distinguish generalizable methods,
 #' problem-specific steps, and shortcoming in existing defaults.
 #' 
+#' # Setup  {.unnumbered}
+#+ setup, include=FALSE
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = '95%'
+)
 #' 
+#' **Load packages**
+#| cache: false
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(cmdstanr)
+library(posterior)
+library(ggplot2)
+library(dplyr)
+library(plyr)
+library(tidyr)
+library(boot)
+library(latex2exp)
+dir.create(root("planetary_motion","saved_fit"))
+source(root("planetary_motion", "tools.R"))
+library(bayesplot)
+bayesplot::color_scheme_set("viridisC")
+theme_set(bayesplot::theme_default(base_family = "sans"))
+set.seed(1954)
+
+print_stan_code <- function(code) {
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 #' # Building the model
 #' 
 #' Consider a simple star-planet system.  We assume the star is much
@@ -163,12 +160,17 @@ set.seed(1954)
 #' At $t = 0$, $q_0 = (1, 0)$ and $p_0 = (0, 1)$,
 #' and we set $k = 1$.
 #| results: hide
-mod_sim <- cmdstan_model(root("planetary_motion","planetary_motion_sim.stan"))
-n <- 40
+mod_sim <- cmdstan_model(root("planetary_motion", "planetary_motion_sim.stan"))
+#| output: asis
+print_stan_code(mod_sim$code())
+
+
+N <- 40
 sigma <- 0.01
 #| label: sim
+#| results: hide
 sim <- mod_sim$sample(
-  data = list(n = n, sigma_x = sigma, sigma_y = sigma),
+  data = list(N = N, sigma_x = sigma, sigma_y = sigma),
   chains = 1,
   iter_warmup = 1,
   iter_sampling = 2,
@@ -176,7 +178,7 @@ sim <- mod_sim$sample(
 )
 simulation <- as.vector(sim$draws(variables = "q_obs")[1, , ])
 
-q_obs <- array(NA, c(n, 2))
+q_obs <- array(NA, c(N, 2))
 q_obs[, 1] <- simulation[1:40]
 q_obs[, 2] <- simulation[41:80]
 #| label: fig-sim
@@ -191,7 +193,7 @@ ggplot(data = data.frame(q_x = q_obs[, 1],
            label = "t=1", hjust = 1) +
   annotate(geom = "text", x = q_obs[40, 1] + 0.05, y = q_obs[40, 2], 
            label = "t=40", hjust = 0)
-1
+
 #' 
 #' # Fitting a simple model and diagnosing inference
 #'
@@ -224,12 +226,16 @@ ggplot(data = data.frame(q_x = q_obs[, 1],
 #' $$
 #' 
 #' We fit 8 chains in parallel.
+stan_data1 <- list(N = N, q_obs = q_obs)
 chains <- 8
+#| results: hide
+mod1 <- cmdstan_model(root("planetary_motion", "planetary_motion.stan"))
+#| output: asis
+print_stan_code(mod1$code())
 #| label: fit1
 #| eval: false
-mod1 <- cmdstan_model(root("planetary_motion","planetary_motion.stan"))
 fit1 <- mod1$sample(
-  data = list(n = n, q_obs = q_obs),
+  data = stan_data1,
   chains = chains,
   parallel_chains = chains,
   iter_warmup = 500,
@@ -237,10 +243,10 @@ fit1 <- mod1$sample(
   seed = 123,
   save_warmup = TRUE
 )
-fit1$save_object(file = root("planetary_motion/saved_fit","fit1.RDS"))
+fit1$save_object(file = root("planetary_motion/saved_fit", "fit1.RDS"))
 
 #' The inference takes a while to run, so we read in the saved output.
-fit1 <- readRDS(root("planetary_motion/saved_fit","fit1.RDS"))
+fit1 <- readRDS(root("planetary_motion/saved_fit", "fit1.RDS"))
 print(fit1$time(), digits = 2)
 
 #' 
@@ -295,7 +301,7 @@ mcmc_trace(fit1$draws(), pars = c("lp__", "k"))
 #| label: fig-ppc
 #| fig-height: 6
 #| fig-width: 6
-data_pred <- data.frame(q_obs, 1:n)
+data_pred <- data.frame(q_obs, 1:N)
 names(data_pred) <- c("qx", "qy", "t")
 ppc_plot2D(fit1, data_pred = data_pred)
 
@@ -583,15 +589,12 @@ ggplot() +
 #' MCMC. Pathfinder has its limitations, too, but in those cases it
 #' ``fails fast''.
 #'
-#| label: fit1p
-#| results: hide
-mod1 <- cmdstan_model(root("planetary_motion","planetary_motion.stan"))
-stan_data1 <- list(n = n, q_obs = q_obs)
-
 #' We run the Pathfinder with 40 paths to find many modes. We usually
 #' need fewer than 100 L-BFGS iterations. To illustrate the robustness of
 #' the Pathfinder algorithm we use Stan's default initialization which
 #' above was shown to be bad for MCMC.
+#| label: fit1p
+#| results: hide
 pth1p <- mod1$pathfinder(
   data = stan_data1,
   num_paths = 40,
@@ -725,13 +728,10 @@ ggplot(data = data.frame(star_x = star_data[, 1],
   ylab(TeX("$q_*^y$")) +
   labs(fill = "log likelihood")
 
-
-#' 
 #' These figures support our conjecture and, along with the log
 #' posterior and the posterior predictive checks, suggest the modes
 #' are mathematical artifacts, much like to ones we have previously
 #' probed.
-#' 
 #' 
 #' ## Fitting the model
 #' 
@@ -739,12 +739,16 @@ ggplot(data = data.frame(star_x = star_data[, 1],
 #' need fewer than 100 L-BFGS iterations. To illustrate the robustness of
 #' the Pathfinder algorithm we use Stan's default initialization which
 #' above was shown to be bad for MCMC.
+#| results: hide
+mod2 <- cmdstan_model(root("planetary_motion", "planetary_motion_star.stan"))
+#| output: asis
+print_stan_code(mod2$code())
+
+N_select <- 40
+time <- (1:N_select) / 10
+stan_data2 <- list(N = N_select, q_obs = q_obs, time = time, sigma = sigma)
 #| label: pth2
 #| results: hide
-mod2 <- cmdstan_model(root("planetary_motion","planetary_motion_star.stan"))
-n_select <- 40
-time <- (1:n_select) / 10
-stan_data2 <- list(n = n_select, q_obs = q_obs, time = time, sigma = sigma)
 pth2 <- mod2$pathfinder(
   data = stan_data2,
   num_paths = 40,
@@ -777,7 +781,6 @@ fit2p$summary(
   "mean", "sd", "rhat", "ess_bulk", "ess_tail"
 )
 
-
 #' Posterior predictive checks look good for all chains!
 #| label: fig-ppc-fit2p
 #| fig-height: 6
@@ -786,7 +789,7 @@ ppc_plot2D(fit2p, data_pred = data_pred, plot_star = TRUE)
 
 #' 
 #' 
-#' # Discussion and lessons learned  {-#sec6}
+#' # Discussion and lessons learned
 #' 
 #' When we fail to fit a model, examining a simplified model can help
 #' us understand the challenges that frustrate our inference

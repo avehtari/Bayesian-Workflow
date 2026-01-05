@@ -1,0 +1,32 @@
+/* Clear backgrounds applied directly to the code element */
+code.sourceCode.stan {
+  background: transparent !important;
+}
+
+/* Clear backgrounds on the pre wrapper (common source of the gray) */
+pre.sourceCode.stan {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* If the language class is only on <code> and not on <pre>,
+   clear the pre used in code-with-copy wrappers too */
+div.code-with-copy pre:has(> code.sourceCode.stan) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  /* Also neutralize Quarto’s code-block background variable */
+  --quarto-code-block-bg: transparent;
+}
+
+/* Fallback for themes that assign background on the sourceCode wrapper */
+div.sourceCode:has(> pre > code.sourceCode.stan) {
+  background: transparent !important;
+  --quarto-code-block-bg: transparent;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}

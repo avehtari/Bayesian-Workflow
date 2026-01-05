@@ -15,21 +15,21 @@ functions {
   }
 }
 data {
-  int n;
-  array[n, 2] real q_obs;
+  int N;
+  array[N, 2] real q_obs;
 }
 transformed data {
   real t0 = 0;
-  int n_coord = 2;
-  array[n_coord] real q0 = {1.0, 0.0};
-  array[n_coord] real p0 = {0.0, 1.0};
-  array[n_coord * 2] real y0 = append_array(q0, p0);
+  int N_coord = 2;
+  array[N_coord] real q0 = {1.0, 0.0};
+  array[N_coord] real p0 = {0.0, 1.0};
+  array[N_coord * 2] real y0 = append_array(q0, p0);
   
   real m = 1.0;
   
-  array[n] real t;
-  for (i in 1 : n) {
-    t[i] = i * 1.0 / 10;
+  array[N] real t;
+  for (n in 1:N) {
+    t[n] = i * 1.0 / 10;
   }
   
   array[0] int x_i;
@@ -37,18 +37,18 @@ transformed data {
   real<lower=0> sigma_x = 0.01;
   real<lower=0> sigma_y = 0.01;
   
-  // ODE tuning parameters
-  real rel_tol = 1e-3; // 1e-12;
-  real abs_tol = 1e-3; // 1e-12;
-  int max_steps = 100; // 1e6
+  // ODE solver parameters
+  real rel_tol = 1e-3;
+  real abs_tol = 1e-3;
+  int max_steps = 100;
 }
 parameters {
   real<lower=0> k;
 }
 transformed parameters {
-  array[n, n_coord * 2] real y = integrate_ode_bdf(ode, y0, t0, t, {k}, {
-                                                   m}, x_i, rel_tol, abs_tol,
-                                                   max_steps);
+  array[N, n_coord * 2] real y =
+    integrate_ode_bdf(ode, y0, t0, t, {k}, {m}, x_i,
+                      rel_tol, abs_tol, max_steps);
 }
 model {
   k ~ normal(0, 1);
@@ -57,8 +57,8 @@ model {
   q_obs[ : , 2] ~ normal(y[ : , 2], sigma_y);
 }
 generated quantities {
-  array[n] real qx_pred;
-  array[n] real qy_pred;
+  array[N] real qx_pred;
+  array[N] real qy_pred;
   
   qx_pred = normal_rng(y[ : , 1], sigma_x);
   qy_pred = normal_rng(y[ : , 2], sigma_y);
