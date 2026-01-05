@@ -48,7 +48,7 @@
 #' of the model into submodels, one can validate big chunks of Stan
 #' code while working with small models only.
 #' 
-#' We expect the reader to be familiar with basics of the package. If not,
+#' We expect the reader to be familiar with basics of the SBC package. If not,
 #' check out the [*Getting Started with SBC* vignette](https://hyunjimoon.github.io/SBC/articles/SBC.html).
 #'
 #' ## Example model
@@ -83,7 +83,7 @@
 #' 1) the mixture submodel where the mixing ratio is the same
 #' for all observations
 #' 
-#' 2) a beta regression where we take covariates and make a prediction of a probability,
+#' 2) a logistic regression where we take covariates and make a prediction of a probability,
 #' assuming we (noisily) observe the probability.
 #' 
 #' It is good practice to start small and implement and validate each
@@ -134,7 +134,7 @@ if (!dir.exists(cache_dir)) {
 
 #' # Mixture submodel
 #' 
-#' There is a good [guide to mixtures](https://mc-stan.org/docs/2_27/stan-users-guide/mixture-modeling-chapter.html) in the Stan user's guide.
+#' There is a good [guide to mixtures](https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html) in the Stan user's guide.
 #' Following the user's guide would save us from a lot of mistakes,
 #' but for the sake of example, we will pretend we didn't really read
 #' it - and we'll see the problems can be discovered via simulations.
@@ -200,7 +200,7 @@ mixture_first_pairs
 #' separate `log_mix` call for each.
 #' 
 #' More details on the mathematical background are explained in the
-#' ["Vectorizing mixtures"](https://mc-stan.org/docs/2_27/stan-users-guide/vectorizing-mixtures.html)
+#' ["Vectorizing mixtures"](https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html#vectorizing-mixtures)
 #' section of Stan User's guide.
 #' 
 #' ## Fixed mixture model
@@ -336,7 +336,7 @@ subset_draws(datasets_ordered_10$variables, draw = problematic_fit_id)
 #' 
 #' For more details see the
 #' [`rejection_sampling`](https://hyunjimoon.github.io/SBC/articles/rejection_sampling.html)
-#' vignette.
+#' vignette in the SBC package.
 #' 
 #' So let us subset the results to avoid divergences:
 sim_ids_to_keep <- 
@@ -426,8 +426,7 @@ ordered_combined_rank_hist / ordered_combined_ecdf_diff
 #' see a potential problem where the coverage for `mu[1]` and `mu[2]`
 #' is no longer consistent with perfect calibration, the `ecdf_diff`
 #' plot takes precedence as the uncertainty in the coverage plot is
-#' only approximate and we thus cannot take it too seriously (see
-#' `help("empirical_coverage")` for some more details).
+#' only approximate and we thus cannot take it too seriously.
 #| label: fig-plot_coverage-fixed_ordered_combined
 plot_coverage(results_fixed_ordered_combined)
 
@@ -736,7 +735,7 @@ combined_ranks / combined_ecdf
 #' factor of 1, while if the components are distinct the Fano factor
 #' will be larger.
 #'
-#' All the divergence are for low fano factors - this is the histogram
+#' All the divergence are for low Fano factors - this is the histogram
 #' of Fano factor for diverging fits:
 #| label: fig-sbcworkflow_fanos
 fanos <- vapply(dataset_combined$generated, 
