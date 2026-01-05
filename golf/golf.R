@@ -23,7 +23,7 @@
 #' ---
 #' 
 #' This notebook includes the code for Bayesian Workflow book chapter
-#' 25 "Model building and expansion: Golf putting"
+#' 25 *Model building and expansion: Golf putting*.
 #'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(

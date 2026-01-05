@@ -21,9 +21,9 @@
 #' bibliography: ../casestudies.bib
 #' ---
 
-#' This notebook includes the code for Bayesian Workflow book chapter
-#' 26 ``Model building with latent variables: Markov models for animal
-#' movement''
+#' This notebook includes the code for Bayesian Workflow book Chapter
+#' 26 *Model building with latent variables: Markov models for animal
+#' movement*.
 #' 
 #' # Introduction
 #'

@@ -21,9 +21,9 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #'
-#' This notebook includes the code for Bayesian Workflow book chapter
-#' 27 "Models for regression coefficients and variable selection: Student
-#' grades".
+#' This notebook includes the code for Bayesian Workflow book Chapter
+#' 27 *Models for regression coefficients and variable selection: Student
+#' grades*.
 #'
 #' # Introduction
 #'

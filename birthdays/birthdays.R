@@ -21,8 +21,8 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #'
-#' This notebook includes the code for Bayesian Workflow book chapter
-#' 27 "Model building: Time-series decomposition for birthdays".
+#' This notebook includes the code for Bayesian Workflow book Chapter
+#' 27 *Model building: Time-series decomposition for birthdays*.
 #'
 #' # Introduction
 #'

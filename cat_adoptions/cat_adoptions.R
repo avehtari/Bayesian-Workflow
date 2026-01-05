@@ -22,7 +22,7 @@
 #' ---
 #'
 #' This notebook includes the code for the Bayesian Workflow book
-#' Chapter 22 *Incremental development and testing: Black cat adoptions*
+#' Chapter 22 *Incremental development and testing: Black cat adoptions*.
 #'
 #' # Introduction
 #'

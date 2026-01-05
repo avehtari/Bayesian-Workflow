@@ -22,7 +22,7 @@
 #' ---
 #' 
 #' This notebook includes the code for the Bayesian Workflow book
-#' Chapter 18 *Predictive model checking and comparison:  Clinical trial*.
+#' Chapter 18 *Predictive model checking and comparison: Clinical trial*.
 #' 
 #' # Introduction
 #' 
