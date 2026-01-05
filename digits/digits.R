@@ -23,8 +23,8 @@
 #' ---
 #' 
 #' This notebook includes the code for Bayesian Workflow book Sections
-#' 11.4 "How many parallel chains and how many iterations" and 11.6
-#' "How many digits to report based on posterior uncertainty".
+#' 11.4 *How many parallel chains and how many iterations* and 11.6
+#' *How many digits to report based on posterior uncertainty*.
 #' 
 #' # Introduction
 #'

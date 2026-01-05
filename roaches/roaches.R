@@ -1,5 +1,5 @@
 #' ---
-#' title: "Roaches cross-validation case study"
+#' title: "Roaches cross-validation model checking and comparison"
 #' author: "Aki Vehtari"
 #' date: 2017-01-10
 #' date-modified: today

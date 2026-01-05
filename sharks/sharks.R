@@ -1,5 +1,5 @@
 #' ---
-#' title: "Model building with latent variables"
+#' title: "Sharks and model building with latent variables"
 #' author: "Vianey Leos Barajas"
 #' date: 2025-12-14
 #' date-modified: today
