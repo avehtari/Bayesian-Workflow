@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -20,13 +21,13 @@
 #'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
-#' # Introduction
-#'
+#' 
 #' This notebook includes the code for the Bayesian Workflow book
 #' Chapter 31 *Simulation-based calibration checking in model
 #' development workflow*.
 #' 
+#' # Introduction
+#'
 #' Here we describe a complete process to iteratively build and
 #' validate the _implementation_ of a non-trivial, but still
 #' relatively small model using simulation based calibration checking
@@ -126,6 +127,18 @@ library(patchwork) # Needed only for saving plots for the book
 library(future)
 plan(multisession) 
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 # Setup caching of results
 cache_dir <- root("sbc", "_cache")
 if (!dir.exists(cache_dir)) {
@@ -140,9 +153,11 @@ if (!dir.exists(cache_dir)) {
 #' it - and we'll see the problems can be discovered via simulations.
 #' 
 #' So this is our first try at implementing the mixture submodel:
-cat(readLines(root("sbc", "models/mixture_first.stan")), sep = "\n")
+code_first <- root("sbc", "models/mixture_first.stan")
+#| output: asis
+print_stan_file(code_first)
 #| label: model_first
-model_first <- cmdstan_model(root("sbc", "models/mixture_first.stan"))
+model_first <- cmdstan_model(code_first)
 backend_first <- SBC_backend_cmdstan_sample(model_first) 
 
 #' And this is our code to simulate data for this model:
@@ -206,9 +221,11 @@ mixture_first_pairs
 #' ## Fixed mixture model
 #' 
 #' We make a new model fixing the `log_mix` problem.
+code_fixed_log_mix <- root("sbc", "models/mixture_fixed_log_mix.stan")
+#| output: asis
+print_stan_file(code_fixed_log_mix)
 #| label: model_fixed_log_mix
-cat(readLines(root("sbc", "models/mixture_fixed_log_mix.stan")), sep = "\n")
-model_fixed_log_mix <- cmdstan_model(root("sbc", "models/mixture_fixed_log_mix.stan"))
+model_fixed_log_mix <- cmdstan_model(code_fixed_log_mix)
 backend_fixed_log_mix <- SBC_backend_cmdstan_sample(model_fixed_log_mix)
 
 #' So let's try once again with the same single simulation:
@@ -234,6 +251,8 @@ results_fixed_log_mix_2 <- compute_SBC(datasets_first_10,
 
 #' So there are some problems - we have quite a bunch of high R-hat
 #' and low ESS values. This is the distribution of all rhats:
+#| label: fig-hist-rhat-fixed_log_mix
+#| out-width: 80%
 hist(results_fixed_log_mix_2$stats$rhat)
 
 #' Let's examine a single pairs plot:
@@ -251,9 +270,11 @@ mixture_fixed_log_mix_pairs
 #' ## Fixed parameter ordering
 #' 
 #' We can easily fix the ordering of the `mu`s by using the `ordered` built-in type.
+code_fixed_ordered <- root("sbc", "models/mixture_fixed_ordered.stan")
+#| output: asis
+print_stan_file(code_fixed_ordered)
 #| label: model_fixed_ordered
-cat(readLines(root("sbc", "models/mixture_fixed_ordered.stan")), sep = "\n")
-model_fixed_ordered <- cmdstan_model(root("sbc", "models/mixture_fixed_ordered.stan"))
+model_fixed_ordered <- cmdstan_model(code_fixed_ordered)
 backend_fixed_ordered <- SBC_backend_cmdstan_sample(model_fixed_ordered) 
 
 #' We also need to update the generator to match the new names and ordering constant:
@@ -351,8 +372,12 @@ summary(results_fixed_ordered_subset)
 
 #' This gives us no obvious problems.
 #| label: fig-rank_hist-fixed_ordered_subset
+#| fig-width: 7
+#| fig-height: 2.75
 plot_rank_hist(results_fixed_ordered_subset)
 #| label: fig-ecdf_hist-fixed_ordered_subset
+#| fig-width: 7
+#| fig-height: 2.5
 plot_ecdf_diff(results_fixed_ordered_subset)
 
 #' Since we now have only `r length(results_fixed_ordered_subset)`
@@ -360,6 +385,8 @@ plot_ecdf_diff(results_fixed_ordered_subset)
 #' huge uncertainty about the actual coverage of our posterior
 #' intervals - we can see that in a plot:
 #| label: fig-plot_coverage-fixed_ordered_subset
+#| fig-width: 7
+#| fig-height: 2.75
 plot_coverage(results_fixed_ordered_subset)
 
 #' The coverage plot shows the observed coverage of central posterior
@@ -428,6 +455,8 @@ ordered_combined_rank_hist / ordered_combined_ecdf_diff
 #' plot takes precedence as the uncertainty in the coverage plot is
 #' only approximate and we thus cannot take it too seriously.
 #| label: fig-plot_coverage-fixed_ordered_combined
+#| fig-width: 7
+#| fig-height: 3
 plot_coverage(results_fixed_ordered_combined)
 
 #' Note: it turns out that extending the model to more components
@@ -438,9 +467,11 @@ plot_coverage(results_fixed_ordered_combined)
 #' # Logistic regression submodel
 #'
 #' Let's move to the logistic regression submodel of our model.
+code_logistic_first <- root("sbc", "models/logistic_first.stan")
+#| output: asis
+print_stan_file(code_logistic_first)
 #| label: model_logistic_first
-cat(readLines(root("sbc", "models/logistic_first.stan")), sep = "\n")
-model_logistic_first <- cmdstan_model(root("sbc", "models/logistic_first.stan"))
+model_logistic_first <- cmdstan_model(code_logistic_first)
 backend_logistic_first <- SBC_backend_cmdstan_sample(model_logistic_first) 
 
 #' If you are good at reading code, you may notice there is a fatal
@@ -486,6 +517,8 @@ logistic_first_ranks / logistic_first_ecdf
 #' simulated values against posterior estimates, which can be done via
 #' the [plot_sim_estimated()] function.
 #| label: fig-sbcworkflow_logistic_first_sim_estimated
+#| fig-width: 7
+#| fig-height: 2.75
 logistic_first_sim_estimated <- plot_sim_estimated(results_logistic_first_10) + 
   labs(x = "Simulated value", y = "Mean, 95% CI")
 logistic_first_sim_estimated
@@ -529,7 +562,9 @@ logistic_first_ranks / logistic_first_ecdf
 #' While the failures for the `beta` parameters are barely visible
 #' with 10 simulations, `log_lik` signals a clear failure.
 #| label: fig-sbcworkflow_results_dq_loglik_only
-results_dq_loglik_only <- plot_rank_hist(results_logistic_first_10_dq, variables = "log_lik") /
+#| fig-width: 7
+#| fig-height: 3
+results_dq_loglik_only <- plot_rank_hist(results_logistic_first_10_dq, variables = "log_lik") +
   plot_ecdf_diff(results_logistic_first_10_dq, variables = "log_lik")
 results_dq_loglik_only
 
@@ -540,8 +575,10 @@ results_dq_loglik_only
 #' to have all 1's in its column of \texttt{X} and has a different
 #' prior. This is also how most common regression modelling packages
 #' handle the situation. We thus modify our Stan code to:
-cat(readLines(root("sbc", "models/logistic_merged_intercept.stan")), sep = "\n")
-
+code_logistic_merged_intercept <- root("sbc", "models/logistic_merged_intercept.stan")
+#| output: asis
+print_stan_file(code_logistic_merged_intercept)
+  
 #' This looks cleaner, but you may notice one additional issue that we
 #' created during the rewrite. We will see that it will quickly
 #' manifest if we use SBC. We also need to modify our simulation code
@@ -549,8 +586,10 @@ cat(readLines(root("sbc", "models/logistic_merged_intercept.stan")), sep = "\n")
 #' keep the explicit loop to decrease chances of having the same
 #' problem in both R and Stan.
 #| label: model_logistic_merged_intercept
-model_logistic_merged_intercept <- cmdstan_model(root("sbc", "models/logistic_merged_intercept.stan"))
-backend_logistic_merged_intercept <- SBC_backend_cmdstan_sample(model_logistic_merged_intercept, chains = 2) 
+model_logistic_merged_intercept <-
+  cmdstan_model(code_logistic_merged_intercept)
+backend_logistic_merged_intercept <-
+  SBC_backend_cmdstan_sample(model_logistic_merged_intercept, chains = 2) 
 
 #' We now update the generator code to match:
 generator_func_logistic_merged_intercept <- function(N_obs, N_predictors) {
@@ -602,13 +641,15 @@ logistic_merged_intercept_ranks / logistic_merged_intercept_ecdf
 #'
 #' To avoid declaring two priors for `beta[1]` we need to modify the
 #' last line of the \texttt{model} block to
-#' ```
+#' ```stan
 #' target += normal_lpdf(beta[2:N_predictors] | 0, 1);    
 #' ```
 #' so the full model now is:
+code_logistic_fixed_prior <- root("sbc", "models/logistic_fixed_prior.stan")
+#| output: asis
+print_stan_file(code_logistic_fixed_prior)
 #| label: model_logistic_fixed_prior
-cat(readLines(root("sbc", "models/logistic_fixed_prior.stan")), sep = "\n")
-model_logistic_fixed_prior <- cmdstan_model(root("sbc", "models/logistic_fixed_prior.stan"))
+model_logistic_fixed_prior <- cmdstan_model(code_logistic_fixed_prior)
 backend_logistic_fixed_prior <- SBC_backend_cmdstan_sample(model_logistic_fixed_prior, chains = 2) 
 
 #' The results for ten simulations are:
@@ -648,9 +689,11 @@ plot_sim_estimated(results_logistic_fixed_prior_200)
 #' # Full model
 #'
 #' We are finally ready to make a first attempt at the full model:
+code_combined <- root("sbc", "models/combined_first.stan")
+#| output: asis
+print_stan_file(code_combined)
 #| label: model_combined_first
-cat(readLines(root("sbc", "models/combined_first.stan")), sep = "\n")
-model_combined <- cmdstan_model(root("sbc", "models/combined_first.stan"))
+model_combined <- cmdstan_model(code_combined)
 backend_combined <- SBC_backend_cmdstan_sample(model_combined)
 
 #' And this is our generator for the full model:
@@ -738,6 +781,7 @@ combined_ranks / combined_ecdf
 #' All the divergence are for low Fano factors - this is the histogram
 #' of Fano factor for diverging fits:
 #| label: fig-sbcworkflow_fanos
+#| out-width: 90%
 fanos <- vapply(dataset_combined$generated, 
                 function(dataset) { var(dataset$y) / mean(dataset$y) }, 
                 FUN.VALUE = 0)
