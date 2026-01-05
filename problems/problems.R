@@ -23,7 +23,7 @@
 #' ---
 #'
 #' This notebook includes the code for Bayesian Workflow book Section
-#' 12.3 ``Failure modes and steps forward''.
+#' 12.3 *Failure modes and steps forward*.
 #'
 #' # Introduction
 #'

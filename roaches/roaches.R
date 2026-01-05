@@ -1,5 +1,5 @@
 #' ---
-#' title: "Roaches cross-validation case study"
+#' title: "Roaches cross-validation model checking and comparison"
 #' author: "Aki Vehtari"
 #' date: 2017-01-10
 #' date-modified: today
@@ -25,7 +25,6 @@
 #' This notebook includes the the code code for the Bayesian Workflow
 #' book Chapter 24 *Leave-one-out cross validation model checking and
 #' comparison: Roaches*.
-#' 
 #' 
 #' # Introduction
 #' 

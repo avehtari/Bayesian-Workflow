@@ -1,5 +1,5 @@
 #' ---
-#' title: "Planetary Motion: Computational challenge of multimodality"
+#' title: "Planetary motion: Computational challenge of multimodality"
 #' author: Charles C. Margossian, Andrew Gelman and Aki Vehtari
 #' date: 2020-11-09
 #' date-modified: today

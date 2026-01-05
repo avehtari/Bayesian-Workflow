@@ -6,9 +6,8 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     theme: readable
 #'     toc: true
-#'     toc-depth: 3
+#'     toc-depth: 2
 #'     toc-location: left
 #'     number-sections: true
 #'     smooth-scroll: true

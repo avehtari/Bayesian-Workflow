@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -78,6 +79,17 @@ dens <- function(x, adj = 0.5, norm.comp = FALSE, main = "",
     lines(thed$x, thed$y, ...)
   }
 }
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
 
 #' # Data
 #'
@@ -117,14 +129,17 @@ for (i in 1:n) {
 
 #' ggplot version
 #| label: fig-gg-cats-data
-d[sample(dat$N, 100), ] |>
+d[idx, ] |>
   ggplot(aes(y = seq_along(days), x = days, color = factor(color))) +
   geom_segment(aes(yend = seq_along(days), xend = 0), size = 1) +
   geom_point(aes(shape = factor(adopted)), size = 3) +
   scale_shape_manual(values = c(1, 16), labels = c("Other", "Adopted")) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
+  scale_color_manual(values = c("1" = "black", "2" = "orange"),
+                     labels = c("Black", "Other")) +
   labs(y = "Cat", x = "Days observed", color = "Color", shape = "Event") +
-  coord_cartesian(expand = c(left = FALSE))
+  coord_cartesian(expand = c(left = FALSE)) +
+  theme(legend.position = "inside",
+        legend.justification.inside = c(1, 0.5))
 
 #' # Generative models
 #'
@@ -176,13 +191,16 @@ synth_cats |>
   geom_step(linewidth = 1) +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
-  labs(x = "Days", y = "Proportion un-adopted", color = "Color")
+  scale_color_manual(values = c("1" = "black", "2" = "orange"),
+                     labels = c("Black", "Other")) +
+  labs(x = "Days", y = "Proportion un-adopted", color = "Color") +
+  theme(legend.position = "none")
 
 
 #' ## First Stan model
 cat_code1 <- root("cat_adoptions", "adoptions_observed.stan")
-writeLines(readLines(cat_code1))
+#| output: asis
+print_stan_file(cat_code1)
 
 #' Prior predictive simulation
 n <- 12
@@ -213,7 +231,8 @@ lapply(1:n, \(i) sim_cats1(n = 1e3, p = sim_prior[, i]) |>
   geom_step() +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
+  scale_color_manual(values = c("1" = "black", "2" = "orange"),
+                     labels = c("Black", "Other")) +
   labs(x = "Days", y = "Proportion un-adopted", color = "Color")
 
 #' Test the first model code using simulated data
@@ -285,8 +304,10 @@ lapply(1:n, \(i) sim_cats1(n = 1e3, p = post1[i, c("p[1]", "p[2]")]) |>
   geom_step(alpha = 0.5) +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
-  labs(x = "Days", y = "Proportion un-adopted", color = "Color")
+  scale_color_manual(values = c("1" = "black", "2" = "orange"),
+                     labels = c("Black", "Other")) +
+  labs(x = "Days", y = "Proportion un-adopted", color = "Color") +
+  theme(legend.position = "none")
 
 #' ## Add observation (censoring) model
 #'
@@ -304,7 +325,8 @@ sim_cats2 <- function(n = 10, p = c(0.1, 0.2), cens = 50) {
 }
 
 cat_code2 <- root("cat_adoptions", "adoptions_censored.stan")
-writeLines(readLines(cat_code2))
+#| output: asis
+print_stan_file(cat_code2)
 
 #' Test censoring model using simulated data
 sim_dat <- sim_cats2(n = 1e3, p = c(0.01, 0.02))
@@ -405,12 +427,16 @@ lapply(1:n, \(i) sim_cats1(n = 1e3, p = post2[i, c("p[1]", "p[2]")]) |>
   geom_step(alpha = 0.5) +
   xlim(c(0, 50)) +
   scale_y_continuous(limits = c(0, 1), expand = expansion(mult = c(0, 0.02))) +
-  scale_color_manual(values = c("1" = "black", "2" = "orange"), labels = c("Black", "Other")) +
-  labs(x = "Days", y = "Proportion un-adopted", color = "Color")
+  scale_color_manual(values = c("1" = "black", "2" = "orange"),
+                     labels = c("Black", "Other")) +
+  labs(x = "Days", y = "Proportion un-adopted", color = "Color") +
+  theme(legend.position = "none")
+  
 
 #' ## Model that uses parameters for censored observations
 cat_code3 <- root("cat_adoptions", "adoptions_imputation.stan")
-writeLines(readLines(cat_code3))
+#| output: asis
+print_stan_file(cat_code3)
 
 #'
 #| results: hide
@@ -427,7 +453,8 @@ print(fit3s)
 #'
 
 cat_code4 <- root("cat_adoptions", "adoptions_poisson.stan")
-writeLines(readLines(cat_code4))
+#| output: asis
+print_stan_file(cat_code4)
 
 #| results: hide
 fit4s <- cstan(cat_code4, data = sim_dat)
@@ -455,7 +482,8 @@ sim_dat <- sim_cats3(n = 1000, p = c(0.2, 0.1), xsd = c(0.1, 0.1))
 
 #' Varying effects model
 cat_code5 <- root("cat_adoptions", "adoptions_varying.stan")
-writeLines(readLines(cat_code5))
+#| output: asis
+print_stan_file(cat_code5)
 
 #| results: hide
 fit2s <- cstan(cat_code2, data = sim_dat)

@@ -1,0 +1,59 @@
+---
+title: "Bayesian Workflow book: Case studies"
+date: 2026-01-05
+date-modified: today
+date-format: iso
+format:
+  html:
+    number-sections: false
+---
+
+## Introduction
+
+The code and data are provided to fully reproduce the examples and
+figures in the book.  They can be a good way to see what the code
+does. Different people have different styles of code and we don't
+claim our style is the best.
+
+When running the notebooks, to avoid need to switch the working
+directory, `rprojroot` package is used to set the project root
+directory. The downloaded git repository can be placed anywhere you
+like and you can rename the Bayesian-Workflow directory if you
+wish. When running the code, it is sufficient that the working
+directory is any directory in the Bayesian-Workflow (or
+renamed). Running
+```
+library("rprojroot")
+root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
+```
+will find the file `.Bayesian-Workflow-root` which is in the `Bayesian-Workflow` directory, and will set the full path according to that. Then, for example,
+```
+bioassay_stan_file <- root("bioassay","bioassay0.stan")
+```
+finds the `bioassay0.stan` file, no matter where you have placed or renamed the `Bayesian-Workflow` directory. When you switch to another example, there is no need to switch the working directory.
+
+
+## Case studies
+
+- [Bioassay, Ch 3](bioassay/bioassay.html)
+- [Modeling performance on a multiple choice exam, Ch 4](multiple_choice/multiple_choice.html)
+- [How many iterations to run and how many digits to report, Sec 11.4 and 11.6](digits/digits.html)
+- [Illustration of problematic posteriors, Sec 12.3](problems/problems.html)
+- [Declining exponentials, Sec 12.4](declining_exponentials/declining_exponentials.html)
+- [Simulated data of movie ratings, Ch 16](movies/movies.html)
+- [Sleep study: Prior specification and model checking, Ch 17](sleep_study/sleep_study.html)
+- [Nabiximols treatment efficiency, Ch 18](nabiximols/nabiximols.html)
+- [Sensitivity and specificity in coronavirus testing, Ch 19](coronavirus/coronavirus.html)
+- [Mixture model for time series competition, Ch 20](timeseries/timeseries.html)
+- [Stochastic learning in dogs -- brms, Ch 21](dogs/dogs.html)
+- [Stochastic learning in dogs -- Stan, Ch 21](dogs/dogs_stan.html)
+- [Survival analysis and black cat adoptions, Ch 22](cat_adoptions/cat_adoptions.html)
+- [World Cup continuous vs discrete models, Ch 23](world_cup/world_cup.html)
+- [Roaches cross-validation model checking and comparison, Ch 24](roaches/roaches.html)
+- [Model building and expansion for golf putting, Ch 25](golf/golf.html)
+- [Sharks and model building with latent variables, Ch 26](sharks/sharks.html)
+- [Birthdays and time-series decomposition, Ch 27](birthdays/birthdays.html)
+- [Variable selection, Ch 28](variable_selection/variable_selection.html)
+- [Park rule: No vehicles in the park, Ch 29](park_rule/park_rule_aki.html)
+- [Planetary motion: Computational challenge of multimodality, Ch 30](planetary_motion/planetary_motion.html)
+- [Simulation based calibration checking (SBC), Ch 31](sbc/sbc.html)

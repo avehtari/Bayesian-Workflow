@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -22,8 +23,8 @@
 #' ---
 #' 
 #' This notebook includes the code for Bayesian Workflow book Sections
-#' 11.4 "How many parallel chains and how many iterations" and 11.6
-#' "How many digits to report based on posterior uncertainty".
+#' 11.4 *How many parallel chains and how many iterations* and 11.6
+#' *How many digits to report based on posterior uncertainty*.
 #' 
 #' # Introduction
 #'
@@ -145,6 +146,18 @@ library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans"))
 SEED <- 48927 # set random seed for reproducibility
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 #' ## Kilpisjärvi data and model
 #' 
 #' Load Kilpisjärvi summer month average temperatures 1952-2013:
@@ -172,7 +185,8 @@ ggplot() +
 #' easier to define the prior on average temperature in the center of
 #' the time range (instead defining prior for temperature at year 0).
 code_lin <- root("digits", "linear.stan")
-writeLines(readLines(code_lin))
+#| output: asis
+print_stan_file(code_lin)
 
 #' Prior parameter values for weakly informative priors
 data_lin_priors <- c(list(

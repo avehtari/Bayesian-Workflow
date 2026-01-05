@@ -1,5 +1,5 @@
 #' ---
-#' title: "Birthdays workflow case study"
+#' title: "Birthdays and time-series decomposition"
 #' author: "Aki Vehtari"
 #' date: 2020-12-28
 #' date-modified: today

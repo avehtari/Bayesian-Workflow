@@ -1,5 +1,5 @@
 #' ---
-#' title: "Bayesian workflow book - World Cup continuous vs discrete"
+#' title: "World Cup continuous vs discrete models"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2021-01-12
 #' date-modified: today

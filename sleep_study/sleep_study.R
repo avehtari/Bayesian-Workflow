@@ -1,5 +1,5 @@
 #' ---
-#' title: "Sleepstudy: Prior specification and model checking"
+#' title: "Sleep study: Prior specification and model checking"
 #' author: "Paul Bürkner and Aki Vehtari"
 #' date: 2025-10-22
 #' date-modified: today
