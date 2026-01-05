@@ -45,7 +45,10 @@ options(mc.cores = 4)
 library(bayesplot)
 library(loo)
 library(posterior)
-
+# utility functions
+logit <- qlogis
+invlogit <- plogis
+fround <- function (x, digits) format(round(x, digits), nsmall = digits)
 print_stan_file <- function(file) {
   code <- readLines(file)
   if (isTRUE(getOption("knitr.in.progress")) &
@@ -57,9 +60,6 @@ print_stan_file <- function(file) {
     writeLines(code)
   }
 }
-logit <- qlogis
-invlogit <- plogis
-fround <- function (x, digits) format(round(x, digits), nsmall = digits)
 
 #' # Introduction
 #' 

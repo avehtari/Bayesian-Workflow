@@ -26,7 +26,6 @@
 #' book Chapter 24 *Leave-one-out cross validation model checking and
 #' comparison: Roaches*.
 #' 
-#' 
 #' # Introduction
 #' 
 #' This case study demonstrates cross-validation model comparison, and

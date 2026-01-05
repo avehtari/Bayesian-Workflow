@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -55,9 +56,20 @@ options(mc.cores = 4)
 options(digits = 2)
 ## options(htmltools.dir.version = FALSE)
 set.seed(1123)
-# utility function
+# utility functions
 fround <- function(x, digits) {
   format(round(x, digits), nsmall = digits)
+}
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
 }
 
 #' # Declining exponential
@@ -71,7 +83,8 @@ fround <- function(x, digits) {
 #' distributed: $\epsilon_i \sim \operatorname{normal}(0,\sigma)$.
 #' 
 #' Here is the model in Stan:
-writeLines(readLines(root("declining_exponentials",  "exponential.stan")))
+#| output: asis
+print_stan_file(root("declining_exponentials",  "exponential.stan"))
 
 #' We have given the parameters $a$, and $b$, and $\sigma$ normal
 #' prior distributions centered at 0 with standard deviation 10.  In
@@ -202,7 +215,8 @@ print(fit_2b)
 #' $$
 #' 
 #' Here is the model in Stan:
-writeLines(readLines(root("declining_exponentials", "exponential_positive_lognormal.stan")))
+#| output: asis
+print_stan_file(root("declining_exponentials", "exponential_positive_lognormal.stan"))
 
 #' As before, we can simulate fake data from this model:
 a <- 5
@@ -256,7 +270,8 @@ print(fit_3)
 #' with lognormally-distributed errors $\epsilon$.
 #' 
 #' Here is the model in Stan:
-writeLines(readLines(root("declining_exponentials", "sum_of_exponentials.stan")))
+#| output: asis
+print_stan_file(root("declining_exponentials", "sum_of_exponentials.stan"))
 
 #' The coefficients $a$ and the residual standard deviation $\sigma$
 #' are constrained to be positive.  The parameters $b$ are also

@@ -12,6 +12,7 @@
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -56,6 +57,18 @@ theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
 library(dplyr)
 library(ggh4x)
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 #' Define function to compute shortest posterior interval (SPIN; @Liu-Gelman-Zheng:2015)
 spin <- function(x, lower=NULL, upper=NULL, conf=0.95) {
   x <- sort(as.vector(x))
@@ -76,8 +89,11 @@ spin <- function(x, lower=NULL, upper=NULL, conf=0.95) {
 
 #' # Simple model fit using pooled specificity and sensitivity
 
-writeLines(readLines(root("coronavirus", "santa-clara.stan")))
-sc_model <- cmdstan_model(root("coronavirus", "santa-clara.stan"))
+code <- root("coronavirus", "santa-clara.stan")
+#| output: asis
+print_stan_file(code)
+#'
+sc_model <- cmdstan_model(code)
 
 #' Compute posterior with data from @Bendavid-Mulaney-Sood-etal:2020a, 11 April 2020
 #| label: fit_1
@@ -198,8 +214,11 @@ powerscale_plot_dens(
 #' # Hierarchical model for sensitivity and specificity
 #'
 #' Hierarchical model that allows sensitivity and specificity to vary across studies.
-writeLines(readLines(root("coronavirus", "santa-clara-hierarchical.stan")))
-sc_model_hierarchical <- cmdstan_model(root("coronavirus", "santa-clara-hierarchical.stan"))
+code_hierarchical <- root("coronavirus", "santa-clara-hierarchical.stan")
+#| output: asis
+print_stan_file(code_hierarchical)
+#'
+sc_model_hierarchical <- cmdstan_model(code_hierarchical)
 
 #' Compute posterior using data from @Bendavid-Mulaney-Sood-etal:2020b 27 April 2020
 #| label: fit_3a
@@ -300,8 +319,11 @@ print(spin(draws_3b[, , "sigma_logit_sens"], conf = 0.95), digits = 2)
 #' MRP model allowing prevalence to vary by sex, ethnicity, age
 #' category, and zip code.  Model is set up to use the ethnicity, age,
 #' and zip categories of @Bendavid-Mulaney-Sood-etal:2020b
-writeLines(readLines(root("coronavirus", "santa-clara-hierarchical-mrp.stan")))
-sc_model_hierarchical_mrp <- cmdstan_model(root("coronavirus", "santa-clara-hierarchical-mrp.stan"))
+code_model_hierarchical_mrp <- root("coronavirus", "santa-clara-hierarchical-mrp.stan")
+#| output: asis
+print_stan_file(code_model_hierarchical_mrp)
+#'
+sc_model_hierarchical_mrp <- cmdstan_model(code_model_hierarchical_mrp)
 
 #' To fit the model, we need individual-level data.  
 #' These data are not publicly available, so just to get the program running, 
@@ -399,8 +421,11 @@ tests <- 3330
 unk_df <- data.frame(pos_tests, tests, sample_prev = pos_tests / tests)
 
 #' Stan model for prior sensitivity analysis
-writeLines(readLines(root("coronavirus", "prior-sensitivity.stan")))
-model <- cmdstan_model(root("coronavirus", "prior-sensitivity.stan"))
+code_sens <- root("coronavirus", "prior-sensitivity.stan")
+#| output: asis
+print_stan_file(code_sens)
+#'
+model_sens <- cmdstan_model(code_sens)
 
 #' Data
 data <- list(
@@ -431,7 +456,7 @@ for (sigma_sens in sigma_senss) {
   for (sigma_spec in sigma_specss) {
     data2 <- append(data, list(sigma_sigma_logit_sens = sigma_sens,
                                sigma_sigma_logit_spec = sigma_spec))
-    fit <-  model$sample(
+    fit <-  model_sens$sample(
       data = data2,
       iter_warmup = 5e4,
       iter_sampling = 5e4,
