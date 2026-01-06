@@ -6,18 +6,10 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     theme: readable
-#'     toc: true
-#'     toc-depth: 3
-#'     toc-location: left
 #'     number-sections: true
-#'     smooth-scroll: true
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #'

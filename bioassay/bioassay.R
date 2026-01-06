@@ -6,24 +6,15 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-depth: 2
-#'     toc-location: left
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
-#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #'
-#' This notebook includes the code for Bayesian Workflow book section
-#' 3.5 "A simple example of probabilistic programming".
+#' This notebook includes the code for Bayesian Workflow book Section
+#' 3.5 *A simple example of probabilistic programming*.
 #'
 #' # Introduction
 #'

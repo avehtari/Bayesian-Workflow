@@ -28,7 +28,7 @@ Back cover text: *blurb*
 
 - If you notice an error that is not mentioned in [the errata](errata.html), [submit an issue](https://github.com/avehtari/Bayesian-Workflow/issues) or send an email.
 
-## Contents
+## Book contents
 
 **Part 1: From Bayesian inference to Bayesian workflow**
 

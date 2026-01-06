@@ -6,19 +6,11 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     encoding: UTF-8
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
+#' bibliography: ../casestudies.bib
 #' ---
 #' 
 #' This notebook includes the code for the Bayesian Workflow book

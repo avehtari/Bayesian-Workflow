@@ -7,7 +7,7 @@
 #' format:
 #'   html:
 #'     toc: true
-#'     toc-location: left
+#'     toc-location: right
 #'     toc-depth: 2
 #'     number-sections: true
 #'     smooth-scroll: true
