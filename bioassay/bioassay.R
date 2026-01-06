@@ -22,6 +22,10 @@
 #' probabilistic programming by going through the steps of data
 #' analysis and computation in the context of a simple example.
 #'
+#' We work through an example by @Racine-Grieve-Fluhler-etal:1986,
+#' also included in Section 2.8 of *Bayesian Data Analysis [@BDA3], of
+#' a logistic regression fit to a bioassay experiment.
+#' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)
 
@@ -325,3 +329,12 @@ ggplot_LD50_mg_ml +
 ggplot_LD50_mg_ml +
   stat_slab(data = bdraws1, color = "gray", fill = NA) +
   coord_cartesian(expand = c(bottom = FALSE))
+
+#' ## References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' ## Licenses {.unnumbered}
+#' 
+#' * Code &copy; 2025, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2025, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.
