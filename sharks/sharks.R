@@ -19,7 +19,11 @@
 #' 
 #' # Introduction
 #'
-#' Intro text...
+#' To demonstrate how hidden Markov models (HMMs) are used to model
+#' animal movement, we use positional data analyzed by
+#' @Towner-Leos-Barajas-Langrock-etal:2016. Here we replicate the
+#' model building workflow and demonstrate how this would be done in
+#' a Bayesian framework.
 #' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=TRUE, comment=NA, out.width='95%')
@@ -645,3 +649,14 @@ p3 <- ggplot(wsf1_chum_tpm_long, aes(dateTime, value)) +
 
 #| label: fig-2state_tpmcov_crencp
 (p1 + p2)/p3
+
+#' <br />
+#'
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#'
+#' * Code &copy; 2025, Vianey Leos Barajas, licensed under BSD-3.
+#' * Text &copy; 2025, Vianey Leos Barajas, licensed under CC-BY-NC 4.0.

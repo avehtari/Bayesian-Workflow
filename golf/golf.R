@@ -16,6 +16,11 @@
 #' This notebook includes the code for Bayesian Workflow book chapter
 #' 25 *Model building and expansion: Golf putting*.
 #'
+#' # Introduction
+#'
+#' We demonstrate the basic workflow of Bayesian modeling using an
+#' example of a set of models fit to data on golf putting.
+#' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
   cache = FALSE,
@@ -52,7 +57,7 @@ print_stan_file <- function(file) {
   }
 }
 
-#' # Introduction
+#' # Data
 #' 
 #' The following graph shows data from professional golfers on the proportion of successful
 #' putts as a function of distance from the hole [from @Berry:1995].  Unsurprisingly, the
@@ -998,5 +1003,5 @@ loo_compare(
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2019-2026, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2019-2026, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2019--2026, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2019--2026, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.

@@ -22,7 +22,7 @@
 #' stochastic learning in dogs data by @Bush+Mosteller:1955. Andrew
 #' wrote his models in [Stan language](https://mc-stan.org/), and
 #' here we use [`brms`](https://paul-buerkner.github.io/brms/)
-#' [@Buerkner:2017:brms] and add some further diagnostics.
+#' and add some further diagnostics.
 #'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
@@ -678,11 +678,11 @@ as_draws_df(bfit_4sh) |>
 #' sufficient for making difference between some plausible models.
 #'
 #'
-#' ## References {.unnumbered}
+#' # References {.unnumbered}
 #'
 #' <div id="refs"></div>
 #'
-#' ## Licenses {.unnumbered}
+#' # Licenses {.unnumbered}
 #'
-#' * Code &copy; 2023-2025, Aki Vehtari and Andrew Gelman, licensed under BSD-3.
-#' * Text &copy; 2023-2025, Aki Vehtari and Andrew Gelman, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2023--2025, Aki Vehtari and Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2023--2025, Aki Vehtari and Andrew Gelman, licensed under CC-BY-NC 4.0.

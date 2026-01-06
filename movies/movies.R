@@ -447,3 +447,8 @@ p5b <- ggplot(data = NULL, aes(x = a_post_median, y = a_true, shape = genre)) +
   theme(legend.justification.inside = c(0.5, 0),
         legend.title = element_blank())
 p5a + p5b
+
+#' # Licenses {.unnumbered}
+#' 
+#' * Code &copy; 2022--2025, Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.

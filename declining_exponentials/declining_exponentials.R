@@ -455,5 +455,5 @@ print(fit_5_with_priors)
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2022-2025, Andrew Gelman, licensed under BSD-3.
-#' * Text &copy; 2022-2025, Andrew Gelman, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2022--2025, Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.

@@ -2791,15 +2791,12 @@ data.frame(varid = 1:nrow(sp), sd_ratio = sp$sd / sm$sd) |>
 ##                             adapt_delta = 0.95, max_treedepth = 15)
 
 #'
-#' ## References {.unnumbered}
+#' # References {.unnumbered}
 #'
 #' <div id="refs"></div>
 #'
-#' ## Licenses {.unnumbered}
+#' # Licenses {.unnumbered}
 #' 
 #' * Code &copy; 2020--2025, Aki Vehtari, licensed under BSD-3.
 #' * Text &copy; 2020--2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
 #' 
-#' ## Original Computing Environment {.unnumbered}
-#' 
-sessionInfo()

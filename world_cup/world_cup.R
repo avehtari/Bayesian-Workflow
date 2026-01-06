@@ -29,15 +29,12 @@
 #' comparison of continuous and discrete models.
 #' 
 #' Game scores could be modelled with a discrete bivariate Poisson
-#' model, and score differences with Poisson difference models (Karlis
-#' and Ntzoufras, 2003), which are commonly used in analysis of sports
-#' data. But we'll start with continuous models and discretized
+#' model, and score differences with Poisson difference models
+#' [@Karlis-Ntzoufras:2003], which are commonly used in analysis of
+#' sports data. But we'll start with continuous models and discretized
 #' continuous models to illustrate how those can be compared, and
 #' eventually build also models using naturally discrete data models.
 #'
-#' -------------
-#' 
-
 #+ setup, include=FALSE
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)
 # switch this to TRUE to save figures in separate files
@@ -79,7 +76,7 @@ print_stan_code <- function(code) {
 #'
 #' Data include 64 game results from World Cup 2014 and Soccer Power
 #' Index that was available on the internet a month before the
-#' tournament (Silver, 2014).  We took the rankings, with Brazil at
+#' tournament [@Silver:2014].  We took the rankings, with Brazil at
 #' the top (getting a score of 32) and Australia at the bottom (with a
 #' score of 1), and then for simplicity in interpretation of the
 #' parameters we rescaled these to have mean 0 and standard deviation
@@ -541,13 +538,6 @@ loo_compare(
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2021-2025, Andrew Gelman, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2021-2025, Andrew Gelman, Aki Vehtari, licensed under CC-BY-NC 4.0.
-#' 
-#' # Original Computing Environment {.unnumbered}
-#' 
-sessionInfo()
-
-#' 
-#' <br />
+#' * Code &copy; 2021--2025, Andrew Gelman, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2021--2025, Andrew Gelman, Aki Vehtari, licensed under CC-BY-NC 4.0.
 #' 

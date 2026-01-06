@@ -19,6 +19,8 @@
 #'
 #' # Introduction
 #'
+#' We demonstrate with an example from Section 4.15 of
+#' @Gelman-Vehtari:2024, assessing the grading of a multiple-choice test.
 #' We analyze data from a 24-question final exam from a class of 32
 #' students, where our applied goal is to check that the individual
 #' test questions are doing a good job at discriminating between
@@ -571,3 +573,12 @@ plot_logit_grid_2(
   item_id,
   guessprob = 0.25
 )
+
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#' 
+#' * Code &copy; 2022--2025, Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.

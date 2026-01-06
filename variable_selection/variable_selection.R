@@ -20,9 +20,10 @@
 #' # Introduction
 #'
 #' We work with an example of predicting mathematics and Portuguese
-#' exam grades for a sample of high school students in Portugal. The
-#' same data was used in Chapter 12 of Regression and Other Stories
-#' book to illustrate different models for regression coefficients .
+#' exam grades for a sample of high school students in Portugal
+#' [@Cortez-Silva:2008]. The same data was used in Chapter 12 of
+#' Regression and Other Stories book [@Gelman-Hill-Vehtari:2020] to
+#' illustrate different models for regression coefficients .
 #'
 #' We predict the students' final-year median exam grade in
 #' mathematics (n=407) and Portuguese (n=657) given a large number of
@@ -799,9 +800,6 @@ plot(cv_proportions(rankp, cumulate = TRUE))
 #'
 #' # Licenses {.unnumbered}
 #'
-#' * Code &copy; 2023-2026, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2023-2026, Aki Vehtari, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2023--2026, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2023--2026, Aki Vehtari, licensed under CC-BY-NC 4.0.
 #'
-#' # Original Computing Environment {.unnumbered}
-#'
-sessionInfo()

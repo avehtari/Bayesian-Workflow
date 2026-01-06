@@ -481,7 +481,7 @@ fit2s <- cstan(cat_code2, data = sim_dat)
 fit5s <- cstan(cat_code5, data = sim_dat)
 
 
-#' # 3 Workflow
+#' # Workflow
 
 #' ## Prior predictive distributuon
 #'
@@ -526,3 +526,8 @@ plot(sfit, lty = 1, lwd = 0.1, col = c("black", "orange"), xlim = c(0, 90),
 #| label: fig-km-3
 # lines(sfit, lwd = 5, col = c("white", "white"))
 # lines(sfit, lwd = 3, col = c("black", "orange"))
+
+#' # Licenses {.unnumbered}
+#'
+#' * Code &copy; 2025, Richard McElreath, licensed under BSD-3.
+#' * Text &copy; 2025, Richard McElreath, licensed under CC-BY-NC 4.0.

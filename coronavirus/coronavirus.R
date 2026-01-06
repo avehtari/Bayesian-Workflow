@@ -485,3 +485,12 @@ ggplot(ribbon_df, aes(x = sigma_spec)) +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
+
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#' 
+#' * Code &copy; 2022--2025, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.

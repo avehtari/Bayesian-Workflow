@@ -127,7 +127,7 @@ knitr::opts_chunk$set(
   out.width = "90%"
 )
 
-#' *Load packages*
+#' **Load packages**
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(tidyr)
@@ -520,5 +520,5 @@ draws |>
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2020-2025, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2020-2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2020--2025, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2020--2025, Aki Vehtari, licensed under CC-BY-NC 4.0.

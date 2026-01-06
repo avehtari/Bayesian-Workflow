@@ -29,7 +29,7 @@
 #+ setup, include=FALSE
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)
 
-#' *Load packages*
+#' **Load packages**
 #| cache: FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
@@ -330,11 +330,11 @@ ggplot_LD50_mg_ml +
   stat_slab(data = bdraws1, color = "gray", fill = NA) +
   coord_cartesian(expand = c(bottom = FALSE))
 
-#' ## References {.unnumbered}
+#' # References {.unnumbered}
 #'
 #' <div id="refs"></div>
 #'
-#' ## Licenses {.unnumbered}
+#' # Licenses {.unnumbered}
 #' 
 #' * Code &copy; 2025, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
 #' * Text &copy; 2025, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.

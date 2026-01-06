@@ -16,6 +16,11 @@
 #' This notebook includes the `CmdStanR` code for the Bayesian Workflow book
 #' Chapter 18 *Posterior predictive checking: Stochastic learning in dogs*.
 #'
+#' # Introduction
+#'
+#' We analyse stochastic learning in dogs data by
+#' @Bush+Mosteller:1955.
+#' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
   cache=FALSE,
@@ -113,7 +118,6 @@ plot_ppc <- function(fit, label){
 #| label: fig-dogs_ppc
 #| fig-height: 5.5
 #| fig-width: 5.5
-## pdf(root("dogs", "dogs_ppc.pdf"), height = 5.5, width = 5.5)
 par(mfrow = c(7, 7), mar = c(.5, .5, .5, .5))
 empty_plot("Real dogs")
 plot_dogs(shock)
@@ -126,13 +130,11 @@ plot_ppc(fit_2, "PPsims from M2:\n2-parameter\nlog model")
 plot_ppc(fit_3, "PPsims from M3:\nhier 1-par\nlog model")
 plot_ppc(fit_4, "PPsims from M4:\nhier 2-par\nlog model")
 plot_ppc(fit_5, "PPsims from M5:\nhier 2-par\nlog model\nwith prior")
-## dev.off()
 
 #| label: fig-dogs_inference
 #| fig-height: 3
 #| fig-width: 7.5
 post <- as_draws_rvars(fit_5$draws())
-## pdf(root("dogs", "dogs_inference.pdf"), height = 3, width = 7.5)
 par(mfrow = c(2, 5), pty = "s", 
     mar = c(2.5, 2.5, 0.5, 0.5), mgp = c(1.5, 0.2, 0), 
     tck = -0.02, oma = c(0, 0, 1, 0))
@@ -152,20 +154,17 @@ for (k in 1:2){
           3, 0, cex = 0.8, outer = TRUE)
   }
 }
-## dev.off()
 
 #| label: fig-dogs_point_estimate
 #| fig-height: 4
 #| fig-width: 4
 post <- as_draws_rvars(fit_5$draws())
-## pdf(root("dogs", "dogs_point_estimate.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, .5, 0), tck = -.01)
 plot(median(post$a), median(post$b), 
      xlim = c(0.55, 1), ylim = c(0.55, 1), xaxs = "i", yaxs = "i", 
      xlab = expression(hat(a)), ylab = expression(hat(b)), pch = 20, cex = 0.6, 
      main = "Posterior medians from fitted model", cex.main = 0.9)
   abline(0,1,lwd=.5, col="gray")
-## dev.off()
 
 new_dogs_mu_logit_ab <- c(2.4, 1.3)
 new_dogs_sigma_ab <- c(0.32, 0.40)
@@ -202,28 +201,23 @@ print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[
 #| label: fig-dogs_parameters
 #| fig-height: 4
 #| fig-width: 4
-## pdf(root("dogs",  "new_dogs_parameters.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)
 plot(a, b, xlim = c(0.55, 1), ylim = c(0.55, 1), 
      xaxs = "i", yaxs = "i",  xlab = "a", ylab = "b", pch = 20, cex = 0.6, 
      main = "Simulated parameters", cex.main = 0.9)
 abline(0, 1, lwd = 0.5, col = "gray")
-## dev.off()
 
 
 #| label: fig-dogs_data
 #| fig-height: 4
 #| fig-width: 3
-## pdf(root("dogs", "new_dogs_data.pdf"), height = 4, width = 3)
 par(pty = "m", mar = c(1, 2, 2, 1))
 plot_dogs(new_dogs, main = "Simulated data", cex.main = 0.9)
-## dev.off()
 
 #| label: fig-dogs_calibration
 #| fig-height: 4
 #| fig-width: 4
 post <- as_draws_rvars(new_fit_5$draws())
-## pdf(root("dogs", "new_dogs_calibration.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)
 plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1),
      xlab = "Posterior inference", ylab = "True parameter value", 
@@ -236,7 +230,6 @@ for (j in 1:J){
   points(median(post$b[j]), b[j], pch = 20, cex = 0.6, col = "red")
   lines(quantile(post$b[j], c(0.25, 0.75)), rep(b[j], 2), lwd = 0.5, col = "red")
 }
-## dev.off()
 
 J <- 300
 new_dogs_ab <- invlogit(mvrnorm(J, new_dogs_mu_logit_ab, new_dogs_Sigma_ab))
@@ -286,16 +279,13 @@ print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[
 #| label: fig-dogs_data_50
 #| fig-height: 4
 #| fig-width: 6
-## pdf(root("dogs", "new_dogs_data_50.pdf"), height = 4, width = 6)
 par(pty = "m", mar = c(1, 2, 2, 1))
 plot_dogs(new_dogs, main = "Simulated data:  50 trials", cex.main = 0.9)
-## dev.off()
 
 #| label: fig-dogs_calibration_50
 #| fig-height: 4
 #| fig-width: 4
 post <- as_draws_rvars(new_fit_5$draws())
-## pdf(root("dogs", "new_dogs_calibration_50.pdf"), height = 4, width = 4)
 par(pty = "s", mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)
 plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1), 
      xlab = "Posterior inference", ylab = "True parameter value", 
@@ -308,4 +298,12 @@ for (j in 1:J){
   points(median(post$b[j]), b[j], pch = 20, cex = 0.6, col = "red")
   lines(quantile(post$b[j], c(0.25, 0.75)), rep(b[j], 2), lwd = 0.5, col = "red")
 }
-## dev.off()
+
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#'
+#' * Code &copy; 2023--2025, Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2023--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.

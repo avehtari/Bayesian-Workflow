@@ -68,8 +68,7 @@ print_stan_file <- function(file) {
 
 #' # Data
 #' 
-#' The roaches data example comes from Chapter 8.3 of [Gelman and Hill
-#' (2007)](http://www.stat.columbia.edu/~gelman/arm/).
+#' The roaches data example comes from Chapter 8.3 of @Gelman-Hill:2007.
 #' 
 #' > the treatment and control were applied to 160 and 104 apartments,
 #' respectively, and the outcome measurement $y_i$ in each apartment
@@ -970,13 +969,5 @@ loo_compare(fit_zinb, fit_zinb_m2,
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2017-2025, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2017-2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
-#' 
-#' # Original Computing Environment {.unnumbered}
-#' 
-sessionInfo()
-
-#' 
-#' <br />
-#' 
+#' * Code &copy; 2017--2025, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2017--2025, Aki Vehtari, licensed under CC-BY-NC 4.0.

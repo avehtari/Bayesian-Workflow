@@ -68,7 +68,6 @@
 #' presentation, we try to distinguish generalizable methods,
 #' problem-specific steps, and shortcoming in existing defaults.
 #' 
-#' # Setup  {.unnumbered}
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
   cache = FALSE,
@@ -829,9 +828,16 @@ ppc_plot2D(fit2p, data_pred = data_pred, plot_star = TRUE)
 #' fit and fail fast. Further posterior draws can be obtained using
 #' MCMC with Pathfinder initialization.
 #' 
-#' ## Acknowledgement {.unnumbered}
+#' # Acknowledgement {.unnumbered}
 #' 
 #' We thank Ben Bales, Matthew West, Martin Modrák, and Jonah Gabry
 #' for helpful discussion.
 #' 
-#' ## References {.unnumbered}
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#'
+#' * Code &copy; 2020--2026, Charles C. Margossian, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2020--2026, Charles C. Margossian, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.

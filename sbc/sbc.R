@@ -1,7 +1,7 @@
 #' ---
 #' title: "Simulation based calibration checking workflow"
 #' author: "Martin Modrák"
-#' date: 2026-01-05
+#' date: 2022-12-16
 #' date-modified: today
 #' date-format: iso
 #' format:
@@ -967,10 +967,7 @@ mean(sign(stats_beta2$q5) == sign(stats_beta2$q95))
 #'
 #' <div id="refs"></div>
 #'
-#' ## Original Computing Environment {.unnumbered}
-#'
-#' Cmdstan version
-cmdstanr::cmdstan_version()
+#' # Licenses {.unnumbered}
 #' 
-sessionInfo()
-
+#' * Code &copy; 2022--2026, Martin Modrák, licensed under BSD-3.
+#' * Text &copy; 2022--2026, Martin Modrák, licensed under CC-BY-NC 4.0.

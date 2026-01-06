@@ -17,40 +17,8 @@
 #' Chapter 20 *Using a fitted model for decision analysis: Mixture
 #' model for time series competition*.
 #'
-#+ setup, include=FALSE
-knitr::opts_chunk$set(
-  cache = FALSE,
-  message = FALSE,
-  error = FALSE,
-  warning = FALSE,
-  comment = NA,
-  out.width = '95%'
-)
-
+#' # Introduction
 #'
-#' **Load packages**
-#| cache: FALSE
-library(rprojroot)
-root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library(scales)
-options(digits = 2)
-library(cmdstanr)
-library(posterior)
-options(mc.cores = 4)
-set.seed(1123)
-
-print_stan_file <- function(file) {
-  code <- readLines(file)
-  if (isTRUE(getOption("knitr.in.progress")) &
-        identical(knitr::opts_current$get("results"), "asis")) {
-    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
-    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
-    knitr::asis_output(block)
-  } else {
-    writeLines(code)
-  }
-}
-
 #' A few years ago someone sent us an email about a "Global Climate
 #' Challenge" that he had seen online, and which was introduced as
 #' follows:
@@ -93,6 +61,42 @@ print_stan_file <- function(file) {
 #'
 #' > Each entry must be accompanied by a payment of $10.
 #'
+#+ setup, include=FALSE
+knitr::opts_chunk$set(
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
+  out.width = '95%'
+)
+
+#'
+#' **Load packages**
+#| cache: FALSE
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
+library(scales)
+options(digits = 2)
+library(cmdstanr)
+library(posterior)
+options(mc.cores = 4)
+set.seed(1123)
+
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
+#' # Data
+#'
 #' OK, now it's time to get to work.  We start by downloading and
 #' graphing the data.
 series <- matrix(
@@ -114,6 +118,8 @@ for (n in 1:N) {
   lines(1:T, series[n, ], lwd = .5, col = alpha("black", 0.2))
 }
 
+#' # Separate linear regression
+#'
 #' Aha! The lines are fanning out from a common starting point. We'll fit
 #' a regression to each line and then summarize each line by its average
 #' slope.  This is not necessarily the most efficient way to estimate
@@ -159,6 +165,8 @@ hist(
 
 #' Based on the problem description, I'd expect to see distributions
 #' centered at 0, -1, and 1. It looks like this might be the case.
+#'
+#' # Stan mixture model
 #'
 #' So let's fit a mixture model. That's easy.  Here's the Stan model:
 #| results: asis
@@ -314,3 +322,7 @@ recip
 #' claims about climate science, it would just mean he hadn't been
 #' careful enough in setting up his bet.
 #'
+#' # Licenses {.unnumbered}
+#'
+#' * Code &copy; 2022--2025, Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.
