@@ -193,7 +193,7 @@ data_lin_priors <- c(list(
     pmualpha_c = 10,     # prior mean for average temperature
     psalpha = 10,        # weakly informative
     pmubeta = 0,         # a priori incr. and decr. as likely
-    psbeta = 0.1/3,   # avg temp prob does does not incr. more than a degree per 10 years:  setting this to +/-3 sd's
+    psbeta = 0.1/3,      # avg temp prob does does not incr. more than a degree per 10 years:  setting this to +/-3 sd's
     pssigma = 1),        # setting sd of total variation in summer average temperatures to 1 degree implies that +/- 3 sd's is +/-3 degrees: 
   data_lin)
 
@@ -333,8 +333,8 @@ estimates <- t(sapply(1:10, function(i) {
                  show_messages = FALSE)$draws() |>
     mutate_variables(beta100 = 100*beta) |>
     subset_draws("beta100") |>
-      summarize_draws(mean, ~quantile(.x, probs = c(0.05, 0.95))) |>
-      select(-variable)})) |> unlist() |> matrix(nrow = 10)
+    summarize_draws(mean, ~quantile(.x, probs = c(0.05, 0.95))) |>
+    select(-variable)})) |> unlist() |> matrix(nrow = 10)
 colnames(estimates) <- c("mean", "5%", "95%")
 
 as_tibble(estimates) |> tt()
