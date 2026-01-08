@@ -963,7 +963,7 @@ mean(sign(stats_beta2$q5) == sign(stats_beta2$q95))
 #' that your model is at least pretty close to your simulator.
 #'
 #' 
-#' ## References {.unnumbered}
+#' # References {.unnumbered}
 #'
 #' <div id="refs"></div>
 #'
