@@ -247,6 +247,7 @@ tic('Finding MAP for model 1 with optimization')
 opt1 <- model1$optimize(data = standata1, init = 0, algorithm = "bfgs",
                         jacobian = TRUE)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -278,10 +279,12 @@ birthdays |>
 #' we get 400 approximate draws.
 #| label: lap1
 #| results: hide
+#| cache: true
 tic('Sampling from Laplace approximation of model 1 posterior')
 lap1 <- model1$laplace(data = standata1, mode = opt1, draws = 400,
                        refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values. With Laplace method, we get
@@ -325,10 +328,12 @@ ldraws1 |>
 #' not be used as the final result.
 #| label: fit1
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 1 posterior')
 fit1 <- model1$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4, seed = 3896)
 #'
+#| cache: true
 mytoc()
 
 #' Depending on the random seed and luck, we sometimes observed that
@@ -348,11 +353,13 @@ mytoc()
 #' which are typical for hierarchical model. We get 400 draws from
 #' 10 Pathfinder runs.
 #| label: pth1
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 1 posterior')
 pth1 <- model1$pathfinder(data = standata1, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 100, max_lbfgs_iters = 100,
                           refresh = 0)
+#| cache: true
 mytoc()
 
 #' Pathfinder provides automatically Pareto-$\hat{k}$ diagnostic which
@@ -380,11 +387,13 @@ summarise_draws(subset(pdraws1, variable = c("intercept", "sigma_f1", "lengthsca
 #' (in unconstrained space).
 #| label: fit1init
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 1 posterior with Pathfinder initialization')
 fit1 <- model1$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth1)
 #'
+#| cache: true
 mytoc()
 
 #' In many of the following short MCMC samplings we get some or many
@@ -449,22 +458,26 @@ model1b <- cmdstan_model(stan_file = root("birthdays", "gpbf1b.stan"),
 
 #' First run Pathfinder
 #| label: pth1b
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 1b posterior')
 pth1b <- model1b$pathfinder(data = standata1, init = 0.1,
                             num_paths = 10, single_path_draws = 40, draws = 400,
                             history_size = 50, max_lbfgs_iters = 100, 
                             refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Then sample using the Pathfinder initialization.
 #| label: fit1b
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 1b posterior with Pathfinder initialization')
 fit1b <- model1b$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
                         chains = 4, parallel_chains = 4,
                         init = pth1b)
 #'
+#| cache: true
 mytoc()
 
 #' The sampling is even faster, indicating that the strong posterior
@@ -550,12 +563,14 @@ standata2 <- list(x = birthdays$id,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth2
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 2 posterior')
 pth2 <- model2$pathfinder(data = standata2, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -614,11 +629,13 @@ pf / (pf1 + pf2)
 #' workflow, the result should not be used as the final result).
 #| label: fit2
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 2 posterior with Pathfinder initialization')
 fit2 <- model2$sample(data = standata2, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth2)
 #'
+#| cache: true
 mytoc()
 
 #' While Pathfinder took about 12s, sampling with short chains is
@@ -722,12 +739,14 @@ standata3 <- list(x = birthdays$id,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth3
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 3 posterior')
 pth3 <- model3$pathfinder(data = standata3, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100, 
                           refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -789,11 +808,13 @@ pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
 #' workflow, the result should not be used as the final result).
 #| label: fit3
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 3 posterior with Pathfinder initialization')
 fit3 <- model3$sample(data = standata3, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth3)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -909,12 +930,14 @@ standata4 <- list(x = birthdays$id,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth4
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 4 posterior')
 pth4 <- model4$pathfinder(data = standata4, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -986,11 +1009,13 @@ pf3b <- birthdays |>
 #' workflow, the result should not be used as the final result).
 #| label: fit4
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 4 posterior with Pathfinder initialization')
 fit4 <- model4$sample(data = standata4, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth4)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1130,12 +1155,14 @@ standata5 <- list(x = birthdays$id,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth5
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -1233,12 +1260,14 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
 #' initializing MCMC. In such case we can turn of the PSIS resampling
 #' in Stan, and do PSIS without replacement in R.
 #| label: pth5_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' We check the number of distinct draws, which is now higher (no resampling).
@@ -1273,11 +1302,13 @@ summarise_draws(subset(pdraws5, variable = c("lp__")), n_distinct) |>
 #' workflow, the result should not be used as the final result).
 #| label: fit5
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 5 posterior with Pathfinder initialization')
 fit5 <- model5$sample(data = standata5, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth5)
 #'
+#| cache: true
 mytoc()
 
 #' Before using Pathfinder to initialize sampling, the sampling took
@@ -1424,12 +1455,14 @@ standata6 <- list(x = birthdays$id,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth6
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pathfinder provides automatically Pareto-$\hat{k}$ diagnostic which
@@ -1529,12 +1562,14 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
 #' initializing MCMC. In such case we can turn of the PSIS resampling
 #' in Stan.
 #| label: pth6_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
@@ -1542,11 +1577,13 @@ mytoc()
 #' workflow, the result should not be used as the final result).
 #| label: fit6
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 6 posterior with Pathfinder initialization')
 fit6 <- model6$sample(data = standata6, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth6)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1700,11 +1737,13 @@ standata7 <- list(x = birthdays$id,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth7
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 7 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0)
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1791,12 +1830,14 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
 
 #' Turn of the PSIS resampling in Stan to get distinct draws for initialization.
 #| label: pth7_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
@@ -1804,11 +1845,13 @@ mytoc()
 #' workflow, the result should not be used as the final result).
 #| label: fit7
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 7 posterior with Pathfinder initialization')
 fit7 <- model7$sample(data = standata7, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth7)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1948,12 +1991,14 @@ standata8 <- list(x = birthdays$id,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth8
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -2051,12 +2096,14 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
 
 #' We turn of the PSIS resampling in Stan.
 #| label: pth8_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
                           refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
@@ -2064,11 +2111,13 @@ mytoc()
 #' workflow, the result should not be used as the final result).
 #| label: fit8
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 8 posterior with Pathfinder initialization')
 fit8 <- model8$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
                       init = pth8, refresh = 10)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -2196,12 +2245,14 @@ model8tnu <- cmdstan_model(stan_file = root("birthdays", "gpbf8tnu.stan"),
 #' final result). We turn off the resampling in Stan to get distinct
 #' draws for initialization of MCMC.
 #| label: pth8tnu
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8tnu posterior')
 pth8tnu <- model8tnu$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
@@ -2209,11 +2260,13 @@ mytoc()
 #' workflow, the result should not be used as the final result).
 #| label: fit8tnu
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 8tnu posterior with Pathfinder initialization')
 fit8tnu <- model8tnu$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
                             init = pth8tnu, refresh = 10)
 #'
+#| cache: true
 mytoc()
 
 #' We get a high number of divergences. The posterior clearly has a
@@ -2395,12 +2448,14 @@ standata8 <- c(standata8,
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
 #| label: pth8rhs
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the optimization result as initial values
@@ -2408,11 +2463,13 @@ mytoc()
 #' workflow, the result should not be used as the final result).
 #| label: fit8rhs
 #| results: hide
+#| cache: true
 tic('MCMC sampling from model 8rhs posterior with Pathfinder initialization')
 fit8rhs <- model8rhs$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
                             init = pth8rhs, refresh = 10)
 #'
+#| cache: true
 mytoc()
 
 #' We get a high number of divergences. The posterior clearly has a
@@ -2635,6 +2692,7 @@ model8rhs_nogq <- cmdstan_model(stan_file = root("birthdays", "gpbf8rhs_nogq.sta
                                 cpp_options = list(stan_threads = TRUE))
 
 #| label: pth8rhs_nogq
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 10,
@@ -2642,6 +2700,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' As the generated quantities are not computed and written to the
@@ -2656,6 +2715,7 @@ mytoc()
 #' the minor modes. At the moment (2024-01-21) there is a bug so that
 #' minimum number of draws per path is 25.
 #| label: pth8rhs_nogq_10draws
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 10,
@@ -2663,6 +2723,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' There is not much time saving and the number of paths run dominate.
@@ -2672,6 +2733,7 @@ mytoc()
 #' number of draws per path is 25, but these draws the ones used to
 #' estimate ELBO, so there is no additional computational cost.
 #| label: pth8rhs_nogq_4draws
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 4,
@@ -2679,6 +2741,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' With my laptop, it takes about 1.5s to run 4 paths to get 4
@@ -2688,6 +2751,7 @@ mytoc()
 #' normal approximation. At the moment (2024-01-21) there is a bug so
 #' that minimum number of draws per path is 25.
 #| label: pth8rhs_nogq_single
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 4,
@@ -2695,6 +2759,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 history_size = 50, max_lbfgs_iters = 100,
                                 refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' The time goes down to less than 1s, but these draws are likely to have less
@@ -2707,6 +2772,7 @@ mytoc()
 #' computation time much.
 #' 
 #| label: pth8rhs_nogq_4000draws
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                      num_threads = 10,
@@ -2714,6 +2780,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                      history_size = 50, max_lbfgs_iters = 100,
                                      refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Compare the mean and sd of some parameters from Pathfinder and MCMC. In this case,
