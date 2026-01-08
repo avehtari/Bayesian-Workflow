@@ -61,8 +61,7 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 
 ## Miscellaneous code
 
-Code which is not part of complete case studies, but can be useful for
-regenarating figures in Chapters 6--12 can be found in [GitHub
-directory
-misc](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
+Code that is not part of complete case studies, but may be useful for 
+regenerating some figures in Chapters 6--12, can be found in the [GitHub `misc` directory](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
+
 
