@@ -57,3 +57,12 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 - [Ch 29: Park rule: No vehicles in the park](park_rule/park_rule_aki.html)
 - [Ch 30: Planetary motion: Computational challenge of multimodality](planetary_motion/planetary_motion.html)
 - [Ch 31: Simulation based calibration checking (SBC)](sbc/sbc.html)
+
+
+## Miscellaneous code
+
+Code which is not part of complete case studies, but can be useful for
+regenarating figures in Chapters 6--12 can be found in [GitHub
+directory
+misc](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
+
