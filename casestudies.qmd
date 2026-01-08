@@ -66,3 +66,57 @@ regenarating figures in Chapters 6--12 can be found in [GitHub
 directory
 misc](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
 
+## Software versions
+
+We list here all the software packages used in the case studies and the versions used
+when rendering the case study web pages 2026-01-08.
+
+```{r, echo=FALSE}
+# 1. Find all .R files recursively
+r_files <- list.files(
+  path = ".",
+  pattern = "\\.[Rr]$",
+  recursive = TRUE,
+  full.names = TRUE
+)
+
+# 2. Extract package names from each file
+get_pkgs_from_file <- function(file) {
+  txt <- readLines(file, warn = FALSE)
+  # remove comments
+  txt <- gsub("#.*$", "", txt)
+  # collapse to single string for easier regex matching
+  all_code <- paste(txt, collapse = "\n")
+  pkgs <- character()
+  # library(pkg) and require(pkg)
+  # handles library("pkg"), library('pkg'), library(pkg)
+  lib_req_pattern <- "\\b(library|require)\\s*\\(\\s*(['\"]?)([A-Za-z0-9\\.]+)\\2\\s*\\)"
+  lib_req_matches <- gregexpr(lib_req_pattern, all_code, perl = TRUE)
+  if (lib_req_matches[[1]][1] != -1) {
+    m <- regmatches(all_code, lib_req_matches)[[1]]
+    pkgs <- c(pkgs, sub(lib_req_pattern, "\\3", m, perl = TRUE))
+  }
+  # pkg::fun or pkg:::fun
+  colon_pattern <- "\\b([A-Za-z0-9\\.]+):::?"
+  colon_matches <- gregexpr(colon_pattern, all_code, perl = TRUE)
+  if (colon_matches[[1]][1] != -1) {
+    m <- regmatches(all_code, colon_matches)[[1]]
+    pkgs <- c(pkgs, sub(colon_pattern, "\\1", m, perl = TRUE))
+  }
+  unique(pkgs)
+}
+pkg_list <- unique(unlist(lapply(r_files, get_pkgs_from_file)))
+# 3. Check installed versions
+ip <- as.data.frame(installed.packages(), stringsAsFactors = FALSE)
+result <- data.frame(
+  Package = pkg_list,
+  Version = ip[pkg_list, "Version"],
+  stringsAsFactors = FALSE,
+  row.names = NULL
+)
+result <- rbind(
+  result,
+  data.frame(Package = "CmdStan", Version = cmdstanr::cmdstan_version())
+)
+result[order(result$Package), ] |> tinytable::tt() |> tinytable::theme_html(class = "tinytable tinytable-sm")
+```
