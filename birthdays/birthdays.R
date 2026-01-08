@@ -53,8 +53,9 @@ mytoc <- \() {
     sprintf("%s took %s sec", msg, as.character(signif(toc - tic, 2)))
   })}
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
 dir.create(root("birthdays", "stan_output"))
-CMDSTANR_OUTPUT_DIR <- root("birthdays", "stan_output")
+options(cmdstanr_output_dir = root("birthdays", "stan_output"))
 library(posterior)
 options(pillar.neg = FALSE,
         pillar.subtle = FALSE,
@@ -244,7 +245,7 @@ standata1 <- list(x = birthdays$id,
 #| results: hide
 tic('Finding MAP for model 1 with optimization')
 opt1 <- model1$optimize(data = standata1, init = 0, algorithm = "bfgs",
-                        jacobian = TRUE, output_dir = CMDSTANR_OUTPUT_DIR)
+                        jacobian = TRUE)
 #'
 mytoc()
 
@@ -279,7 +280,7 @@ birthdays |>
 #| results: hide
 tic('Sampling from Laplace approximation of model 1 posterior')
 lap1 <- model1$laplace(data = standata1, mode = opt1, draws = 400,
-                       refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                       refresh = 0)
 #'
 mytoc()
 
@@ -326,8 +327,7 @@ ldraws1 |>
 #| results: hide
 tic('MCMC sampling from model 1 posterior')
 fit1 <- model1$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
-                      chains = 4, parallel_chains = 4, seed = 3896, 
-                      output_dir = CMDSTANR_OUTPUT_DIR)
+                      chains = 4, parallel_chains = 4, seed = 3896)
 #'
 mytoc()
 
@@ -352,7 +352,7 @@ tic('Sampling from Pathfinder approximation of model 1 posterior')
 pth1 <- model1$pathfinder(data = standata1, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 100, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 mytoc()
 
 #' Pathfinder provides automatically Pareto-$\hat{k}$ diagnostic which
@@ -383,7 +383,7 @@ summarise_draws(subset(pdraws1, variable = c("intercept", "sigma_f1", "lengthsca
 tic('MCMC sampling from model 1 posterior with Pathfinder initialization')
 fit1 <- model1$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth1, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth1)
 #'
 mytoc()
 
@@ -453,7 +453,7 @@ tic('Sampling from Pathfinder approximation of model 1b posterior')
 pth1b <- model1b$pathfinder(data = standata1, init = 0.1,
                             num_paths = 10, single_path_draws = 40, draws = 400,
                             history_size = 50, max_lbfgs_iters = 100, 
-                            refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                            refresh = 0)
 #'
 mytoc()
 
@@ -463,7 +463,7 @@ mytoc()
 tic('MCMC sampling from model 1b posterior with Pathfinder initialization')
 fit1b <- model1b$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
                         chains = 4, parallel_chains = 4,
-                        init = pth1b, output_dir = CMDSTANR_OUTPUT_DIR)
+                        init = pth1b)
 #'
 mytoc()
 
@@ -554,7 +554,7 @@ tic('Sampling from Pathfinder approximation of model 2 posterior')
 pth2 <- model2$pathfinder(data = standata2, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
 mytoc()
 
@@ -617,7 +617,7 @@ pf / (pf1 + pf2)
 tic('MCMC sampling from model 2 posterior with Pathfinder initialization')
 fit2 <- model2$sample(data = standata2, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth2, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth2)
 #'
 mytoc()
 
@@ -726,7 +726,7 @@ tic('Sampling from Pathfinder approximation of model 3 posterior')
 pth3 <- model3$pathfinder(data = standata3, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100, 
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
 mytoc()
 
@@ -792,7 +792,7 @@ pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
 tic('MCMC sampling from model 3 posterior with Pathfinder initialization')
 fit3 <- model3$sample(data = standata3, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth3, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth3)
 #'
 mytoc()
 
@@ -913,7 +913,7 @@ tic('Sampling from Pathfinder approximation of model 4 posterior')
 pth4 <- model4$pathfinder(data = standata4, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
 mytoc()
 
@@ -989,7 +989,7 @@ pf3b <- birthdays |>
 tic('MCMC sampling from model 4 posterior with Pathfinder initialization')
 fit4 <- model4$sample(data = standata4, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth4, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth4)
 #'
 mytoc()
 
@@ -1134,7 +1134,7 @@ tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
 mytoc()
 
@@ -1237,8 +1237,7 @@ tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -1277,7 +1276,7 @@ summarise_draws(subset(pdraws5, variable = c("lp__")), n_distinct) |>
 tic('MCMC sampling from model 5 posterior with Pathfinder initialization')
 fit5 <- model5$sample(data = standata5, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth5, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth5)
 #'
 mytoc()
 
@@ -1429,7 +1428,7 @@ tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
 mytoc()
 
@@ -1534,8 +1533,7 @@ tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -1547,7 +1545,7 @@ mytoc()
 tic('MCMC sampling from model 6 posterior with Pathfinder initialization')
 fit6 <- model6$sample(data = standata6, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth6, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth6)
 #'
 mytoc()
 
@@ -1706,7 +1704,7 @@ tic('Sampling from Pathfinder approximation of model 7 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1797,8 +1795,7 @@ tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -1810,7 +1807,7 @@ mytoc()
 tic('MCMC sampling from model 7 posterior with Pathfinder initialization')
 fit7 <- model7$sample(data = standata7, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth7, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth7)
 #'
 mytoc()
 
@@ -1955,7 +1952,7 @@ tic('Sampling from Pathfinder approximation of model 8 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
 mytoc()
 
@@ -2058,8 +2055,7 @@ tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -2071,7 +2067,7 @@ mytoc()
 tic('MCMC sampling from model 8 posterior with Pathfinder initialization')
 fit8 <- model8$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth8, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth8, refresh = 10)
 #'
 mytoc()
 
@@ -2204,8 +2200,7 @@ tic('Sampling from Pathfinder approximation of model 8tnu posterior')
 pth8tnu <- model8tnu$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -2217,7 +2212,7 @@ mytoc()
 tic('MCMC sampling from model 8tnu posterior with Pathfinder initialization')
 fit8tnu <- model8tnu$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
-                            init = pth8tnu, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
+                            init = pth8tnu, refresh = 10)
 #'
 mytoc()
 
@@ -2404,8 +2399,7 @@ tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -2417,7 +2411,7 @@ mytoc()
 tic('MCMC sampling from model 8rhs posterior with Pathfinder initialization')
 fit8rhs <- model8rhs$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
-                            init = pth8rhs, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
+                            init = pth8rhs, refresh = 10)
 #'
 mytoc()
 
@@ -2646,8 +2640,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 10,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -2668,8 +2661,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 10,
                                 num_paths = 10, single_path_draws = 1, draws = 10,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -2685,8 +2677,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 4,
                                 num_paths = 4, single_path_draws = 1, draws = 4,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -2702,8 +2693,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 4,
                                 num_paths = 1, single_path_draws = 4, draws = 4,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
@@ -2722,8 +2712,7 @@ pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                      num_threads = 10,
                                      num_paths = 40, single_path_draws = 100, draws = 4000,
                                      history_size = 50, max_lbfgs_iters = 100,
-                                     refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                     psis_resample = FALSE)
+                                     refresh = 0, psis_resample = FALSE)
 #'
 mytoc()
 
