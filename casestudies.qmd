@@ -15,8 +15,8 @@ figures in the book.  They can be a good way to see what the code
 does. Different people have different styles of code and we don't
 claim our style is the best.
 
-When running the notebooks, to avoid need to switch the working
-directory, `rprojroot` package is used to set the project root
+When running the notebooks, to avoid the need to switch the working
+directory, the `rprojroot` package is used to set the project root
 directory. The downloaded git repository can be placed anywhere you
 like and you can rename the Bayesian-Workflow directory if you
 wish. When running the code, it is sufficient that the working
@@ -26,7 +26,8 @@ renamed). Running
 library("rprojroot")
 root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
 ```
-will find the file `.Bayesian-Workflow-root` which is in the `Bayesian-Workflow` directory, and will set the full path according to that. Then, for example,
+will find the file `.Bayesian-Workflow-root` which is in the `Bayesian-Workflow` directory, 
+and will set the full path according to that. Then, for example,
 ```
 bioassay_stan_file <- root("bioassay","bioassay0.stan")
 ```
@@ -61,10 +62,9 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 
 ## Miscellaneous code
 
-Code which is not part of complete case studies, but can be useful for
-regenarating figures in Chapters 6--12 can be found in [GitHub
-directory
-misc](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
+Code that is not part of complete case studies, but may be useful for 
+regenerating some figures in Chapters 6--12, can be found in the [GitHub `misc` directory](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
+
 
 ## Software versions
 
