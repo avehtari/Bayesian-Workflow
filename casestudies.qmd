@@ -89,7 +89,6 @@ get_pkgs_from_file <- function(file) {
   all_code <- paste(txt, collapse = "\n")
   pkgs <- character()
   # library(pkg) and require(pkg)
-  # handles library("pkg"), library('pkg'), library(pkg)
   lib_req_pattern <- "\\b(library|require)\\s*\\(\\s*(['\"]?)([A-Za-z0-9\\.]+)\\2\\s*\\)"
   lib_req_matches <- gregexpr(lib_req_pattern, all_code, perl = TRUE)
   if (lib_req_matches[[1]][1] != -1) {
@@ -105,18 +104,68 @@ get_pkgs_from_file <- function(file) {
   }
   unique(pkgs)
 }
+
 pkg_list <- unique(unlist(lapply(r_files, get_pkgs_from_file)))
+
 # 3. Check installed versions
 ip <- as.data.frame(installed.packages(), stringsAsFactors = FALSE)
+
 result <- data.frame(
   Package = pkg_list,
   Version = ip[pkg_list, "Version"],
   stringsAsFactors = FALSE,
   row.names = NULL
 )
+
+# add CmdStan row
 result <- rbind(
   result,
   data.frame(Package = "CmdStan", Version = cmdstanr::cmdstan_version())
 )
-result[order(result$Package), ] |> tinytable::tt() |> tinytable::theme_html(class = "tinytable tinytable-sm")
+
+# helper to get package website URL
+get_pkg_url <- function(pkg) {
+  # special cases
+  url <- switch(pkg,
+                brms = "https://paulbuerkner.com/brms/",
+                CmdStan = "https://mc-stan.org/cmdstanr/",
+                priorsense = "https://n-kall.github.io/priorsense/",
+                NULL)
+  if (!is.null(url)) return(url)
+
+  # try DESCRIPTION first
+  desc <- tryCatch(utils::packageDescription(pkg), error = function(e) NULL)
+  if (!is.null(desc)) {
+    if ("URL" %in% names(desc)) {
+      url_field <- desc[["URL"]]
+      if (!is.null(url_field) && nzchar(url_field)) {
+        # DESCRIPTION may have multiple URLs separated by commas/spaces/newlines
+        urls <- unlist(strsplit(url_field, "[,[:space:]]+"))
+        urls <- urls[urls != ""]
+        if (length(urls)) return(urls[1])
+      }
+    }
+  }
+
+  # fallback: CRAN page
+  paste0("https://cran.r-project.org/package=", pkg)
+}
+
+# Build an HTML link for each package
+result$Package_link <- vapply(
+  result$Package,
+  function(p) {
+    url <- get_pkg_url(p)
+    sprintf("<a href=\"%s\" target=\"_blank\">%s</a>", url, p)
+  },
+  character(1)
+)
+
+# Order and select columns for display
+result_display <- result[order(result$Package), c("Package_link", "Version")]
+names(result_display)[1] <- "Package"
+
+result_display |>
+  tinytable::tt(escape = FALSE) |>
+  tinytable::theme_html(class = "tinytable tinytable-sm")
 ```
