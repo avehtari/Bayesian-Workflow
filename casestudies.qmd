@@ -72,100 +72,63 @@ We list here all the software packages used in the case studies and the versions
 when rendering the case study web pages 2026-01-08.
 
 ```{r, echo=FALSE}
-# 1. Find all .R files recursively
-r_files <- list.files(
-  path = ".",
-  pattern = "\\.[Rr]$",
-  recursive = TRUE,
-  full.names = TRUE
-)
-
-# 2. Extract package names from each file
-get_pkgs_from_file <- function(file) {
-  txt <- readLines(file, warn = FALSE)
-  # remove comments
-  txt <- gsub("#.*$", "", txt)
-  # collapse to single string for easier regex matching
-  all_code <- paste(txt, collapse = "\n")
-  pkgs <- character()
-  # library(pkg) and require(pkg)
-  lib_req_pattern <- "\\b(library|require)\\s*\\(\\s*(['\"]?)([A-Za-z0-9\\.]+)\\2\\s*\\)"
-  lib_req_matches <- gregexpr(lib_req_pattern, all_code, perl = TRUE)
-  if (lib_req_matches[[1]][1] != -1) {
-    m <- regmatches(all_code, lib_req_matches)[[1]]
-    pkgs <- c(pkgs, sub(lib_req_pattern, "\\3", m, perl = TRUE))
-  }
-  # pkg::fun or pkg:::fun
-  colon_pattern <- "\\b([A-Za-z0-9\\.]+):::?"
-  colon_matches <- gregexpr(colon_pattern, all_code, perl = TRUE)
-  if (colon_matches[[1]][1] != -1) {
-    m <- regmatches(all_code, colon_matches)[[1]]
-    pkgs <- c(pkgs, sub(colon_pattern, "\\1", m, perl = TRUE))
-  }
-  unique(pkgs)
+# Extract package names from R files
+get_pkgs <- function(file) {
+  code <- paste(gsub("#.*$", "", readLines(file, warn = FALSE)), collapse = "\n")
+  lib_pat <- "\\b(library|require)\\s*\\(\\s*['\"]?([A-Za-z0-9.]+)"
+  col_pat <- "\\b([A-Za-z0-9.]+):::"
+  c(gsub(lib_pat, "\\2", regmatches(code, gregexpr(lib_pat, code))[[1]]),
+    gsub(col_pat, "\\1", regmatches(code, gregexpr(col_pat, code))[[1]])) |> unique()
 }
 
-pkg_list <- unique(unlist(lapply(r_files, get_pkgs_from_file)))
-
-# 3. Check installed versions
-ip <- as.data.frame(installed.packages(), stringsAsFactors = FALSE)
-
-result <- data.frame(
-  Package = pkg_list,
-  Version = ip[pkg_list, "Version"],
-  stringsAsFactors = FALSE,
-  row.names = NULL
-)
-
-# add CmdStan row
-result <- rbind(
-  result,
-  data.frame(Package = "CmdStan", Version = cmdstanr::cmdstan_version())
-)
-
-# helper to get package website URL
-get_pkg_url <- function(pkg) {
-  # special cases
-  url <- switch(pkg,
-                brms = "https://paulbuerkner.com/brms/",
-                CmdStan = "https://mc-stan.org/cmdstanr/",
-                priorsense = "https://n-kall.github.io/priorsense/",
-                NULL)
-  if (!is.null(url)) return(url)
-
-  # try DESCRIPTION first
-  desc <- tryCatch(utils::packageDescription(pkg), error = function(e) NULL)
-  if (!is.null(desc)) {
-    if ("URL" %in% names(desc)) {
-      url_field <- desc[["URL"]]
-      if (!is.null(url_field) && nzchar(url_field)) {
-        # DESCRIPTION may have multiple URLs separated by commas/spaces/newlines
-        urls <- unlist(strsplit(url_field, "[,[:space:]]+"))
-        urls <- urls[urls != ""]
-        if (length(urls)) return(urls[1])
-      }
+# Get first sentence of description
+first_sentence <- function(pkg) {
+  if (pkg == "CmdStan") return("The command-line interface to Stan.")
+  desc <- tryCatch(packageDescription(pkg), error = function(e) NULL)
+  if (is.null(desc) || !is.list(desc) || is.null(desc$Description)) return("")
+  txt <- trimws(gsub("\\s+", " ", desc$Description))
+  for (i in seq_len(nchar(txt))) {
+    if (substr(txt, i, i) %in% c(".", "?", "!")) {
+      before <- substr(txt, 1, i - 1)
+      if (grepl("\\) ?$", before)) return(substr(txt, 1, i))
+      if (grepl("[. ][A-Za-z]$", before)) next
+      if (grepl("[A-Za-z]{2,}$", before)) return(substr(txt, 1, i))
     }
   }
+  txt
+}
 
-  # fallback: CRAN page
+# Get package URL
+get_url <- function(pkg) {
+  special <- c(brms = "https://paulbuerkner.com/brms/",
+               CmdStan = "https://mc-stan.org/cmdstanr/",
+               priorsense = "https://n-kall.github.io/priorsense/")
+  if (pkg %in% names(special)) return(special[[pkg]])
+  desc <- tryCatch(packageDescription(pkg), error = function(e) NULL)
+  if (!is.null(desc$URL)) {
+    url <- strsplit(desc$URL, "[,[:space:]]+")[[1]][1]
+    if (nzchar(url)) return(url)
+  }
   paste0("https://cran.r-project.org/package=", pkg)
 }
 
-# Build an HTML link for each package
-result$Package_link <- vapply(
-  result$Package,
-  function(p) {
-    url <- get_pkg_url(p)
-    sprintf("<a href=\"%s\" target=\"_blank\">%s</a>", url, p)
-  },
-  character(1)
-)
+# Build package table
+r_files <- list.files(".", "\\.[Rr]$", recursive = TRUE, full.names = TRUE)
+pkgs <- unique(unlist(lapply(r_files, get_pkgs)))
+ip <- installed.packages()
 
-# Order and select columns for display
-result_display <- result[order(result$Package), c("Package_link", "Version")]
-names(result_display)[1] <- "Package"
-
-result_display |>
+data.frame(
+  Package = c(pkgs, "CmdStan"),
+  Version = c(ip[pkgs, "Version"], cmdstanr::cmdstan_version())
+) |>
+  transform(
+    Link = sprintf("<a href=\"%s\" target=\"_blank\">%s</a>",
+                   sapply(Package, get_url), Package),
+    Desc = sapply(Package, first_sentence)
+  ) |>
+  (\(d) d[order(tolower(d$Package)), ])() |>
+  subset(select = c(Link, Version, Desc)) |>
+  setNames(c("Package", "Version", "Description")) |>
   tinytable::tt(escape = FALSE) |>
   tinytable::theme_html(class = "tinytable tinytable-sm")
 ```
