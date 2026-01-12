@@ -40,3 +40,4 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 .Rproj.user
+Bayesian_Workflow_book.pdf
