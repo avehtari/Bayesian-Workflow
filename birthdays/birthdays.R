@@ -410,6 +410,7 @@ draws1 <- fit1$draws()
 summarise_draws(subset(draws1, variable = c("intercept", "sigma_f1", "lengthscale_f1", "sigma"))) |>
   tt()
 #' Trace plot shows slow mixing but no multimodality.
+#| label: fig-births-fit1-trace
 mcmc_trace(draws1, regex_pars = c("intercept", "sigma_f1", "lengthscale_f1", "sigma"))
 
 #' The model result from short MCMC chains looks very similar to the
@@ -487,6 +488,7 @@ draws1b <- fit1b$draws()
 summarise_draws(subset(draws1b, variable = c("sigma_f1", "lengthscale_f1", "sigma"))) |>
   tt()
 #' Examining the trace plots don't show multimodality
+#| label: fig-births-fit1b-trace
 mcmc_trace(draws1b, regex_pars = c("sigma_f1", "lengthscale_f1", "sigma"))
 
 #' We drop global intercept from the rest of the models, but continue
