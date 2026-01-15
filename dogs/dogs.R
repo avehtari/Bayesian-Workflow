@@ -116,6 +116,7 @@ dogs_df$prev_avoid <- as.numeric(rowCumsums(1 - shock)[, 1:(ncol(shock) - 1)])
 #' $$
 #| label: bfit_0
 #| results: "hide"
+#| cache: true
 bfit_0 <- brm(shock ~ time, family = bernoulli(),
               prior = prior(normal(0,1)),
               data = dogs_df, refresh = 0)
@@ -143,6 +144,7 @@ bfit_0 <- add_criterion(bfit_0, criterion = "loo")
 #' $$
 #| label: bfit_0h
 #| results: "hide"
+#| cache: true
 bfit_0h <- brm(shock ~ time + (time | dog), family = bernoulli(),
                prior = prior(normal(0,1)),
                data = dogs_df, refresh = 0, adapt_delta = 0.95)
@@ -336,6 +338,7 @@ powerscale_sensitivity(bfit_0h, variable = variables(as_draws(bfit_0h))[1:6]) |>
 #' $$
 #| label: bfit_1
 #| results: "hide"
+#| cache: true
 bfit_1 <- brm(bf(shock ~ a^(time - 1), a ~ 1, nl = TRUE),
               family = bernoulli(link = "identity"),
               prior = prior(beta(1, 1), nlpar = "a", lb = 0, ub = 1),
@@ -366,6 +369,7 @@ loo_compare(bfit_0, bfit_0h, bfit_1) |>
 #' avoidances, respectively, in trials $1,\ldots,t-1$ for dog $j$.
 #| label: bfit_2
 #| results: "hide"
+#| cache: true
 bfit_2 <- brm(bf(shock ~ a^prev_shock * b^prev_avoid,
                 a ~ 1, b ~ 1, nl = TRUE),
               family = bernoulli(link = "identity"),
@@ -404,6 +408,7 @@ loo_compare(bfit_0h, bfit_2) |>
 #' where $a_j$ is parameter for dog $j$.
 #| label: bfit_3
 #| results: "hide"
+#| cache: true
 inv_logit <- function(x) 1 / (1 + exp(-x))
 bfit_3 <- brm(bf(shock ~ inv_logit(etaa)^(time - 1),
                  etaa ~ (1 | dog), nl = TRUE),
@@ -440,6 +445,7 @@ loo_compare(bfit_0h, bfit_2, bfit_3) |>
 #' $$
 #| label: bfit_4
 #| results: "hide"
+#| cache: true
 bfit_4 <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoid,
                  mvbind(etaa, etab) ~ (1 |p| dog), nl=TRUE),
               family = bernoulli(link = "identity"),
@@ -631,6 +637,7 @@ as_draws_df(bfit_4) |>
 #' Generate shocks and avoidances using the simple logistic regression
 #| label: bfit_4s
 #| results: "hide"
+#| cache: true
 dogs_df_pred_0 <- dogs_df
 pred_shock_0 <- matrix(c(rep(1, 30), posterior_predict(bfit_0, ndraws = 1) |> as.numeric()),
                        nrow = 30, ncol = 25)
@@ -650,6 +657,7 @@ as_draws_df(bfit_4s) |>
 #' Generate shocks and avoidances using the hierarchical logistic regression
 #| label: bfit_4sh
 #| results: "hide"
+#| cache: true
 dogs_df_pred_0h <- dogs_df
 pred_shock_0h <- matrix(c(rep(1, 30), posterior_predict(bfit_0h, ndraws = 1) |> as.numeric()),
                        nrow = 30, ncol = 25)
