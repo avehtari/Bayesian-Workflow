@@ -386,6 +386,7 @@ pp_check(fit_normal, type = "loo_pit_ecdf", moment_match = TRUE)
 #' We can also examine PIT values computed by comparing all posterior
 #' predictive draws with observations marginally, which in this case
 #' show the miscalibration very clearly.
+#| label: fig-ppc_marginal_pit_ecdf-normal
 #| fig-height: 4
 #| fig-width: 4
 marginal_pit <- function(y, x) {
@@ -902,13 +903,14 @@ fit_normal2b <- add_criterion(fit_normal2b, criterion = "loo",
 
 #'
 #' LOO-PIT-ECDF hints slight miscalibration
-#| label: fig-ppc_pit_ecdf-normal2b
+#| label: fig-ppc_loo_pit_ecdf-normal2b
 #| fig-height: 4
 #| fig-width: 4
 pp_check(fit_normal2b, type = "loo_pit_ecdf")
 
 #'
 #' Marginal PIT-ECDF shows clear miscalibration
+#| label: fig-ppc_pit_ecdf-normal2b
 #| fig-height: 4
 #| fig-width: 4
 ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal2b))) +
