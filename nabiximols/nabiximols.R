@@ -129,6 +129,7 @@ cu_df |>
 #' Mills provided two `brms` [@Buerkner:2017:brms] models with
 #' specified priors. The first one is a normal regression model with
 #' varying intercept for each participant (`id`).
+#| label: fit_normal
 #| results: hide
 #| cache: true
 fit_normal <- brm(formula = cu ~ group*week + (1 | id),
@@ -145,6 +146,7 @@ fit_normal <- add_criterion(fit_normal, criterion = "loo", save_psis = TRUE,
 
 #' The second provided models is binomial model with the number of
 #' trials being $28$ for each outcome (`cu`)
+#| label: fit_binomial
 #| results: hide
 #| cache: true
 fit_binomial <- brm(formula = cu | trials(set)  ~ group*week + (1 | id),
@@ -288,6 +290,7 @@ sum(p3)
 cu_scaled_df <- cu_df |>
   mutate(cu_scaled = (cu - mean(cu)) / sd(cu))
 #' Fit the normal model with scaled target.
+#| label: fit_normal_scaled
 #| results: hide
 #| cache: true
 fit_normal_scaled <- brm(formula = cu_scaled ~ group*week + (1 | id),
@@ -412,7 +415,7 @@ ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal))) +
 #' Binomial model doesn't have overdispersion term, but the normal
 #' model does. How about using beta-binomial model which is an
 #' overdispersed version of the binomial model.
-#' 
+#| label: fit_betabinomial
 #| results: hide
 #| cache: true
 fit_betabinomial <- brm(formula = cu | trials(set) ~ group*week + (1 | id),
@@ -553,6 +556,7 @@ powerscale_sensitivity(fit_betabinomial,
 #' 
 #' However, I decided to try slightly wider priors, especially as the
 #' data seem to be quite informative
+#| label: fit_betabinomial2
 #| results: hide
 #| cache: true
 fit_betabinomial2 <- brm(formula = cu | trials(set) ~ group*week + (1 | id),
@@ -586,6 +590,7 @@ loo_compare(fit_betabinomial, fit_betabinomial2)
 #' interaction term with `group`, which does not make sense as the
 #' group should not affect the baseline. I modify the data and models by
 #' moving the baseline `week=0` `cu`s to be pre-treatment covariate.
+#| label: fit_betabinomial2b
 #| results: hide
 #| cache: true
 cu_df_b <- cu_df |> filter(week != 0) |>
@@ -881,6 +886,7 @@ trt_effect_draws |> powerscale_sensitivity()
 #' intervals). We build normal and beta-binomial models which match
 #' the model in the paper, expect that we don't include site factor as
 #' this was not available for us.
+#| label: fit_normal2b
 #| results: hide
 #| cache: true
 fit_normal2b <- brm(formula = cu ~ group*week + cu_baseline + (1 | id),
@@ -913,7 +919,7 @@ loo_compare(fit_normal2b, fit_betabinomial2b)
 
 #' Next we build models predicting total cu for all weeks (except 0), by dropping
 #' week covariate.
-#' 
+#| label: fit_normal2c
 #| results: hide
 #| cache: true
 cu_df_c <- cu_df_b |>
@@ -930,6 +936,7 @@ fit_normal2c <- brm(formula = cu_total ~ group + cu_baseline,
         refresh = 0)
 fit_normal2c <- add_criterion(fit_normal2c, criterion = "loo",
                               save_psis = TRUE, moment_match = TRUE)
+#| label: fit_betabinomial2c
 #| results: hide
 #| cache: true
 fit_betabinomial2c <- brm(formula = cu_total | trials(set_total) ~ group + cu_baseline,
@@ -1026,6 +1033,7 @@ rbind(dat_bb2b, dat_n2b, dat_bb2c, dat_n2c) |>
 #'
 #' Let's now build the mode without treatment group variable and check
 #' whether there is significant difference in predictive performance.
+#| label: fit_betabinomial3b
 fit_betabinomial3b <- brm(cu | trials(set) ~ week + cu_baseline + (1 | id),
         data = cu_df_b,
         beta_binomial(),
