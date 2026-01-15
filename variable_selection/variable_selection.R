@@ -277,7 +277,7 @@ p
 #'    in `brms` assumes the predictors have been standardized to have
 #'    unit variance.
 #'
-#| label: fitm
+#| label: fitm_n1
 #| results: hide
 #| cache: true
 # we sample from both posterior and prior
@@ -294,6 +294,9 @@ fitm_n1pt <- update(fitm_n1, sample_prior = "only",
                               prior(student_t(3, 0, 3), lb=5, class = sigma)),
                     refresh = 0)
 
+#| label: fitm_n2
+#| results: hide
+#| cache: true
 # normal(0, sqrt(0.3/26)*sd(y))
 scale_b <- sqrt(0.3/26) * sd(studentstd_Gmat$Gmat)
 fitm_n2 <- brm(Gmat ~ ., data = studentstd_Gmat,
@@ -303,6 +306,9 @@ fitm_n2 <- brm(Gmat ~ ., data = studentstd_Gmat,
                refresh = 0)
 fitm_n2p <- update(fitm_n2, sample_prior = "only")
 
+#| label: fitm_hs
+#| results: hide
+#| cache: true
 # Horseshoe
 p <- length(predictors)
 p0 <- 6
@@ -315,6 +321,9 @@ fitm_hs <- brm(Gmat ~ ., data = studentstd_Gmat,
                refresh = 0)
 fitm_hsp <- update(fitm_hs, sample_prior = "only")
 
+#| label: fitm
+#| results: hide
+#| cache: true
 # R2D2
 fitm <- brm(Gmat ~ ., data = studentstd_Gmat,
             prior = c(prior(R2D2(mean_R2 = 1/3, prec_R2 = 3, cons_D2 = 1/2), class = b)),
@@ -341,6 +350,7 @@ pp1 <- lapply(1:8, \(i) data.frame(
   filter(type=="Prior") |>
   ggplot(aes(x=R2, color=priorname)) +
   stat_slab(expand = TRUE, trim = FALSE, alpha = .6, fill = NA, adjust = 2) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   xlim(c(0,1)) +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
