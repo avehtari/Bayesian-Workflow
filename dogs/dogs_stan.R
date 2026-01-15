@@ -36,6 +36,9 @@ knitr::opts_chunk$set(
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("dogs", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("dogs", "stan_output"))
 options(mc.cores = 4)
 library(posterior)
 library(MASS)
@@ -51,36 +54,42 @@ dogs_data <- list(y = shock, J = nrow(shock), T = ncol(shock))
 
 dogs_0 <- cmdstan_model(root("dogs", "dogs_0.stan"))
 #| results: hide
+#| cache: true
 fit_0 <- dogs_0$sample(data = dogs_data, refresh = 0)
 #'
 print(fit_0)
 
 dogs_1 <- cmdstan_model(root("dogs", "dogs_1.stan"))
 #| results: hide
+#| cache: true
 fit_1 <- dogs_1$sample(data = dogs_data, refresh = 0)
 #'
 print(fit_1)
 
 dogs_2 <- cmdstan_model(root("dogs", "dogs_2.stan"))
 #| results: hide
+#| cache: true
 fit_2 <- dogs_2$sample(data = dogs_data, refresh = 0)
 #'
 print(fit_2)
 
 dogs_3 <- cmdstan_model(root("dogs", "dogs_3.stan"))
 #| results: hide
+#| cache: true
 fit_3 <- dogs_3$sample(data = dogs_data, refresh = 0)
 #'
 print(fit_3, variables = c("mu_logit_a", "sigma_logit_a"))
 
 dogs_4 <- cmdstan_model(root("dogs", "dogs_4.stan"))
 #| results: hide
+#| cache: true
 fit_4 <- dogs_4$sample(data = dogs_data, refresh = 0)
 #'
 print(fit_4, variables = c("mu_logit_ab", "Sigma_logit_ab"))
 
 dogs_5 <- cmdstan_model(root("dogs", "dogs_5.stan"))
 #| results: hide
+#| cache: true
 fit_5 <- dogs_5$sample(data = dogs_data, refresh = 0)
 #'
 print(fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
@@ -193,6 +202,7 @@ for (j in 1:J) {
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
 #| results: hide
+#| cache: true
 new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
 #'
 print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
@@ -250,6 +260,7 @@ for (j in 1:J) {
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
 #| results: hide
+#| cache: true
 new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
 #'
 print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
@@ -271,6 +282,7 @@ for (j in 1:J){
 }
 new_dogs_data <- list(y = new_dogs, J = J, T = T)
 #| results: hide
+#| cache: true
 new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
 #'
 print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",

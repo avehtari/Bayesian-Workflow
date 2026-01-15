@@ -45,6 +45,9 @@ savefigs <- FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("world_cup", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("world_cup", "stan_output"))
 options(mc.cores = 4)
 library(posterior)
 options(
@@ -134,7 +137,7 @@ print_stan_code(model_1$code())
 #' Fit the model and show the results
 #| label: fit_1
 #| results: hide
-#| cache: false
+#| cache: true
 fit_1 <- model_1$sample(data = stan_data, refresh = 0)
 
 #| label: fit_1_summary
@@ -155,7 +158,7 @@ model_1_rep <- cmdstan_model(stan_file = root("world_cup", "worldcup_with_replic
 print_stan_code(model_1_rep$code())
 #| label: fit_1_rep
 #| results: hide
-#| cache: false
+#| cache: true
 fit_1_rep <- model_1_rep$sample(data = stan_data, refresh = 0)
 
 #| label: fig-worldcup-ppc-intervals-fit_1
@@ -179,7 +182,7 @@ model_2 <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_sqrt.stan"))
 print_stan_code(model_2$code())
 #| label: fit_2
 #| results: hide
-#| cache: false
+#| cache: true
 fit_2 <- model_2$sample(data = stan_data, refresh = 0)
 
 #| label: fit_2_summary
@@ -215,7 +218,7 @@ model_3 <- cmdstan_model(stan_file = root("world_cup", "worldcup_fixed.stan"))
 print_stan_code(model_3$code())
 #| label: fit_3
 #| results: hide
-#| cache: false
+#| cache: true
 fit_3 <- model_3$sample(data = stan_data, refresh = 0)
 
 #| label: fit_3_summary
@@ -253,7 +256,7 @@ model_3_no_prior <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_pri
 print_stan_code(model_3_no_prior$code())
 #| label: fit_3_no_prior
 #| results: hide
-#| cache: false
+#| cache: true
 fit_3_no_prior <- model_3_no_prior$sample(data = c(stan_data, b = 0), refresh = 0)
 
 #| label: fig-worldcup-mcmc-intervals-fit_3_no_prior
@@ -274,7 +277,7 @@ model_discr_z <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_
 print_stan_code(model_discr_z$code())
 #| label: fit_discr_z
 #| results: hide
-#| cache: false
+#| cache: true
 fit_discr_z <- model_discr_z$sample(data = stan_data, refresh = 0)
 loo_discr_z <- fit_discr_z$loo()
 
@@ -287,7 +290,7 @@ model_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete.st
 print_stan_code(model_discr$code())
 #| label: fit_discr
 #| results: hide
-#| cache: false
+#| cache: true
 fit_discr <- model_discr$sample(data = stan_data, refresh = 0)
 loo_discr <- fit_discr$loo()
 
@@ -300,7 +303,7 @@ model_discr_nopower <- cmdstan_model(stan_file = root("world_cup", "worldcup_dis
 print_stan_code(model_discr_nopower$code())
 #| label: fit_discr_nopwer
 #| results: hide
-#| cache: false
+#| cache: true
 fit_discr_nopower <- model_discr_nopower$sample(data = stan_data, refresh = 0)
 loo_discr_nopower <- fit_discr_nopower$loo()
 
@@ -314,7 +317,7 @@ model_discr_poweronly <- cmdstan_model(stan_file = root("world_cup", "worldcup_d
 print_stan_code(model_discr_poweronly$code())
 #| label: fit_discr_poweronly
 #| results: hide
-#| cache: false
+#| cache: true
 fit_discr_poweronly <- model_discr_poweronly$sample(data = stan_data, refresh = 0)
 loo_discr_poweronly <- fit_discr_poweronly$loo()
 
@@ -327,7 +330,7 @@ model_discr_pool <- cmdstan_model(stan_file = root("world_cup", "worldcup_discre
 print_stan_code(model_discr_pool$code())
 #| label: fit_discr_pooled
 #| results: hide
-#| cache: false
+#| cache: true
 fit_discr_pool <- model_discr_pool$sample(data = stan_data, refresh = 0)
 loo_discr_pool <- fit_discr_pool$loo()
 
@@ -363,7 +366,7 @@ model_cont_midp <- cmdstan_model(stan_file = root("world_cup", "worldcup_continu
 print_stan_code(model_cont_midp$code())
 #| label: fit_cont_midp
 #| results: hide
-#| cache: false
+#| cache: true
 fit_cont_midp <- model_cont_midp$sample(data = stan_data, refresh = 0)
 loo_cont_midp <- fit_cont_midp$loo()
 
@@ -377,7 +380,7 @@ model_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_continuous.s
 print_stan_code(model_cont$code())
 #| label: fit_cont
 #| results: hide
-#| cache: false
+#| cache: true
 fit_cont <- model_cont$sample(data = stan_data, refresh = 0)
 loo_cont <- fit_cont$loo()
 
@@ -404,7 +407,7 @@ model_sqrt_cont_noj <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqr
 print_stan_code(model_sqrt_cont_noj$code())
 #| label: fit_sqrt_cont_noj
 #| results: hide
-#| cache: false
+#| cache: true
 fit_sqrt_cont_noj <- model_sqrt_cont_noj$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont_noj <- fit_sqrt_cont_noj$loo()
 
@@ -422,7 +425,7 @@ model_sqrt_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_co
 print_stan_code(model_sqrt_cont$code())
 #| label: fit_sqrt_cont
 #| results: hide
-#| cache: false
+#| cache: true
 fit_sqrt_cont <- model_sqrt_cont$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont <- fit_sqrt_cont$loo()
 
@@ -437,7 +440,7 @@ model_sqrt_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_d
 print_stan_code(model_sqrt_discr$code())
 #| label: fit_sqrt_discr
 #| results: hide
-#| cache: false
+#| cache: true
 fit_sqrt_discr <- model_sqrt_discr$sample(data = stan_data, refresh = 0)
 loo_sqrt_discr <- fit_sqrt_discr$loo()
 
@@ -495,7 +498,7 @@ model_bipois <- cmdstan_model(stan_file = root("world_cup", "worldcup_bivariate_
 print_stan_code(model_bipois$code())
 #| label: fit_bipois
 #| results: hide
-#| cache: false
+#| cache: true
 fit_bipois <- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta = 0.95)
 
 #| label: fit_bipois_summary
@@ -508,7 +511,7 @@ model_poisdif <- cmdstan_model(stan_file = root("world_cup", "worldcup_poisson_d
 print_stan_code(model_poisdif$code())
 #| label: fit_poisdif
 #| results: hide
-#| cache: false
+#| cache: true
 fit_poisdif <- model_poisdif$sample(data = stan_data, refresh = 0)
 
 #| label: fit_poisdif_summary

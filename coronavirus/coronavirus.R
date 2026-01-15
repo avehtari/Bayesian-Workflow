@@ -39,6 +39,9 @@ knitr::opts_chunk$set(
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("coronavirus", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("coronavirus", "stan_output"))
 options(mc.cores = 4)
 library(posterior)
 library(priorsense)
@@ -89,6 +92,7 @@ sc_model <- cmdstan_model(code)
 #' Compute posterior with data from @Bendavid-Mulaney-Sood-etal:2020a, 11 April 2020
 #| label: fit_1
 #| results: hide
+#| cache: true
 fit_1 <- sc_model$sample(
   data = list(
     y_sample = 50,
@@ -173,6 +177,7 @@ print(spin(draws_1[, , "p"], lower = 0, upper = 1, conf = 0.95), digits = 2)
 #'
 #| label: fit_2
 #| results: hide
+#| cache: true
 fit_2 <- sc_model$sample(
   data = list(
     y_sample = 50,
@@ -214,6 +219,7 @@ sc_model_hierarchical <- cmdstan_model(code_hierarchical)
 #' Compute posterior using data from @Bendavid-Mulaney-Sood-etal:2020b 27 April 2020
 #| label: fit_3a
 #| results: hide
+#| cache: true
 santaclara_data <- list(
   y_sample = 50,
   n_sample = 3330,
@@ -265,9 +271,10 @@ powerscale_plot_dens(
 #' 
 santaclara_data$logit_spec_prior_scale <- 0.3
 santaclara_data$logit_sens_prior_scale <- 0.3
+#' MCMC gets sometimes stuck on minor mode, so we initialize with Pathfinder
 #| label: fit_3b
 #| results: hide
-#' MCMC gets sometimes stuck on minor mode, so we initialize with Pathfinder
+#| cache: true
 pth_3b <- sc_model_hierarchical$pathfinder(
   data = santaclara_data,
   refresh = 0,
@@ -362,6 +369,7 @@ for (i_zip in 1:N_zip){
 #' Put together the data and fit the model
 #| label: fit_4
 #| results: hide
+#| cache: true
 santaclara_mrp_data <- list(
   N = N,
   y = y,
@@ -441,6 +449,8 @@ ribbon_df <- data.frame(
 )
 
 #' Loop over different prior parameter values
+#| label: loop-over-prior-values
+#| cache: true
 sigma_senss <- c(0.01, 0.25, 0.5, 0.75, 1)
 sigma_specss <- c(0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 for (sigma_sens in sigma_senss) {

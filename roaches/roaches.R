@@ -37,10 +37,15 @@ knitr::opts_chunk$set(
 #' 
 #' **Load packages**
 #| cache: FALSE
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(loo)
 library(rstantools)
 library(brms)
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("roaches", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("roaches", "stan_output"))
 options(mc.cores = 4)
 library(ggplot2)
 library(khroma)
@@ -619,7 +624,7 @@ pp_check(fit_pvi, type = "loo_pit_ecdf")
 #' predictive distribution given other parameters than `z`. This is
 #' needed to get the correct LOO predictive distributions when
 #' combined with integrated PSIS-LOO.
-poisson_vi_int <- "poisson_vi_integrate.stan"
+poisson_vi_int <- root("roaches","poisson_vi_integrate.stan")
 #| output: asis
 print_stan_file(poisson_vi_int)
 
@@ -641,9 +646,9 @@ print_stan_file(poisson_vi_int)
 #'
 #' We increase the number of sampling iterations to improve effective
 #' sample size needed for better LOO-PIT plot.
-#| results: hide
-#| cache: false
 mod_p_vi <- cmdstan_model(stan_file = poisson_vi_int)
+#| results: hide
+#| cache: true
 datap <- list(N = dim(roaches)[1],
               P = 3,
               offsett = log(roaches$exposure2),

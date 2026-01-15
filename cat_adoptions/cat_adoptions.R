@@ -37,6 +37,9 @@ library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(scales)
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("cat_adoptions", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("cat_adoptions", "stan_output"))
 library(posterior)
 library(survival)
 library(rethinking)
@@ -230,6 +233,7 @@ lapply(1:n, \(i) sim_cats1(n = 1e3, p = sim_prior[, i]) |>
 p <- c(0.1, 0.15)
 sim_dat <- sim_cats1(n = 1000, p = p)
 #| results: hide
+#| cache: true
 fit1s <- cstan(cat_code1, data = sim_dat)
 
 #' Posterior summary
@@ -262,6 +266,7 @@ post1s |>
 
 #' Sample from the posterior using the real data
 #| results: hide
+#| cache: true
 fit1 <- cstan(cat_code1, data = dat)
 
 #' Posterior summary
@@ -322,6 +327,7 @@ print_stan_file(cat_code2)
 #' Test censoring model using simulated data
 sim_dat <- sim_cats2(n = 1e3, p = c(0.01, 0.02))
 #| results: hide
+#| cache: true
 fit2s <- cstan(cat_code2, data = sim_dat)
 
 #' Posterior summary
@@ -350,6 +356,7 @@ post2s |>
 
 #' Test previous model with new censored data
 #| results: hide
+#| cache: true
 fit1s <- cstan(cat_code1, data = sim_dat)
 
 print(fit1s)
@@ -378,6 +385,7 @@ post1s |>
 
 #' Sample using real data
 #| results: hide
+#| cache: true
 fit1 <- cstan(cat_code1, data = dat)
 fit2 <- cstan(cat_code2, data = dat)
 
@@ -431,6 +439,7 @@ print_stan_file(cat_code3)
 
 #'
 #| results: hide
+#| cache: true
 fit3s <- cstan(cat_code3, data = sim_dat)
 
 #' Posterior summary
@@ -448,6 +457,7 @@ cat_code4 <- root("cat_adoptions", "adoptions_poisson.stan")
 print_stan_file(cat_code4)
 
 #| results: hide
+#| cache: true
 fit4s <- cstan(cat_code4, data = sim_dat)
 
 #' Posterior summary
@@ -477,6 +487,7 @@ cat_code5 <- root("cat_adoptions", "adoptions_varying.stan")
 print_stan_file(cat_code5)
 
 #| results: hide
+#| cache: true
 fit2s <- cstan(cat_code2, data = sim_dat)
 fit5s <- cstan(cat_code5, data = sim_dat)
 
