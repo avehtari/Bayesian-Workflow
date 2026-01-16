@@ -28,6 +28,32 @@ Back cover text: *blurb*
 
 - If you notice an error that is not mentioned in [the errata](errata.html), [submit an issue](https://github.com/avehtari/Bayesian-Workflow/issues) or send an email.
 
+
+**How to cite**
+<details>
+
+Cite the book:
+
+> Gelman, Vehtari, McElreath, Simpson, Margossian, Yao, Kennedy, Gabry, Bürkner, Modrák, Leos Barajas (2026). *Bayesian Workflow*. CRC Press / Taylor \& Francis.
+
+If you want to refer to a case study, cite the book and chapter, e.g.
+
+> blah blah (Gelman et al., 2026, Ch 18 code).
+
+BibTeX entry:
+
+```
+@book{Bayesian-Workflow:2026,
+  title={Bayesian Workflow},
+  author={Andrew Gelman and Aki Vehtari and Richard McElreath and Daniel Simpson and
+          Charles C. Margossian and Yuling Yao and Lauren Kennedy and Jonah Gabry and
+          Paul-Christian Bürkner and Martin Modrák and Vianey Leos Barajas},
+  year=2026,
+  publisher={CRC Press}
+}
+```
+</details>
+
 ## Book contents
 
 **Part 1: From Bayesian inference to Bayesian workflow**
