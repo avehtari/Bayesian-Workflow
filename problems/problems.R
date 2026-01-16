@@ -141,7 +141,8 @@ summarize_draws(draws)
 #| label: fig-separable_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' ## Stan compiler pedantic check
@@ -185,7 +186,8 @@ summarize_draws(draws)
 #| label: fig-separable_prior_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' # A model with unused parameter
@@ -228,7 +230,8 @@ summarize_draws(draws)
 #| label: fig-unusedparam_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta", "gamma"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta", "gamma"),
+           off_diag_args = list(alpha = 0.2))
 
 #' Non-mixing is well diagnosed by $\widehat{R}$ and ESS, but the
 #' following Figure shows one of the rare cases where trace plots are
@@ -300,7 +303,8 @@ summarize_draws(draws)
 #| label: fig-competing_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta[1]", "beta[2]"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta[1]", "beta[2]"),
+           off_diag_args = list(alpha = 0.2))
 
 
 #' We can compute the correlation.
@@ -383,7 +387,8 @@ summarize_draws(draws)
 #| label: fig-correlating_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #' Here the reason is that the $x$ values are in the range 1952--2013,
 #' and the intercept `alpha` denotes the temperature at year 0, which
@@ -419,7 +424,8 @@ summarize_draws(draws)
 #| label: fig-uncorrelating_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' With this change, there is no posterior correlation, Bulk-ESS
@@ -613,7 +619,8 @@ summarize_draws(draws)
 #| label: fig-poisson_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #' The reason for the issue is that the initial values for
 #' `beta` are sampled from $(-2, 2)$ and `x` has some
@@ -686,7 +693,8 @@ summarize_draws(draws)
 #| label: fig-thick_tail_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' The dynamic HMC algorithm used by Stan, along with many other MCMC
