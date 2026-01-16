@@ -64,7 +64,7 @@ website:
           - text: "Ch 28: Variable selection"
             href: variable_selection/variable_selection.html
           - text: "Ch 29: Park rule: No vehicles in the park"
-            href: park_rule/park_rule_aki.html
+            href: park_rule/park_rule.html
           - text: "Ch 30: Planetary motion: Computational challenge of multimodality"
             href: planetary_motion/planetary_motion.html
           - text: "Ch 31: Simulation based calibration checking (SBC)"
