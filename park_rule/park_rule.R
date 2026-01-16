@@ -376,7 +376,7 @@ draws_2 |>
 #' prior scale. We examine `a_item` and `sigma_item`. Instead of
 #' showing plot for all variables in vector `a_item`, we show here the
 #' scatter plot for `a_item[1]` and `sigma_item´.
-#| label: fig-fit_1-scatter-a_item-sigma_item
+#| label: fig-fit_2-scatter-a_item-sigma_item
 #| out-width: 80%
 draws_2 |>
   subset_draws(variable = c("a_item[1]","sigma_item")) |>
@@ -396,7 +396,7 @@ draws_2 |>
 
 #' Now $\widehat{R}$ and ESSs indicate problems with `z_item`.
 #' We examine the scatter plot for `z_item[1]` and `sigma_item`:
-#| label: fig-fit_1-scatter-z_item-sigma_item
+#| label: fig-fit_2-scatter-z_item-sigma_item
 #| out-width: 80%
 draws_2 |>
   subset_draws(variable = c("z_item[1]","sigma_item")) |>
@@ -406,7 +406,7 @@ draws_2 |>
 #' but as `sigma_item` is constrained to be positive, the sampling is
 #' done in log space, and we should use that also for the scatter
 #' plot.
-#| label: fig-fit_1-scatter-z_item-log_sigma_item
+#| label: fig-fit_2-scatter-z_item-log_sigma_item
 #| out-width: 80%
 draws_2 |>
   subset_draws(variable = c("z_item[1]","sigma_item")) |>
