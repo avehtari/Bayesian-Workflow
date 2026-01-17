@@ -349,7 +349,7 @@ pp1 <- lapply(1:8, \(i) data.frame(
   bind_rows() |>
   filter(type=="Prior") |>
   ggplot(aes(x=R2, color=priorname)) +
-  stat_slab(expand = TRUE, trim = FALSE, alpha = .6, fill = NA, adjust = 2) +
+  stat_slab(density = "bounded", expand = TRUE, trim = FALSE, alpha = .6, fill = NA, adjust = 2) +
   coord_cartesian(expand = c(bottom = FALSE)) +
   xlim(c(0,1)) +
   theme(axis.text.y = element_blank(),
@@ -379,8 +379,9 @@ pp2 <- lapply(1:8, \(i) data.frame(
   bind_rows() |>
   filter(type == "Prior") |>
   ggplot(aes(x = R2, color = priorname)) +
-  stat_slab(expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
-  xlim(c(0.04,.419)) +
+  stat_slab(density = "bounded", expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
+  xlim(c(0.041,.419)) +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.line.y = element_blank(),
@@ -407,7 +408,8 @@ pp3 <- lapply(1:8, \(i) data.frame(
   bind_rows() |>
   filter(type == "Posterior") |>
   ggplot(aes(x = R2, color = priorname)) +
-  stat_slab(expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
+  stat_slab(density = "unbounded", expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   xlim(c(0.04,.42)) +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
@@ -435,7 +437,8 @@ looR2 <- lapply(1:8, \(i) data.frame(
 pp4 <- looR2 |>
   filter(type == "Posterior") |>
   ggplot(aes(x = R2, color = priorname)) +
-  stat_slab(expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
+  stat_slab(density = "unbounded", expand = TRUE, trim = FALSE, alpha = 0.5, fill = NA, adjust = 2) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   xlim(c(0.04,.42)) +
   theme(axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
