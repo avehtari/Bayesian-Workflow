@@ -6,19 +6,10 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
-#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
@@ -537,8 +528,11 @@ dr4 <- fit_4$draws() |> as_draws_rvars()
 a_item_hat <- ranef(fit_lme4)$item
 a_item_sd <- sqrt(as.numeric(attr(a_item_hat, "postVar")))
 a_item_h <- as.numeric(a_item_hat$`(Intercept)`)
+rng <- range(summarize_draws(
+  dr4$a_item, ~quantile(.x, probs = c(0.05, 0.95)))[,c("5%","95%")])
 ggplot(data=NULL) +
-  geom_abline(color="gray") + 
+  coord_fixed(xlim = rng, ylim = rng) +
+  geom_abline(color="gray") +
   stat_pointinterval(aes(x = a_item_h, ydist = dr4$a_item),
                      .width = c(0.90),
                      interval_size_range = c(0.4, 0.8),
@@ -555,7 +549,10 @@ ggplot(data=NULL) +
 a_respondent_hat <- ranef(fit_lme4)$respondent
 a_respondent_sd <- sqrt(as.numeric(attr(a_respondent_hat, "postVar")))
 a_respondent_h <- as.numeric(a_respondent_hat$`(Intercept)`)
+rng <- range(summarize_draws(
+  dr4$a_respondent, ~quantile(.x, probs = c(0.05, 0.95)))[,c("5%","95%")])
 ggplot(data=NULL) +
+  coord_fixed(xlim = rng, ylim = rng) +
   geom_abline(color="gray") + 
   stat_pointinterval(aes(x = a_respondent_h, ydist = dr4$a_respondent),
                      .width = c(0.90),
