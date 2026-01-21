@@ -41,3 +41,4 @@ vignettes/*.pdf
 *.knit.md
 .Rproj.user
 Bayesian_Workflow_book.pdf
+/.quarto/
