@@ -10,12 +10,18 @@ format:
 
 ## Information
 
-Website for the **Bayesian Workflow** book by [Andrew
-Gelman](http://www.stat.columbia.edu/~gelman/), [Aki
-Vehtari](https://users.aalto.fi/ave/), [Richard
-McElreath](https://xcelab.net/rm/) with Daniel Simpson, Charles
-C. Margossian, Yuling Yao, Lauren Kennedy, Jonah Gabry, Paul-Christian
-Bürkner, Martin Modrák, Vianey Leos Barajas.
+Website for the **Bayesian Workflow** book by 
+[Andrew Gelman](http://www.stat.columbia.edu/~gelman/), 
+[Aki Vehtari](https://users.aalto.fi/ave/),
+[Richard McElreath](https://xcelab.net/rm/) with 
+Daniel Simpson, 
+[Charles C. Margossian](https://charlesm93.github.io/),
+[Yuling Yao](https://yulingyao.com/),
+[Lauren Kennedy](https://jazzystats.com/),
+[Jonah Gabry](https://jgabry.github.io/),
+[Paul-Christian Bürkner](https://paulbuerkner.com/),
+[Martin Modrák](https://www.martinmodrak.cz/),
+[Vianey Leos Barajas](https://www.vleosbarajas.com/).
 
 Published by CRC Press in 2026.<br>
 Copyright by Andrew Gelman, Aki Vehtari, Richard McElreath, Daniel
