@@ -95,7 +95,7 @@ BibTeX entry:
 26. Model building with latent variables: Markov models for animal movement
 27. Model building: Time-series decomposition for birthdays
 28. Models for regression coefficients and variable selection: Student grades
-29. Funnel problem with latent variables: No vehicles in the park
+29. Sampling problems with latent variables: No vehicles in the park
 30. Computational challenge of multimodality: Differential equation for planetary motion
 31. Simulation-based calibration checking in model development workflow
 
