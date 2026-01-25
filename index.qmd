@@ -96,7 +96,7 @@ BibTeX entry:
 27. Model building: Time-series decomposition for birthdays
 28. Models for regression coefficients and variable selection: Student grades
 29. Sampling problems with latent variables: No vehicles in the park
-30. Computational challenge of multimodality: Differential equation for planetary motion
+30. Challenge of multimodality: Differential equation for planetary motion
 31. Simulation-based calibration checking in model development workflow
 
 **Appendices**
