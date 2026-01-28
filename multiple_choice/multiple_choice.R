@@ -1,23 +1,15 @@
 #' ---
-#' title: "Sensitivity and specificity in coronavirus testing"
+#' title: "Modeling performance on a multiple choice exam"
 #' author: "Andrew Gelman"
 #' date: 2022-08-22
 #' date-modified: today
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #'
@@ -27,6 +19,8 @@
 #'
 #' # Introduction
 #'
+#' We demonstrate with an example from Section 4.15 of
+#' @Gelman-Vehtari:2024, assessing the grading of a multiple-choice test.
 #' We analyze data from a 24-question final exam from a class of 32
 #' students, where our applied goal is to check that the individual
 #' test questions are doing a good job at discriminating between
@@ -63,6 +57,17 @@ library(arm)
 set.seed(123)
 # Bring in plotting functions from a separate file
 source(root("multiple_choice", "plot_functions.R"))
+
+print_stan_code <- function(code) {
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
 
 #' # Stan models
 #' 
@@ -107,7 +112,8 @@ item_id_0 <- LETTERS[1:J]  # Only works here because J is no more than 26!
 #' # Simple models
 #' 
 #' ## Base model logit_0
-logit_0
+#| output: asis
+print_stan_code(logit_0$code())
 
 #| label: fig-final_exams_1
 #| fig-height: 4
@@ -122,7 +128,8 @@ plot_logit(
 )
 
 #' ## Add priors
-logit_prior
+#| output: asis
+print_stan_code(logit_prior$code())
 
 #| label: fig-final_exams_2
 #| fig-height: 4
@@ -190,7 +197,8 @@ plot_logit_grid(
 )
 
 #' ## Allow for guessing
-logit_guessing
+#| output: asis
+print_stan_code(logit_guessing$code())
 
 #| label: fig-final_exams_4
 #| fig-height: 6
@@ -230,7 +238,8 @@ longdata <- list(
 )
 
 #' ## Multilevel model
-logit_guessing_multilevel
+#| output: asis
+print_stan_code(logit_guessing_multilevel$code())
 
 #| label: fig-final_exams_5
 #| fig-height: 6
@@ -252,7 +261,8 @@ fit_5 <- plot_logit_grid_2(
 print(fit_5, variables = c("mu_a", "sigma_a", "mu_b", "sigma_b"))
 
 #' ## Multilevel model with correlation
-logit_guessing_multilevel_bivariate
+#| output: asis
+print_stan_code(logit_guessing_multilevel_bivariate$code())
 
 #| label: fig-final_exams_6
 #| fig-height: 6
@@ -274,7 +284,8 @@ fit_6 <- plot_logit_grid_2(
 print(fit_6, variables = c("mu_ab", "sigma_ab", "Omega_ab"))
 
 #' ## Multilevel model with correlation using Cholesky
-logit_guessing_multilevel_bivariate_cholesky
+#| output: asis
+print_stan_code(logit_guessing_multilevel_bivariate_cholesky$code())
 
 #| label: fig-final_exams_7
 #| fig-height: 6
@@ -299,7 +310,8 @@ print(fit_7, variables = c("mu_ab", "sigma_ab", "Omega_ab"))
 #' # Item-response theory (IRT) models
 #'
 #' ## Item-response model
-irt_guessing
+#| output: asis
+print_stan_code(irt_guessing$code())
 
 #| label: fig-final_exams_11
 #| fig-height: 6
@@ -316,7 +328,8 @@ fit_11 <- plot_irt(
 )
 
 #' ## Item-response model with discrimination parameters
-irt_guessing_discrimination
+#| output: asis
+print_stan_code(irt_guessing_discrimination$code())
 
 #| label: fig-final_exams_12
 #| fig-height: 6
@@ -464,7 +477,8 @@ mtext("10 prior predictive simulations with a ~ normal(0, 50) and b ~ normal(0, 
 
 
 #' # Breaking the model
-logit_guessing_uncentered
+#| output: asis
+print_stan_code(logit_guessing_uncentered$code())
 
 #' Simulate data
 set.seed(123)
@@ -559,3 +573,12 @@ plot_logit_grid_2(
   item_id,
   guessprob = 0.25
 )
+
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#' 
+#' * Code &copy; 2022--2025, Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.

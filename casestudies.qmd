@@ -1,0 +1,134 @@
+---
+title: "Bayesian Workflow book: Case studies"
+date: 2026-01-05
+date-modified: today
+date-format: iso
+format:
+  html:
+    number-sections: false
+---
+
+## Introduction
+
+The code and data are provided to fully reproduce the examples and
+figures in the book.  They can be a good way to see what the code
+does. Different people have different styles of code and we don't
+claim our style is the best.
+
+When running the notebooks, to avoid the need to switch the working
+directory, the `rprojroot` package is used to set the project root
+directory. The downloaded git repository can be placed anywhere you
+like and you can rename the Bayesian-Workflow directory if you
+wish. When running the code, it is sufficient that the working
+directory is any directory in the Bayesian-Workflow (or
+renamed). Running
+```
+library("rprojroot")
+root<-has_file(".Bayesian-Workflow-root")$make_fix_file()
+```
+will find the file `.Bayesian-Workflow-root` which is in the `Bayesian-Workflow` directory, 
+and will set the full path according to that. Then, for example,
+```
+bioassay_stan_file <- root("bioassay","bioassay0.stan")
+```
+finds the `bioassay0.stan` file, no matter where you have placed or renamed the `Bayesian-Workflow` directory. When you switch to another example, there is no need to switch the working directory.
+
+
+## Case studies
+
+- [Sec 3.5: Bioassay](bioassay/bioassay.html)
+- [Ch 4: Modeling performance on a multiple choice exam](multiple_choice/multiple_choice.html)
+- [Sec 11.4-6: How many iterations to run and how many digits to report](digits/digits.html)
+- [Sec 12.3: Illustration of problematic posteriors](problems/problems.html)
+- [Sec 12.4: Declining exponentials](declining_exponentials/declining_exponentials.html)
+- [Ch 16: Simulated data of movie ratings](movies/movies.html)
+- [Ch 17: Sleep study: Prior specification and model checking](sleep_study/sleep_study.html)
+- [Ch 18: Nabiximols treatment efficiency](nabiximols/nabiximols.html)
+- [Ch 19: Sensitivity and specificity in coronavirus testing](coronavirus/coronavirus.html)
+- [Ch 20: Mixture model for time series competition](timeseries/timeseries.html)
+- [Ch 21: Stochastic learning in dogs -- brms version](dogs/dogs.html)
+- [Ch 21: Stochastic learning in dogs -- Stan version](dogs/dogs_stan.html)
+- [Ch 22: Survival analysis and black cat adoptions](cat_adoptions/cat_adoptions.html)
+- [Ch 23: World Cup continuous vs discrete models](world_cup/world_cup.html)
+- [Ch 24: Roaches cross-validation model checking and comparison](roaches/roaches.html)
+- [Ch 25: Model building and expansion for golf putting](golf/golf.html)
+- [Ch 26: Sharks and model building with latent variables](sharks/sharks.html)
+- [Ch 27: Birthdays and time-series decomposition](birthdays/birthdays.html)
+- [Ch 28: Variable selection](variable_selection/variable_selection.html)
+- [Ch 29: Park rule: No vehicles in the park](park_rule/park_rule_aki.html)
+- [Ch 30: Planetary motion: Computational challenge of multimodality](planetary_motion/planetary_motion.html)
+- [Ch 31: Simulation based calibration checking (SBC)](sbc/sbc.html)
+
+
+## Miscellaneous code
+
+Code that is not part of complete case studies, but may be useful for 
+regenerating some figures in Chapters 6--12, can be found in the [GitHub `misc` directory](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
+
+
+## Software versions
+
+We list here all the software packages used in the case studies and the versions used
+when rendering the case study web pages 2026-01-08.
+
+```{r, echo=FALSE}
+# Extract package names from R files
+get_pkgs <- function(file) {
+  code <- paste(gsub("#.*$", "", readLines(file, warn = FALSE)), collapse = "\n")
+  lib_pat <- "\\b(library|require)\\s*\\(\\s*['\"]?([A-Za-z0-9.]+)"
+  col_pat <- "\\b([A-Za-z0-9.]+):::"
+  c(gsub(lib_pat, "\\2", regmatches(code, gregexpr(lib_pat, code))[[1]]),
+    gsub(col_pat, "\\1", regmatches(code, gregexpr(col_pat, code))[[1]])) |> unique()
+}
+
+# Get first sentence of description
+first_sentence <- function(pkg) {
+  if (pkg == "CmdStan") return("The command-line interface to Stan.")
+  desc <- tryCatch(packageDescription(pkg), error = function(e) NULL)
+  if (is.null(desc) || !is.list(desc) || is.null(desc$Description)) return("")
+  txt <- trimws(gsub("\\s+", " ", desc$Description))
+  for (i in seq_len(nchar(txt))) {
+    if (substr(txt, i, i) %in% c(".", "?", "!")) {
+      before <- substr(txt, 1, i - 1)
+      if (grepl("\\) ?$", before)) return(substr(txt, 1, i))
+      if (grepl("[. ][A-Za-z]$", before)) next
+      if (grepl("[A-Za-z]{2,}$", before)) return(substr(txt, 1, i))
+    }
+  }
+  txt
+}
+
+# Get package URL
+get_url <- function(pkg) {
+  special <- c(brms = "https://paulbuerkner.com/brms/",
+               CmdStan = "https://mc-stan.org/cmdstanr/",
+               priorsense = "https://n-kall.github.io/priorsense/")
+  if (pkg %in% names(special)) return(special[[pkg]])
+  desc <- tryCatch(packageDescription(pkg), error = function(e) NULL)
+  if (!is.null(desc$URL)) {
+    url <- strsplit(desc$URL, "[,[:space:]]+")[[1]][1]
+    if (nzchar(url)) return(url)
+  }
+  paste0("https://cran.r-project.org/package=", pkg)
+}
+
+# Build package table
+r_files <- list.files(".", "\\.[Rr]$", recursive = TRUE, full.names = TRUE)
+pkgs <- unique(unlist(lapply(r_files, get_pkgs)))
+ip <- installed.packages()
+
+data.frame(
+  Package = c(pkgs, "CmdStan"),
+  Version = c(ip[pkgs, "Version"], cmdstanr::cmdstan_version())
+) |>
+  transform(
+    Link = sprintf("<a href=\"%s\" target=\"_blank\">%s</a>",
+                   sapply(Package, get_url), Package),
+    Desc = sapply(Package, first_sentence)
+  ) |>
+  (\(d) d[order(tolower(d$Package)), ])() |>
+  subset(select = c(Link, Version, Desc)) |>
+  setNames(c("Package", "Version", "Description")) |>
+  tinytable::tt(escape = FALSE) |>
+  tinytable::theme_html(class = "tinytable tinytable-sm")
+```

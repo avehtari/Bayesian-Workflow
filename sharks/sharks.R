@@ -1,33 +1,29 @@
 #' ---
-#' title: "Model building with latent variables"
+#' title: "Sharks and model building with latent variables"
 #' author: "Vianey Leos Barajas"
 #' date: 2025-12-14
 #' date-modified: today
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 
-#' This notebook includes the code for Bayesian Workflow book chapter
-#' 26 ``Model building with latent variables: Markov models for animal
-#' movement''
+#' This notebook includes the code for Bayesian Workflow book Chapter
+#' 26 *Model building with latent variables: Markov models for animal
+#' movement*.
 #' 
 #' # Introduction
 #'
-#' Intro text...
+#' To demonstrate how hidden Markov models (HMMs) are used to model
+#' animal movement, we use positional data analyzed by
+#' @Towner-Leos-Barajas-Langrock-etal:2016. Here we replicate the
+#' model building workflow and demonstrate how this would be done in
+#' a Bayesian framework.
 #' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=TRUE, comment=NA, out.width='95%')
@@ -692,3 +688,14 @@ p3 <- ggplot(wsf1_chum_tpm_long, aes(dateTime, value)) +
 
 #| label: fig-2state_tpmcov_crencp
 (p1 + p2)/p3
+
+#' <br />
+#'
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#'
+#' * Code &copy; 2025, Vianey Leos Barajas, licensed under BSD-3.
+#' * Text &copy; 2025, Vianey Leos Barajas, licensed under CC-BY-NC 4.0.

@@ -13,34 +13,35 @@ functions {
   }
 }
 data {
-  int n;
-  array[n, 2] real q_obs;
-  array[n] real time;
+  int N;
+  array[N, 2] real q_obs;
+  array[N] real time;
   
   real<lower=0> sigma;
 }
 transformed data {
   real t0 = 0;
-  int n_coord = 2;
+  int N_coord = 2;
   real m = 1.0;
   
   real<lower=0> sigma_x = sigma;
   real<lower=0> sigma_y = sigma;
   
-  // ODE tuning parameters
+  // ODE solver parameters
   real rel_tol = 1e-6;
   real abs_tol = 1e-6;
   int max_steps = 1000;
 }
 parameters {
   real<lower=0> k;
-  vector[n_coord] q0;
-  vector[n_coord] p0;
-  vector[n_coord] star;
+  vector[N_coord] q0;
+  vector[N_coord] p0;
+  vector[N_coord] star;
 }
 transformed parameters {
-  vector[n_coord * 2] y0 = append_row(q0, p0);
-  array[n] vector[n_coord * 2] y = ode_rk45_tol(ode, y0, t0, time, rel_tol, abs_tol, max_steps, k, star, m);
+  vector[N_coord * 2] y0 = append_row(q0, p0);
+  array[N] vector[N_coord * 2] y =
+    ode_rk45_tol(ode, y0, t0, time, rel_tol, abs_tol, max_steps, k, star, m);
 }
 model {
   k ~ normal(1, 0.001); // prior derive based on solar system 
@@ -55,8 +56,8 @@ model {
   q_obs[ : , 2] ~ normal(y[ : , 2], sigma_y);
 }
 generated quantities {
-  array[n] real qx_pred;
-  array[n] real qy_pred;
+  array[N] real qx_pred;
+  array[N] real qy_pred;
   
   qx_pred = normal_rng(y[ : , 1], sigma_x);
   qy_pred = normal_rng(y[ : , 2], sigma_y);

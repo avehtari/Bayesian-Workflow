@@ -6,31 +6,23 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #'
 #' This notebook includes the code for Bayesian Workflow book Section
-#' 12.3 ``Failure modes and steps forward''.
+#' 12.3 *Failure modes and steps forward*.
 #'
 #' # Introduction
-#' 
+#'
 #' This case study demonstrates using simple examples the most common
 #' failure modes in Markov chain Monte Carlo based Bayesian inference,
 #' how to recognize these using the diagnostics, and how to fix the
 #' problems.
-#' 
+#'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
   cache = FALSE,
@@ -41,7 +33,7 @@ knitr::opts_chunk$set(
   out.width = "90%"
 )
 
-#' *Load packages*
+#' **Load packages**
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr) 
@@ -59,9 +51,21 @@ theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
 set1 <- RColorBrewer::brewer.pal(7, "Set1")
 SEED <- 48927 # set random seed for reproducibility
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 #'
 #' # Improper posterior
-#' 
+#'
 #' An unbounded likelihood without a proper prior can lead to an
 #' improper posterior. We recommend to always use proper priors
 #' (integral over a proper distribution is finite) to guarantee proper
@@ -95,7 +99,9 @@ data.frame(data_logit) |>
 #' We use the following Stan logistic regression model, where we have
 #' ``forgot'' to include prior for the coefficient `beta`.
 code_logit <- root("problems", "logit_glm.stan")
-writeLines(readLines(code_logit))
+#| output: asis
+print_stan_file(code_logit)
+
 #' Sample
 #| label: fit_logit
 #| results: hide
@@ -104,7 +110,7 @@ fit_logit <- mod_logit$sample(data = data_logit, seed = SEED, refresh = 0)
 
 #'
 #' ## Convergence diagnostics
-#' 
+#'
 #' When running Stan, we get warnings. We can also
 #' explicitly check the inference diagnostics:
 fit_logit$diagnostic_summary()
@@ -123,7 +129,7 @@ summarize_draws(draws)
 #' that mentions possibility to adjust the sampling algorithm options
 #' (e.g., increasing `adapt_delta` and `max_treedepth`), but it is
 #' better first to investigate the posterior.
-#' 
+#'
 #' The following Figure shows the posterior draws as marginal
 #' histograms and joint scatterplots. The range of the values is huge,
 #' which is typical for improper posterior, but the values of `alpha`
@@ -131,11 +137,12 @@ summarize_draws(draws)
 #' smaller magnitude. In this case, increasing `adapt_delta` and
 #' `max_treedepth` would not have solved the problem, and would have
 #' just caused waste of modeler and computation time.
-#' 
+#'
 #| label: fig-separable_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' ## Stan compiler pedantic check
@@ -155,7 +162,8 @@ mod_logit$check_syntax(pedantic = TRUE)
 #'
 #' We add proper weak priors and rerun inference.
 code_logit2 <- root("problems", "logit_glm2.stan")
-writeLines(readLines(code_logit2))
+#| output: asis
+print_stan_file(code_logit2)
 #' Sample
 #| label: fit_logit2
 #| results: hide
@@ -178,11 +186,12 @@ summarize_draws(draws)
 #| label: fig-separable_prior_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' # A model with unused parameter
-#' 
+#'
 #' When writing and editing models, a common mistake is to declare a
 #' parameter, but not use it in the model. If the parameter is not
 #' used at all, it doesn't have proper prior and the likelihood
@@ -194,7 +203,8 @@ mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 #'
 #' ## Model
 code_logit3 <- root("problems", "logit_glm3.stan")
-writeLines(readLines(code_logit3))
+#| output: asis
+print_stan_file(code_logit3)
 #' Sample
 #| label: fit_logit3
 #| results: hide
@@ -203,7 +213,7 @@ fit_logit3 <- mod_logit3$sample(data = data_logit, seed = SEED, refresh = 0)
 
 #'
 #' ## Convergence diagnostics
-#' 
+#'
 #' There is sampler warning. We can also explicitly call inference
 #' diagnostics:
 fit_logit3$diagnostic_summary()
@@ -220,7 +230,8 @@ summarize_draws(draws)
 #| label: fig-unusedparam_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta", "gamma"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta", "gamma"),
+           off_diag_args = list(alpha = 0.2))
 
 #' Non-mixing is well diagnosed by $\widehat{R}$ and ESS, but the
 #' following Figure shows one of the rare cases where trace plots are
@@ -257,12 +268,13 @@ data_logit4 <- list(M = M, N = N, x = x, y = y)
 
 #'
 #' ## Model
-#' 
+#'
 #' We use the previous logistic regression model with proper priors
 #' (and no extra `gamma`).
 #'
 code_logit2 <- root("problems", "logit_glm2.stan")
-writeLines(readLines(code_logit2))
+#| output: asis
+print_stan_file(code_logit2)
 #' Sample
 #| label: fit_logit4
 #| results: hide
@@ -284,14 +296,15 @@ summarize_draws(draws)
 #' [@Vehtari-Gelman-Simpson-etal:2021], but
 #' lower than what we would expect in general from Stan for such a
 #' lower dimensional problem.
-#' 
+#'
 #' The following figure shows marginal histograms and joint
 #' scatterplots, and we can see that `alpha` and `beta[1]` are highly
 #' correlated. 
 #| label: fig-competing_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta[1]", "beta[2]"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta[1]", "beta[2]"),
+           off_diag_args = list(alpha = 0.2))
 
 
 #' We can compute the correlation.
@@ -326,7 +339,7 @@ mod_logit4$check_syntax(pedantic = TRUE)
 #' it.
 #'
 #' ## Data
-#' 
+#'
 #' The data are Kilpisjärvi summer month temperatures 1952-2013
 #' measured by Finnish Meteorological Institute.
 data_kilpis <- read.delim(root("problems/data", "kilpisjarvi-summer-temp.csv"), sep = ";")
@@ -345,10 +358,11 @@ data.frame(data_lin) |>
   guides(linetype = "none")
 
 #' ## Model
-#' 
+#'
 #' We use the following Stan linear regression model
 code_lin <- root("problems", "linear_glm_kilpis.stan")
-writeLines(readLines(code_lin))
+#| output: asis
+print_stan_file(code_lin)
 
 #| label: fit_lin_kilpis
 #| results: hide
@@ -356,7 +370,7 @@ mod_lin <- cmdstan_model(stan_file = code_lin)
 fit_lin <- mod_lin$sample(data = data_lin, seed = SEED, refresh = 0)
 
 #' ## Convergence diagnostics
-#' 
+#'
 #' Stan gives a warning: There were X transitions after warmup that
 #' exceeded the maximum treedepth. As in the previous example, there
 #' are no other warnings.
@@ -373,7 +387,8 @@ summarize_draws(draws)
 #| label: fig-correlating_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #' Here the reason is that the $x$ values are in the range 1952--2013,
 #' and the intercept `alpha` denotes the temperature at year 0, which
@@ -399,7 +414,7 @@ data_lin <- list(
 fit_lin <- mod_lin$sample(data = data_lin, seed = SEED, refresh = 0)
 
 #' ## Convergence diagnostics
-#' 
+#'
 #' We check the diagnostics
 fit_lin$diagnostic_summary()
 draws <- as_draws_rvars(fit_lin$draws())
@@ -409,7 +424,8 @@ summarize_draws(draws)
 #| label: fig-uncorrelating_params_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' With this change, there is no posterior correlation, Bulk-ESS
@@ -418,7 +434,7 @@ mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 #' faster inference. In a bigger problems this could correspond to
 #' reduction of computation time from 24 hours to less than 20
 #' minutes.
-#' 
+#'
 
 #'
 #' # A bimodal posterior
@@ -429,7 +445,7 @@ mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 #' diagnostics revealing the multimodal posterior. We use a simple toy
 #' problem with $t$ model and data that is not from a $t$
 #' distribution, but from a mixture of two normal distributions
-#' 
+#'
 #' ## Data
 #'
 #' Bimodally distributed data
@@ -441,7 +457,8 @@ data_tt <- list(N = N, y = y)
 #'
 #' Unimodal Student's $t$ model:
 code_tt <- root("problems", "student.stan")
-writeLines(readLines(code_tt))
+#| output: asis
+print_stan_file(code_tt)
 #' Sample
 #| label: fit_tt_hard
 #| results: hide
@@ -449,7 +466,7 @@ mod_tt <- cmdstan_model(stan_file = code_tt)
 fit_tt <- mod_tt$sample(data = data_tt, seed = SEED, refresh = 0)
 
 #' ## Convergence diagnostics
-#' 
+#'
 #' We check the diagnostics
 fit_tt$diagnostic_summary()
 draws <- as_draws_rvars(fit_tt$draws())
@@ -482,7 +499,7 @@ mcmc_hist(as_draws_array(draws), pars = c("mu"))
 #' are needed to improve mixing between the modes (e.g. Yao et al.,
 #' 2020) or to approximately weight the chains (e.g. Yao et al.,
 #' 2022).
-#' 
+#'
 #' # Easy bimodal posterior
 #'
 #' If the modes in the bimodal distribution are not strongly
@@ -497,7 +514,7 @@ data_tt <- list(N = N, y = y)
 fit_tt <- mod_tt$sample(data = data_tt, seed = SEED, refresh = 0)
 
 #' ## Convergence diagnostics
-#' 
+#'
 #' We check the diagnostics
 fit_tt$diagnostic_summary()
 draws <- as_draws_rvars(fit_tt$draws())
@@ -572,7 +589,8 @@ data.frame(data_pois) |>
 #' `alpha + beta * x` but is implemented with better computational
 #' efficiency.
 code_pois <- root("problems", "pois_glm.stan")
-writeLines(readLines(code_pois))
+#| output: asis
+print_stan_file(code_pois)
 #' Sample
 #| label: fit_pois
 #| results: hide
@@ -588,7 +606,7 @@ fit_pois <- mod_pois$sample(data = data_pois, seed = SEED, refresh = 0)
 #'```
 #'
 #' ## Convergence diagnostics
-#' 
+#'
 #' We check the diagnostics:
 fit_pois$diagnostic_summary()
 draws <- as_draws_rvars(fit_pois$draws())
@@ -601,7 +619,8 @@ summarize_draws(draws)
 #| label: fig-poisson_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #' The reason for the issue is that the initial values for
 #' `beta` are sampled from $(-2, 2)$ and `x` has some
@@ -611,7 +630,7 @@ mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
 #' infinity (`Inf`). 
 #'
 #' ## Scaled data
-#' 
+#'
 #' Sometimes an easy option is to change the initialization range. For
 #' example, in this the sampling succeeds if the initial values are
 #' drawn from the range $(-0.001, 0.001)$. Alternatively we can scale
@@ -632,7 +651,7 @@ fit_pois <- mod_pois$sample(data = data_pois, seed = SEED, refresh = 0)
 
 #'
 #' ## Convergence diagnostics
-#' 
+#'
 #' We check the diagnostics:
 fit_pois$diagnostic_summary()
 draws <- as_draws_rvars(fit_pois$draws())
@@ -652,7 +671,8 @@ summarize_draws(draws)
 #'
 #' ## Model
 code_logit_glm4 <- root("problems", "logit_glm4.stan")
-writeLines(readLines(code_logit_glm4))
+#| output: asis
+print_stan_file(code_logit_glm4)
 #' Sample
 #| label: fit_logit_glm4
 #| results: hide
@@ -661,7 +681,7 @@ fit_logit_glm4 <- mod_logit_glm4$sample(data = data_logit, seed = SEED, refresh 
 
 #'
 #' ## Convergence diagnostics
-#' 
+#'
 #' We check diagnostics
 fit_logit_glm4$diagnostic_summary()
 draws <- as_draws_rvars(fit_logit_glm4$draws())
@@ -673,7 +693,8 @@ summarize_draws(draws)
 #| label: fig-thick_tail_pairs
 #| fig-height: 4
 #| fig-width: 6
-mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"))
+mcmc_pairs(as_draws_array(draws), pars = c("alpha", "beta"),
+           off_diag_args = list(alpha = 0.2))
 
 #'
 #' The dynamic HMC algorithm used by Stan, along with many other MCMC
@@ -711,7 +732,7 @@ draws |> thin_draws(ndraws(draws) / ess_bulk(draws$alpha)) |>
 #' declaring the parameter as `real<lower=0> sigma;`
 #'
 #' ## Data
-#' 
+#'
 #' We simulated x and y independently from independently from
 #' normal(0,1) and normal(0,0.1) respectively. As $N=8$ is small,
 #' there will be a lot of uncertainty about the parameters including
@@ -724,10 +745,11 @@ y <- rnorm(N) / 10
 data_lin <- list(M = M, N = N, x = x, y = y)
 
 #' ## Model
-#' 
+#'
 #' We use linear regression model with proper priors.
 code_lin <- root("problems", "linear_glm.stan")
-writeLines(readLines(code_lin))
+#| output: asis
+print_stan_file(code_lin)
 #' Sample
 #| label: fit_lin
 #| results: hide
@@ -756,14 +778,14 @@ fit_lin <- mod_lin$sample(data = data_lin, seed = SEED, refresh = 0)
 #' numerical accuracy of the computations.
 #'
 #' ## Convergence diagnostics
-#' 
+#'
 #' We check diagnostics
 fit_lin$diagnostic_summary()
 draws <- as_draws_rvars(fit_lin$draws())
 summarize_draws(draws)
 
 #' ## Stan compiler pedantic check
-#' 
+#'
 #' Stan compiler pedantic check can recognize that `A normal_id_glm
 #' distribution is given parameter sigma as a scale parameter
 #' (argument 4), but sigma was not constrained to be strictly
@@ -777,10 +799,11 @@ mod_lin$check_syntax(pedantic = TRUE)
 #' specific case, the bias is negligible when running MCMC with the
 #' model code without the constraint, but it is difficult to diagnose
 #' without running the fixed model.
-#' 
+#'
 #' Fixed model includes <lower=0> constraint for sigma.
 code_lin2 <- root("problems", "linear_glm2.stan")
-writeLines(readLines(code_lin2))
+#| output: asis
+print_stan_file(code_lin2)
 #' Sample
 #| label: fit_lin2
 #| results: hide
@@ -796,12 +819,12 @@ summarize_draws(draws2)
 #' diagnose without running the fixed model.
 #'
 #' <br />
-#' 
+#'
 #' # References {.unnumbered}
 #'
 #' <div id="refs"></div>
-#' 
+#'
 #' # Licenses {.unnumbered}
-#' 
-#' * Code &copy; 2021-2025, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2021-2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
+#'
+#' * Code &copy; 2021--2025, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2021--2025, Aki Vehtari, licensed under CC-BY-NC 4.0.

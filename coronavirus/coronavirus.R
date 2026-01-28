@@ -1,29 +1,21 @@
 #' ---
 #' title: "Sensitivity and specificity in coronavirus testing"
-#' author: "Andrew Gelman"
+#' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2022-08-22
 #' date-modified: today
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #'
 #' This notebook includes the code for the Bayesian Workflow book
 #' Chapter 19 *Building up to a hierarchical model: Coronavirus
-#' testing*
+#' testing*.
 #'
 #' # Introduction
 #'
@@ -47,13 +39,29 @@ knitr::opts_chunk$set(
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("coronavirus", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("coronavirus", "stan_output"))
 options(mc.cores = 4)
+library(posterior)
 library(priorsense)
 library(ggplot2)
 library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
 library(dplyr)
 library(ggh4x)
+
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
 
 #' Define function to compute shortest posterior interval (SPIN; @Liu-Gelman-Zheng:2015)
 spin <- function(x, lower=NULL, upper=NULL, conf=0.95) {
@@ -75,12 +83,16 @@ spin <- function(x, lower=NULL, upper=NULL, conf=0.95) {
 
 #' # Simple model fit using pooled specificity and sensitivity
 
-writeLines(readLines(root("coronavirus", "santa-clara.stan")))
-sc_model <- cmdstan_model(root("coronavirus", "santa-clara.stan"))
+code <- root("coronavirus", "santa-clara.stan")
+#| output: asis
+print_stan_file(code)
+#'
+sc_model <- cmdstan_model(code)
 
 #' Compute posterior with data from @Bendavid-Mulaney-Sood-etal:2020a, 11 April 2020
 #| label: fit_1
 #| results: hide
+#| cache: true
 fit_1 <- sc_model$sample(
   data = list(
     y_sample = 50,
@@ -95,28 +107,28 @@ fit_1 <- sc_model$sample(
   iter_sampling = 1e4
 )
 print(fit_1, digits = 3)
-draws_1 <- fit_1$draws()
 
 #' Check prior-likelihood sensitivity using powerscaling
 powerscale_sensitivity(fit_1)
-powerscale_sequence(draws_1, lower_alpha = 0.5, length = 3)
 #| label: fig-specificity_priorsense_1
 #| fig-height: 6.5
 #| fig-width: 12
 powerscale_plot_dens(
-  draws_1,
+  fit_1,
   variables = c("p", "spec", "sens"),
   lower_alpha = 0.5,
   help_text = FALSE
 )
 
 #' Inference for the population prevalence
+draws_1 <- fit_1$draws()
 subset <- sample(1e4, 1e3)
 x <- as.vector(draws_1[subset, , "spec"])
 y <- as.vector(draws_1[subset, , "p"])
 #| label: fig-scatter
 #| fig-height: 3.5
 #| fig-width: 4.5
+#| out-width: 70%
 par(mar = c(3, 3, 0, 1), mgp = c(2, .7, 0), tck = -.02)
 plot(x, y, 
      xlim = c(min(x), 1), ylim = c(0, max(y)), 
@@ -125,14 +137,37 @@ plot(x, y,
      ylab = expression(paste("Prevalence, ", pi)), bty = "l", 
      pch=20, cex=.3)
 
+#' ggplot version
+#| label: fig-gg-scatter
+#| fig-height: 3.5
+#| fig-width: 4.5
+#| out-width: 70%
+fit_1$draws() |>
+  resample_draws(ndraws = 1e3) |>
+  mcmc_scatter(pars = c("spec", "p"), size = 1, alpha = 0.5) +
+  lims(x = c(NA, 1), y = c(0, NA)) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
+  labs(x = expression(paste("Specificity, ", gamma)), 
+       y = expression(paste("Prevalence, ", pi)))
+
 #| label: fig-hist
 #| fig-height: 3.5
 #| fig-width: 5.5
+#| out-width: 70%
 par(mar = c(3, 3, 0, 1), mgp = c(2, .7, 0), tck = -.02)
 hist(y, 
      yaxt = "n", yaxs = "i", 
      xlab = expression(paste("Prevalence, ", pi)), 
      ylab = "", main = "")
+
+#| label: fig-gg-hist
+#| fig-height: 3.5
+#| fig-width: 5.5
+#| out-width: 70%
+fit_1$draws() |>
+  mcmc_hist(pars = c("p"), breaks = seq(0, 0.03, length.out = 30)) +
+  theme(axis.line.y = element_blank()) + 
+  labs(x = expression(paste("Prevalence, ", pi)))
 
 #' Use the shortest posterior interval, which makes more sense than a central 
 #' interval because of the skewness of the posterior and the hard boundary at 0.
@@ -142,6 +177,7 @@ print(spin(draws_1[, , "p"], lower = 0, upper = 1, conf = 0.95), digits = 2)
 #'
 #| label: fit_2
 #| results: hide
+#| cache: true
 fit_2 <- sc_model$sample(
   data = list(
     y_sample = 50,
@@ -162,14 +198,10 @@ print(spin(draws_2[, , "p"], lower = 0, upper = 1, conf = 0.95), digits = 2)
 
 
 #' Check prior-likelihood sensitivity using powerscaling
-draws_2 <- fit_2$draws(format = "df") |>
-  mutate(prevalence = p,
-         specificity = spec,
-         sensitivity = sens)
 powerscale_sensitivity(fit_2)
 #| label: fig-specificity_priorsense_x
 powerscale_plot_dens(
-  draws_2,
+  fit_2,
   variables = c("p", "spec", "sens"),
   lower_alpha = 0.5,
   help_text = FALSE
@@ -178,12 +210,16 @@ powerscale_plot_dens(
 #' # Hierarchical model for sensitivity and specificity
 #'
 #' Hierarchical model that allows sensitivity and specificity to vary across studies.
-writeLines(readLines(root("coronavirus", "santa-clara-hierarchical.stan")))
-sc_model_hierarchical <- cmdstan_model(root("coronavirus", "santa-clara-hierarchical.stan"))
+code_hierarchical <- root("coronavirus", "santa-clara-hierarchical.stan")
+#| output: asis
+print_stan_file(code_hierarchical)
+#'
+sc_model_hierarchical <- cmdstan_model(code_hierarchical)
 
 #' Compute posterior using data from @Bendavid-Mulaney-Sood-etal:2020b 27 April 2020
 #| label: fit_3a
 #| results: hide
+#| cache: true
 santaclara_data <- list(
   y_sample = 50,
   n_sample = 3330,
@@ -219,7 +255,7 @@ powerscale_sensitivity(fit_3a, variable = c("p", "sens", "spec")) |>
 #| fig-height: 6.5
 #| fig-width: 12
 powerscale_plot_dens(
-  draws_3a,
+  fit_3a,
   variables = c("p", "spec[1]", "sens[1]"),
   lower_alpha = 0.5,
   help_text = FALSE
@@ -233,11 +269,12 @@ powerscale_plot_dens(
 #' Compute posterior using data from @Bendavid-Mulaney-Sood-etal:2020b
 #' 27 April 2020 and stronger priors
 #' 
-#| label: fit_3b
-#| results: hide
 santaclara_data$logit_spec_prior_scale <- 0.3
 santaclara_data$logit_sens_prior_scale <- 0.3
 #' MCMC gets sometimes stuck on minor mode, so we initialize with Pathfinder
+#| label: fit_3b
+#| results: hide
+#| cache: true
 pth_3b <- sc_model_hierarchical$pathfinder(
   data = santaclara_data,
   refresh = 0,
@@ -280,8 +317,11 @@ print(spin(draws_3b[, , "sigma_logit_sens"], conf = 0.95), digits = 2)
 #' MRP model allowing prevalence to vary by sex, ethnicity, age
 #' category, and zip code.  Model is set up to use the ethnicity, age,
 #' and zip categories of @Bendavid-Mulaney-Sood-etal:2020b
-writeLines(readLines(root("coronavirus", "santa-clara-hierarchical-mrp.stan")))
-sc_model_hierarchical_mrp <- cmdstan_model(root("coronavirus", "santa-clara-hierarchical-mrp.stan"))
+code_model_hierarchical_mrp <- root("coronavirus", "santa-clara-hierarchical-mrp.stan")
+#| output: asis
+print_stan_file(code_model_hierarchical_mrp)
+#'
+sc_model_hierarchical_mrp <- cmdstan_model(code_model_hierarchical_mrp)
 
 #' To fit the model, we need individual-level data.  
 #' These data are not publicly available, so just to get the program running, 
@@ -329,6 +369,7 @@ for (i_zip in 1:N_zip){
 #' Put together the data and fit the model
 #| label: fit_4
 #| results: hide
+#| cache: true
 santaclara_mrp_data <- list(
   N = N,
   y = y,
@@ -379,8 +420,11 @@ tests <- 3330
 unk_df <- data.frame(pos_tests, tests, sample_prev = pos_tests / tests)
 
 #' Stan model for prior sensitivity analysis
-writeLines(readLines(root("coronavirus", "prior-sensitivity.stan")))
-model <- cmdstan_model(root("coronavirus", "prior-sensitivity.stan"))
+code_sens <- root("coronavirus", "prior-sensitivity.stan")
+#| output: asis
+print_stan_file(code_sens)
+#'
+model_sens <- cmdstan_model(code_sens)
 
 #' Data
 data <- list(
@@ -405,13 +449,15 @@ ribbon_df <- data.frame(
 )
 
 #' Loop over different prior parameter values
+#| label: loop-over-prior-values
+#| cache: true
 sigma_senss <- c(0.01, 0.25, 0.5, 0.75, 1)
 sigma_specss <- c(0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 for (sigma_sens in sigma_senss) {
   for (sigma_spec in sigma_specss) {
     data2 <- append(data, list(sigma_sigma_logit_sens = sigma_sens,
                                sigma_sigma_logit_spec = sigma_spec))
-    fit <-  model$sample(
+    fit <-  model_sens$sample(
       data = data2,
       iter_warmup = 5e4,
       iter_sampling = 5e4,
@@ -449,3 +495,12 @@ ggplot(ribbon_df, aes(x = sigma_spec)) +
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         strip.background = element_blank())
+
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#' 
+#' * Code &copy; 2022--2025, Andrew Gelman and Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman and Aki Vehtari, licensed under CC-BY-NC 4.0.

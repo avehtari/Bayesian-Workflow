@@ -1,25 +1,20 @@
 #' ---
-#' title: "Bayesian workflow book - World Cup continuous vs discrete"
+#' title: "World Cup continuous vs discrete models"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2021-01-12
 #' date-modified: today
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
+#' 
+#' This notebook includes the the code code for the Bayesian Workflow book
+#' Chapter 23 *Debugging a model: World Cup football*.
 #' 
 #' # World Cup 2014 team performance analysis
 #'
@@ -34,15 +29,12 @@
 #' comparison of continuous and discrete models.
 #' 
 #' Game scores could be modelled with a discrete bivariate Poisson
-#' model, and score differences with Poisson difference models (Karlis
-#' and Ntzoufras, 2003), which are commonly used in analysis of sports
-#' data. But we'll start with continuous models and discretized
+#' model, and score differences with Poisson difference models
+#' [@Karlis-Ntzoufras:2003], which are commonly used in analysis of
+#' sports data. But we'll start with continuous models and discretized
 #' continuous models to illustrate how those can be compared, and
 #' eventually build also models using naturally discrete data models.
 #'
-#' -------------
-#' 
-
 #+ setup, include=FALSE
 knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)
 # switch this to TRUE to save figures in separate files
@@ -53,6 +45,9 @@ savefigs <- FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("world_cup", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("world_cup", "stan_output"))
 options(mc.cores = 4)
 library(posterior)
 options(
@@ -69,23 +64,35 @@ library(loo)
 library(dplyr)
 library(readr)
 
+print_stan_code <- function(code) {
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 #' # Data
 #'
 #' Data include 64 game results from World Cup 2014 and Soccer Power
 #' Index that was available on the internet a month before the
-#' tournament (Silver, 2014).  We took the rankings, with Brazil at
+#' tournament [@Silver:2014].  We took the rankings, with Brazil at
 #' the top (getting a score of 32) and Australia at the bottom (with a
 #' score of 1), and then for simplicity in interpretation of the
 #' parameters we rescaled these to have mean 0 and standard deviation
 #' 1/2, to get ``prior scores'' that ranged from $-0.83$ to $+0.83$.
-powerindex <- read_csv(root("world_cup", "data","soccerpowerindex.csv")) %>%
+powerindex <- read_csv(root("world_cup", "data","soccerpowerindex.csv")) |>
   mutate(prior_score = as.vector(scale(rev(index))/2))
 teamnames <- powerindex$team
-worldcup2014 <- read_csv(root("world_cup", "data", "worldcup2014.csv")) %>%
+worldcup2014 <- read_csv(root("world_cup", "data", "worldcup2014.csv")) |>
   mutate(team_1 = match(team1, teamnames),
          team_2 = match(team2, teamnames))
 N_games <- nrow(worldcup2014)
-gamenames <- with(worldcup2014, rev(paste(teamnames[team_1], "vs.", teamnames[team_2])))
+gamenames <- with(worldcup2014,
+                  rev(paste(teamnames[team_1], "vs.", teamnames[team_2])))
 
 #' ## Data for Stan
 stan_data <- with(
@@ -123,13 +130,14 @@ stan_data <- with(
 #' $$
 #' setting the degrees of freedom to $\nu=7$.
 #'
-#' 
-#' 
+#' Stan model
+model_1 <- cmdstan_model(stan_file = root("world_cup", "worldcup_first_try.stan"))
+#| results: asis
+print_stan_code(model_1$code())
 #' Fit the model and show the results
 #| label: fit_1
 #| results: hide
-#| cache: false
-model_1 <- cmdstan_model(stan_file = root("world_cup", "worldcup_first_try.stan"))
+#| cache: true
 fit_1 <- model_1$sample(data = stan_data, refresh = 0)
 
 #| label: fit_1_summary
@@ -145,10 +153,12 @@ fit_1$draws("a") |>
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_1.pdf", height=7, width=8))
 
 #' ## Check fit of the first model
+model_1_rep <- cmdstan_model(stan_file = root("world_cup", "worldcup_with_replication.stan"))
+#| results: asis
+print_stan_code(model_1_rep$code())
 #| label: fit_1_rep
 #| results: hide
-#| cache: false
-model_1_rep <- cmdstan_model(stan_file = root("world_cup", "worldcup_with_replication.stan"))
+#| cache: true
 fit_1_rep <- model_1_rep$sample(data = stan_data, refresh = 0)
 
 #| label: fig-worldcup-ppc-intervals-fit_1
@@ -161,15 +171,18 @@ ppc_intervals(
   prob = 1e-12
 ) +
   scale_x_continuous(labels = gamenames, breaks=1:64)+
-  labs(y="Game score differentials\ncompared to 90% predictive interval from model", x="") +
+  labs(y="Game score differentials\ncompared to 90% predictive interval from model",
+       x="") +
   coord_flip() 
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_3.pdf", height=10, width=8))
 
 #' # Second model without sqrt transformation
+model_2 <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_sqrt.stan"))
+#| results: asis
+print_stan_code(model_2$code())
 #| label: fit_2
 #| results: hide
-#| cache: false
-model_2 <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_sqrt.stan"))
+#| cache: true
 fit_2 <- model_2$sample(data = stan_data, refresh = 0)
 
 #| label: fit_2_summary
@@ -200,10 +213,12 @@ ppc_intervals(
 #if (savefigs) ggsave(root("world_cup/figs","worldcup_5.pdf", height=10, width=8))
 
 #' # Fix the first model
+model_3 <- cmdstan_model(stan_file = root("world_cup", "worldcup_fixed.stan"))
+#| results: asis
+print_stan_code(model_3$code())
 #| label: fit_3
 #| results: hide
-#| cache: false
-model_3 <- cmdstan_model(stan_file = root("world_cup", "worldcup_fixed.stan"))
+#| cache: true
 fit_3 <- model_3$sample(data = stan_data, refresh = 0)
 
 #| label: fit_3_summary
@@ -236,10 +251,12 @@ ppc_intervals(
 
 #' ## Fit the same model without the powerindex prior
 #' set b=0 in the data
+model_3_no_prior <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_prior.stan"))
+#| results: asis
+print_stan_code(model_3_no_prior$code())
 #| label: fit_3_no_prior
 #| results: hide
-#| cache: false
-model_3_no_prior <- cmdstan_model(stan_file = root("world_cup", "worldcup_no_prior.stan"))
+#| cache: true
 fit_3_no_prior <- model_3_no_prior$sample(data = c(stan_data, b = 0), refresh = 0)
 
 #| label: fig-worldcup-mcmc-intervals-fit_3_no_prior
@@ -255,10 +272,12 @@ fit_3_no_prior$draws("a") |>
 #' # Discrete models and LOO-CV comparison
 
 #' ## Discrete model with explicit latent z sampled
+model_discr_z <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_z.stan"))
+#| results: asis
+print_stan_code(model_discr_z$code())
 #| label: fit_discr_z
 #| results: hide
-#| cache: false
-model_discr_z <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_z.stan"))
+#| cache: true
 fit_discr_z <- model_discr_z$sample(data = stan_data, refresh = 0)
 loo_discr_z <- fit_discr_z$loo()
 
@@ -266,10 +285,12 @@ loo_discr_z <- fit_discr_z$loo()
 fit_discr_z$summary(c("b", "sigma_a", "sigma_z"))
 
 #' ## Discrete model with latent z integrated out
+model_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete.stan"))
+#| results: asis
+print_stan_code(model_discr$code())
 #| label: fit_discr
 #| results: hide
-#| cache: false
-model_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete.stan"))
+#| cache: true
 fit_discr <- model_discr$sample(data = stan_data, refresh = 0)
 loo_discr <- fit_discr$loo()
 
@@ -277,10 +298,12 @@ loo_discr <- fit_discr$loo()
 fit_discr$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_z"))
 
 #' ## Discrete model with no power score
+model_discr_nopower <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_nopower.stan"))
+#| results: asis
+print_stan_code(model_discr_nopower$code())
 #| label: fit_discr_nopwer
 #| results: hide
-#| cache: false
-model_discr_nopower <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_nopower.stan"))
+#| cache: true
 fit_discr_nopower <- model_discr_nopower$sample(data = stan_data, refresh = 0)
 loo_discr_nopower <- fit_discr_nopower$loo()
 
@@ -289,10 +312,12 @@ fit_discr_nopower$summary(c("a[1]", "a[32]", "sigma_a", "sigma_z"))
 
 
 #' ## Discrete model with power score only
+model_discr_poweronly <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_poweronly.stan"))
+#| results: asis
+print_stan_code(model_discr_poweronly$code())
 #| label: fit_discr_poweronly
 #| results: hide
-#| cache: false
-model_discr_poweronly <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_poweronly.stan"))
+#| cache: true
 fit_discr_poweronly <- model_discr_poweronly$sample(data = stan_data, refresh = 0)
 loo_discr_poweronly <- fit_discr_poweronly$loo()
 
@@ -300,10 +325,12 @@ loo_discr_poweronly <- fit_discr_poweronly$loo()
 fit_discr_poweronly$summary(c("b0", "b", "sigma_z"))
 
 #' ## Discrete model with no power score and pooled effect
+model_discr_pool <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_pooled.stan"))
+#| results: asis
+print_stan_code(model_discr_pool$code())
 #| label: fit_discr_pooled
 #| results: hide
-#| cache: false
-model_discr_pool <- cmdstan_model(stan_file = root("world_cup", "worldcup_discrete_pooled.stan"))
+#| cache: true
 fit_discr_pool <- model_discr_pool$sample(data = stan_data, refresh = 0)
 loo_discr_pool <- fit_discr_pool$loo()
 
@@ -334,10 +361,12 @@ loo_compare(
 #' 
 #' ## Continuous model with log predictive probability using midpoint rule
 #' 
+model_cont_midp <- cmdstan_model(stan_file = root("world_cup", "worldcup_continuous_midpoint_ll.stan"))
+#| results: asis
+print_stan_code(model_cont_midp$code())
 #| label: fit_cont_midp
 #| results: hide
-#| cache: false
-model_cont_midp <- cmdstan_model(stan_file = root("world_cup", "worldcup_continuous_midpoint_ll.stan"))
+#| cache: true
 fit_cont_midp <- model_cont_midp$sample(data = stan_data, refresh = 0)
 loo_cont_midp <- fit_cont_midp$loo()
 
@@ -346,10 +375,12 @@ fit_cont_midp$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 
 #' ## Continuous model with log predictive probability using exact integration
 #' 
+model_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_continuous.stan"))
+#| results: asis
+print_stan_code(model_cont$code())
 #| label: fit_cont
 #| results: hide
-#| cache: false
-model_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_continuous.stan"))
+#| cache: true
 fit_cont <- model_cont$sample(data = stan_data, refresh = 0)
 loo_cont <- fit_cont$loo()
 
@@ -371,10 +402,12 @@ loo_compare(
 #' ## More discretized continuous models
 #'
 #' Continuous sqrt model with log predictive probability using midpoint rule and no Jacobian
+model_sqrt_cont_noj <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_continuous_nojacobian.stan"))
+#| results: asis
+print_stan_code(model_sqrt_cont_noj$code())
 #| label: fit_sqrt_cont_noj
 #| results: hide
-#| cache: false
-model_sqrt_cont_noj <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_continuous_nojacobian.stan"))
+#| cache: true
 fit_sqrt_cont_noj <- model_sqrt_cont_noj$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont_noj <- fit_sqrt_cont_noj$loo()
 
@@ -387,10 +420,12 @@ fit_sqrt_cont_noj$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 
 #' Continuous sqrt model with log predictive probability using
 #' Jacobian and quadrature integration
+model_sqrt_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_continuous.stan"))
+#| results: asis
+print_stan_code(model_sqrt_cont$code())
 #| label: fit_sqrt_cont
 #| results: hide
-#| cache: false
-model_sqrt_cont <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_continuous.stan"))
+#| cache: true
 fit_sqrt_cont <- model_sqrt_cont$sample(data = stan_data, refresh = 0)
 loo_sqrt_cont <- fit_sqrt_cont$loo()
 
@@ -400,10 +435,12 @@ fit_sqrt_cont$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
 #' Discrete sqrt model with log predictive probability using Jacobian
 #' and quadrature integration. The sampling is slow as the quadrature
 #' integration is done at each HMC/NUTS leapfrog step.
+model_sqrt_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_discrete.stan"))
+#| results: asis
+print_stan_code(model_sqrt_discr$code())
 #| label: fit_sqrt_discr
 #| results: hide
-#| cache: false
-model_sqrt_discr <- cmdstan_model(stan_file = root("world_cup", "worldcup_sqrt_discrete.stan"))
+#| cache: true
 fit_sqrt_discr <- model_sqrt_discr$sample(data = stan_data, refresh = 0)
 loo_sqrt_discr <- fit_sqrt_discr$loo()
 
@@ -456,20 +493,25 @@ ppc_pit_ecdf(
 #' difference we can also use Poisson difference model
 #' [@Karlis-Ntzoufras:2003].
 #'
+model_bipois <- cmdstan_model(stan_file = root("world_cup", "worldcup_bivariate_poisson.stan"))
+#| results: asis
+print_stan_code(model_bipois$code())
 #| label: fit_bipois
 #| results: hide
-#| cache: false
-model_bipois <- cmdstan_model(stan_file = root("world_cup", "worldcup_bivariate_poisson.stan"))
+#| cache: true
 fit_bipois <- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta = 0.95)
 
 #| label: fit_bipois_summary
 fit_bipois$summary(c("a","o[1]","o[32]","d[1]","d[32]","b_o","b_d","sigma_o","sigma_d"))
+#'
 (loo_bipois <- fit_bipois$loo())
 
+model_poisdif <- cmdstan_model(stan_file = root("world_cup", "worldcup_poisson_difference.stan"))
+#| results: asis
+print_stan_code(model_poisdif$code())
 #| label: fit_poisdif
 #| results: hide
-#| cache: false
-model_poisdif <- cmdstan_model(stan_file = root("world_cup", "worldcup_poisson_difference.stan"))
+#| cache: true
 fit_poisdif <- model_poisdif$sample(data = stan_data, refresh = 0)
 
 #| label: fit_poisdif_summary
@@ -499,13 +541,6 @@ loo_compare(
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2021-2025, Andrew Gelman, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2021-2025, Andrew Gelman, Aki Vehtari, licensed under CC-BY-NC 4.0.
-#' 
-#' # Original Computing Environment {.unnumbered}
-#' 
-sessionInfo()
-
-#' 
-#' <br />
+#' * Code &copy; 2021--2025, Andrew Gelman, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2021--2025, Andrew Gelman, Aki Vehtari, licensed under CC-BY-NC 4.0.
 #' 

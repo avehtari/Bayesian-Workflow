@@ -7,11 +7,12 @@
 #' format:
 #'   html:
 #'     toc: true
-#'     toc-location: left
+#'     toc-location: right
 #'     toc-depth: 2
 #'     number-sections: true
 #'     smooth-scroll: true
 #'     theme: readable
+#'     css: ../_styles.css
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
@@ -22,8 +23,8 @@
 #' ---
 #' 
 #' This notebook includes the code for Bayesian Workflow book Sections
-#' 11.4 "How many parallel chains and how many iterations" and 11.6
-#' "How many digits to report based on posterior uncertainty".
+#' 11.4 *How many parallel chains and how many iterations* and 11.6
+#' *How many digits to report based on posterior uncertainty*.
 #' 
 #' # Introduction
 #'
@@ -118,24 +119,24 @@
 #'
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
-  cache=FALSE,
-  message=FALSE,
-  error=FALSE,
-  warning=FALSE,
-  comment=NA,
+  cache = FALSE,
+  message = FALSE,
+  error = FALSE,
+  warning = FALSE,
+  comment = NA,
   out.width = "90%"
 )
 
-#' *Load packages*
-library("rprojroot")
+#' **Load packages**
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library(tidyr) 
-library(dplyr) 
+library(tidyr)
+library(dplyr)
 library(cmdstanr)
 library(posterior)
 options(pillar.neg = FALSE,
-        pillar.subtle=FALSE,
-        pillar.sigfig=2)
+        pillar.subtle = FALSE,
+        pillar.sigfig = 2)
 library(tinytable)
 options(tinytable_format_num_fmt = "significant_cell",
         tinytable_format_digits = 2,
@@ -145,19 +146,31 @@ library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans"))
 SEED <- 48927 # set random seed for reproducibility
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 #' ## Kilpisjärvi data and model
 #' 
 #' Load Kilpisjärvi summer month average temperatures 1952-2013:
-data_kilpis <- read.delim(root("digits/data","kilpisjarvi-summer-temp.csv"), sep = ";")
-data_lin <-list(N = nrow(data_kilpis),
-             x = data_kilpis$year,
-             xpred = 2016,
-             y = data_kilpis[,5])
+data_kilpis <- read.delim(root("digits/data", "kilpisjarvi-summer-temp.csv"), sep = ";")
+data_lin <- list(N = nrow(data_kilpis),
+                 x = data_kilpis$year,
+                 xpred = 2016,
+                 y = data_kilpis[, 5])
 #' 
 #' Plot the data
 ggplot() +
   geom_point(aes(x, y), data = data.frame(data_lin), size = 1) +
-  labs(y = 'Summer temperature\n at Kilpisjärvi', x= "Year")
+  labs(y = "Summer temperature\n at Kilpisjärvi", x = "Year")
 
 #' We use a simple linear model with normal observation model, weakly
 #' informative normal prior, and the predictor (time) centered to have
@@ -172,14 +185,15 @@ ggplot() +
 #' easier to define the prior on average temperature in the center of
 #' the time range (instead defining prior for temperature at year 0).
 code_lin <- root("digits", "linear.stan")
-writeLines(readLines(code_lin))
+#| output: asis
+print_stan_file(code_lin)
 
 #' Prior parameter values for weakly informative priors
 data_lin_priors <- c(list(
     pmualpha_c = 10,     # prior mean for average temperature
     psalpha = 10,        # weakly informative
     pmubeta = 0,         # a priori incr. and decr. as likely
-    psbeta = 0.1/3,   # avg temp prob does does not incr. more than a degree per 10 years:  setting this to +/-3 sd's
+    psbeta = 0.1/3,      # avg temp prob does does not incr. more than a degree per 10 years:  setting this to +/-3 sd's
     pssigma = 1),        # setting sd of total variation in summer average temperatures to 1 degree implies that +/- 3 sd's is +/-3 degrees: 
   data_lin)
 
@@ -204,7 +218,7 @@ draws <- as_draws_rvars(fit_lin$draws())
 summarize_draws(draws) |> tt()
 
 #' Compute posterior draws for the linear fit
-draws$mu <- draws$alpha_c+draws$beta*(data_lin$x-mean(data_lin$x))
+draws$mu <- draws$alpha_c + draws$beta * (data_lin$x - mean(data_lin$x))
 #' Plot the linear fit with 90% posterior interval
 #| label: fig-kilpisjarvi_fit
 #| fig-height: 3
@@ -213,12 +227,12 @@ data.frame(x = data_lin$x,
            y = data_lin$y,
            Emu = mean(draws$mu),
            q05 = as.vector(quantile(draws$mu, 0.05)),
-           q95 = as.vector(quantile(draws$mu, 0.95))) |> 
+           q95 = as.vector(quantile(draws$mu, 0.95))) |>
   ggplot() +
-  geom_ribbon(aes(x=x, ymin=q05, ymax=q95), fill='grey90') +
-  geom_line(aes(x=x, y=Emu, )) +
+  geom_ribbon(aes(x = x, ymin = q05, ymax = q95), fill = "grey90") +
+  geom_line(aes(x = x, y = Emu, )) +
   geom_point(aes(x, y), size = 1) +
-  labs(y = 'Summer temperature\n at Kilpisjärvi (°C)', x= "Year")+
+  labs(y = "Summer temperature\n at Kilpisjärvi (°C)", x = "Year") +
   guides(linetype = "none")
 
 #' At this point it is sufficient that diagnostics are OK
@@ -284,7 +298,7 @@ draws |>
 #' Depending on the print method, we may also see many more digits. For
 #' example, the default number of digits for R numeric output is 7.
 mean(draws$beta)
-quantile(draws$beta, probs=c(0.05,0.95))
+quantile(draws$beta, probs = c(0.05, 0.95))
 #' We could use `options(digits = 2)` to show only 2 decimal digits,
 #' but that is not as useful as showing 2 significant digits.
 #' 
@@ -315,13 +329,13 @@ quantile(draws$beta, probs=c(0.05,0.95))
 #' number generator seed, we get slightly different estimates.
 #| results: hide
 estimates <- t(sapply(1:10, function(i) {
-  mod_lin$sample(data = data_lin_priors, seed = SEED+i, refresh = 0,
+  mod_lin$sample(data = data_lin_priors, seed = SEED + i, refresh = 0,
                  show_messages = FALSE)$draws() |>
     mutate_variables(beta100 = 100*beta) |>
     subset_draws("beta100") |>
-      summarize_draws(mean, ~quantile(.x, probs = c(0.05, 0.95))) |>
-      select(-variable)})) |> unlist() |> matrix(nrow=10)
-colnames(estimates) <- c("mean" ,"5%","95%")
+    summarize_draws(mean, ~quantile(.x, probs = c(0.05, 0.95))) |>
+    select(-variable)})) |> unlist() |> matrix(nrow = 10)
+colnames(estimates) <- c("mean", "5%", "95%")
 
 as_tibble(estimates) |> tt()
 
@@ -384,7 +398,7 @@ draws |>
 #' We can also report the probability that the temperature change is
 #' positive.
 draws |>
-  mutate_variables(beta0p = beta100>0) |>
+  mutate_variables(beta0p = beta100 > 0) |>
   subset_draws("beta0p") |>
   summarize_draws("mean", mcse = mcse_mean) |>
   tt()
@@ -406,11 +420,11 @@ draws |>
 #' is more than 1, 2, 3 or 4 degrees, and corresponding MCSEs and ESSs.
 draws |>
   subset_draws("beta100") |>
-  mutate_variables(beta1p = beta100>1,
-                   beta2p = beta100>2,
-                   beta3p = beta100>3,
-                   beta4p = beta100>4) |>
-  subset_draws("beta[1-4]p", regex=TRUE) |>
+  mutate_variables(beta1p = beta100 > 1,
+                   beta2p = beta100 > 2,
+                   beta3p = beta100 > 3,
+                   beta4p = beta100 > 4) |>
+  subset_draws("beta[1-4]p", regex = TRUE) |>
   summarize_draws("mean", mcse = mcse_mean, ESS = ess_mean) |>
   tt()
 
@@ -506,5 +520,5 @@ draws |>
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2020-2025, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2020-2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2020--2025, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2020--2025, Aki Vehtari, licensed under CC-BY-NC 4.0.

@@ -1,27 +1,22 @@
 #' ---
-#' title: "Birthdays workflow case study"
+#' title: "Birthdays and time-series decomposition"
 #' author: "Aki Vehtari"
 #' date: 2020-12-28
 #' date-modified: today
 #' date-format: iso
 #' format:
 #'   html:
-#'     theme: readable
-#'     toc: true
-#'     toc-depth: 3
-#'     toc-location: left
 #'     number-sections: true
-#'     smooth-scroll: true
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
-#' Workflow case study for iterative building of a time series model.
+#'
+#' This notebook includes the code for Bayesian Workflow book Chapter
+#' 27 *Model building: Time-series decomposition for birthdays*.
+#'
+#' # Introduction
 #'
 #' We analyse the relative number of births per day in USA 1969-1988
 #' using Gaussian process time series model with several model
@@ -34,21 +29,20 @@
 #' [@Zhang+etal:2022:pathfinder] to quickly check that model code
 #' produces something reasonable and to initialize MCMC sampling.
 #'
-#' Stan model codes are available in [the corresponding git repo](https://github.com/avehtari/casestudies/tree/master/Birthdays)
+#' Stan model codes are available in [the corresponding git repo](https://github.com/avehtari/Bayesian-Workflow/tree/master/birthdays).
 #'
 #' -------------
 #'
-
 #+ setup, include = FALSE
 knitr::opts_chunk$set(
+  cache = FALSE,
   message = FALSE,
   error = FALSE,
   warning = FALSE,
-  comment = NA,
-  cache = FALSE
+  comment = NA
 )
 
-#' #### Load packages {.unnumbered}
+#' *Load packages*
 #| cache: FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
@@ -59,8 +53,9 @@ mytoc <- \() {
     sprintf("%s took %s sec", msg, as.character(signif(toc - tic, 2)))
   })}
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
 dir.create(root("birthdays", "stan_output"))
-CMDSTANR_OUTPUT_DIR <- root("birthdays", "stan_output")
+options(cmdstanr_output_dir = root("birthdays", "stan_output"))
 library(posterior)
 options(pillar.neg = FALSE,
         pillar.subtle = FALSE,
@@ -79,7 +74,7 @@ set1 <- brewer.pal(7, "Set1")
 #' Use English for names of weekdays and months
 Sys.setlocale("LC_TIME", "en_GB.utf8")
 
-#' ## Load and plot birthdays data
+#' # Data
 #'
 #' Load birthdays per day in USA 1969-1988:
 birthdays <- read_csv(root("birthdays/data", "births_usa_1969.csv"))
@@ -89,7 +84,7 @@ birthdays <- birthdays |>
   mutate(date = as.Date("1968-12-31") + id,
          births_relative100 = births / mean(births) * 100)
 
-#' ### Plot all births
+#' ## Plot all births
 #'
 #' We can see slow variation in trend, yearly pattern, and especially
 #' in the later years spread to lower and higher values.
@@ -101,7 +96,7 @@ birthdays |>
   geom_point(color = set1[2]) +
   labs(x = "Date", y = "Relative number of births")
 
-#' ### Plot all births as relative to mean
+#' ## Plot all births as relative to mean
 #'
 #' To make the interpretation we switch to examine the relative
 #' change, with the mean level denoted with 100.
@@ -112,7 +107,7 @@ birthdays |>
   geom_hline(yintercept = 100, color = "gray") +
   labs(x = "Date", y = "Relative births per day")
 
-#' ### Plot mean per day of year
+#' ## Plot mean per day of year
 #'
 #' We can see the generic pattern in yearly seasonal trend simply by
 #' averaging over each day of year (day_of_year has numbers from 1 to
@@ -128,7 +123,7 @@ birthdays |>
   scale_x_date(date_breaks = "1 month", date_labels = "%b") +
   labs(x = "Day of year", y = "Relative births per day of year")
 
-#' ### Plot mean per day of week
+#' ## Plot mean per day of week
 #' 
 #' We can see the generic pattern in weekly trend simply by averaging
 #' over each day of week.
@@ -142,7 +137,7 @@ birthdays |>
   scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
   labs(x = "Day of week", y = "Relative number of births of week")
 
-#' ## Previous analyses
+#' # Previous analyses
 #' 
 #' We had analysed the same data before (see @BDA3) and thus we
 #' already had an idea of what kind of model to use. Previously we
@@ -158,7 +153,7 @@ birthdays |>
 #' than expected raising suspicion of inefficient model code or bad
 #' posterior shape due to bad model specification.
 #'
-#' ## Workflow for quick iterative model building
+#' # Workflow for quick iterative model building
 #'
 #' Even we have general idea for the model (slow trend, seasonal
 #' trend, weekday effect, etc), adding them all at once to the model
@@ -181,8 +176,7 @@ birthdays |>
 #' later. Overall we build tens of different models, but illustrate
 #' here only the main line.
 #' 
-
-#' ## Models for relative number of birthdays
+#' # Models for relative number of birthdays
 #'
 #' As the relative number of births is positive it's natural to model
 #' the logarithm value. The generic form of the models is
@@ -193,7 +187,7 @@ birthdays |>
 #' conditional on $x$ that includes running day number, day of year,
 #' day of week and eventually some special floating US bank holidays.
 #'
-#' ### Model 1: Slow trend
+#' ## Model 1: Slow trend
 #'
 #' The model 1 is just the slow trend over the years using Hilbert
 #' space basis function approximated Gaussian process
@@ -218,8 +212,9 @@ birthdays |>
 #' @Riutort-Mayol:2023:HSGP).
 #'
 
-#' Compile Stan model [gpbf1.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf1.stan) which includes [gpbasisfun_functions1.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbasisfun_functions1.stan).
-#+ model1, results = "hide"
+#' Compile Stan model [gpbf1.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf1.stan) which includes [gpbasisfun_functions.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbasisfun_functions.stan).
+#| label: model1
+#| results: hide
 model1 <- cmdstan_model(stan_file = root("birthdays", "gpbf1.stan"),
                         include_paths = root("birthdays"))
 
@@ -246,12 +241,13 @@ standata1 <- list(x = birthdays$id,
 #' than one second while MCMC sampling with default options would have
 #' taken several minutes. Although this result can be useful in a
 #' quick workflow, the result should not be used as the final result.
-#+ opt1
-#| results: "hide"
+#| label: opt1
+#| results: hide
 tic('Finding MAP for model 1 with optimization')
 opt1 <- model1$optimize(data = standata1, init = 0, algorithm = "bfgs",
-                        jacobian = TRUE, output_dir = CMDSTANR_OUTPUT_DIR)
+                        jacobian = TRUE)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -281,12 +277,14 @@ birthdays |>
 #' `jacobian = TRUE` by default. As we did already optimize, we can pass
 #' the optimization result to the Laplace method. With additional 2s
 #' we get 400 approximate draws.
-#+ lap1
-#| results: "hide"
+#| label: lap1
+#| results: hide
+#| cache: true
 tic('Sampling from Laplace approximation of model 1 posterior')
 lap1 <- model1$laplace(data = standata1, mode = opt1, draws = 400,
-                       refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                       refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values. With Laplace method, we get
@@ -328,13 +326,14 @@ ldraws1 |>
 #' can reveal if there are multiple modes. Although the result from
 #' short chains can be useful in a quick workflow, the result should
 #' not be used as the final result.
-#+ fit1
-#| results: "hide"
+#| label: fit1
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 1 posterior')
 fit1 <- model1$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
-                      chains = 4, parallel_chains = 4, seed = 3896, 
-                      output_dir = CMDSTANR_OUTPUT_DIR)
+                      chains = 4, parallel_chains = 4, seed = 3896)
 #'
+#| cache: true
 mytoc()
 
 #' Depending on the random seed and luck, we sometimes observed that
@@ -353,12 +352,14 @@ mytoc()
 #' is better than Laplace for highly skewed and funnel like posteriors
 #' which are typical for hierarchical model. We get 400 draws from
 #' 10 Pathfinder runs.
-#+ pth1
+#| label: pth1
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 1 posterior')
 pth1 <- model1$pathfinder(data = standata1, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 100, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
+#| cache: true
 mytoc()
 
 #' Pathfinder provides automatically Pareto-$\hat{k}$ diagnostic which
@@ -384,13 +385,15 @@ summarise_draws(subset(pdraws1, variable = c("intercept", "sigma_f1", "lengthsca
 #' likely to be closer to where most of the posterior mass is than the
 #' default Stan initialization using uniform random draws from -2 to 2
 #' (in unconstrained space).
-#+ fit1init
-#| results: "hide"
+#| label: fit1init
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 1 posterior with Pathfinder initialization')
 fit1 <- model1$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth1, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth1)
 #'
+#| cache: true
 mytoc()
 
 #' In many of the following short MCMC samplings we get some or many
@@ -407,6 +410,7 @@ draws1 <- fit1$draws()
 summarise_draws(subset(draws1, variable = c("intercept", "sigma_f1", "lengthscale_f1", "sigma"))) |>
   tt()
 #' Trace plot shows slow mixing but no multimodality.
+#| label: fig-births-fit1-trace
 mcmc_trace(draws1, regex_pars = c("intercept", "sigma_f1", "lengthscale_f1", "sigma"))
 
 #' The model result from short MCMC chains looks very similar to the
@@ -447,30 +451,34 @@ birthdays |>
 #' term. The intercept term is not necessarily needed as the data has
 #' been centered. We test a model without the explicit intercept term.
 #'
-#' Compile Stan model [gpbf1b.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf1b.stan)
-#+ model1b
-#| results: "hide"
+#' Compile Stan model [gpbf1b.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf1b.stan)
+#| label: model1b
+#| results: hide
 model1b <- cmdstan_model(stan_file = root("birthdays", "gpbf1b.stan"),
                          include_paths = root("birthdays"))
 
 #' First run Pathfinder
-#+ pth1b
+#| label: pth1b
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 1b posterior')
 pth1b <- model1b$pathfinder(data = standata1, init = 0.1,
                             num_paths = 10, single_path_draws = 40, draws = 400,
                             history_size = 50, max_lbfgs_iters = 100, 
-                            refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                            refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Then sample using the Pathfinder initialization.
-#+ fit1b
-#| results: "hide"
+#| label: fit1b
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 1b posterior with Pathfinder initialization')
 fit1b <- model1b$sample(data = standata1, iter_warmup = 100, iter_sampling = 100,
                         chains = 4, parallel_chains = 4,
-                        init = pth1b, output_dir = CMDSTANR_OUTPUT_DIR)
+                        init = pth1b)
 #'
+#| cache: true
 mytoc()
 
 #' The sampling is even faster, indicating that the strong posterior
@@ -480,6 +488,7 @@ draws1b <- fit1b$draws()
 summarise_draws(subset(draws1b, variable = c("sigma_f1", "lengthscale_f1", "sigma"))) |>
   tt()
 #' Examining the trace plots don't show multimodality
+#| label: fig-births-fit1b-trace
 mcmc_trace(draws1b, regex_pars = c("sigma_f1", "lengthscale_f1", "sigma"))
 
 #' We drop global intercept from the rest of the models, but continue
@@ -538,9 +547,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' short MCMC chains and sampling diagnostic tools were crucial for
 #' fast experimentation and solving the problem.
 #' 
-#' Compile Stan model 2 (the fixed version) [gpbf2.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf2.stan)
-#+ model2
-#| results: "hide"
+#' Compile Stan model 2 (the fixed version) [gpbf2.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf2.stan)
+#| label: model2
+#| results: hide
 model2 <- cmdstan_model(stan_file = root("birthdays", "gpbf2.stan"),
                         include_paths = root("birthdays"))
 
@@ -555,13 +564,15 @@ standata2 <- list(x = birthdays$id,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth2
+#| label: pth2
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 2 posterior')
 pth2 <- model2$pathfinder(data = standata2, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -618,13 +629,15 @@ pf / (pf1 + pf2)
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit2
-#| results: "hide"
+#| label: fit2
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 2 posterior with Pathfinder initialization')
 fit2 <- model2$sample(data = standata2, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth2, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth2)
 #'
+#| cache: true
 mytoc()
 
 #' While Pathfinder took about 12s, sampling with short chains is
@@ -709,9 +722,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' \end{aligned}
 #' $$
 #' 
-#' Compile Stan model 3 [gpbf3.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf3.stan)
-#+ model3
-#| results: "hide"
+#' Compile Stan model 3 [gpbf3.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf3.stan)
+#| label: model3
+#| results: hide
 model3 <- cmdstan_model(stan_file = root("birthdays", "gpbf3.stan"),
                         include_paths = root("birthdays"))
 
@@ -727,13 +740,15 @@ standata3 <- list(x = birthdays$id,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth3
+#| label: pth3
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 3 posterior')
 pth3 <- model3$pathfinder(data = standata3, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100, 
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -793,13 +808,15 @@ pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit3
-#| results: "hide"
+#| label: fit3
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 3 posterior with Pathfinder initialization')
 fit3 <- model3$sample(data = standata3, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth3, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth3)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -894,9 +911,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' where $g_3$ has GP prior with zero mean and exponentiated quadratic
 #' covariance function.
 #' 
-#' Compile Stan model 4 [gpbf4.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf4.stan)
-#+ model4
-#| results: "hide"
+#' Compile Stan model 4 [gpbf4.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf4.stan)
+#| label: model4
+#| results: hide
 model4 <- cmdstan_model(stan_file = root("birthdays", "gpbf4.stan"),
                         include_paths = root("birthdays"))
 
@@ -914,13 +931,15 @@ standata4 <- list(x = birthdays$id,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth4
+#| label: pth4
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 4 posterior')
 pth4 <- model4$pathfinder(data = standata4, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -990,13 +1009,15 @@ pf3b <- birthdays |>
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit4
-#| results: "hide"
+#| label: fit4
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 4 posterior with Pathfinder initialization')
 fit4 <- model4$sample(data = standata4, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth4, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth4)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1113,9 +1134,9 @@ ggplot(data = NULL, aes(
 #' much better results and using it to initialize MCMC, the sampling
 #' took only 2.5 minutes.
 #'
-#' Compile Stan model 5 [gpbf5.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf5.stan)
-#+ model5
-#| results: "hide"
+#' Compile Stan model 5 [gpbf5.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf5.stan)
+#| label: model5
+#| results: hide
 model5 <- cmdstan_model(stan_file = root("birthdays", "gpbf5.stan"),
                         include_paths = root("birthdays"))
 
@@ -1135,13 +1156,15 @@ standata5 <- list(x = birthdays$id,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth5
+#| label: pth5
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pareto-$\hat{k}$ is even higher, but the Pathfinder draws are
@@ -1238,14 +1261,15 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
 #' that may return less distinct draws than we would like to use for
 #' initializing MCMC. In such case we can turn of the PSIS resampling
 #' in Stan, and do PSIS without replacement in R.
-#+ pth5_noresample
+#| label: pth5_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 5 posterior')
 pth5 <- model5$pathfinder(data = standata5, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' We check the number of distinct draws, which is now higher (no resampling).
@@ -1278,13 +1302,15 @@ summarise_draws(subset(pdraws5, variable = c("lp__")), n_distinct) |>
 #' Sample short chains using the Pathfinder result as initial values. 
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit5
-#| results: "hide"
+#| label: fit5
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 5 posterior with Pathfinder initialization')
 fit5 <- model5$sample(data = standata5, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth5, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth5)
 #'
+#| cache: true
 mytoc()
 
 #' Before using Pathfinder to initialize sampling, the sampling took
@@ -1411,9 +1437,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' \end{aligned}
 #' $$
 #' 
-#' Compile Stan model 6 [gpbf6.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf6.stan)
-#+ model6
-#| results: "hide"
+#' Compile Stan model 6 [gpbf6.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf6.stan)
+#| label: model6
+#| results: hide
 model6 <- cmdstan_model(stan_file = root("birthdays", "gpbf6.stan"),
                         include_paths = root("birthdays"))
 
@@ -1430,13 +1456,15 @@ standata6 <- list(x = birthdays$id,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth6
+#| label: pth6
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Pathfinder provides automatically Pareto-$\hat{k}$ diagnostic which
@@ -1535,26 +1563,29 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
 #' that may return less distinct draws than we would like to use for
 #' initializing MCMC. In such case we can turn of the PSIS resampling
 #' in Stan.
-#+ pth6_noresample
+#| label: pth6_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth6 <- model6$pathfinder(data = standata6, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit6
-#| results: "hide"
+#| label: fit6
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 6 posterior with Pathfinder initialization')
 fit6 <- model6$sample(data = standata6, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth6, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth6)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1675,9 +1706,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' Thanksgiving (fourth Thursday of November, and we include also the
 #' following Friday).
 #'
-#' Compile Stan model 7 [gpbf7.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf7.stan)
-#+ model7
-#| results: "hide"
+#' Compile Stan model 7 [gpbf7.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf7.stan)
+#| label: model7
+#| results: hide
 model7 <- cmdstan_model(stan_file = root("birthdays", "gpbf7.stan"),
                         include_paths = root("birthdays"))
 
@@ -1707,12 +1738,14 @@ standata7 <- list(x = birthdays$id,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth7
+#| label: pth7
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 7 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1798,26 +1831,29 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
 (pf + pf1) / (pf2 + pf3) / (pf2b)
 
 #' Turn of the PSIS resampling in Stan to get distinct draws for initialization.
-#+ pth7_noresample
+#| label: pth7_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit7
-#| results: "hide"
+#| label: fit7
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 7 posterior with Pathfinder initialization')
 fit7 <- model7$sample(data = standata7, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth7, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth7)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -1922,9 +1958,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' As the day of year and floating day effects work well, we'll add
 #' the time dependent day of week effect back to the model.
 #' 
-#' Compile Stan model 8 [gpbf8.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf8.stan)
-#+ model8
-#| results: "hide"
+#' Compile Stan model 8 [gpbf8.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf8.stan)
+#| label: model8
+#| results: hide
 model8 <- cmdstan_model(stan_file = root("birthdays", "gpbf8.stan"),
                         include_paths = root("birthdays"))
 
@@ -1956,13 +1992,15 @@ standata8 <- list(x = birthdays$id,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth8
+#| label: pth8
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR)
+                          refresh = 0)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -2059,26 +2097,29 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
 (pf + pf1) / (pf2 + pf3b) / (pf2b)
 
 #' We turn of the PSIS resampling in Stan.
-#+ pth8_noresample
+#| label: pth8_noresample
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 6 posterior')
 pth8 <- model8$pathfinder(data = standata8, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
-                          refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                          psis_resample = FALSE)
+                          refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit8
-#| results: "hide"
+#| label: fit8
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 8 posterior with Pathfinder initialization')
 fit8 <- model8$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                       chains = 4, parallel_chains = 4,
-                      init = pth8, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
+                      init = pth8, refresh = 10)
 #'
+#| cache: true
 mytoc()
 
 #' Check whether parameters have reasonable values
@@ -2195,9 +2236,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #'
 #' ### Model 8+t_nu: day of year effect with Student's t prior
 #' 
-#' Compile Stan model 8 + t_nu [gpbf8tnu.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf8tnu.stan)
-#+ model8tnu
-#| results: "hide"
+#' Compile Stan model 8 + t_nu [gpbf8tnu.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf8tnu.stan)
+#| label: model8tnu
+#| results: hide
 model8tnu <- cmdstan_model(stan_file = root("birthdays", "gpbf8tnu.stan"),
                            include_paths = root("birthdays"))
 
@@ -2205,26 +2246,29 @@ model8tnu <- cmdstan_model(stan_file = root("birthdays", "gpbf8tnu.stan"),
 #' useful in a quick workflow, the result should not be used as the
 #' final result). We turn off the resampling in Stan to get distinct
 #' draws for initialization of MCMC.
-#+ pth8tnu
+#| label: pth8tnu
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8tnu posterior')
 pth8tnu <- model8tnu$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit8tnu
-#| results: "hide"
+#| label: fit8tnu
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 8tnu posterior with Pathfinder initialization')
 fit8tnu <- model8tnu$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
-                            init = pth8tnu, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
+                            init = pth8tnu, refresh = 10)
 #'
+#| cache: true
 mytoc()
 
 #' We get a high number of divergences. The posterior clearly has a
@@ -2392,9 +2436,9 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' non-centered to centered parameterization by removing the multiplier
 #' from one of the parameter declarations).
 #'
-#' Compile Stan model 8 + RHS [gpbf8rhs.stan](https://github.com/avehtari/casestudies/blob/master/Birthdays/gpbf8rhs.stan)
-#+ model8rhs
-#| results: "hide"
+#' Compile Stan model 8 + RHS [gpbf8rhs.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf8rhs.stan)
+#| label: model8rhs
+#| results: hide
 model8rhs <- cmdstan_model(stan_file = root("birthdays", "gpbf8rhs.stan"),
                            include_paths = root("birthdays"))
 
@@ -2405,26 +2449,29 @@ standata8 <- c(standata8,
 #' Pathfinder is faster than sampling (although this result can be
 #' useful in a quick workflow, the result should not be used as the
 #' final result).
-#+ pth8rhs
+#| label: pth8rhs
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs$pathfinder(data = standata8, init = 0.1,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Sample short chains using the optimization result as initial values
 #' (although the result from short chains can be useful in a quick
 #' workflow, the result should not be used as the final result).
-#+ fit8rhs
-#| results: "hide"
+#| label: fit8rhs
+#| results: hide
+#| cache: true
 tic('MCMC sampling from model 8rhs posterior with Pathfinder initialization')
 fit8rhs <- model8rhs$sample(data = standata8, iter_warmup = 100, iter_sampling = 100,
                             chains = 4, parallel_chains = 4,
-                            init = pth8rhs, refresh = 10, output_dir = CMDSTANR_OUTPUT_DIR)
+                            init = pth8rhs, refresh = 10)
 #'
+#| cache: true
 mytoc()
 
 #' We get a high number of divergences. The posterior clearly has a
@@ -2640,21 +2687,22 @@ data.frame(Model = "Model 8 Student's t", `LOO-R2` = LOOR2) |>
 #' just for initialization, and trust it so that we don't need to
 #' check the generated quantities we can drop that out (or call it
 #' separately).
-#+ model8rhs_nogq
-#| results: "hide"
+#| label: model8rhs_nogq
+#| results: hide
 model8rhs_nogq <- cmdstan_model(stan_file = root("birthdays", "gpbf8rhs_nogq.stan"),
                                 include_paths = root("birthdays"),
                                 cpp_options = list(stan_threads = TRUE))
 
-#+ pth8rhs_nogq
+#| label: pth8rhs_nogq
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 10,
                                 num_paths = 10, single_path_draws = 40, draws = 400,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' As the generated quantities are not computed and written to the
@@ -2668,15 +2716,16 @@ mytoc()
 #' resample without replacement in hope of dropping out the draws from
 #' the minor modes. At the moment (2024-01-21) there is a bug so that
 #' minimum number of draws per path is 25.
-#+ pth8rhs_nogq_10draws
+#| label: pth8rhs_nogq_10draws
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 10,
                                 num_paths = 10, single_path_draws = 1, draws = 10,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' There is not much time saving and the number of paths run dominate.
@@ -2685,15 +2734,16 @@ mytoc()
 #' paths.  At the moment (2024-01-21) there is a bug so that minimum
 #' number of draws per path is 25, but these draws the ones used to
 #' estimate ELBO, so there is no additional computational cost.
-#+ pth8rhs_nogq_4draws
+#| label: pth8rhs_nogq_4draws
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 4,
                                 num_paths = 4, single_path_draws = 1, draws = 4,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' With my laptop, it takes about 1.5s to run 4 paths to get 4
@@ -2702,15 +2752,16 @@ mytoc()
 #' Alternatively we could run just one path with 4 draw from the
 #' normal approximation. At the moment (2024-01-21) there is a bug so
 #' that minimum number of draws per path is 25.
-#+ pth8rhs_nogq_single
+#| label: pth8rhs_nogq_single
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                 num_threads = 4,
                                 num_paths = 1, single_path_draws = 4, draws = 4,
                                 history_size = 50, max_lbfgs_iters = 100,
-                                refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                psis_resample = FALSE)
+                                refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' The time goes down to less than 1s, but these draws are likely to have less
@@ -2722,15 +2773,16 @@ mytoc()
 #' improve such mean and sd estimates, without increasing the
 #' computation time much.
 #' 
-#+ pth8rhs_nogq_4000draws
+#| label: pth8rhs_nogq_4000draws
+#| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
 pth8rhs <- model8rhs_nogq$pathfinder(data = standata8, init = 0.1,
                                      num_threads = 10,
                                      num_paths = 40, single_path_draws = 100, draws = 4000,
                                      history_size = 50, max_lbfgs_iters = 100,
-                                     refresh = 0, output_dir = CMDSTANR_OUTPUT_DIR,
-                                     psis_resample = FALSE)
+                                     refresh = 0, psis_resample = FALSE)
 #'
+#| cache: true
 mytoc()
 
 #' Compare the mean and sd of some parameters from Pathfinder and MCMC. In this case,
@@ -2797,15 +2849,12 @@ data.frame(varid = 1:nrow(sp), sd_ratio = sp$sd / sm$sd) |>
 ##                             adapt_delta = 0.95, max_treedepth = 15)
 
 #'
-#' ## References {.unnumbered}
+#' # References {.unnumbered}
 #'
 #' <div id="refs"></div>
 #'
-#' ## Licenses {.unnumbered}
+#' # Licenses {.unnumbered}
 #' 
 #' * Code &copy; 2020--2025, Aki Vehtari, licensed under BSD-3.
 #' * Text &copy; 2020--2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
 #' 
-#' ## Original Computing Environment {.unnumbered}
-#' 
-sessionInfo()

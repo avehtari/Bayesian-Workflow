@@ -6,18 +6,10 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #'
@@ -48,16 +40,27 @@ knitr::opts_chunk$set(
 
 #' **Load packages and set options**
 #| cache: FALSE
-library("rprojroot")
+library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
-library("cmdstanr")
+library(cmdstanr)
 options(mc.cores = 4)
 options(digits = 2)
 ## options(htmltools.dir.version = FALSE)
 set.seed(1123)
-# utility function
+# utility functions
 fround <- function(x, digits) {
   format(round(x, digits), nsmall = digits)
+}
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
 }
 
 #' # Declining exponential
@@ -71,7 +74,8 @@ fround <- function(x, digits) {
 #' distributed: $\epsilon_i \sim \operatorname{normal}(0,\sigma)$.
 #' 
 #' Here is the model in Stan:
-writeLines(readLines(root("declining_exponentials",  "exponential.stan")))
+#| output: asis
+print_stan_file(root("declining_exponentials",  "exponential.stan"))
 
 #' We have given the parameters $a$, and $b$, and $\sigma$ normal
 #' prior distributions centered at 0 with standard deviation 10.  In
@@ -202,7 +206,8 @@ print(fit_2b)
 #' $$
 #' 
 #' Here is the model in Stan:
-writeLines(readLines(root("declining_exponentials", "exponential_positive_lognormal.stan")))
+#| output: asis
+print_stan_file(root("declining_exponentials", "exponential_positive_lognormal.stan"))
 
 #' As before, we can simulate fake data from this model:
 a <- 5
@@ -256,7 +261,8 @@ print(fit_3)
 #' with lognormally-distributed errors $\epsilon$.
 #' 
 #' Here is the model in Stan:
-writeLines(readLines(root("declining_exponentials", "sum_of_exponentials.stan")))
+#| output: asis
+print_stan_file(root("declining_exponentials", "sum_of_exponentials.stan"))
 
 #' The coefficients $a$ and the residual standard deviation $\sigma$
 #' are constrained to be positive.  The parameters $b$ are also
@@ -449,5 +455,5 @@ print(fit_5_with_priors)
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2022-2025, Andrew Gelman, licensed under BSD-3.
-#' * Text &copy; 2022-2025, Andrew Gelman, licensed under CC-BY-NC 4.0.
+#' * Code &copy; 2022--2025, Andrew Gelman, licensed under BSD-3.
+#' * Text &copy; 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.

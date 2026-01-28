@@ -1,27 +1,28 @@
 #' ---
-#' title: "Roaches cross-validation case study"
+#' title: "Roaches cross-validation model checking and comparison"
 #' author: "Aki Vehtari"
 #' date: 2017-01-10
 #' date-modified: today
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' # Setup  {.unnumbered}
+#' This notebook includes the the code code for the Bayesian Workflow
+#' book Chapter 24 *Leave-one-out cross validation model checking and
+#' comparison: Roaches*.
+#' 
+#' # Introduction
+#' 
+#' This case study demonstrates cross-validation model comparison, and
+#' posterior and cross-validation predictive checking of
+#' models. Furthermore the notebook demonstrates how to use integrated
+#' PSIS-LOO with varying intercept ("random effect") models.
 #' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
@@ -36,10 +37,15 @@ knitr::opts_chunk$set(
 #' 
 #' **Load packages**
 #| cache: FALSE
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(loo)
 library(rstantools)
 library(brms)
 library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("roaches", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("roaches", "stan_output"))
 options(mc.cores = 4)
 library(ggplot2)
 library(khroma)
@@ -53,16 +59,21 @@ library(dplyr)
 library(tibble)
 library(reliabilitydiag)
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
+#' # Data
 #' 
-#' # Introduction
-#' 
-#' This case study demonstrates cross-validation model comparison, and
-#' posterior and cross-validation predictive checking of
-#' models. Furthermore the notebook demonstrates how to use integrated
-#' PSIS-LOO with varying intercept ("random effect") models.
-#' 
-#' The roaches data example comes from Chapter 8.3 of [Gelman and Hill
-#' (2007)](http://www.stat.columbia.edu/~gelman/arm/).
+#' The roaches data example comes from Chapter 8.3 of @Gelman-Hill:2007.
 #' 
 #' > the treatment and control were applied to 160 and 104 apartments,
 #' respectively, and the outcome measurement $y_i$ in each apartment
@@ -613,8 +624,9 @@ pp_check(fit_pvi, type = "loo_pit_ecdf")
 #' predictive distribution given other parameters than `z`. This is
 #' needed to get the correct LOO predictive distributions when
 #' combined with integrated PSIS-LOO.
-poisson_vi_int <- "poisson_vi_integrate.stan"
-writeLines(readLines(poisson_vi_int))
+poisson_vi_int <- root("roaches","poisson_vi_integrate.stan")
+#| output: asis
+print_stan_file(poisson_vi_int)
 
 #' We could also move the integrated likelihood to the model block and
 #' not use MCMC to sample the varying intercepts at all. This would
@@ -634,9 +646,9 @@ writeLines(readLines(poisson_vi_int))
 #'
 #' We increase the number of sampling iterations to improve effective
 #' sample size needed for better LOO-PIT plot.
-#| results: hide
-#| cache: false
 mod_p_vi <- cmdstan_model(stan_file = poisson_vi_int)
+#| results: hide
+#| cache: true
 datap <- list(N = dim(roaches)[1],
               P = 3,
               offsett = log(roaches$exposure2),
@@ -836,7 +848,7 @@ ratio_zinb |>
   ggplot(aes(x = ratio)) +
   stat_dots(quantiles = 100) +
   stat_slab(density = "unbounded", trim = FALSE, fill = NA, color = "gray") +
-  coord_cartesian(expand = FALSE) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
@@ -881,7 +893,7 @@ ratio_zinb |>
             fill = NA, color = clr[3], alpha = 0.6) +
   labs(x = "Ratio of roaches with vs without treatment", y = NULL) +
   scale_y_continuous(breaks = NULL) +
-  coord_cartesian(expand = FALSE) +
+  coord_cartesian(expand = c(bottom = FALSE)) +
   theme(axis.line.y = element_blank(), strip.text.y = element_blank()) +
   xlim(c(0, 1)) +
   geom_vline(xintercept = 1, linetype = "dotted") +
@@ -962,13 +974,5 @@ loo_compare(fit_zinb, fit_zinb_m2,
 #' 
 #' # Licenses {.unnumbered}
 #' 
-#' * Code &copy; 2017-2025, Aki Vehtari, licensed under BSD-3.
-#' * Text &copy; 2017-2025, Aki Vehtari, licensed under CC-BY-NC 4.0.
-#' 
-#' # Original Computing Environment {.unnumbered}
-#' 
-sessionInfo()
-
-#' 
-#' <br />
-#' 
+#' * Code &copy; 2017--2025, Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2017--2025, Aki Vehtari, licensed under CC-BY-NC 4.0.

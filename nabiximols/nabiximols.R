@@ -6,21 +6,16 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
+#' 
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 18 *Predictive model checking and comparison: Clinical trial*.
+#' 
 #' # Introduction
 #' 
 #' This notebook was inspired by [a question by Llew Mills in Stan
@@ -134,6 +129,7 @@ cu_df |>
 #' Mills provided two `brms` [@Buerkner:2017:brms] models with
 #' specified priors. The first one is a normal regression model with
 #' varying intercept for each participant (`id`).
+#| label: fit_normal
 #| results: hide
 #| cache: true
 fit_normal <- brm(formula = cu ~ group*week + (1 | id),
@@ -150,6 +146,7 @@ fit_normal <- add_criterion(fit_normal, criterion = "loo", save_psis = TRUE,
 
 #' The second provided models is binomial model with the number of
 #' trials being $28$ for each outcome (`cu`)
+#| label: fit_binomial
 #| results: hide
 #| cache: true
 fit_binomial <- brm(formula = cu | trials(set)  ~ group*week + (1 | id),
@@ -293,6 +290,7 @@ sum(p3)
 cu_scaled_df <- cu_df |>
   mutate(cu_scaled = (cu - mean(cu)) / sd(cu))
 #' Fit the normal model with scaled target.
+#| label: fit_normal_scaled
 #| results: hide
 #| cache: true
 fit_normal_scaled <- brm(formula = cu_scaled ~ group*week + (1 | id),
@@ -388,6 +386,7 @@ pp_check(fit_normal, type = "loo_pit_ecdf", moment_match = TRUE)
 #' We can also examine PIT values computed by comparing all posterior
 #' predictive draws with observations marginally, which in this case
 #' show the miscalibration very clearly.
+#| label: fig-ppc_marginal_pit_ecdf-normal
 #| fig-height: 4
 #| fig-width: 4
 marginal_pit <- function(y, x) {
@@ -417,7 +416,7 @@ ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal))) +
 #' Binomial model doesn't have overdispersion term, but the normal
 #' model does. How about using beta-binomial model which is an
 #' overdispersed version of the binomial model.
-#' 
+#| label: fit_betabinomial
 #| results: hide
 #| cache: true
 fit_betabinomial <- brm(formula = cu | trials(set) ~ group*week + (1 | id),
@@ -558,6 +557,7 @@ powerscale_sensitivity(fit_betabinomial,
 #' 
 #' However, I decided to try slightly wider priors, especially as the
 #' data seem to be quite informative
+#| label: fit_betabinomial2
 #| results: hide
 #| cache: true
 fit_betabinomial2 <- brm(formula = cu | trials(set) ~ group*week + (1 | id),
@@ -591,6 +591,7 @@ loo_compare(fit_betabinomial, fit_betabinomial2)
 #' interaction term with `group`, which does not make sense as the
 #' group should not affect the baseline. I modify the data and models by
 #' moving the baseline `week=0` `cu`s to be pre-treatment covariate.
+#| label: fit_betabinomial2b
 #| results: hide
 #| cache: true
 cu_df_b <- cu_df |> filter(week != 0) |>
@@ -853,18 +854,19 @@ trt_effect_draws <- cu_df_b |>
   data_grid(group, week, cu_baseline = 28, id = 129, set = 28) |>
   add_epred_draws(fit_betabinomial2b, re_formula = NA, allow_new_levels = TRUE) |>
   compare_levels(.epred, by = group) |>
-  pivot_wider(names_from = c(group, week), values_from = .epred, names_sep = " week ") |>
-  select(!c(cu_baseline, id, set, .chain, .iteration)) |>
+  ungroup() |>
+  pivot_wider(names_from = c(group,week), values_from = .epred, names_sep = " week ") |>
+  select(!c(.chain,.iteration)) |>
   left_join(as_draws_df(log_lik_draws(fit_betabinomial2b)), by = ".draw") |>
+  left_join(as_draws_df(log_prior_draws(fit_betabinomial2b)), by = ".draw") |>
   as_draws_df() |>
-  bind_draws(log_prior_draws(fit_betabinomial2b)) |>
-  rename_variables(`nabiximols - placebo week  4` = `nabiximols - placebo week 4`,
-                   `nabiximols - placebo week  8` = `nabiximols - placebo week 8`,) |>
+  rename_variables(`nabiximols - placebo week  4`=`nabiximols - placebo week 4`,
+                   `nabiximols - placebo week  8`=`nabiximols - placebo week 8`,) |>
   subset_draws(variable = c("nabiximols - placebo week  4",
-                          "nabiximols - placebo week  8",
-                          "nabiximols - placebo week 12",
-                          "log_lik",
-                          "lprior"))
+                            "nabiximols - placebo week  8",
+                            "nabiximols - placebo week 12",
+                            "log_lik",
+                            "lprior"))
 
 #| label: fig-priorsense-diff-betabinomial2b
 trt_effect_draws |> powerscale_plot_dens(help_text = FALSE)
@@ -885,6 +887,7 @@ trt_effect_draws |> powerscale_sensitivity()
 #' intervals). We build normal and beta-binomial models which match
 #' the model in the paper, expect that we don't include site factor as
 #' this was not available for us.
+#| label: fit_normal2b
 #| results: hide
 #| cache: true
 fit_normal2b <- brm(formula = cu ~ group*week + cu_baseline + (1 | id),
@@ -900,13 +903,14 @@ fit_normal2b <- add_criterion(fit_normal2b, criterion = "loo",
 
 #'
 #' LOO-PIT-ECDF hints slight miscalibration
-#| label: fig-ppc_pit_ecdf-normal2b
+#| label: fig-ppc_loo_pit_ecdf-normal2b
 #| fig-height: 4
 #| fig-width: 4
 pp_check(fit_normal2b, type = "loo_pit_ecdf")
 
 #'
 #' Marginal PIT-ECDF shows clear miscalibration
+#| label: fig-ppc_pit_ecdf-normal2b
 #| fig-height: 4
 #| fig-width: 4
 ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal2b))) +
@@ -917,7 +921,7 @@ loo_compare(fit_normal2b, fit_betabinomial2b)
 
 #' Next we build models predicting total cu for all weeks (except 0), by dropping
 #' week covariate.
-#' 
+#| label: fit_normal2c
 #| results: hide
 #| cache: true
 cu_df_c <- cu_df_b |>
@@ -934,6 +938,7 @@ fit_normal2c <- brm(formula = cu_total ~ group + cu_baseline,
         refresh = 0)
 fit_normal2c <- add_criterion(fit_normal2c, criterion = "loo",
                               save_psis = TRUE, moment_match = TRUE)
+#| label: fit_betabinomial2c
 #| results: hide
 #| cache: true
 fit_betabinomial2c <- brm(formula = cu_total | trials(set_total) ~ group + cu_baseline,
@@ -1030,6 +1035,7 @@ rbind(dat_bb2b, dat_n2b, dat_bb2c, dat_n2c) |>
 #'
 #' Let's now build the mode without treatment group variable and check
 #' whether there is significant difference in predictive performance.
+#| label: fit_betabinomial3b
 fit_betabinomial3b <- brm(cu | trials(set) ~ week + cu_baseline + (1 | id),
         data = cu_df_b,
         beta_binomial(),

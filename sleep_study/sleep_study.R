@@ -1,27 +1,32 @@
 #' ---
-#' title: "Sleepstudy: Prior Specification and model checking"
+#' title: "Sleep study: Prior specification and model checking"
 #' author: "Paul Bürkner and Aki Vehtari"
 #' date: 2025-10-22
 #' date-modified: today
 #' date-format: iso
 #' format:
 #'   html:
-#'     encoding: UTF-8
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
+#' bibliography: ../casestudies.bib
 #' ---
-
-#' # Setup  {.unnumbered}
+#' 
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 17 *Prior specification for regression models: Reanalysis
+#' of sleep study*.
+#'
+#' # Introduction
+#'
+#' Prior distributions are at the heart of Bayesian statistics and are
+#' mentioned as one of its defining features in almost all
+#' introductions. Yet, in practice, specifying priors remains a highly
+#' challenging and complex topic that tends to cause a lot of
+#' confusion for people having to deal with it. In this case study, we
+#' clarify some of this confusion by explaining the different purposes
+#' of priors and things that should be considered when specifying
+#' them.
 #' 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
@@ -52,28 +57,14 @@ options(future.globals.maxSize = 1e9)
 library(priorsense)
 options(priorsense.plot_help_text = FALSE)
 
-#' # Main Story and Messages
-#'
-#' Prior distributions are at the heart of Bayesian statistics and are
-#' mentioned as one of its defining features in almost all
-#' introductions. Yet, in practice, specifying priors remains a highly
-#' challenging and complex topic that tends to cause a lot of
-#' confusion for people having to deal with it. In this case study, I
-#' will try to clarify some of this confusion by explaining the
-#' different purposes of priors and things that should be considered
-#' when specifying them. Towards the end, I will highlight future
-#' research directions to make prior specification easier for
-#' everyone.
+#' # The sleep study data
 #' 
-#' Main Messages:
-#' 
-#' - Priors specification can follow different purposes.
-#' - Prior specification is hard for everyone, as is statistical modeling in general.
-#' - We should aim to identify when thinking about the prior is important and when it is not.
-#' - We need a lot of further research in the areas of prior specification and elicitation.
-#' 
-#' 
-#' ## The Sleepstudy Data
+#' We analyze the `sleepstudy` data set
+#' [@Belenky-Wesensten-Thorne-etal:2003] that is shipped with the R
+#' package `lme4` [@Bates-Maechler-Bolker-etal:2015]. The dataset
+#' covers 18 people undergoing sleep deprivation (less than 3 hours of
+#' sleep per night) for 7 consecutive nights, with their average
+#' reaction times in milliseconds in a simple experiment.
 #' 
 #' Reasons for choosing the `sleepstudy` data set:
 #' 
@@ -84,8 +75,6 @@ options(priorsense.plot_help_text = FALSE)
 #' - independent priors are sensible(ish) due to the small number of parameters
 #' - well known to a lot of R users
 #' 
-#' Introduce the research questions, gather variables, and available data
-#'
 #' Days 0-1 were adaptation and training (T1/T2), day 2 was baseline (B);
 #' sleep deprivation started after day 2. We Drop days 0-1, and make the
 #' baseline to be new 0.
@@ -105,9 +94,8 @@ sleepstudy |>
   facet_wrap("Subject", ncol = 6) +
   scale_x_continuous(breaks = 0:7) +
   labs(y = "Reaction time (ms)")
-#ggsave("plots/sleepstudy_data.pdf", height = 4, width = 8)
 
-#' ## Simple Linear Model
+#' # Simple linear model
 #'
 #' Prior base
 prior_lin_base <- prior(normal(200, 100), class = b, coef = "Intercept") +
@@ -137,7 +125,7 @@ plot(conditional_effects(fit_lin_base), points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
   
 
-#' ## Simple Linear Model (centered predictors)
+#' # Simple linear model (centered predictors)
 #' 
 #' Points to discuss:
 #' 
@@ -169,7 +157,6 @@ set.seed(652312)
 pp_check(fit1_prior, ndraws = 100) + 
   ylim(c(0, 0.02)) +
   theme_sub_axis_y(line = element_blank())
-#ggsave("plots/prior_pred_lin_sleep.pdf", height = 2.5, width = 5)
 
 #' Model 1: sample from the posterior
 fit1 <- brm(
@@ -202,9 +189,8 @@ pp_check(fit1, ndraws = 50) +
 #| fig-width: 7
 powerscale_plot_dens(fit1, variable = c("b_Intercept", "b_Days", "sigma"),
                      component = "prior")
-## ggsave("plots/sleep_priorsense_weak.pdf", width = 7, height = 3)
 
-#' ## Simple Linear Model (informative priors)
+#' # Simple linear model (informative priors)
 #' 
 #' Points to discuss:
 #' 
@@ -242,9 +228,8 @@ plot(conditional_effects(fit2), points = TRUE, plot = FALSE)[[1]] +
 #| fig-width: 7
 powerscale_plot_dens(fit2, variable = c("b_Intercept", "b_Days", "sigma"),
                      component = "prior")
-## ggsave("plots/sleep_priorsense_strong.pdf", width = 7, height = 3)
 
-#' ## Simple Linear Model (informative priors with fat tails)
+#' # Simple linear model (informative priors with fat tails)
 #' 
 #' Points to discuss:
 #' - tails of the priors (normal vs. student-t)
@@ -279,7 +264,6 @@ plot(conditional_effects(fit2b), points = TRUE, plot = FALSE)[[1]] +
 #| fig-width: 7
 powerscale_plot_dens(fit2b, variable = c("b_Intercept", "b_Days", "sigma"),
                      component = "prior")
-## ggsave("plots/sleep_priorsense_student.pdf", width = 7, height = 3)
 
 #' Illustrate difference between normal and Student-t prior:
 #| label: fig-compare-normal-student-density
@@ -297,12 +281,11 @@ data.frame(
   geom_line(size = 0.8) +
   xlab(expression(b[1])) +
   ylab("Density")
-##ggsave("plots/normal_student_density.pdf", height = 2, width = 5)
 
 #' Compute CI-bound for an exponential prior:
 qexp(c(0.025, 0.975), 0.02)
 
-#' ## Linear Varying Intercept Model
+#' # Linear varying intercept model
 #' 
 #' Points to discuss:
 #' 
@@ -343,7 +326,7 @@ plot(conditional_effects(fit3, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-#' ## Linear Varying Intercept and Slope Model
+#' # Linear varying intercept and slope model
 #' 
 #' Points to discuss:
 #' 
@@ -390,7 +373,6 @@ plot(conditional_effects(fit4, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   scale_x_continuous(breaks = 0:9) +
   labs(y = "Reaction time (ms)")
-## ggsave("plots/sleep_multilevel_ceffects.pdf", height = 4, width = 7)
 
 #' Illustrate the marginal LKJ(1) prior for different dimensions.
 #| label: fig-sleepstudy-LKJ1
@@ -410,9 +392,8 @@ data.frame(x = rep(seq(-0.999, 0.999, 0.001), 3)) |>
   scale_color_viridis_d() +
   ylab("Density") +
   xlab(expression(rho))
-## ggsave("plots/LKJ_1_density.pdf", height = 2.5, width = 5)
 
-#' ## Log-Linear Prior-Only Model
+#' ## Log-Linear prior-only model
 #'
 #' Reuse priors from the normal linear model: Prior ln1
 prior_ln1 <- prior(normal(250, 100), class = Intercept) +
@@ -446,7 +427,6 @@ gg_ln1_prior <- ggplot(prp_ln_dat, aes(y, yrep)) +
   scale_x_continuous(trans = "log10") +
   scale_y_continuous(trans = "log10") +
   ylab("Mean yrep")
-# ggsave("plots/prior_pred_ln1_sleep.pdf", height = 2.5, width = 5)
 
 #' Use more sensible priors: Prior ln2
 prior_ln2 <- prior(normal(5, 0.55), class = Intercept) +
@@ -480,14 +460,12 @@ gg_ln2_prior <- ggplot(prp_ln_dat, aes(y, yrep)) +
   scale_x_continuous(trans = "log10") +
   scale_y_continuous(trans = "log10") +
   ylab("Mean yrep")
-# ggsave("plots/prior_pred_ln2_sleep.pdf", height = 2.5, width = 5)
 
 #' Prior predictive checking comparing priors ln1 and ln2
 #| label: fig-sleepstudy-pp_check-fit_ln1_ln2_prior
 #| fig-height: 2.5
 #| fig-width: 6
 gg_ln1_prior + gg_ln2_prior
-## ggsave("plots/prior_pred_ln_sleep.pdf", height = 2.5, width = 6)
 
 #' Sample from the posterior
 fit_ln2 <- brm(
@@ -514,9 +492,8 @@ plot(conditional_effects(fit_ln2), plot = FALSE)[[1]] +
 #| fig-width: 7
 powerscale_plot_dens(fit_ln2, variable = c("b_Intercept", "b_Days", "sigma"),
                      component = "prior")
-## ggsave("plots/sleep_priorsense_ln_reg.pdf", width = 7, height = 3)
 
-#' ## Log-Linear Varying Intercept and Slope Model
+#' # Log-linear varying intercept and slope model
 #' 
 #' Points to discuss:
 #' 
@@ -569,7 +546,6 @@ pp_check(fit5) +
 pp_check(fit4, type = "intervals") + labs(y = "Reaction time (ms)") +
   pp_check(fit5, type = "intervals") + 
   plot_layout(guides = "collect") 
-## ggsave("plots/sleep_multilevel_ppc.pdf", height = 4, width = 7)
 
 #' Posterior conditional effects
 #| label: fig-sleepstudy-conditional_effects-plus-fit5
@@ -579,7 +555,6 @@ plot(conditional_effects(fit5, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   scale_x_continuous(breaks = 0:9) +
   labs(y = "Reaction time (ms)")
-## ggsave("plots/sleep_multilevel_ceffects_ln.pdf", height = 4, width = 7)
 
 #' Prior sensitivity analysis
 #| label: fig-sleepstudy-priorsense-fit5
@@ -588,15 +563,14 @@ plot(conditional_effects(fit5, conditions = conditions, re_formula = NULL),
 vars5 <- c("b_Intercept", "b_Days", "sd_Subject__Intercept", 
            "sd_Subject__Days", "cor_Subject__Intercept__Days", "sigma")
 powerscale_plot_dens(fit5, variable = vars5, component = "prior")
-## ggsave("plots/sleep_priorsense_ln_mlm.pdf", width = 13, height = 4)
 
 #' Compare with linear multilevel model which indicated the lognormal model
 #' having a little better predictive performance.
 loo(fit4, fit5)
 
-#' ## Log-Linear Distributional Multilevel Model
+#' # log-linear distributional multilevel model
 
-#' ## Points to discuss:
+#' Points to discuss:
 #'
 #' - Parameters for standard deviations on the log or log-log scale
 #'   or hard to understand and hence set priors on.
@@ -639,9 +613,9 @@ plot(conditional_effects(fit6, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-## ## Exgaussian Distributional Multilevel Model
-
-#' ## Points to discuss:
+#' # Exgaussian distributional multilevel model
+#' 
+#' Points to discuss:
 #'
 #' - All the models before are relatively robust to the choice of priors:
 #'   Even completely flat priors work ok and don't produce much different results
@@ -686,8 +660,8 @@ plot(conditional_effects(fit7, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-## ## Exgaussian Distributional Multilevel Model (default priors)
-
+#' # Exgaussian distributional multilevel model (default priors)
+#' 
 #' Points to discuss:
 #' 
 #' - some parameters are better informed by the data than others
@@ -718,7 +692,7 @@ plot(conditional_effects(fit8, conditions = conditions, re_formula = NULL),
      ncol = 6, points = TRUE, plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
-#' ## Exgaussian Distributional Multilevel Model (flat priors)
+#' # Exgaussian distributional multilevel model (flat priors)
 #' 
 #' Points to discuss:
 #'
@@ -780,12 +754,11 @@ loo_compare(fit4, fit5)
 #| fig-width: 11
 pp_check(fit4, type = "loo_intervals") +
   labs(y = "Reaction time (ms)")
-## ggsave(file = "sleepstudy_fit4_loo_intervals.pdf", width = 11, height = 4)
 
 #' There are clearly some outliers.
 #'
 #' Create varying intercept (fit3t) and varying intercept and slope
-#' (fit4t) models with Student's t data model
+#' (fit4t) models with Student's $t$ data model
 #| results: hide
 #| cache: true
 fit3t <- update(fit3, family = student())
@@ -810,25 +783,32 @@ pp_check(fit4t, type = "loo_intervals") +
 pp_check(fit4, type = "loo_pit_ecdf", ndraws = 4000) +
   pp_check(fit5, type = "loo_pit_ecdf", ndraws = 4000) +
   pp_check(fit4t, type = "loo_pit_ecdf", ndraws = 4000) 
-## ggsave(file = "sleepstudy_loo_pit_ecdf.pdf", width = 11, height = 3.5)
 
 #' We see that normal and log-normal models have too wide predictive
 #' distribution for most observations, which is due to a few outliers
-#' inflating the residual scale. LOO-PIT plot for Student's t model
+#' inflating the residual scale. LOO-PIT plot for Student's $t$ model
 #' looks better.
 
-#' Compare normal and Student's t models
+#' Compare normal and Student's $t$ models
 loo_compare(fit4, fit4t)
 
-#' Student's t model has much better predictive performance.
+#' Student's $t$ model has much better predictive performance.
 #' 
 #' Examine how much adding varying slope improved predictive performance in case of normal data model:
 loo_compare(fit3, fit4)
 
 #' Examine how much adding varying slope improved predictive
-#' performance in case of Student's t data model:
+#' performance in case of Student's $t$ data model:
 loo_compare(fit3t, fit4t)
 
-#' When using Student's t model, the predictive performance difference
+#' When using Student's $t$ model, the predictive performance difference
 #' between not using or using varying slope is bigger.
 #' 
+#' # References {.unnumbered}
+#'
+#' <div id="refs"></div>
+#'
+#' # Licenses {.unnumbered}
+#'
+#' * Code &copy; 2025, Paul Bürkner and Aki Vehtari, licensed under BSD-3.
+#' * Text &copy; 2025, Paul Bürkner and Aki Vehtari, licensed under CC-BY-NC 4.0.

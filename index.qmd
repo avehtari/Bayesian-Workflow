@@ -1,0 +1,105 @@
+---
+title: "Bayesian Workflow book: Website"
+date: 2026-01-05
+date-modified: today
+date-format: iso
+format:
+  html:
+    number-sections: false
+---
+
+## Information
+
+Website for the **Bayesian Workflow** book by [Andrew
+Gelman](http://www.stat.columbia.edu/~gelman/), [Aki
+Vehtari](https://users.aalto.fi/ave/), [Richard
+McElreath](https://xcelab.net/rm/) with Daniel Simpson, Charles
+C. Margossian, Yuling Yao, Lauren Kennedy, Jonah Gabry, Paul-Christian
+Bürkner, Martin Modrák, Vianey Leos Barajas.
+
+Published by CRC Press in 2026.<br>
+Copyright by Andrew Gelman, Aki Vehtari, Richard McElreath, Daniel
+Simpson, Charles C. Margossian, Yuling Yao, Lauren Kennedy, Jonah
+Gabry, Paul-Christian Bürkner, Martin Modrák, Vianey Leos Barajas.
+
+
+Back cover text: *blurb*
+
+
+- If you notice an error that is not mentioned in [the errata](errata.html), [submit an issue](https://github.com/avehtari/Bayesian-Workflow/issues) or send an email.
+
+
+**How to cite**
+<details>
+
+Cite the book:
+
+> Gelman, Vehtari, McElreath, Simpson, Margossian, Yao, Kennedy, Gabry, Bürkner, Modrák, Leos Barajas (2026). *Bayesian Workflow*. CRC Press / Taylor \& Francis.
+
+If you want to refer to a case study, cite the book and chapter, e.g.
+
+> blah blah (Gelman et al., 2026, Ch 18 code).
+
+BibTeX entry:
+
+```
+@book{Bayesian-Workflow:2026,
+  title={Bayesian Workflow},
+  author={Andrew Gelman and Aki Vehtari and Richard McElreath and Daniel Simpson and
+          Charles C. Margossian and Yuling Yao and Lauren Kennedy and Jonah Gabry and
+          Paul-Christian Bürkner and Martin Modrák and Vianey Leos Barajas},
+  year=2026,
+  publisher={CRC Press}
+}
+```
+</details>
+
+## Book contents
+
+**Part 1: From Bayesian inference to Bayesian workflow**
+
+1. Bayesian theory and Bayesian practice
+2. Statistical modeling and workflow
+3. Computational tools
+4. Introduction to workflow: Modeling performance on a multiple choice exam
+
+**Part 2: Statistical workflow**
+
+5. Building statistical models
+6. Using simulations to capture uncertainty
+7. Prediction, generalization, and causal inference
+8. Visualizing and checking fitted models
+9. Comparing and improving models
+10. Statistical inference and scientific inference
+
+**Part 3: Computational workflow**
+
+11. Fitting statistical models
+12. Diagnosing and fixing problems with fitting
+13. Approximate algorithms and approximate models
+14. Simulation-based calibration checking
+15. Statistical modeling as software development
+
+**4. Case studies**
+
+16. Coding a series of models: Simulated data of movie ratings
+17. Prior specification for regression models: Reanalysis of a sleep study
+18. Predictive model checking and comparison: Clinical trial
+19. Building up to a hierarchical model: Coronavirus testing
+20. Using a fitted model for decision analysis: Mixture model for time series competition
+21. Posterior predictive checking: Stochastic learning in dogs
+22. Incremental development and testing: Black cat adoptions
+23. Debugging a model: World Cup football
+24. Leave-one-out cross validation model checking and comparison: Roaches
+25. Model building and expansion: Golf putting
+26. Model building with latent variables: Markov models for animal movement
+27. Model building: Time-series decomposition for birthdays
+28. Models for regression coefficients and variable selection: Student grades
+29. Sampling problems with latent variables: No vehicles in the park
+30. Challenge of multimodality: Differential equation for planetary motion
+31. Simulation-based calibration checking in model development workflow
+
+**Appendices**
+
+A. Statistical and computational workflow for Bayesians and non-Bayesians<br>
+B. How to get the most out of Bayesian Data Analysis

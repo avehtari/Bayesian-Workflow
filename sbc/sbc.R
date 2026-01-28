@@ -6,27 +6,19 @@
 #' date-format: iso
 #' format:
 #'   html:
-#'     toc: true
-#'     toc-location: left
-#'     toc-depth: 2
 #'     number-sections: true
-#'     smooth-scroll: true
-#'     theme: readable
 #'     code-copy: true
 #'     code-download: true
 #'     code-tools: true
-#'     embed-resources: true
-#'     anchor-sections: true
-#'     html-math-method: katex
 #' bibliography: ../casestudies.bib
 #' ---
-
-#' # Introduction
-#'
+#' 
 #' This notebook includes the code for the Bayesian Workflow book
 #' Chapter 31 *Simulation-based calibration checking in model
 #' development workflow*.
 #' 
+#' # Introduction
+#'
 #' Here we describe a complete process to iteratively build and
 #' validate the _implementation_ of a non-trivial, but still
 #' relatively small model using simulation based calibration checking
@@ -48,7 +40,7 @@
 #' of the model into submodels, one can validate big chunks of Stan
 #' code while working with small models only.
 #' 
-#' We expect the reader to be familiar with basics of the package. If not,
+#' We expect the reader to be familiar with basics of the SBC package. If not,
 #' check out the [*Getting Started with SBC* vignette](https://hyunjimoon.github.io/SBC/articles/SBC.html).
 #'
 #' ## Example model
@@ -83,12 +75,12 @@
 #' 1) the mixture submodel where the mixing ratio is the same
 #' for all observations
 #' 
-#' 2) a beta regression where we take covariates and make a prediction of a probability,
+#' 2) a logistic regression submodel where we take the covariates and make a prediction of a probability,
 #' assuming we (noisily) observe the probability.
 #' 
 #' It is good practice to start small and implement and validate each
 #' of those submodels separately and then put them together and
-#' validate the bigger model.  This makes is substantially easier to
+#' validate the bigger model.  This makes it substantially easier to
 #' locate bugs.  You'll notice that the process ends up involving a
 #' lot of steps, but the fact is that we still ignore all the
 #' completely invalid models we created while writing this vignette
@@ -101,14 +93,16 @@
 #+ setup, include = FALSE
 knitr::opts_chunk$set(
   cache = FALSE,
-  message = FALSE,
-  error = FALSE,
-  warning = FALSE,
+  message = TRUE,
+  error = TRUE,
+  warning = TRUE,
   comment = NA,
   out.width = "95%"
 )
 #'
 #' Let's setup and get our hands dirty.
+#| message: FALSE
+#| warning: FALSE
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 # remotes::install_github("hyunjimoon/SBC")
@@ -126,6 +120,18 @@ library(patchwork) # Needed only for saving plots for the book
 library(future)
 plan(multisession) 
 
+print_stan_file <- function(file) {
+  code <- readLines(file)
+  if (isTRUE(getOption("knitr.in.progress")) &
+        identical(knitr::opts_current$get("results"), "asis")) {
+    # In render: emit as-is so Pandoc/Quarto does syntax highlighting
+    block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
+    knitr::asis_output(block)
+  } else {
+    writeLines(code)
+  }
+}
+
 # Setup caching of results
 cache_dir <- root("sbc", "_cache")
 if (!dir.exists(cache_dir)) {
@@ -134,15 +140,17 @@ if (!dir.exists(cache_dir)) {
 
 #' # Mixture submodel
 #' 
-#' There is a good [guide to mixtures](https://mc-stan.org/docs/2_27/stan-users-guide/mixture-modeling-chapter.html) in the Stan user's guide.
+#' There is a good [guide to mixtures](https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html) in the Stan user's guide.
 #' Following the user's guide would save us from a lot of mistakes,
 #' but for the sake of example, we will pretend we didn't really read
 #' it - and we'll see the problems can be discovered via simulations.
 #' 
 #' So this is our first try at implementing the mixture submodel:
-cat(readLines(root("sbc", "models/mixture_first.stan")), sep = "\n")
+code_first <- root("sbc", "models/mixture_first.stan")
+#| output: asis
+print_stan_file(code_first)
 #| label: model_first
-model_first <- cmdstan_model(root("sbc", "models/mixture_first.stan"))
+model_first <- cmdstan_model(code_first)
 backend_first <- SBC_backend_cmdstan_sample(model_first) 
 
 #' And this is our code to simulate data for this model:
@@ -168,14 +176,16 @@ generator_func_first <- function(N) {
 generator_first <- SBC_generator_function(generator_func_first, N = 50)
 
 #' Let's start with just a single simulation:
+#| label: results-first
 set.seed(68455554)
 datasets_first <- generate_datasets(generator_first, 1)
 results_first <- compute_SBC(datasets_first, backend_first, 
                              cache_mode = "results", 
                              cache_location = file.path(cache_dir, "mixture_first"))
 
-#' Let's examine the MCMC pairs plots
+#' There are divergences. Let's examine the MCMC pairs plots:
 #| label: fig-sbcworkflow_mixture_first_pairs
+#| fig-cap: Pairs plot for our first attempt at the mixture component.
 # Fixing the condition for above/over diagonal chains, in a minority
 # of runs the plot shows the problem less clearly, as discussed at
 # https://github.com/stan-dev/bayesplot/issues/132
@@ -185,7 +195,7 @@ mixture_first_pairs <- mcmc_pairs(results_first$fits[[1]]$draws(),
                                   np = nuts_params(results_first$fits[[1]]))
 mixture_first_pairs
 
-#' There are divergences. One thing that stands out is that either
+#' One thing that stands out is that either
 #' `mu1` is tightly determined and `mu2` is allowed the full prior
 #' range or the other way around. We also don't learn anything about
 #' theta.
@@ -200,15 +210,17 @@ mixture_first_pairs
 #' separate `log_mix` call for each.
 #' 
 #' More details on the mathematical background are explained in the
-#' ["Vectorizing mixtures"](https://mc-stan.org/docs/2_27/stan-users-guide/vectorizing-mixtures.html)
+#' ["Vectorizing mixtures"](https://mc-stan.org/docs/stan-users-guide/finite-mixtures.html#vectorizing-mixtures)
 #' section of Stan User's guide.
 #' 
 #' ## Fixed mixture model
 #' 
 #' We make a new model fixing the `log_mix` problem.
+code_fixed_log_mix <- root("sbc", "models/mixture_fixed_log_mix.stan")
+#| output: asis
+print_stan_file(code_fixed_log_mix)
 #| label: model_fixed_log_mix
-cat(readLines(root("sbc", "models/mixture_fixed_log_mix.stan")), sep = "\n")
-model_fixed_log_mix <- cmdstan_model(root("sbc", "models/mixture_fixed_log_mix.stan"))
+model_fixed_log_mix <- cmdstan_model(code_fixed_log_mix)
 backend_fixed_log_mix <- SBC_backend_cmdstan_sample(model_fixed_log_mix)
 
 #' So let's try once again with the same single simulation:
@@ -234,10 +246,14 @@ results_fixed_log_mix_2 <- compute_SBC(datasets_first_10,
 
 #' So there are some problems - we have quite a bunch of high R-hat
 #' and low ESS values. This is the distribution of all rhats:
+#| label: fig-hist-rhat-fixed_log_mix
+#| out-width: 80%
+#| fig-cap: Distribution of $\widehat{R}$ statistic for the fits of the mixture component after fixing the first bug.
 hist(results_fixed_log_mix_2$stats$rhat)
 
 #' Let's examine a single pairs plot:
 #| label: fig-sbcworkflow_mixture_fixed_log_mix_pairs
+#| fig-cap: A pairs plot for one of the problematic fits.
 mixture_fixed_log_mix_pairs <- mcmc_pairs(results_fixed_log_mix_2$fits[[1]]$draws())
 mixture_fixed_log_mix_pairs
 
@@ -246,14 +262,16 @@ mixture_fixed_log_mix_pairs
 #' for `1 - theta` gives _exactly_ the same likelihood - because the
 #' ordering does not matter. A more detailed explanation of this type
 #' of problem is at
-#' https://betanalpha.github.io/assets/case_studies/identifying_mixture_models.html
+#' [https://betanalpha.github.io/assets/case_studies/identifying_mixture_models.html](https://betanalpha.github.io/assets/case_studies/identifying_mixture_models.html)
 #' 
 #' ## Fixed parameter ordering
 #' 
 #' We can easily fix the ordering of the `mu`s by using the `ordered` built-in type.
+code_fixed_ordered <- root("sbc", "models/mixture_fixed_ordered.stan")
+#| output: asis
+print_stan_file(code_fixed_ordered)
 #| label: model_fixed_ordered
-cat(readLines(root("sbc", "models/mixture_fixed_ordered.stan")), sep = "\n")
-model_fixed_ordered <- cmdstan_model(root("sbc", "models/mixture_fixed_ordered.stan"))
+model_fixed_ordered <- cmdstan_model(code_fixed_ordered)
 backend_fixed_ordered <- SBC_backend_cmdstan_sample(model_fixed_ordered) 
 
 #' We also need to update the generator to match the new names and ordering constant:
@@ -293,7 +311,8 @@ print(results_fixed_ordered$backend_diagnostics, digits = 2)
 
 #' One of the fits has quite a lot of divergent transitions. Let's
 #' look at the pairs plot for the model:
-#| label: sbcworkflow_mixture_fixed_ordered_pairs
+#| label: sbcworkflow-mixture-fixed-ordered-pairs
+#| fig-cap: Pairs plot of a problematic fit in mixture model with ordered components.
 problematic_fit_id <- 2
 problematic_fit <- results_fixed_ordered$fits[[problematic_fit_id]]
 mixture_fixed_ordered_pairs <- mcmc_pairs(problematic_fit$draws(),
@@ -336,7 +355,7 @@ subset_draws(datasets_ordered_10$variables, draw = problematic_fit_id)
 #' 
 #' For more details see the
 #' [`rejection_sampling`](https://hyunjimoon.github.io/SBC/articles/rejection_sampling.html)
-#' vignette.
+#' vignette in the SBC package.
 #' 
 #' So let us subset the results to avoid divergences:
 sim_ids_to_keep <- 
@@ -351,15 +370,24 @@ summary(results_fixed_ordered_subset)
 
 #' This gives us no obvious problems.
 #| label: fig-rank_hist-fixed_ordered_subset
+#| fig-width: 7
+#| fig-height: 2.75
+#| fig-cap: Rank histograms for the simulations where there were no divergecnces
 plot_rank_hist(results_fixed_ordered_subset)
 #| label: fig-ecdf_hist-fixed_ordered_subset
-plot_ecdf_diff(results_fixed_ordered_subset)
+#| fig-width: 7
+#| fig-height: 2.5
+#| fig-cap: ECDF plots for the simulations where there were no divergences
+plot_ecdf(results_fixed_ordered_subset)
 
 #' Since we now have only `r length(results_fixed_ordered_subset)`
 #' simulations, it is not surprising that we are still left with a
 #' huge uncertainty about the actual coverage of our posterior
 #' intervals - we can see that in a plot:
 #| label: fig-plot_coverage-fixed_ordered_subset
+#| fig-width: 7
+#| fig-height: 2.75
+#| fig-cap: Nominal (light blue) and observed (black) coverage of central posterior intervals for the simulations where there were no divergecnces
 plot_coverage(results_fixed_ordered_subset)
 
 #' The coverage plot shows the observed coverage of central posterior
@@ -414,6 +442,8 @@ results_fixed_ordered_combined <-
                results_fixed_ordered_100_subset)
 
 #| label: fig-sbcworkflow_results_fixed_ordered_combined_results
+#| fig-cap: Rank histogram (top) and ECDF plot (bottom) for the first 100 simulations of the fixed mixture submodel after removing fits with divergent transitions.
+
 ordered_combined_rank_hist <- plot_rank_hist(results_fixed_ordered_combined)
 ordered_combined_ecdf_diff <- plot_ecdf_diff(results_fixed_ordered_combined)
 ordered_combined_rank_hist / ordered_combined_ecdf_diff
@@ -426,9 +456,11 @@ ordered_combined_rank_hist / ordered_combined_ecdf_diff
 #' see a potential problem where the coverage for `mu[1]` and `mu[2]`
 #' is no longer consistent with perfect calibration, the `ecdf_diff`
 #' plot takes precedence as the uncertainty in the coverage plot is
-#' only approximate and we thus cannot take it too seriously (see
-#' `help("empirical_coverage")` for some more details).
+#' only approximate and we thus cannot take it too seriously.
 #| label: fig-plot_coverage-fixed_ordered_combined
+#| fig-width: 7
+#| fig-height: 3
+#| fig-cap: Nominal (light blue) and observed (black) coverage of central posterior intervals for the fixed mixture submodel.
 plot_coverage(results_fixed_ordered_combined)
 
 #' Note: it turns out that extending the model to more components
@@ -439,9 +471,11 @@ plot_coverage(results_fixed_ordered_combined)
 #' # Logistic regression submodel
 #'
 #' Let's move to the logistic regression submodel of our model.
+code_logistic_first <- root("sbc", "models/logistic_first.stan")
+#| output: asis
+print_stan_file(code_logistic_first)
 #| label: model_logistic_first
-cat(readLines(root("sbc", "models/logistic_first.stan")), sep = "\n")
-model_logistic_first <- cmdstan_model(root("sbc", "models/logistic_first.stan"))
+model_logistic_first <- cmdstan_model(code_logistic_first)
 backend_logistic_first <- SBC_backend_cmdstan_sample(model_logistic_first) 
 
 #' If you are good at reading code, you may notice there is a fatal
@@ -465,19 +499,20 @@ generator_func_logistic_first <- function(N_obs, N_predictors) {
 }
 generator_logistic_first <- SBC_generator_function(generator_func_logistic_first, N_obs = 50, N_predictors = 2)
 
-#' We'll start with 10 simulations once again.
-set.seed(2345688)
-datasets_logistic_first <- generate_datasets(generator_logistic_first, 10)
+#' We'll start with 20 simulations.
+set.seed(31859523)
+datasets_logistic_first <- generate_datasets(generator_logistic_first, 20)
 
-results_logistic_first_10 <- compute_SBC(datasets_logistic_first,
+results_logistic_first_20 <- compute_SBC(datasets_logistic_first,
                                          backend_logistic_first, 
                                          cache_mode = "results", 
-                                         cache_location = file.path(cache_dir, "logistic_first_10"))
+                                         cache_location = file.path(cache_dir, "logistic_first_20"))
 
-#' Already with 10 datasets we are likely to see suspicious rank/ECDF plots:
+#' Already with 20 datasets we are likely to see suspicious rank/ECDF plots:
 #| label: fig-sbcworkflow_logistic_first_results
-logistic_first_ranks <- plot_rank_hist(results_logistic_first_10)
-logistic_first_ecdf <- plot_ecdf_diff(results_logistic_first_10)
+#| fig-cap: Rank histogram (top) and ECDF plot (bottom) for the first 20 simulations of the logistic submodel.
+logistic_first_ranks <- plot_rank_hist(results_logistic_first_20)
+logistic_first_ecdf <- plot_ecdf(results_logistic_first_20)
 logistic_first_ranks / logistic_first_ecdf
 
 #' At this point, we could use more simulations to see if the
@@ -485,9 +520,12 @@ logistic_first_ranks / logistic_first_ecdf
 #' introduce additional ways to diagnose mismatches between the Stan
 #' code and the simulator. A simple diagnostic is to plot the
 #' simulated values against posterior estimates, which can be done via
-#' the [plot_sim_estimated()] function.
+#' the `plot_sim_estimated()` function.
 #| label: fig-sbcworkflow_logistic_first_sim_estimated
-logistic_first_sim_estimated <- plot_sim_estimated(results_logistic_first_10) + 
+#| fig-cap: Simulated and estimated values of all parameters for the first 20 simulations of the logistic regression submodel.
+#| fig-width: 7
+#| fig-height: 2.75
+logistic_first_sim_estimated <- plot_sim_estimated(results_logistic_first_20) + 
   labs(x = "Simulated value", y = "Mean, 95% CI")
 logistic_first_sim_estimated
 
@@ -500,7 +538,7 @@ logistic_first_sim_estimated
 #' This problem manifests as suspicious rank/ECDF plots for the `beta`
 #' parameters. In fact, using this model, SBC will never show a
 #' failure for `alpha`, as just sampling from the prior (and ignoring
-#' likelihood) will always satisfy the SBC equality.
+#' likelihood) will always satisfy the SBC equality _for the parameter_.
 #'
 #' An additional useful diagnostic in this case is running SBC for a
 #' derived quantity: the SBC equality has to be satisfied not only for
@@ -508,41 +546,40 @@ logistic_first_sim_estimated
 #' parameters and data. Quite often, adding the model likelihood as an
 #' additional quantity increases sensitivity of SBC checks, as the
 #' likelihood is a complex function of all parameters. So lets do just
-#' that. We don't need to refit the model, we just call
+#' that. We don't need to refit the models, we just call
 #' `recompute_SBC_statistics` to compute the derived quantities.
 logistic_loglik_dq <- derived_quantities(
   log_lik =  sum(dbinom(y,
                         size = 1,
                         prob = plogis(alpha + X %*% beta),
                         log = TRUE)))
-results_logistic_first_10_dq <-
-  recompute_SBC_statistics(results_logistic_first_10,
+results_logistic_first_20_dq <-
+  recompute_SBC_statistics(results_logistic_first_20,
                            datasets_logistic_first,
                            backend_logistic_first,
                            dquants = logistic_loglik_dq)
 
 #' The rank and ECDF plots are shown below.
 #| label: fig-sbcworkflow_logistic_first_results_dq
-logistic_first_ranks <- plot_rank_hist(results_logistic_first_10_dq)
-logistic_first_ranks <- plot_ecdf_diff(results_logistic_first_10_dq)
-logistic_first_ranks / logistic_first_ecdf
+#| fig-cap: Rank histogram (top) and ECDF plot (bottom) for the first 20 simulations of the logistic submodel, now with the log-likelihood derived quantity.
+logistic_first_ranks_dq <- plot_rank_hist(results_logistic_first_20_dq, facet_args = list(nrow = 1))
+logistic_first_ecdf_dq <- plot_ecdf(results_logistic_first_20_dq, facet_args = list(nrow = 1)) + theme(legend.position = "bottom")
+logistic_first_ranks_dq / logistic_first_ecdf_dq
 
-#' While the failures for the `beta` parameters are barely visible
-#' with 10 simulations, `log_lik` signals a clear failure.
-#| label: fig-sbcworkflow_results_dq_loglik_only
-results_dq_loglik_only <- plot_rank_hist(results_logistic_first_10_dq, variables = "log_lik") /
-  plot_ecdf_diff(results_logistic_first_10_dq, variables = "log_lik")
-results_dq_loglik_only
+#' While the failures for the original parameters are barely visible
+#' with 20 simulations, `log_lik` signals a clear failure.
 
-#' ## Merging the intercept with predictors
+## Merging the intercept with predictors
 #'
-#' One way to resolve the problem -- and simplify our Stan code --- is
+#' One way to resolve the problem --- and simplify our Stan code --- is
 #' by treating the intercept as just another predictor which happens
-#' to have all 1's in its column of \texttt{X} and has a different
+#' to have all 1's in its column of `X` and has a different
 #' prior. This is also how most common regression modelling packages
 #' handle the situation. We thus modify our Stan code to:
-cat(readLines(root("sbc", "models/logistic_merged_intercept.stan")), sep = "\n")
-
+code_logistic_merged_intercept <- root("sbc", "models/logistic_merged_intercept.stan")
+#| output: asis
+print_stan_file(code_logistic_merged_intercept)
+  
 #' This looks cleaner, but you may notice one additional issue that we
 #' created during the rewrite. We will see that it will quickly
 #' manifest if we use SBC. We also need to modify our simulation code
@@ -550,8 +587,10 @@ cat(readLines(root("sbc", "models/logistic_merged_intercept.stan")), sep = "\n")
 #' keep the explicit loop to decrease chances of having the same
 #' problem in both R and Stan.
 #| label: model_logistic_merged_intercept
-model_logistic_merged_intercept <- cmdstan_model(root("sbc", "models/logistic_merged_intercept.stan"))
-backend_logistic_merged_intercept <- SBC_backend_cmdstan_sample(model_logistic_merged_intercept, chains = 2) 
+model_logistic_merged_intercept <-
+  cmdstan_model(code_logistic_merged_intercept)
+backend_logistic_merged_intercept <-
+  SBC_backend_cmdstan_sample(model_logistic_merged_intercept, chains = 2) 
 
 #' We now update the generator code to match:
 generator_func_logistic_merged_intercept <- function(N_obs, N_predictors) {
@@ -588,13 +627,14 @@ results_logistic_merged_intercept_10 <- compute_SBC(
 
 #' The results for 10 simulations are:
 #| label: sbcworkflow_logistic_merged_intercept_results
-logistic_merged_intercept_ranks <-  plot_rank_hist(results_logistic_merged_intercept_10)
-logistic_merged_intercept_ecdf <- plot_ecdf_diff(results_logistic_merged_intercept_10)
+#| fig-cap: Rank histogram (top) and ECDF plot (bottom) for the first 10 simulations of the logistic submodel with merged intercept.
+logistic_merged_intercept_ranks <-  plot_rank_hist(results_logistic_merged_intercept_10, facet_args = list(nrow = 1))
+logistic_merged_intercept_ecdf <- plot_ecdf(results_logistic_merged_intercept_10, facet_args = list(nrow = 1)) + theme(legend.position = "bottom")
 logistic_merged_intercept_ranks / logistic_merged_intercept_ecdf
 
 #' This signals a potential problem with `beta[1]` (the
 #' intercept). The reason for the failure is that we have included two
-#' separate statements for prior for \texttt{beta[1]}.
+#' separate statements for prior for `beta[1]`.
 #'
 #' This example also shows that the `log_lik` term is not magic, as it
 #' does not signal this failure earlier than `beta[1]`.
@@ -602,14 +642,16 @@ logistic_merged_intercept_ranks / logistic_merged_intercept_ecdf
 #' ## Fixing prior definition
 #'
 #' To avoid declaring two priors for `beta[1]` we need to modify the
-#' last line of the \texttt{model} block to
-#' ```
+#' last line of the `model` block to
+#' ```stan
 #' target += normal_lpdf(beta[2:N_predictors] | 0, 1);    
 #' ```
 #' so the full model now is:
+code_logistic_fixed_prior <- root("sbc", "models/logistic_fixed_prior.stan")
+#| output: asis
+print_stan_file(code_logistic_fixed_prior)
 #| label: model_logistic_fixed_prior
-cat(readLines(root("sbc", "models/logistic_fixed_prior.stan")), sep = "\n")
-model_logistic_fixed_prior <- cmdstan_model(root("sbc", "models/logistic_fixed_prior.stan"))
+model_logistic_fixed_prior <- cmdstan_model(code_logistic_fixed_prior)
 backend_logistic_fixed_prior <- SBC_backend_cmdstan_sample(model_logistic_fixed_prior, chains = 2) 
 
 #' The results for ten simulations are:
@@ -621,8 +663,10 @@ results_logistic_fixed_prior_10 <- compute_SBC(
   cache_location = file.path(cache_dir, "logistic_fixed_prior_10"))
 
 #| label: fig-sbcworkflow_logistic_fixed_prior_results_10
-logistic_fixed_prior_ranks <- plot_rank_hist(results_logistic_fixed_prior_10)
-logistic_fixed_prior_ecdf <- plot_ecdf_diff(results_logistic_fixed_prior_10)
+#| fig-cap: Rank histogram (top) and ECDF plot (bottom) for the first 10 simulations of the logistic submodel with fixed prior.
+
+logistic_fixed_prior_ranks <- plot_rank_hist(results_logistic_fixed_prior_10, facet_args = list(nrow = 1))
+logistic_fixed_prior_ecdf <- plot_ecdf(results_logistic_fixed_prior_10, facet_args = list(nrow = 1)) + theme(legend.position = "bottom")
 logistic_fixed_prior_ranks / logistic_fixed_prior_ecdf
 
 #' No obvious problem, so let's add 200 additional simulations:
@@ -637,21 +681,26 @@ results_logistic_fixed_prior_200 <- compute_SBC(
   cache_location = file.path(cache_dir, "logistic_fixed_prior_200"))
 
 #| label: fig-sbcworkflow_logistic_fixed_prior_results_200
-logistic_fixed_prior_ranks <- plot_rank_hist(results_logistic_fixed_prior_200)
-logistic_fixed_prior_ecdf <- plot_ecdf_diff(results_logistic_fixed_prior_200)
+#| fig-cap: Rank histogram (top) and ECDF plot (bottom) for the full 200 simulations of the logistic submodel with merged intercept.
+logistic_fixed_prior_ranks <- plot_rank_hist(results_logistic_fixed_prior_200, facet_args = list(nrow = 1))
+logistic_fixed_prior_ecdf <- plot_ecdf_diff(results_logistic_fixed_prior_200, facet_args = list(nrow = 1)) + theme(legend.position = "bottom")
 logistic_fixed_prior_ranks / logistic_fixed_prior_ecdf
 
 #' Looking good! We can also check that we are indeed able to learn
 #' the model parameters with reasonable precision from the data.
 #| label: fig-sbcworkflow_logistic_fixed_prior_sim_estimated
+#| fig-cap: Simulated and estimated values for the 200 simulations of the logistic submodel with merged intercept.
+
 plot_sim_estimated(results_logistic_fixed_prior_200)
 
 #' # Full model
 #'
 #' We are finally ready to make a first attempt at the full model:
+code_combined <- root("sbc", "models/combined_first.stan")
+#| output: asis
+print_stan_file(code_combined)
 #| label: model_combined_first
-cat(readLines(root("sbc", "models/combined_first.stan")), sep = "\n")
-model_combined <- cmdstan_model(root("sbc", "models/combined_first.stan"))
+model_combined <- cmdstan_model(code_combined)
 backend_combined <- SBC_backend_cmdstan_sample(model_combined)
 
 #' And this is our generator for the full model:
@@ -697,8 +746,9 @@ results_combined <- compute_SBC(dataset_combined,
 
 #' We get some amount of divergent transitions, but the ranks look pretty good:
 #| label: fig-sbcworkflow_combined_results
+#| fig-cap: Rank histogram (top) and ECDF difference plot (bottom) for the first 200 simulations of the logistic submodel with fixed prior.
 combined_ranks <- plot_rank_hist(results_combined)
-combined_ecdf <- plot_ecdf_diff(results_combined)
+combined_ecdf <- plot_ecdf_diff(results_combined) + theme(legend.position = "bottom")
 combined_ranks / combined_ecdf
 
 #' Indeed it seems the model works pretty well.
@@ -736,9 +786,11 @@ combined_ranks / combined_ecdf
 #' factor of 1, while if the components are distinct the Fano factor
 #' will be larger.
 #'
-#' All the divergence are for low fano factors - this is the histogram
+#' All the divergences are for low Fano factors - this is the histogram
 #' of Fano factor for diverging fits:
 #| label: fig-sbcworkflow_fanos
+#| out-width: 90%
+#| fig-cap: Fano factors of fits with/without divergent transitions.
 fanos <- vapply(dataset_combined$generated, 
                 function(dataset) { var(dataset$y) / mean(dataset$y) }, 
                 FUN.VALUE = 0)
@@ -748,7 +800,7 @@ fanos_df <- data.frame(fano = fanos,
 fano_threshold <- 1.8
 fanos_plot <-  ggplot(fanos_df, aes(x = fano)) + 
   geom_histogram(binwidth = 0.1) + 
-  geom_vline(xintercept = fano_threshold, color = "blue", size = 2) +
+  geom_vline(xintercept = fano_threshold, color = "blue", linewidth = 2) +
   scale_x_log10("Fano factor") + facet_wrap(~type, ncol = 1)
 fanos_plot
 
@@ -809,13 +861,15 @@ results_combined_reject <- compute_SBC(dataset_combined_reject,
 
 #' No more divergences! And the ranks look nice.
 #| label: fig-sbcworkflow_combined_reject_results
+#| fig-cap: Rank histogram (top) and ECDF difference plot (bottom) for the full model after rejecting datasets with low Fano factor.
 combined_ranks <- plot_rank_hist(results_combined_reject)
-combined_ecdf <- plot_ecdf_diff(results_combined_reject)
+combined_ecdf <- plot_ecdf_diff(results_combined_reject) + theme(legend.position = "bottom")
 combined_ranks / combined_ecdf
 
 #' And our coverage is pretty tight:
 #| label: fig-sbcworkflow_combined_reject_coverage
-plot_coverage(results_combined_reject)
+#| fig-cap: Difference between actual and expected coverage of central posterior intervals for the full model.
+plot_coverage_diff(results_combined_reject)
 
 #' Below we show the uncertainty for two variables and some widths of
 #' central posterior intervals numerically:
@@ -840,12 +894,15 @@ results_combined_reject_more <- bind_results(
 #' sampling would remove those as well).
 #'
 #' Our plots and coverage are now pretty decent:
-#| label: fig-sbcworkflow_combined_reject_more_results
+#| label: fig-sbcworkflow-combined-reject-more-results
+#| fig-cap: Rank histogram (top) and ECDF difference plot (bottom) after adding more simulations for the complete model.
+
 combined_ranks <- plot_rank_hist(results_combined_reject_more)
-combined_ecdf <- plot_ecdf_diff(results_combined_reject_more)
+combined_ecdf <- plot_ecdf_diff(results_combined_reject_more) + theme(legend.position = "bottom")
 combined_ranks / combined_ecdf
 
-#| label: fig-sbcworkflow_combined_reject_coverage_more
+#| label: fig-sbcworkflow-combined-reject-coverage-more
+#| fig-cap: Difference between actual and expected coverage of central posterior intervals for the full model, including more simulations.
 combined_reject_coverage <- plot_coverage_diff(results_combined_reject_more)
 combined_reject_coverage
 
@@ -871,6 +928,7 @@ empirical_coverage(stats_subset, c(0.25, 0.5, 0.9, 0.95))
 #' values (simulated by the generator) against estimated mean + 90%
 #' posterior credible interval:
 #| label: fig-sbcworkflow_sim_estimated_final
+#| fig-cap: Simulated and estimated values for the comibned model and more simulations.
 sim_estimated_final <- plot_sim_estimated(results_combined_reject_more, alpha = 0.2)
 sim_estimated_final
 
@@ -905,10 +963,11 @@ mean(sign(stats_beta2$q5) == sign(stats_beta2$q95))
 #' that your model is at least pretty close to your simulator.
 #'
 #' 
-#' ## References {.unnumbered}
+#' # References {.unnumbered}
 #'
 #' <div id="refs"></div>
 #'
-#' ## Original Computing Environment {.unnumbered}
+#' # Licenses {.unnumbered}
 #' 
-sessionInfo()
+#' * Code &copy; 2022--2026, Martin Modrák, licensed under BSD-3.
+#' * Text &copy; 2022--2026, Martin Modrák, licensed under CC-BY-NC 4.0.
