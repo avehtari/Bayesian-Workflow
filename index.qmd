@@ -28,19 +28,14 @@ Copyright by Andrew Gelman, Aki Vehtari, Richard McElreath, Daniel
 Simpson, Charles C. Margossian, Yuling Yao, Lauren Kennedy, Jonah
 Gabry, Paul-Christian Bürkner, Martin Modrák, Vianey Leos Barajas.
 
-
-Back cover text: *blurb*
-
-
-- If you notice an error that is not mentioned in [the errata](errata.html), [submit an issue](https://github.com/avehtari/Bayesian-Workflow/issues) or send an email.
-
+- Buy the book via [publisher's website](https://www.routledge.com/Bayesian-Workflow/Gelman-Vehtari-McElreath-Simpson-Margossian-Yao-Kennedy-Gabry-Burkner-Modrak-Barajas/p/book/9780367490140)
 
 **How to cite**
 <details>
 
 Cite the book:
 
-> Gelman, Vehtari, McElreath, Simpson, Margossian, Yao, Kennedy, Gabry, Bürkner, Modrák, Leos Barajas (2026). *Bayesian Workflow*. CRC Press / Taylor \& Francis.
+> Gelman, Vehtari, McElreath, Simpson, Margossian, Yao, Kennedy, Gabry, Bürkner, Modrák, Leos Barajas (2026). *Bayesian Workflow*. Chapman & Hall.
 
 If you want to refer to a case study, cite the book and chapter, e.g.
 
@@ -55,10 +50,59 @@ BibTeX entry:
           Charles C. Margossian and Yuling Yao and Lauren Kennedy and Jonah Gabry and
           Paul-Christian Bürkner and Martin Modrák and Vianey Leos Barajas},
   year=2026,
-  publisher={CRC Press}
+  publisher={Chapman & Hall}
 }
 ```
 </details>
+
+## Description
+
+Bayesian statistics and statistical practice have evolved over the
+years, driven by advancements in theory, methods, and computational
+tools. This book explores the intricate workflows of applied Bayesian
+statistics, aiming to uncover the tacit knowledge often overlooked in
+published papers and textbooks. By systematizing the process of
+Bayesian model development, the book seeks to improve applied analyses
+and inspire future innovations in theory, methods, and software. It
+emphasizes the importance of iterative model building, model checking,
+computational troubleshooting, and simulated-data experimentation,
+offering a comprehensive perspective on statistical analysis.
+
+Through detailed examples and practical guidance, the book bridges the
+gap between theory and application, empowering practitioners and
+researchers to navigate the complexities of Bayesian inference. It is
+not a checklist or cookbook but a flexible framework for understanding
+and resolving challenges in statistical modeling and decision-making
+under uncertainty.
+
+**Features:**
+
+- Covers all aspects of Bayesian statistical workflow, including model
+  building, inference, validation, troubleshooting, and understanding
+- Demonstrates iterative model development and computational
+  problem-solving through real-world case studies
+- Explores computational challenges, calibration checking, and
+  connections between modeling and computation
+- Highlights the importance of checking models under diverse
+  conditions to understand their limitations and improve their
+  robustness
+- Discusses how Bayesian principles apply to non-Bayesian methods in
+  statistics and machine learning
+- Includes code snippets, exercises, and links to full datasets and
+  code in R and Stan, with applicability to other programming
+  environments like Python and Julia
+
+This book is designed for practitioners of applied Bayesian
+statistics, particularly users of probabilistic programming languages
+such as Stan, as well as developers of methods and software tailored
+to these users. It also targets researchers in Bayesian theory and
+methods, offering insights into understudied aspects of statistical
+workflows. Instructors and students will find adaptable exercises and
+case studies to enhance their learning experience. Beyond Bayesian
+inference, the book’s principles are relevant to users of non-Bayesian
+methods, making it a valuable resource for statisticians, data
+scientists, and machine learning professionals seeking to improve
+their modeling and decision-making processes.
 
 ## Book contents
 
