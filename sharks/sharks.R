@@ -35,13 +35,12 @@ root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(tidyverse)
 library(CircStats)
 library(patchwork)
-library(rstan)
 library(lubridate)
 library(moveHMM)
 library(bayesplot)
 library(tidyr)
+library(cmdstanr)
 options(mc.cores = 4)
-rstan_options(auto_write = TRUE)
 
 #' # Shark momevement data
 load(root("sharks/data","whiteshark_trackdata.RData"))
@@ -107,7 +106,8 @@ init_fun_logmu <- function(no_states, no_chains) {
 
 #' # 2-state HMM
 #' 
-stanHMM_2states <-  list(Nstates = 2, 
+stanHMM_2states <-  list(
+              Nstates = 2, 
               Tlen = dim(ws_HMM)[1], 
               track_index = as.numeric(as.factor(ws_HMM$SharksexTrackNo)),
               steplength = ws_HMM$steplength, 
@@ -116,12 +116,29 @@ stanHMM_2states <-  list(Nstates = 2,
 #| label: fit_2stateHMM
 #| cache: true
 #| results: hide
-fit_2stateHMM <- stan(file = root("sharks","step_turn_hmm.stan"), 
-                      data = stanHMM_2states,
-                      chains = 2,
-                      init = init_fun_mu(2, 2))
+
+model_2stateHMM <- cmdstan_model(
+  root("sharks", "step_turn_hmm.stan")
+)
+
+fit_2stateHMM <- model_2stateHMM$sample(
+  data = stanHMM_2states, 
+  init = init_fun_mu(2,4), 
+  chains = 4
+)
+
+fit_2stateHMM$summary(variables = c("mu", "sigma", "mixp", 
+                                    "xangle", "yangle", 
+                                    "tpm", "initial_dist", 
+                                    "lp__"))
+
+# fit_2stateHMM <- stan(file = root("sharks","step_turn_hmm.stan"), 
+#                       data = stanHMM_2states,
+#                       chains = 2,
+#                       init = init_fun_mu(2, 2))
+
 #'
-print(fit_2stateHMM, pars=names(fit_2stateHMM)[1:28])
+# print(fit_2stateHMM, pars=names(fit_2stateHMM)[1:28])
 
 #' Plot MCMC results for certain parameters
 #| label: fig-mcmc_hist_by_chain_2state
@@ -136,13 +153,14 @@ eval_gamma_sdd <- function(stan_fit, no_samples) {
   state1_dens <- matrix(NA, nrow = 200, ncol = no_samples)
   state2_dens <- matrix(NA, nrow = 200, ncol = no_samples)
   #extract posterior draws
-  post_params <- rstan::extract(stan_fit, pars = params)
+  post_params <- fit_2stateHMM$draws(variables=params, format="df")
+  #post_params <- rstan::extract(stan_fit, pars = params)
   shape <- post_params$shape
   rate <- post_params$rate
   for (j in 1:no_samples) {
     state1_dens[,j] <- dgamma(xval, 
-                              shape = shape[j,1], 
-                              rate = rate[j,1])
+                              shape = post_params[j,"shape[1]"], 
+                              rate = post_params[j,"rate[1]"])
     state2_dens[,j] <- dgamma(xval, 
                               shape = shape[j,2], 
                               rate = rate[j,2])
@@ -161,7 +179,7 @@ eval_vonMises_sdd <- function(stan_fit, no_samples) {
   state1_dens <- matrix(NA, nrow = 200, ncol = no_samples)
   state2_dens <- matrix(NA, nrow = 200, ncol = no_samples)
   #extract posterior draws
-  post_params <- rstan::extract(stan_fit, pars = params)
+  post_params <- fit_2stateHMM$draws(variables=params)
   loc <- post_params$loc
   kappa <- post_params$kappa
   for (j in 1:no_samples) {
@@ -376,13 +394,24 @@ stanHMM_2states_covariates <- list(Nstates = 2,
                                    angle = ws_HMM$turnang, 
                                    nCovs = 4, 
                                    covs = HMM_covar)
+
 #| label: fit_2stateHMM_covariates
 #| cache: true
 #| results: hide
-fit_2stateHMM_covariates <- stan(file = root("sharks","step_turn_hmm_covariates.stan"), 
-                          data = stanHMM_2states_covariates,
-                          init = init_fun_mu(2, 4), 
-                          chains = 4)
+model_2stateHMM_covariates <- cmdstan_model(
+  root("sharks", "step_turn_hmm_covariates.stan")
+)
+
+fit_2stateHMM_covariates <- model_2stateHMM_covariates$sample(
+  data = stanHMM_2states_covariates, 
+  init=init_fun_mu(2, 4), 
+  chains=4
+)
+
+# fit_2stateHMM_covariates <- stan(file = root("sharks","step_turn_hmm_covariates.stan"), 
+#                           data = stanHMM_2states_covariates,
+#                           init = init_fun_mu(2, 4), 
+#                           chains = 4)
 
 #' # 2-state HMM with covariates in transition probability matrix and individual varying effects
 HMM_covar <- matrix(data = c(rep(1, dim(ws_HMM)[1]), 
@@ -404,10 +433,20 @@ stanHMM_2states_tpmcov_crencp <- list(Nstates = 2,
 #| label: fit_2stateHMM_tpmcov_crencp
 #| cache: true
 #| results: hide
-fit_2stateHMM_tpmcov_crencp <- stan(file = root("sharks","step_turn_hmm_covariates_cre_ncp.stan"), 
-                          data = stanHMM_2states_tpmcov_crencp,
-                          init = init_fun_mu(2, 1), 
-                          chains = 1)
+model_2stateHMM_tpmcov_crencp <- cmdstan_model(
+  root("sharks", "step_turn_hmm_covariates_cre_ncp.stan")
+)
+
+fit_2stateHMM_tpmcov_crencp <- model_2stateHMM_tpmcov_crencp$sample(
+  data = stanHMM_2states_tpmcov_crencp, 
+  init = init_fun_mu(2, 1),
+  chains = 1
+)
+
+# fit_2stateHMM_tpmcov_crencp <- stan(file = root("sharks","step_turn_hmm_covariates_cre_ncp.stan"), 
+#                           data = stanHMM_2states_tpmcov_crencp,
+#                           init = init_fun_mu(2, 1), 
+#                           chains = 1)
 
 #' Plot entries of transition probability matrix with covariates and individual varying effects:
 beta <- extract(fit_2stateHMM_tpmcov_crencp, 
