@@ -48,6 +48,8 @@ library(ggplot2)
 library(bayesplot)
 library(RColorBrewer)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
+library(latex2exp)
+library(patchwork)
 set1 <- RColorBrewer::brewer.pal(7, "Set1")
 SEED <- 48927 # set random seed for reproducibility
 
@@ -723,6 +725,149 @@ summarize_draws(draws)
 #| fig-width: 6
 draws |> thin_draws(ndraws(draws) / ess_bulk(draws$alpha)) |>
   mcmc_rank_ecdf(pars = c("alpha"), plot_diff = TRUE)
+
+#' # Funnel
+#'
+#' A special case of varying curvature is known as the funnel, based
+#' on the shape of the typical set of the distribution. Consider a
+#' hierarchical model, $y_i\sim\normal(\mu_{k[i]},\sigma)$ for
+#' $i=1,\dots,N$ and group membership variable $k[i]$ which takes on
+#' values from 1 through $K$.  We shall assume the prior distribution,
+#' $\mu_k\sim\normal(\mu_0,\sigma_0),j=1,\dots,J$.  When plotted on
+#' the scale $\mu_1,\dots,\mu_K, \log\sigma_0$, this prior can be
+#' visualized as a having shape of a funnel
+#'
+#' If the funnel-shaped prior is combined with a weak likelihood, the
+#' posterior is also funnel shaped. As a toy example, we use the
+#' Kilpisjärvi temperature data, with each group being one year, with
+#' three summer month temperatures per year. With only three
+#' observations per group, the likelihood is weak for each $\mu_k$ and
+#' the prior is likely to dominate the posterior shape. The number of
+#' groups is 71, and this high dimensionality makes the funnel
+#' challenging.
+data_kilpis <- read.delim(root("problems/data", "kilpisjarvi-summer-temp.csv"), sep = ";")
+data_grpy <-list(N = length(data_kilpis$year)*ncol(data_kilpis[,2:4]),
+             K = length(data_kilpis$year),
+             x = rep(1:length(data_kilpis$year), ncol(data_kilpis[,2:4])),
+             y = c(t(t(data_kilpis[,2:4]))))
+
+#' Here is a direct implementation of the hierarchical model in
+#' Stan. The parameterization used is also known as centered
+#' parameterization.
+code_hier_cp <- root("problems", "hier_cp.stan")
+#| output: asis
+print_stan_file(code_hier_cp)
+
+#' We first try running Stan with its default settings.
+#| label: fit_hier_cp
+#| results: hide
+SEED <- 48929
+mod_hier_cp <- cmdstan_model(stan_file = code_hier_cp)
+fit_hier_cp <- mod_hier_cp$sample(data = data_grpy, seed = SEED, refresh = 0)
+
+#' We get a warning that some transitions ended with a divergence. The
+#' convergence diagnostics $\widehat{R}$, bulk-ESS, and tail-ESS
+#' reveal that the chains are not mixing well:
+fit_hier_cp
+
+#' Plot scatter plot of $\mu_1$ vs $\log\sigma_0$ with divergences shown in red (bayesplot)
+np <- fit_hier_cp$sampler_diagnostics(format="df")|>
+  mutate(Chain=.chain,Iteration=.iteration,Parameter="divergent__",Value=divergent__)|>
+  select(Chain,Iteration,Parameter,Value)
+fit_hier_cp$draws(format="df")|>
+  mutate(log_sigma0=log(sigma0))|>
+  mcmc_scatter(pars=c("mu[1]","sigma0"),transform=list(sigma0="log"), alpha=0.1, shape=20,
+               np=np, np_style = scatter_style_np(div_shape = 18, div_size = 3)) +
+  labs(x=TeX(r"($\mu_1$)"), y=TeX(r"($\log\,\sigma_0$)"), title="a) Centered param.")
+
+#' Plot scatter plot of $\mu_1$ vs $\log\sigma_0$ with divergences shown in red (ggplot)
+drws <- bind_draws(fit_hier_cp$draws(format="df"), fit_hier_cp$sampler_diagnostics(format="df")) |>
+  mutate(log_sigma0=log(sigma0))
+p1 <- ggplot(data = NULL, aes(x=`mu[1]`,`log_sigma0`)) +
+  geom_point(data = drws |> filter(divergent__==0), shape = 20, color = bayesplot:::get_color("m"), fill = bayesplot:::get_color("lh"), alpha = 0.1, size = 2) +
+  geom_point(data = drws |> filter(divergent__==1), shape = 23, fill = "red", color = "white", size = 2) +
+  labs(x=TeX(r"($\mu_1$)"), y=TeX(r"($\log\,\sigma_0$)"), title="c) Centered param.")
+p1
+
+#' We change the adapt_delta tuning parameter of the NUTS algorithm to
+#' force a smaller step size.
+#| label: fit_hier_cp_999
+#| results: hide
+fit_hier_cp_999 <- mod_hier_cp$sample(data = data_grpy, seed = SEED, refresh=0, adapt_delta=0.999)
+
+#' However, the convergence diagnostics still indicate serious mixing problems:
+fit_hier_cp_999
+
+#' Plot scatter plot of $\mu_1$ vs $\log\sigma_0$ with divergences shown in red (bayesplot)
+np <- fit_hier_cp_999$sampler_diagnostics(format="df")|>
+  mutate(Chain=.chain,Iteration=.iteration,Parameter="divergent__",Value=divergent__)|>
+  select(Chain,Iteration,Parameter,Value)
+fit_hier_cp_999$draws(format="df")|>
+  mutate(log_sigma0=log(sigma0))|>
+  mcmc_scatter(pars=c("mu[1]","sigma0"),transform=list(sigma0="log"), alpha=0.1, shape=20,
+               np=np, np_style = scatter_style_np(div_shape = 18, div_size = 3)) +
+  labs(x=TeX(r"($\mu_1$)"), y=TeX(r"($\log\,\sigma_0$)"), title="a) Centered param. + higher adapt_delta")
+
+#' Plot scatter plot of $\mu_1$ vs $\log\sigma_0$ with divergences shown in red (ggplot)
+drws <- bind_draws(fit_hier_cp_999$draws(format="df"), fit_hier_cp_999$sampler_diagnostics(format="df")) |>
+  mutate(log_sigma0=log(sigma0))
+p2 <- ggplot(data = NULL, aes(x=`mu[1]`,`log_sigma0`)) +
+  geom_point(data = drws |> filter(divergent__==0), shape = 20, color = bayesplot:::get_color("m"), fill = bayesplot:::get_color("lh"), alpha = 0.1, size = 2) +
+  geom_point(data = drws |> filter(divergent__==1), shape = 23, fill = "red", color = "white", size = 2) +
+  labs(x=TeX(r"($\mu_1$)"), y=TeX(r"($\log\,\sigma_0$)"), title="b) Centered param. + higher adapt_delta")
+p2
+
+#' The usual approach to resolve the funnel problem is to change how
+#' the model is parameterized. The so-called non-centered
+#' parameterization provides the same model, but the sampling happens
+#' in a transformed space that does not have the difficult funnel
+#' geometry. 
+code_hier_ncp <- root("problems", "hier_ncp.stan")
+#| output: asis
+print_stan_file(code_hier_ncp)
+
+#' We run Stan with its default settings.
+#| label: fit_hier_ncp
+#| results: hide
+mod_hier_ncp <- cmdstan_model(stan_file = code_hier_ncp)
+fit_hier_ncp <- mod_hier_ncp$sample(data = data_grpy, seed = SEED, refresh=0)
+
+#' The convergence diagnostics $\widehat{R}$, bulk-ESS, and tail-ESS
+#' look good now.
+fit_hier_ncp
+
+#' Plot scatter plot of $\mu_1$ vs $\log\sigma_0$ with divergences shown in red (bayesplot)
+np <- fit_hier_ncp$sampler_diagnostics(format="df")|>
+  mutate(Chain=.chain,Iteration=.iteration,Parameter="divergent__",Value=divergent__)|>
+  select(Chain,Iteration,Parameter,Value)
+fit_hier_ncp$draws(format="df")|>
+  mutate(log_sigma0=log(sigma0))|>
+  mcmc_scatter(pars=c("mu[1]","sigma0"),transform=list(sigma0="log"), alpha=0.1, shape=20,
+               np=np, np_style = scatter_style_np(div_shape = 18, div_size = 3)) +
+  labs(x=TeX(r"($\mu_1$)"), y=TeX(r"($\log\,\sigma_0$)"), title="a) Non-centered param.")
+
+#' Plot scatter plot of $\mu_1$ vs $\log\sigma_0$ with divergences shown in red (ggplot)
+drws <- bind_draws(fit_hier_ncp$draws(format="df"), fit_hier_ncp$sampler_diagnostics(format="df")) |>
+  mutate(log_sigma0=log(sigma0))
+p3 <- ggplot(data = NULL, aes(x=`mu[1]`,`log_sigma0`)) +
+  geom_point(data = drws |> filter(divergent__==0), shape = 20, color = bayesplot:::get_color("m"), fill = bayesplot:::get_color("lh"), alpha = 0.1, size = 2) +
+  geom_point(data = drws |> filter(divergent__==1), shape = 23, fill = "red", color = "white", size = 2) +
+  labs(x=TeX(r"($\mu_1$)"), y=TeX(r"($\log\,\sigma_0$)"), title="c) Non-centered param.")
+p3
+
+#' If we compare the scatter plots side by side, we clearly see that
+#' increasing `adapt_delta` and getting rid of divergences did not
+#' solve the funnel problem and the posterior estimates with centered
+#' parameterization would be biased.
+#| label: fig-kilpis-funnel
+#| fig-width: 14
+#| fig-height: 4.5
+#| out-width: 100%
+(p1 + p2 + p3) *
+  scale_y_continuous(lim=c(-8,0.3)) *
+  scale_x_continuous(lim=c(7.2,11.8)) *
+  theme(plot.title = element_text(size=16)) +
+  plot_layout(axis_titles="collect_y") 
 
 #'
 #' # Variance parameter that is not constrained to be positive
