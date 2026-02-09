@@ -73,7 +73,7 @@ website:
 format:
   html:
     encoding: UTF-8
-    theme: readble
+    theme: readable
     css: _styles.css
     toc: true
     toc-depth: 2
