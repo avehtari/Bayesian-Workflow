@@ -23,10 +23,7 @@ Daniel Simpson,
 [Martin Modrák](https://www.martinmodrak.cz/),
 [Vianey Leos Barajas](https://www.vleosbarajas.com/).
 
-Published by CRC Press in 2026.<br>
-Copyright by Andrew Gelman, Aki Vehtari, Richard McElreath, Daniel
-Simpson, Charles C. Margossian, Yuling Yao, Lauren Kennedy, Jonah
-Gabry, Paul-Christian Bürkner, Martin Modrák, Vianey Leos Barajas.
+Published by CRC Press in 2026. Copyright by the authors.
 
 - Buy the book via [publisher's website](https://www.routledge.com/Bayesian-Workflow/Gelman-Vehtari-McElreath-Simpson-Margossian-Yao-Kennedy-Gabry-Burkner-Modrak-Barajas/p/book/9780367490140)
 
