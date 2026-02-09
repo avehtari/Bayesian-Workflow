@@ -1,0 +1,58 @@
+---
+title: "Bayesian Workflow book: Resources"
+date: 2026-01-05
+date-modified: today
+date-format: iso
+format:
+  html:
+    number-sections: false
+---
+
+## Related books on Bayesian methods and modeling
+
+- Gelman, Carlin, Stern, Dunson, Vehtari and Rubin (2013). *Bayesian Data Analysis*, Third Edition. Chapman and Hall/CRC.
+    - [Publisher's webpage for the book](https://www.crcpress.com/Bayesian-Data-Analysis-Third-Edition/Gelman-Carlin-Stern-Dunson-Vehtari-Rubin/9781439840955).
+    - [Authors' web page for the book](https://www.stat.columbia.edu/~gelman/book/).<br>
+    - [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/BDA3.pdf).<br>
+- McElreath (2020). *Statistical Rethinking*, Second Edition. Chapman and Hall.
+    - [Publisher's webpage for the book](https://www.crcpress.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919).
+    - [Author's web page for the book](https://xcelab.net/rm/).
+- Gelman, Hill and Vehtari (2020). *Regression and other stories*. Cambridge University Press.<br>
+    - [Publisher's webpage for the book](https://www.cambridge.org/fi/academic/subjects/statistics-probability/statistical-theory-and-methods/regression-and-other-stories).
+    - [Authors' webpage for the book](https://avehtari.github.io/ROS-Examples/).
+    - [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/ROS.pdf).<br>
+- Gelman and Vehtari (2024). *Active Statistics*. Cambridge University Press.
+    - [Publisher's webpage for the book](https://www.cambridge.org/core/books/active-statistics/4E066112B3F82CA44C81CB4097960808)
+    - [Authors' webpage for the book](https://avehtari.github.io/ActiveStatistics/).
+    - [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/ActiveStatistics.pdf).
+
+## Related software
+
+- [Stan](https://mc-stan.org/)
+- [CmdStanR](https:://mc-stan.org/cmdstanr/)
+- [brms](https://paulbuerkner.com/brms/)
+- [rstanarm](https:://mc-stan.org/rstanarm/)
+- [bayesplot](https:://mc-stan.org/bayesplot/)
+- [loo](https:://mc-stan.org/loo/)
+- [posterior](https:://mc-stan.org/posterior/)
+- [priorsense](https://n-kall.github.io/priorsense/)
+- [projpred](https:://mc-stan.org/projpred/)
+- [ggdist](https://mjskay.github.io/ggdist/)
+- [ArviZ](https://python.arviz.org/)
+
+## More case studies
+
+- [Aki Vehtari's case studies](https://users.aalto.fi/~ave/casestudies.html)
+
+## R programming and visualization with R
+
+- For R programming basics see [Appendix A of Regression and Other Stories](https://avehtari.github.io/ROS-Examples/Regression_and_Other_Stories_Appendix_A.pdf).
+- For learning more about R programming we recommend
+    - [Garrett Grolemund, Hands-On Programming with R](https://rstudio-education.github.io/hopr/)
+- For learning more about basic and advanced plotting using R we recommend
+    - [Kieran Healy, Data Visualization - A practical introduction](https://socviz.co/)
+    - [Antony Unwin, Graphical Data Analysis with R](http://www.gradaanwr.net/)
+- Further ideas for visualization
+    - [ggdist: Visualizations of distributions and uncertainty](https://mjskay.github.io/ggdist/)
+    - [tidybayes: Bayesian analysis + tidy data + geoms](http://mjskay.github.io/tidybayes/)
+    - [Claus O. Wilke, Fundamentals of Data Visualization](https://serialmentor.com/dataviz/)
