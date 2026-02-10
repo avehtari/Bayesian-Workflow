@@ -107,7 +107,12 @@ ggplot(data = sharks.HMMtracks.df%>%
 
 #' # Initial values for an N-state HMM:
 #' 
-#' Time homogeneous HMMs with fixed state-dependent distributions
+#' We create two functions to provide starting values for the mean of the
+#' state-dependent distribution for step length. Without specifying starting 
+#' values, the MCMC may have some trouble initializing at plausible values. 
+#' There may still be issues with initialization depending on starting
+#' values for other parameters but for now we proceed only specifying 
+#' starting values for the means. 
 init_fun_mu <- function(no_states, no_chains) {
   mu_init <- list()
   for (n in 1:no_chains) {
@@ -124,7 +129,13 @@ init_fun_logmu <- function(no_states, no_chains) {
 }
 
 #' # 2-state HMM
-#' 
+#' We fit a 2-state HMM to the white shark tracks, assuming that each 
+#' track is an independent realization of the same 2-state HMM. Note that in 
+#' the corresponding chapter, we modify either the prior distributions for the 
+#' state-dependent distribution or specify an ordering on the means for the 
+#' step length state-dependent distribution. The Stan code in 
+#' `step_turn_hmm.stan` can be modified to mimic different behavior and 
+#' reproduce similar results. 
 stanHMM_2states <-  list(
               Nstates = 2, 
               Tlen = dim(ws_HMM)[1], 
@@ -146,7 +157,7 @@ fit_2stateHMM <- model_2stateHMM$sample(
   chains = 4
 )
 
-fit_2stateHMM$summary(variables = c("mu", "sigma", "mixp", 
+fit_2stateHMM$summary(variables = c("mu", "sigma", "mixp",
                                     "xangle", "yangle", 
                                     "tpm", "initial_dist", 
                                     "lp__"))
@@ -154,28 +165,32 @@ fit_2stateHMM$summary(variables = c("mu", "sigma", "mixp",
 
 #' Plot MCMC results for certain parameters
 #| label: fig-mcmc_hist_by_chain_2state
-mcmc_hist_by_chain(fit_2stateHMM, pars = c("mu[1]", "mu[2]", "lp__"))
+fit_2stateHMM_draws <- fit_2stateHMM$draws(format = "df",
+                                           variables = c("mu", "sigma", "mixp",
+                                                         "shape", "rate",
+                                                         "xangle", "yangle",
+                                                         "kappa", "loc",
+                                                         "tpm", "initial_dist", 
+                                                         "lp__"))
+mcmc_hist_by_chain(fit_2stateHMM_draws, regex_pars = "mu", pars = "lp__")
 
 #' Plot state-dependent distributions
-cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-eval_gamma_sdd <- function(stan_fit, no_samples) {
+cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", 
+               "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+eval_gamma_sdd <- function(post_draws, no_samples) {
   # setup
   xval <- seq(0.001, 1, len = 200)
-  params <- c("shape", "rate")
   state1_dens <- matrix(NA, nrow = 200, ncol = no_samples)
   state2_dens <- matrix(NA, nrow = 200, ncol = no_samples)
-  #extract posterior draws
-  post_params <- fit_2stateHMM$draws(variables=params, format="df")
-  #post_params <- rstan::extract(stan_fit, pars = params)
-  shape <- post_params$shape
-  rate <- post_params$rate
+
   for (j in 1:no_samples) {
     state1_dens[,j] <- dgamma(xval, 
-                              shape = post_params[j,"shape[1]"], 
-                              rate = post_params[j,"rate[1]"])
+                              shape = as.numeric(post_draws[j,"shape[1]"]), 
+                              rate = as.numeric(post_draws[j,"rate[1]"]))
     state2_dens[,j] <- dgamma(xval, 
-                              shape = shape[j,2], 
-                              rate = rate[j,2])
+                              shape = as.numeric(post_draws[j,"shape[2]"]), 
+                              rate = as.numeric(post_draws[j,"rate[2]"]))
   }
   sdd <- data.frame(xval = rep(xval, times = no_samples), 
                     state1_dens = c(state1_dens), 
@@ -184,23 +199,19 @@ eval_gamma_sdd <- function(stan_fit, no_samples) {
   return(sdd)
 }
 
-eval_vonMises_sdd <- function(stan_fit, no_samples) {
+eval_vonMises_sdd <- function(post_draws, no_samples) {
   # setup
   xval <- seq(-pi, pi, len = 200)
-  params <- c("loc", "kappa")
   state1_dens <- matrix(NA, nrow = 200, ncol = no_samples)
   state2_dens <- matrix(NA, nrow = 200, ncol = no_samples)
-  #extract posterior draws
-  post_params <- fit_2stateHMM$draws(variables=params)
-  loc <- post_params$loc
-  kappa <- post_params$kappa
+
   for (j in 1:no_samples) {
     state1_dens[,j] <- dvm(xval, 
-                           mu = loc[j,1], 
-                           kappa = kappa[j,1])
+                           mu = as.numeric(post_draws[j,"loc[1]"]),
+                           kappa = as.numeric(post_draws[j,"kappa[1]"]))
     state2_dens[,j] <- dvm(xval, 
-                           mu = loc[j,2], 
-                           kappa = kappa[j,2])
+                           mu =  as.numeric(post_draws[j,"loc[2]"]),
+                           kappa = as.numeric(post_draws[j,"kappa[2]"]))
   }
   sdd <- data.frame(xval = rep(xval, times = no_samples), 
                     state1_dens = c(state1_dens), 
@@ -209,11 +220,11 @@ eval_vonMises_sdd <- function(stan_fit, no_samples) {
   return(sdd)
 }
 
-sdd_steplength <- eval_gamma_sdd(fit_2stateHMM, no_samples = 1000)
-sdd_angle <- eval_vonMises_sdd(fit_2stateHMM, no_samples = 1000)
+sdd_steplength <- eval_gamma_sdd(fit_2stateHMM_draws, no_samples = 1000)
+sdd_angle <- eval_vonMises_sdd(fit_2stateHMM_draws, no_samples = 1000)
 #| label: fig-hmm_2state_distributions
 sl_sdd <- ggplot(ws_HMM) + 
-  geom_histogram(aes(steplength, y=..density..), bins=100, alpha=0.2) + 
+  geom_histogram(aes(steplength, y=after_stat(density)), bins=100, alpha=0.2) + 
   xlim(-0.01, 1) +  
   geom_line(data=sdd_steplength, aes(xval, 0.5*state1_dens, group=sample), 
             color = cbPalette[2], alpha=0.2) + 
@@ -226,8 +237,9 @@ sl_sdd <- ggplot(ws_HMM) +
   annotate("text", x = 0.3, y = 4, label = "state 1", color = cbPalette[2])  +
   annotate("text", x = 0.45, y = 1.5, label = "state 2", color = cbPalette[3]) + 
   ggtitle("step length state-dependent distributions")
+
 angle_sdd <- ggplot(ws_HMM) + 
-  geom_histogram(aes(turnang, y=..density..), bins=100, alpha=0.2) + 
+  geom_histogram(aes(turnang, y=after_stat(density)), bins=100, alpha=0.2) + 
   xlim(-pi, pi) +
   geom_line(data=sdd_angle, aes(xval, 0.5*state1_dens, group=sample), 
             color = cbPalette[2], alpha=0.2) + 
@@ -243,7 +255,8 @@ angle_sdd <- ggplot(ws_HMM) +
 sl_sdd + angle_sdd
 
 #' Plot state-decodings onto track
-state_probs_draws <- extract(fit_2stateHMM, pars=c("state_probs"), permuted = FALSE)
+state_prob_draws <- fit_2stateHMM$draws(variables =c("state_probs"))
+#state_probs_draws <- extract(fit_2stateHMM, pars=c("state_probs"), permuted = FALSE)
 state_probs_means <- data.frame(state1prob = colMeans(state_probs_draws[,1,(4584+1):(2*4584)]), 
                                 state2prob = colMeans(state_probs_draws[,1,1:4584])) 
 state1_probs_quants <- data.frame(state1prob025 = apply(state_probs_draws[,1,(4584+1):(2*4584)], 2, quantile, probs=0.025), 
