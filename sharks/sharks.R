@@ -42,7 +42,22 @@ library(tidyr)
 library(cmdstanr)
 options(mc.cores = 4)
 
-#' # Shark momevement data
+#' # Shark movement data 
+#' The positions, in longitude and latitude, of multiple sharks were taken 
+#' over time in Gansbaii, South Africa. Some sharks have repeated trackings. 
+#' Hidden Markov models (HMMs) applied to the positions of animals over time are
+#' often first transformed into step lengths and turning angles, and then 
+#' analyzed. Here we use the R package `moveHMM` to process our tracks. 
+#' `moveHMM` requires a column named ID to denote individual tracks, with 
+#' multiple IDs possibly corresponding to the same shark if they are tracked
+#' multiple times. Because these are discrete-time HMMs, `moveHMM` also assumes
+#' that the observations are taken regularly over time, with missing values
+#' filling any times where observations were not available. It will not check 
+#' this automatically, so it is important for users to prepare their data
+#' appropriately. In the following code we import the data, use the function 
+#' `prepData` to compute step lengths and turning angles. We also compute 
+#' covariates, such as time of day, sex, and chum that will be used for 
+#' model extensions.
 load(root("sharks/data","whiteshark_trackdata.RData"))
 sharks.HMMtracks.df$ID <- sharks.HMMtracks.df$SharksexTrackNo
 moveHMM_wsdata <- prepData(sharks.HMMtracks.df[,c("ID", "Long", "Lat")], type=c("LL"), coordNames = c("Long", "Lat"))
@@ -60,15 +75,19 @@ ws_HMM <- ws_HMM_full[,c("dateTime",
                     "CDB")]
 
 #' time of day covariates
-ws_HMM$tod_cos <- cos((2*pi*(hour(ws_HMM$dateTime)*60 + minute(ws_HMM$dateTime)))/1440)
-ws_HMM$tod_sin <- sin((2*pi*(hour(ws_HMM$dateTime)*60 + minute(ws_HMM$dateTime)))/1440)
+ws_HMM$tod_cos <- cos((2*pi*(hour(ws_HMM$dateTime)*60 + 
+                               minute(ws_HMM$dateTime)))/1440)
+ws_HMM$tod_sin <- sin((2*pi*(hour(ws_HMM$dateTime)*60 + 
+                               minute(ws_HMM$dateTime)))/1440)
 #' chum covariate
 ws_HMM$chum <- ifelse(ws_HMM$CDB == "x", yes = 1, no = 0) 
 ws_HMM$chum[which(is.na(ws_HMM$CDB))] <- 0
+
 #' sex covariate
 ws_HMM$sex_char <- substring(ws_HMM$SharksexTrackNo, 3, 3)
 ws_HMM$sex <- ifelse(ws_HMM$sex_char == "F", yes = 0, no = 1)
 
+#' setting NA's to numeric values for implementation in Stan
 ws_HMM$steplength[is.na (ws_HMM$steplength)] <- -100
 ws_HMM$steplength[which(ws_HMM$steplength > 1.5)] <- -100
 ws_HMM$turnang[is.na(ws_HMM$turnang)] <- -100
@@ -132,13 +151,6 @@ fit_2stateHMM$summary(variables = c("mu", "sigma", "mixp",
                                     "tpm", "initial_dist", 
                                     "lp__"))
 
-# fit_2stateHMM <- stan(file = root("sharks","step_turn_hmm.stan"), 
-#                       data = stanHMM_2states,
-#                       chains = 2,
-#                       init = init_fun_mu(2, 2))
-
-#'
-# print(fit_2stateHMM, pars=names(fit_2stateHMM)[1:28])
 
 #' Plot MCMC results for certain parameters
 #| label: fig-mcmc_hist_by_chain_2state
