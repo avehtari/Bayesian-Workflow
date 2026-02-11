@@ -74,18 +74,18 @@ ws_HMM <- ws_HMM_full[,c("dateTime",
                     "month", 
                     "CDB")]
 
-#' time of day covariates
-ws_HMM$tod_cos <- cos((2*pi*(hour(ws_HMM$dateTime)*60 + 
-                               minute(ws_HMM$dateTime)))/1440)
-ws_HMM$tod_sin <- sin((2*pi*(hour(ws_HMM$dateTime)*60 + 
-                               minute(ws_HMM$dateTime)))/1440)
-#' chum covariate
-ws_HMM$chum <- ifelse(ws_HMM$CDB == "x", yes = 1, no = 0) 
-ws_HMM$chum[which(is.na(ws_HMM$CDB))] <- 0
-
-#' sex covariate
-ws_HMM$sex_char <- substring(ws_HMM$SharksexTrackNo, 3, 3)
-ws_HMM$sex <- ifelse(ws_HMM$sex_char == "F", yes = 0, no = 1)
+#' #' time of day covariates
+#' ws_HMM$tod_cos <- cos((2*pi*(hour(ws_HMM$dateTime)*60 + 
+#'                                minute(ws_HMM$dateTime)))/1440)
+#' ws_HMM$tod_sin <- sin((2*pi*(hour(ws_HMM$dateTime)*60 + 
+#'                                minute(ws_HMM$dateTime)))/1440)
+#' #' chum covariate
+#' ws_HMM$chum <- ifelse(ws_HMM$CDB == "x", yes = 1, no = 0) 
+#' ws_HMM$chum[which(is.na(ws_HMM$CDB))] <- 0
+#' 
+#' #' sex covariate
+#' ws_HMM$sex_char <- substring(ws_HMM$SharksexTrackNo, 3, 3)
+#' ws_HMM$sex <- ifelse(ws_HMM$sex_char == "F", yes = 0, no = 1)
 
 #' setting NA's to numeric values for implementation in Stan
 ws_HMM$steplength[is.na (ws_HMM$steplength)] <- -100
@@ -255,14 +255,14 @@ angle_sdd <- ggplot(ws_HMM) +
 sl_sdd + angle_sdd
 
 #' Plot state-decodings onto track
-state_prob_draws <- fit_2stateHMM$draws(variables =c("state_probs"))
+state_probs_draws <- fit_2stateHMM$draws(variables =c("state_probs"), format = "draws_matrix")
 #state_probs_draws <- extract(fit_2stateHMM, pars=c("state_probs"), permuted = FALSE)
-state_probs_means <- data.frame(state1prob = colMeans(state_probs_draws[,1,(4584+1):(2*4584)]), 
-                                state2prob = colMeans(state_probs_draws[,1,1:4584])) 
-state1_probs_quants <- data.frame(state1prob025 = apply(state_probs_draws[,1,(4584+1):(2*4584)], 2, quantile, probs=0.025), 
-                                state1prob975 = apply(state_probs_draws[,1,(4584+1):(2*4584)], 2, quantile, probs=0.975)) 
-state2_probs_quants <- data.frame(state1prob025 = apply(state_probs_draws[,1,1:(4584)], 2, quantile, probs=0.025), 
-                                  state1prob975 = apply(state_probs_draws[,1,1:(4584)], 2, quantile, probs=0.975)) 
+state_probs_means <- data.frame(state1prob = colMeans(state_probs_draws[1:1000,(4584+1):(2*4584)]), 
+                                state2prob = colMeans(state_probs_draws[1:1000,1:4584])) 
+state1_probs_quants <- data.frame(state1prob025 = apply(state_probs_draws[1:1000,(4584+1):(2*4584)], 2, quantile, probs=0.025), 
+                                state1prob975 = apply(state_probs_draws[1:1000,(4584+1):(2*4584)], 2, quantile, probs=0.975)) 
+state2_probs_quants <- data.frame(state1prob025 = apply(state_probs_draws[1:1000,1:(4584)], 2, quantile, probs=0.025), 
+                                  state1prob975 = apply(state_probs_draws[1:1000,1:(4584)], 2, quantile, probs=0.975)) 
 ws_HMM_rep <- ws_HMM_full[,c("dateTime", 
                              "SharkName", 
                              "SharksexTrackNo", 
@@ -311,12 +311,11 @@ ggplot(data = ws_HMM_rep %>%
 
 #' Plot pseudo-residuals
 # plot pseudo residuals
-pseudo_residuals <- extract(fit_2stateHMM, 
-                            pars=c("pseudo_residuals"), 
-                            permuted = FALSE)
-pr_mean <- colMeans(pseudo_residuals[,1,])
-pr_025 <- apply(pseudo_residuals[,1,], 2, quantile, probs=0.025)
-pr_975 <- apply(pseudo_residuals[,1,], 2, quantile, probs=0.975)
+pseudo_residuals <- fit_2stateHMM$draws(variables = "pseudo_residuals", 
+                                        format="draws_matrix")
+pr_mean <- colMeans(pseudo_residuals[1:1000,])
+pr_025 <- apply(pseudo_residuals[1:1000,], 2, quantile, probs=0.025)
+pr_975 <- apply(pseudo_residuals[1:1000,], 2, quantile, probs=0.975)
 pr_missing_index <- which(pr_mean == 0)
 df <- data.frame(y = pr_mean[-pr_missing_index])
 
