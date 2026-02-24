@@ -4,8 +4,6 @@
 * `US-2000-2014-SSA.txt`: USA number of births per day 2000-2014 by Social Security Administration
 * Data for 1969-1988 is also included in the `birthdays/data` directory of the GitHub repository since
 it is used in that case study.
-* `BMJSubmissions.csv`: information on papers submitted to the British Medical Journal.
-
 
 For the CDC data see: 
 
