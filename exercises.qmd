@@ -10,6 +10,44 @@ format:
 
 ## Data files for exercises
 
-The list of additional data files for exercises:
+This page lists data files used in the exercises that are not already provided
+in the case study directories. Exercise datasets that are included with case
+studies are not repeated here.
 
-To appear
+### Chapter 5
+
+- [Monks.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_05/Monks.csv)
+
+### Chapter 6
+
+- [2008ElectionResult.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/2008ElectionResult.csv)
+- [BMJSubmissions.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/BMJSubmissions.csv)
+- [pew_research_center_june_elect_wknd_data.dta](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/pew_research_center_june_elect_wknd_data.dta)
+- [US-EST00INT-ALLDATA.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/US-EST00INT-ALLDATA.csv)
+- [births.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/births.txt)
+- [black_death_rates_from_1999_to_2013_by_sex.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/black_death_rates_from_1999_to_2013_by_sex.txt)
+- [deaton.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/deaton.txt)
+- [white_hisp_death_rates_from_1999_to_2013_by_sex.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/white_hisp_death_rates_from_1999_to_2013_by_sex.txt)
+- [white_nonhisp_death_rates_from_1999_to_2013_by_sex.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/white_nonhisp_death_rates_from_1999_to_2013_by_sex.txt)
+
+### Chapter 7
+
+- [Achehunting.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_07/Achehunting.csv)
+- [incentives_data_clean.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_07/incentives_data_clean.txt)
+
+### Chapter 8
+
+- [nba2023.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_08/nba2023.txt)
+
+### Chapter 11
+
+- [naes04.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_11/naes04.csv)
+
+### Chapter 13
+
+- [cd4.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_13/cd4.csv)
+
+### Chapter 27
+
+- [US-2000-2014-SSA.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_27/US-2000-2014-SSA.txt)
+- [clean_cdc_birth_data.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_27/clean_cdc_birth_data.csv)
