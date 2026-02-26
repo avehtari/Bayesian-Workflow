@@ -36,34 +36,35 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 
 ## Case studies
 
-- [Sec 3.5: Bioassay](bioassay/bioassay.html)
-- [Ch 4: Modeling performance on a multiple choice exam](multiple_choice/multiple_choice.html)
-- [Sec 11.4-6: How many iterations to run and how many digits to report](digits/digits.html)
-- [Sec 12.3: Illustration of problematic posteriors](problems/problems.html)
-- [Sec 12.4: Declining exponentials](declining_exponentials/declining_exponentials.html)
-- [Ch 16: Simulated data of movie ratings](movies/movies.html)
-- [Ch 17: Sleep study: Prior specification and model checking](sleep_study/sleep_study.html)
-- [Ch 18: Nabiximols treatment efficiency](nabiximols/nabiximols.html)
-- [Ch 19: Sensitivity and specificity in coronavirus testing](coronavirus/coronavirus.html)
-- [Ch 20: Mixture model for time series competition](timeseries/timeseries.html)
-- [Ch 21: Stochastic learning in dogs -- brms version](dogs/dogs.html)
-- [Ch 21: Stochastic learning in dogs -- Stan version](dogs/dogs_stan.html)
-- [Ch 22: Survival analysis and black cat adoptions](cat_adoptions/cat_adoptions.html)
-- [Ch 23: World Cup continuous vs discrete models](world_cup/world_cup.html)
-- [Ch 24: Roaches cross-validation model checking and comparison](roaches/roaches.html)
-- [Ch 25: Model building and expansion for golf putting](golf/golf.html)
-- [Ch 26: Sharks and model building with latent variables](sharks/sharks.html)
-- [Ch 27: Birthdays and time-series decomposition](birthdays/birthdays.html)
-- [Ch 28: Variable selection](variable_selection/variable_selection.html)
-- [Ch 29: Park rule: No vehicles in the park](park_rule/park_rule_aki.html)
-- [Ch 30: Planetary motion: Computational challenge of multimodality](planetary_motion/planetary_motion.html)
-- [Ch 31: Simulation based calibration checking (SBC)](sbc/sbc.html)
+Links to case studies will be added later.
 
+- Sec 3.5: Bioassay
+- Ch 4: Modeling performance on a multiple choice exam
+- Sec 11.4-6: How many iterations to run and how many digits to report
+- Sec 12.3: Illustration of problematic posteriors
+- Sec 12.4: Declining exponentials
+- Ch 16: Simulated data of movie ratings
+- Ch 17: Sleep study: Prior specification and model checking
+- Ch 18: Nabiximols treatment efficiency
+- Ch 19: Sensitivity and specificity in coronavirus testing
+- Ch 20: Mixture model for time series competition
+- Ch 21: Stochastic learning in dogs -- brms version
+- Ch 21: Stochastic learning in dogs -- Stan version
+- Ch 22: Survival analysis and black cat adoptions
+- Ch 23: World Cup continuous vs discrete models
+- Ch 24: Roaches cross-validation model checking and comparison
+- Ch 25: Model building and expansion for golf putting
+- Ch 26: Sharks and model building with latent variables
+- Ch 27: Birthdays and time-series decomposition
+- Ch 28: Variable selection
+- Ch 29: Park rule: No vehicles in the park
+- Ch 30: Planetary motion: Computational challenge of multimodality
+- Ch 31: Simulation based calibration checking (SBC)
 
 ## Miscellaneous code
 
 Code that is not part of complete case studies, but may be useful for 
-regenerating some figures in Chapters 6--12, can be found in the [GitHub `misc` directory](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
+regenerating some figures in Chapters 6--12, can be found in the GitHub `misc` directory.
 
 
 ## Software versions

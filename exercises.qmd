@@ -1,0 +1,15 @@
+---
+title: "Bayesian Workflow book: Exercises"
+date: 2026-01-05
+date-modified: today
+date-format: iso
+format:
+  html:
+    number-sections: false
+---
+
+## Data files for exercises
+
+The list of additional data files for exercises:
+
+To appear

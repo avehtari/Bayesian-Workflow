@@ -25,10 +25,9 @@ Daniel Simpson,
 
 Published by CRC Press in 2026. Copyright by the authors.
 
-- Buy the book via [publisher's website](https://www.routledge.com/Bayesian-Workflow/Gelman-Vehtari-McElreath-Simpson-Margossian-Yao-Kennedy-Gabry-Burkner-Modrak-Barajas/p/book/9780367490140)
+- Buy the book via [publisher's website](https://www.routledge.com/Bayesian-Workflow/Gelman-Vehtari-McElreath-Simpson-Margossian-Yao-Kennedy-Gabry-Burkner-Modrak-Barajas/p/book/9780367490140). Expected publication date in June.
 
-**How to cite**
-<details>
+<details><summary>How to cite</summary>
 
 Cite the book:
 

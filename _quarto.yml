@@ -12,13 +12,14 @@ website:
         href: index.qmd
       - text: "Case studies"
         href: casestudies.html
+      - text: "Exercises"
+        href: exercises.html
       - text: "Errata"
         href: errata.html
       - text: "Resources"
         href: resources.html
     right:
       - icon: github
-        href: https://github.com/avehtari/Bayesian-Workflow
         text: GitHub
   sidebar:
     style: "docked"
@@ -26,49 +27,27 @@ website:
       - section: "Case studies"
         contents:
           - text: "Sec 3.5: Bioassay"
-            href: bioassay/bioassay.html
           - text: "Ch 4: Modeling performance on a multiple choice exam"
-            href: multiple_choice/multiple_choice.html
           - text: "Sec 11.4 and 11.6: How many iterations to run and how many digits to report"
-            href: digits/digits.html
           - text: "Sec 12.3: Illustration of problematic posteriors"
-            href: problems/problems.html
           - text: "Sec 12.4: Declining exponentials"
-            href: declining_exponentials/declining_exponentials.html
           - text: "Ch 16: Simulated data of movie ratings"
-            href: movies/movies.html
           - text: "Ch 17: Sleep study: Prior specification and model checking"
-            href: sleep_study/sleep_study.html
           - text: "Ch 18: Nabiximols treatment efficiency"
-            href: nabiximols/nabiximols.html
           - text: "Ch 19: Sensitivity and specificity in coronavirus testing"
-            href: coronavirus/coronavirus.html
           - text: "Ch 20: Mixture model for time series competition"
-            href: timeseries/timeseries.html
           - text: "Ch 21: Stochastic learning in dogs -- brms"
-            href: dogs/dogs.html
           - text: "Ch 21: Stochastic learning in dogs -- Stan"
-            href: dogs/dogs_stan.html
           - text: "Ch 22: Survival analysis and black cat adoptions"
-            href: cat_adoptions/cat_adoptions.html
           - text: "Ch 23: World Cup continuous vs discrete models"
-            href: world_cup/world_cup.html
           - text: "Ch 24: Roaches cross-validation model checking and comparison"
-            href: roaches/roaches.html
           - text: "Ch 25: Model building and expansion for golf putting"
-            href: golf/golf.html
           - text: "Ch 26: Sharks and model building with latent variables"
-            href: sharks/sharks.html
           - text: "Ch 27: Birthdays and time-series decomposition"
-            href: birthdays/birthdays.html
           - text: "Ch 28: Variable selection"
-            href: variable_selection/variable_selection.html
           - text: "Ch 29: Park rule: No vehicles in the park"
-            href: park_rule/park_rule.html
           - text: "Ch 30: Planetary motion: Computational challenge of multimodality"
-            href: planetary_motion/planetary_motion.html
           - text: "Ch 31: Simulation based calibration checking (SBC)"
-            href: sbc/sbc.html
 
 format:
   html:
