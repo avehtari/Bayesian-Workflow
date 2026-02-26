@@ -42,3 +42,9 @@ vignettes/*.pdf
 .Rproj.user
 Bayesian_Workflow_book.pdf
 /.quarto/
+Bayesian_Workflow_book_gray.pdf
+
+# Grayscale review rendered pages
+gray_review_pages/
+
+**/*.quarto_ipynb
