@@ -1,6 +1,6 @@
 ---
 title: "Bayesian Workflow book: Website"
-date: 2026-01-05
+date: 2026-02-26
 date-modified: today
 date-format: iso
 format:
