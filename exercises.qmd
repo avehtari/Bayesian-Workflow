@@ -16,38 +16,50 @@ studies are not repeated here.
 
 ### Chapter 5
 
-- [Monks.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_05/Monks.csv)
+- [Monks.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_05/Monks.csv): "Like" and "dislike" nominations by 18 monks over three time periods.
+Sampson, S. F. (1968). "A novitiate in a period of change: An experimental and
+case study of relationships." Ph.D. dissertation, Department of Sociology,
+Cornell University.
 
 ### Chapter 6
 
-- [2008ElectionResult.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/2008ElectionResult.csv)
-- [BMJSubmissions.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/BMJSubmissions.csv)
-- [pew_research_center_june_elect_wknd_data.dta](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/pew_research_center_june_elect_wknd_data.dta)
-- [US-EST00INT-ALLDATA.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/US-EST00INT-ALLDATA.csv)
-- [births.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/births.txt)
-- [black_death_rates_from_1999_to_2013_by_sex.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/black_death_rates_from_1999_to_2013_by_sex.txt)
-- [deaton.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/deaton.txt)
-- [white_hisp_death_rates_from_1999_to_2013_by_sex.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/white_hisp_death_rates_from_1999_to_2013_by_sex.txt)
-- [white_nonhisp_death_rates_from_1999_to_2013_by_sex.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/cdc/white_nonhisp_death_rates_from_1999_to_2013_by_sex.txt)
+- [2008ElectionResult.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/2008ElectionResult.csv): 2008 U.S. election results; downloaded from [sites.stat.columbia.edu/gelman/bda.course/2008ElectionResult.csv](https://sites.stat.columbia.edu/gelman/bda.course/2008ElectionResult.csv).
+- [BMJSubmissions.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/BMJSubmissions.csv): Information on papers submitted to the British Medical Journal.
+- [pew_research_center_june_elect_wknd_data.dta](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_06/pew_research_center_june_elect_wknd_data.dta): Pew Research Center polling data from the 2008 election campaign; downloaded from [stat.columbia.edu/~gelman/bda.course/pew_research_center_june_elect_wknd_data.dta](http://www.stat.columbia.edu/~gelman/bda.course/pew_research_center_june_elect_wknd_data.dta).
+- [cdc/](http://github.com/avehtari/Bayesian-Workflow/tree/main/exercises/chapter_06/cdc): CDC data bundle directory used in Chapter 6 exercises; downloaded from [stat.columbia.edu/~gelman/bda.course/cdc.zip](http://www.stat.columbia.edu/~gelman/bda.course/cdc.zip).
 
 ### Chapter 7
 
-- [Achehunting.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_07/Achehunting.csv)
-- [incentives_data_clean.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_07/incentives_data_clean.txt)
+- [Achehunting.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_07/Achehunting.csv): Data on 14,364 hunting trips by 147 Aché men in Paraguay.
+- [incentives_data_clean.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_07/incentives_data_clean.txt): Data from the Singer et al. paper on survey incentives; downloaded from [sites.stat.columbia.edu/gelman/bda.course/incentives_data_clean.txt](https://sites.stat.columbia.edu/gelman/bda.course/incentives_data_clean.txt).
 
 ### Chapter 8
 
-- [nba2023.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_08/nba2023.txt)
+- [nba2023.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_08/nba2023.txt): Data from teamratings.com and bleacherreport.com as of 27 Dec 2023, win totals odds from 19 Dec 2020 (Fanduel odds from www.thelines.com/odds/nba/win-totals/), and schedule strength from powerrankingsguru.com/nba/strength-of-schedule.php.
 
 ### Chapter 11
 
-- [naes04.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_11/naes04.csv)
+- [naes04.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_11/naes04.csv): Data from the 2004 National Annenberg Election Survey; downloaded from [sites.stat.columbia.edu/gelman/bda.course/naes04.csv](https://sites.stat.columbia.edu/gelman/bda.course/naes04.csv).
 
 ### Chapter 13
 
-- [cd4.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_13/cd4.csv)
+- [cd4.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_13/cd4.csv): CD4 percentages for a set of young children with HIV measured several times over two years; downloaded from [sites.stat.columbia.edu/gelman/bda.course/cd4.csv](https://sites.stat.columbia.edu/gelman/bda.course/cd4.csv).
 
 ### Chapter 27
 
-- [US-2000-2014-SSA.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_27/US-2000-2014-SSA.txt)
-- [clean_cdc_birth_data.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_27/clean_cdc_birth_data.csv)
+- [US-2000-2014-SSA.txt](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_27/US-2000-2014-SSA.txt): U.S. births per day (2000-2014) from the Social Security Administration.
+- [clean_cdc_birth_data.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_27/clean_cdc_birth_data.csv): U.S. births per day (1994-2003) from the CDC.
+- Note: Data for 1969-1988 is in the case-study directory [birthdays/data](http://github.com/avehtari/Bayesian-Workflow/tree/main/birthdays/data).
+
+For the CDC data, see:
+
+- 1994: [cdc.gov/nchs/data/statab/t941x16.pdf](https://www.cdc.gov/nchs/data/statab/t941x16.pdf)
+- 1995: [cdc.gov/nchs/data/statab/natfinal1995annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal1995annvol1_16.pdf)
+- 1996: [cdc.gov/nchs/data/statab/natfinal1996.annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal1996.annvol1_16.pdf)
+- 1997: [cdc.gov/nchs/data/statab/t1x1697.pdf](https://www.cdc.gov/nchs/data/statab/t1x1697.pdf)
+- 1998: [cdc.gov/nchs/data/statab/t981x16.pdf](https://www.cdc.gov/nchs/data/statab/t981x16.pdf)
+- 1999: [cdc.gov/nchs/data/statab/t991x16.pdf](https://www.cdc.gov/nchs/data/statab/t991x16.pdf)
+- 2000: [cdc.gov/nchs/data/statab/t001x16.pdf](https://www.cdc.gov/nchs/data/statab/t001x16.pdf)
+- 2001: [cdc.gov/nchs/data/statab/natfinal2001.annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal2001.annvol1_16.pdf)
+- 2002: [cdc.gov/nchs/data/statab/natfinal2002.annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal2002.annvol1_16.pdf)
+- 2003: [cdc.gov/nchs/data/statab/natfinal2003.annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal2003.annvol1_16.pdf)
