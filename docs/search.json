@@ -67,7 +67,7 @@
     "href": "exercises.html",
     "title": "Bayesian Workflow book: Exercises",
     "section": "",
-    "text": "This page lists data files used in the exercises that are not already provided in the case study directories. Exercise datasets that are included with case studies are not repeated here.\n\n\n\nMonks.csv: “Like” and “dislike” nominations by 18 monks over three time periods. Sampson, S. F. (1968). “A novitiate in a period of change: An experimental and case study of relationships.” Ph.D. dissertation, Department of Sociology, Cornell University.\n\n\n\n\n\n2008ElectionResult.csv: 2008 U.S. election results; downloaded from sites.stat.columbia.edu/gelman/bda.course/2008ElectionResult.csv.\nBMJSubmissions.csv: Information on papers submitted to the British Medical Journal.\npew_research_center_june_elect_wknd_data.dta: Pew Research Center polling data from the 2008 election campaign; downloaded from stat.columbia.edu/~gelman/bda.course/pew_research_center_june_elect_wknd_data.dta.\ncdc/: CDC data bundle directory used in Chapter 6 exercises; downloaded from stat.columbia.edu/~gelman/bda.course/cdc.zip.\n\n\n\n\n\nAchehunting.csv: Data on 14,364 hunting trips by 147 Aché men in Paraguay.\nincentives_data_clean.txt: Data from the Singer et al. paper on survey incentives; downloaded from sites.stat.columbia.edu/gelman/bda.course/incentives_data_clean.txt.\n\n\n\n\n\nnba2023.txt: Data from teamratings.com and bleacherreport.com as of 27 Dec 2023, win totals odds from 19 Dec 2020 (Fanduel odds from www.thelines.com/odds/nba/win-totals/), and schedule strength from powerrankingsguru.com/nba/strength-of-schedule.php.\n\n\n\n\n\nnaes04.csv: Data from the 2004 National Annenberg Election Survey; downloaded from sites.stat.columbia.edu/gelman/bda.course/naes04.csv.\n\n\n\n\n\ncd4.csv: CD4 percentages for a set of young children with HIV measured several times over two years; downloaded from sites.stat.columbia.edu/gelman/bda.course/cd4.csv.\n\n\n\n\n\nUS-2000-2014-SSA.txt: U.S. births per day (2000-2014) from the Social Security Administration.\nclean_cdc_birth_data.csv: U.S. births per day (1994-2003) from the CDC.\nNote: Data for 1969-1988 is in the case-study directory birthdays/data.\n\nFor the CDC data, see:\n\n1994: cdc.gov/nchs/data/statab/t941x16.pdf\n1995: cdc.gov/nchs/data/statab/natfinal1995annvol1_16.pdf\n1996: cdc.gov/nchs/data/statab/natfinal1996.annvol1_16.pdf\n1997: cdc.gov/nchs/data/statab/t1x1697.pdf\n1998: cdc.gov/nchs/data/statab/t981x16.pdf\n1999: cdc.gov/nchs/data/statab/t991x16.pdf\n2000: cdc.gov/nchs/data/statab/t001x16.pdf\n2001: cdc.gov/nchs/data/statab/natfinal2001.annvol1_16.pdf\n2002: cdc.gov/nchs/data/statab/natfinal2002.annvol1_16.pdf\n2003: cdc.gov/nchs/data/statab/natfinal2003.annvol1_16.pdf"
+    "text": "Exercise datasets will be listed here when the book is published."
   },
   {
     "objectID": "exercises.html#data-files-for-exercises",
@@ -81,7 +81,7 @@
     "href": "errata.html",
     "title": "Bayesian Workflow book: Errata",
     "section": "",
-    "text": "Errata (excluding minor typos) for the book.\nIf you notice an error that is not mentioned in the errata, submit an issue or send an email."
+    "text": "Errata (excluding minor typos) for the book.\nThe book has not yet been printed"
   },
   {
     "objectID": "resources.html",
