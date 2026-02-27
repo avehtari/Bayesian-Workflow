@@ -42,3 +42,5 @@ vignettes/*.pdf
 .Rproj.user
 Bayesian_Workflow_book.pdf
 /.quarto/
+
+**/*.quarto_ipynb
