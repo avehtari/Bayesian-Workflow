@@ -8,6 +8,14 @@ format:
     number-sections: false
 ---
 
+::: {.content-visible when-profile="draft"}
+
+*Exercise datasets will be listed here when the book is published.*
+
+:::
+
+::: {.content-visible unless-profile="draft"}
+
 ## Data files for exercises
 
 This page lists data files used in the exercises that are not already provided
@@ -63,3 +71,5 @@ For the CDC data, see:
 - 2001: [cdc.gov/nchs/data/statab/natfinal2001.annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal2001.annvol1_16.pdf)
 - 2002: [cdc.gov/nchs/data/statab/natfinal2002.annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal2002.annvol1_16.pdf)
 - 2003: [cdc.gov/nchs/data/statab/natfinal2003.annvol1_16.pdf](https://www.cdc.gov/nchs/data/statab/natfinal2003.annvol1_16.pdf)
+
+:::
