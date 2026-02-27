@@ -10,6 +10,16 @@ format:
 
 Errata (excluding minor typos) for the book.
 
-<!-- If you notice an error that is not mentioned in [the errata](errata.html), [submit an issue](https://github.com/avehtari/Bayesian-Workflow/issues) or send an email. -->
+::: {.content-visible when-profile="draft"}
 
-The book has not yet been printed
+*The book has not yet been printed*
+
+:::
+
+::: {.content-visible unless-profile="draft"}
+
+If you notice an error that is not mentioned in [the errata](errata.html), [submit an issue](https://github.com/avehtari/Bayesian-Workflow/issues) or send an email.
+
+:::
+
+

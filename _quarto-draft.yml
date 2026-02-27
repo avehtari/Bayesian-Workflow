@@ -1,0 +1,19 @@
+# Draft profile: excludes links to case studies
+# Activated via: QUARTO_PROFILE=draft quarto render ...
+# or:            make DRAFT=true
+
+website:
+  title: "Bayesian Workflow book"
+  navbar:
+    left:
+      - text: "Home"
+        href: index.qmd
+      - text: "Case studies"
+        href: casestudies.html
+      - text: "Exercises"
+        href: exercises.html
+      - text: "Errata"
+        href: errata.html
+      - text: "Resources"
+        href: resources.html
+  sidebar: false
