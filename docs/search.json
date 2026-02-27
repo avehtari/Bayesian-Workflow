@@ -67,21 +67,21 @@
     "href": "exercises.html",
     "title": "Bayesian Workflow book: Exercises",
     "section": "",
-    "text": "The list of additional data files for exercises:\nTo appear"
+    "text": "This page lists data files used in the exercises that are not already provided in the case study directories. Exercise datasets that are included with case studies are not repeated here.\n\n\n\nMonks.csv: “Like” and “dislike” nominations by 18 monks over three time periods. Sampson, S. F. (1968). “A novitiate in a period of change: An experimental and case study of relationships.” Ph.D. dissertation, Department of Sociology, Cornell University.\n\n\n\n\n\n2008ElectionResult.csv: 2008 U.S. election results; downloaded from sites.stat.columbia.edu/gelman/bda.course/2008ElectionResult.csv.\nBMJSubmissions.csv: Information on papers submitted to the British Medical Journal.\npew_research_center_june_elect_wknd_data.dta: Pew Research Center polling data from the 2008 election campaign; downloaded from stat.columbia.edu/~gelman/bda.course/pew_research_center_june_elect_wknd_data.dta.\ncdc/: CDC data bundle directory used in Chapter 6 exercises; downloaded from stat.columbia.edu/~gelman/bda.course/cdc.zip.\n\n\n\n\n\nAchehunting.csv: Data on 14,364 hunting trips by 147 Aché men in Paraguay.\nincentives_data_clean.txt: Data from the Singer et al. paper on survey incentives; downloaded from sites.stat.columbia.edu/gelman/bda.course/incentives_data_clean.txt.\n\n\n\n\n\nnba2023.txt: Data from teamratings.com and bleacherreport.com as of 27 Dec 2023, win totals odds from 19 Dec 2020 (Fanduel odds from www.thelines.com/odds/nba/win-totals/), and schedule strength from powerrankingsguru.com/nba/strength-of-schedule.php.\n\n\n\n\n\nnaes04.csv: Data from the 2004 National Annenberg Election Survey; downloaded from sites.stat.columbia.edu/gelman/bda.course/naes04.csv.\n\n\n\n\n\ncd4.csv: CD4 percentages for a set of young children with HIV measured several times over two years; downloaded from sites.stat.columbia.edu/gelman/bda.course/cd4.csv.\n\n\n\n\n\nUS-2000-2014-SSA.txt: U.S. births per day (2000-2014) from the Social Security Administration.\nclean_cdc_birth_data.csv: U.S. births per day (1994-2003) from the CDC.\nNote: Data for 1969-1988 is in the case-study directory birthdays/data.\n\nFor the CDC data, see:\n\n1994: cdc.gov/nchs/data/statab/t941x16.pdf\n1995: cdc.gov/nchs/data/statab/natfinal1995annvol1_16.pdf\n1996: cdc.gov/nchs/data/statab/natfinal1996.annvol1_16.pdf\n1997: cdc.gov/nchs/data/statab/t1x1697.pdf\n1998: cdc.gov/nchs/data/statab/t981x16.pdf\n1999: cdc.gov/nchs/data/statab/t991x16.pdf\n2000: cdc.gov/nchs/data/statab/t001x16.pdf\n2001: cdc.gov/nchs/data/statab/natfinal2001.annvol1_16.pdf\n2002: cdc.gov/nchs/data/statab/natfinal2002.annvol1_16.pdf\n2003: cdc.gov/nchs/data/statab/natfinal2003.annvol1_16.pdf"
   },
   {
     "objectID": "exercises.html#data-files-for-exercises",
     "href": "exercises.html#data-files-for-exercises",
     "title": "Bayesian Workflow book: Exercises",
     "section": "",
-    "text": "The list of additional data files for exercises:\nTo appear"
+    "text": "This page lists data files used in the exercises that are not already provided in the case study directories. Exercise datasets that are included with case studies are not repeated here.\n\n\n\nMonks.csv: “Like” and “dislike” nominations by 18 monks over three time periods. Sampson, S. F. (1968). “A novitiate in a period of change: An experimental and case study of relationships.” Ph.D. dissertation, Department of Sociology, Cornell University.\n\n\n\n\n\n2008ElectionResult.csv: 2008 U.S. election results; downloaded from sites.stat.columbia.edu/gelman/bda.course/2008ElectionResult.csv.\nBMJSubmissions.csv: Information on papers submitted to the British Medical Journal.\npew_research_center_june_elect_wknd_data.dta: Pew Research Center polling data from the 2008 election campaign; downloaded from stat.columbia.edu/~gelman/bda.course/pew_research_center_june_elect_wknd_data.dta.\ncdc/: CDC data bundle directory used in Chapter 6 exercises; downloaded from stat.columbia.edu/~gelman/bda.course/cdc.zip.\n\n\n\n\n\nAchehunting.csv: Data on 14,364 hunting trips by 147 Aché men in Paraguay.\nincentives_data_clean.txt: Data from the Singer et al. paper on survey incentives; downloaded from sites.stat.columbia.edu/gelman/bda.course/incentives_data_clean.txt.\n\n\n\n\n\nnba2023.txt: Data from teamratings.com and bleacherreport.com as of 27 Dec 2023, win totals odds from 19 Dec 2020 (Fanduel odds from www.thelines.com/odds/nba/win-totals/), and schedule strength from powerrankingsguru.com/nba/strength-of-schedule.php.\n\n\n\n\n\nnaes04.csv: Data from the 2004 National Annenberg Election Survey; downloaded from sites.stat.columbia.edu/gelman/bda.course/naes04.csv.\n\n\n\n\n\ncd4.csv: CD4 percentages for a set of young children with HIV measured several times over two years; downloaded from sites.stat.columbia.edu/gelman/bda.course/cd4.csv.\n\n\n\n\n\nUS-2000-2014-SSA.txt: U.S. births per day (2000-2014) from the Social Security Administration.\nclean_cdc_birth_data.csv: U.S. births per day (1994-2003) from the CDC.\nNote: Data for 1969-1988 is in the case-study directory birthdays/data.\n\nFor the CDC data, see:\n\n1994: cdc.gov/nchs/data/statab/t941x16.pdf\n1995: cdc.gov/nchs/data/statab/natfinal1995annvol1_16.pdf\n1996: cdc.gov/nchs/data/statab/natfinal1996.annvol1_16.pdf\n1997: cdc.gov/nchs/data/statab/t1x1697.pdf\n1998: cdc.gov/nchs/data/statab/t981x16.pdf\n1999: cdc.gov/nchs/data/statab/t991x16.pdf\n2000: cdc.gov/nchs/data/statab/t001x16.pdf\n2001: cdc.gov/nchs/data/statab/natfinal2001.annvol1_16.pdf\n2002: cdc.gov/nchs/data/statab/natfinal2002.annvol1_16.pdf\n2003: cdc.gov/nchs/data/statab/natfinal2003.annvol1_16.pdf"
   },
   {
     "objectID": "errata.html",
     "href": "errata.html",
     "title": "Bayesian Workflow book: Errata",
     "section": "",
-    "text": "Errata (excluding minor typos) for the book.\n\nThe book has not yet been printed"
+    "text": "Errata (excluding minor typos) for the book.\nIf you notice an error that is not mentioned in the errata, submit an issue or send an email."
   },
   {
     "objectID": "resources.html",
@@ -117,5 +117,19 @@
     "title": "Bayesian Workflow book: Resources",
     "section": "R programming and visualization with R",
     "text": "R programming and visualization with R\n\nFor R programming basics see Appendix A of Regression and Other Stories.\nFor learning more about R programming we recommend\n\nGarrett Grolemund, Hands-On Programming with R\n\nFor learning more about basic and advanced plotting using R we recommend\n\nKieran Healy, Data Visualization - A practical introduction\nAntony Unwin, Graphical Data Analysis with R\n\nFurther ideas for visualization\n\nggdist: Visualizations of distributions and uncertainty\ntidybayes: Bayesian analysis + tidy data + geoms\nClaus O. Wilke, Fundamentals of Data Visualization"
+  },
+  {
+    "objectID": "casestudies.html#case-studies-1",
+    "href": "casestudies.html#case-studies-1",
+    "title": "Bayesian Workflow book: Case studies",
+    "section": "Case studies",
+    "text": "Case studies\n\nSec 3.5: Bioassay\nCh 4: Modeling performance on a multiple choice exam\nSec 11.4-6: How many iterations to run and how many digits to report\nSec 12.3: Illustration of problematic posteriors\nSec 12.4: Declining exponentials\nCh 16: Simulated data of movie ratings\nCh 17: Sleep study: Prior specification and model checking\nCh 18: Nabiximols treatment efficiency\nCh 19: Sensitivity and specificity in coronavirus testing\nCh 20: Mixture model for time series competition\nCh 21: Stochastic learning in dogs – brms version\nCh 21: Stochastic learning in dogs – Stan version\nCh 22: Survival analysis and black cat adoptions\nCh 23: World Cup continuous vs discrete models\nCh 24: Roaches cross-validation model checking and comparison\nCh 25: Model building and expansion for golf putting\nCh 26: Sharks and model building with latent variables\nCh 27: Birthdays and time-series decomposition\nCh 28: Variable selection\nCh 29: Park rule: No vehicles in the park\nCh 30: Planetary motion: Computational challenge of multimodality\nCh 31: Simulation based calibration checking (SBC)"
+  },
+  {
+    "objectID": "casestudies.html#miscellaneous-code-1",
+    "href": "casestudies.html#miscellaneous-code-1",
+    "title": "Bayesian Workflow book: Case studies",
+    "section": "Miscellaneous code",
+    "text": "Miscellaneous code\nCode that is not part of complete case studies, but may be useful for regenerating some figures in Chapters 6–12, can be found in the GitHub misc directory."
   }
 ]
