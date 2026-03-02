@@ -1,13 +1,16 @@
 //
-// This Stan program fits an N-state hidden Markov model
-// with state-dependent distributions for step length (>0)
+// This Stan program fits a time-inhomogeneous N-state hidden Markov model
+// with state-dependent distributions for step length (>=0)
 // and turning angle (-pi, pi)
 // 
 // Parameters to be estimated: 
-//   location(mu)/scale(sigma) for step length distributions
-//   location(kappa)/concentration for turning angle
-//   entries of transition probability matrix (gamma)
-//
+//   location(mu)/scale(sigma)/zero point mass(mixp) for 
+//     step length distributions
+//   xangle/yangle for turning angle distributions
+//   coefficients(beta) for covariates in transition probability matrix 
+//   random effects(randeff_tpm_raw) in transition probability matrix
+//   mean(mu_tpm)/standard deviation(sigma_tpm) for random effects distribution 
+//   entries of initial state distribution (initial_dist)
 
 data {
   int<lower=0> Nstates;

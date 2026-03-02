@@ -1,12 +1,14 @@
 //
 // This Stan program fits an N-state hidden Markov model
-// with state-dependent distributions for step length (>0)
+// with state-dependent distributions for step length (>=0)
 // and turning angle (-pi, pi)
 // 
 // Parameters to be estimated: 
-//   location(mu)/scale(sigma) for step length distributions
-//   location(kappa)/concentration? for turning angle
+//   location(mu)/scale(sigma)/zero point mass(mixp) for 
+//     step length distributions
+//   xangle/yangle for turning angle distributions
 //   entries of transition probability matrix (gamma)
+//   entries of initial state distribution (initial_dist)
 //
 
 data {
@@ -49,8 +51,8 @@ transformed parameters{
 }
 
 model {
-  vector[Nstates] alpha;
-  vector[Nstates] alpha_temp;
+  vector[Nstates] lalpha;
+  vector[Nstates] lalpha_temp;
   array[Nstates] vector[Nstates] log_tpm_tr;
   
   // prior distributions
@@ -67,45 +69,45 @@ model {
 
   // likelilhood computation
   for(n in 1:Nstates){
-    alpha[n] = log(initial_dist[n]);
+    lalpha[n] = log(initial_dist[n]);
     if(steplength[1] > 0)
-      alpha[n] = alpha[n] + log(mixp[n]) +
+      lalpha[n] = lalpha[n] + log(mixp[n]) +
         gamma_lpdf(steplength[1]| shape[n], rate[n]);
     if(steplength[1]==0)
-      alpha[n] = alpha[n] + log(1-mixp[n]); 
+      lalpha[n] = lalpha[n] + log(1-mixp[n]); 
     if(angle[1] > (-pi())) 
-      alpha[n] = alpha[n] + von_mises_lpdf(angle[1] | loc[n], kappa[n]);
+      lalpha[n] = lalpha[n] + von_mises_lpdf(angle[1] | loc[n], kappa[n]);
   }
   
   for(t in 2:Tlen){
     if(track_index[t]!=track_index[t-1]){
       for(n in 1:Nstates){
-        alpha_temp[n] = log(initial_dist[n]);
+        lalpha_temp[n] = log(initial_dist[n]);
         if(steplength[t]>0)
-          alpha_temp[n] = alpha_temp[n] + log(mixp[n]) +
+          lalpha_temp[n] = lalpha_temp[n] + log(mixp[n]) +
             gamma_lpdf(steplength[t]| shape[n], rate[n]); 
         if(steplength[t]==0)
-          alpha_temp[n] = alpha_temp[n] + log(1-mixp[n]); 
+          lalpha_temp[n] = lalpha_temp[n] + log(1-mixp[n]); 
         if(angle[t] > (-pi()))  
-          alpha_temp[n] = alpha_temp[n] + 
+          lalpha_temp[n] = lalpha_temp[n] + 
             von_mises_lpdf(angle[t]| loc[n], kappa[n]);
       }
     } else {
       for(n in 1:Nstates){
-        alpha_temp[n] = log_sum_exp(to_vector(log_tpm_tr[n]) + alpha); 
+        lalpha_temp[n] = log_sum_exp(to_vector(log_tpm_tr[n]) + lalpha); 
         if(steplength[t]>0)
-          alpha_temp[n] = alpha_temp[n] + log(mixp[n]) +
+          lalpha_temp[n] = lalpha_temp[n] + log(mixp[n]) +
             gamma_lpdf(steplength[t]| shape[n], rate[n]); 
         if(steplength[t]==0)
-          alpha_temp[n] = alpha_temp[n] + log(1-mixp[n]); 
+          lalpha_temp[n] = lalpha_temp[n] + log(1-mixp[n]); 
         if(angle[t] > (-pi()))  
-          alpha_temp[n] = alpha_temp[n] + 
+          lalpha_temp[n] = lalpha_temp[n] + 
             von_mises_lpdf(angle[t]| loc[n], kappa[n]);
       }
     }  
-    alpha = alpha_temp;
+    lalpha = lalpha_temp;
     if(t == Tlen || track_index[t+1]!=track_index[t])
-      target+=log_sum_exp(alpha);
+      target+=log_sum_exp(lalpha);
   }
 }
 

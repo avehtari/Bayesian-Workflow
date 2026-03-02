@@ -80,8 +80,8 @@ ws_HMM <- ws_HMM_full[,c("dateTime",
 #' ws_HMM$tod_sin <- sin((2*pi*(hour(ws_HMM$dateTime)*60 + 
 #'                                minute(ws_HMM$dateTime)))/1440)
 #' #' chum covariate
-#' ws_HMM$chum <- ifelse(ws_HMM$CDB == "x", yes = 1, no = 0) 
-#' ws_HMM$chum[which(is.na(ws_HMM$CDB))] <- 0
+ws_HMM$chum <- ifelse(ws_HMM$CDB == "x", yes = 1, no = 0) 
+ws_HMM$chum[which(is.na(ws_HMM$CDB))] <- 0
 #' 
 #' #' sex covariate
 #' ws_HMM$sex_char <- substring(ws_HMM$SharksexTrackNo, 3, 3)
@@ -330,30 +330,16 @@ p + stat_qq() + stat_qq_line() + theme_classic() +
 #'
 #' Simulate data from posterior predictive distribution
 #' of fitted 2-state HMM
-init_dist <- extract(fit_2stateHMM, 
-                     pars=c("initial_dist"), 
-                     permute=F)
-tpm <- extract(fit_2stateHMM, 
-               pars=c("tpm"), 
-               permute=F)
-sdd_sl_shape <- extract(fit_2stateHMM, 
-                     pars=c("shape"), 
-                     permute=F)
-sdd_sl_rate <- extract(fit_2stateHMM, 
-                        pars=c("rate"), 
-                        permute=F)
-sdd_sl_zeromass <- extract(fit_2stateHMM, 
-                           pars=c("mixp"), 
-                           permute=F)
-sdd_angle_loc <- extract(fit_2stateHMM, 
-                         pars=c("loc"), 
-                         permute=F)
-sdd_angle_conc <- extract(fit_2stateHMM, 
-                          pars=c("kappa"), 
-                          permute=F)
-post_state_samples <- extract(fit_2stateHMM, 
-                              pars=c("state_sequence"), 
-                              permute=F)
+#' 
+init_dist <- fit_2stateHMM$draws("initial_dist", format = "draws_array")
+tpm <- fit_2stateHMM$draws("tpm", format = "draws_array")
+sdd_sl_shape <- fit_2stateHMM$draws("shape", format = "draws_array")
+sdd_sl_rate <- fit_2stateHMM$draws("rate", format = "draws_array")
+sdd_sl_zeromass <- fit_2stateHMM$draws("mixp", format = "draws_array")
+sdd_angle_loc <- fit_2stateHMM$draws("loc", format = "draws_array")
+sdd_angle_conc <- fit_2stateHMM$draws("kappa", format = "draws_array")
+post_state_samples <- fit_2stateHMM$draws("state_sequence", format = "draws_array")
+
 state_samples <- matrix(NA, nrow=4584, ncol = 1000)
 state_samples[1,1] <- sample(x = 2:1, size = 1, prob = init_dist[1,1,])
 for (j in 1:1000) {
@@ -432,11 +418,6 @@ fit_2stateHMM_covariates <- model_2stateHMM_covariates$sample(
   chains=4
 )
 
-# fit_2stateHMM_covariates <- stan(file = root("sharks","step_turn_hmm_covariates.stan"), 
-#                           data = stanHMM_2states_covariates,
-#                           init = init_fun_mu(2, 4), 
-#                           chains = 4)
-
 #' # 2-state HMM with covariates in transition probability matrix and individual varying effects
 HMM_covar <- matrix(data = c(rep(1, dim(ws_HMM)[1]), 
                              ws_HMM$chum, 
@@ -467,11 +448,6 @@ fit_2stateHMM_tpmcov_crencp <- model_2stateHMM_tpmcov_crencp$sample(
   chains = 1
 )
 
-# fit_2stateHMM_tpmcov_crencp <- stan(file = root("sharks","step_turn_hmm_covariates_cre_ncp.stan"), 
-#                           data = stanHMM_2states_tpmcov_crencp,
-#                           init = init_fun_mu(2, 1), 
-#                           chains = 1)
-
 #' Plot entries of transition probability matrix with covariates and individual varying effects:
 beta <- extract(fit_2stateHMM_tpmcov_crencp, 
                 pars=c("beta"), 
@@ -482,6 +458,11 @@ randeff <- extract(fit_2stateHMM_tpmcov_crencp,
 mu_tpm <- extract(fit_2stateHMM_tpmcov_crencp, 
                   pars=c("mu_tpm"), 
                   permute = FALSE)
+
+beta <- fit_2stateHMM_tpmcov_crencp$draws("beta", format = "draws_array")
+randeff <- fit_2stateHMM_tpmcov_crencp$draws("randeff_tpm", format = "draws_array")
+mu_tpm <- fit_2stateHMM_tpmcov_crencp$draws("mu_tpm", format = "draws_array")
+
 # intercept is female, no chum
 DM_female_nochum <- cbind(1, 
                         rep(0, 721), 
