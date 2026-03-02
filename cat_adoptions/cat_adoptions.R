@@ -443,7 +443,12 @@ print_stan_file(cat_code3)
 fit3s <- cstan(cat_code3, data = sim_dat)
 
 #' Posterior summary
+#| echo: false
+oldo <- options(width = 90)
+#| echo: true
 print(fit3s)
+#| echo: false
+options(oldo)
 
 #' ## Poisson model
 #'
