@@ -449,16 +449,6 @@ fit_2stateHMM_tpmcov_crencp <- model_2stateHMM_tpmcov_crencp$sample(
 )
 
 #' Plot entries of transition probability matrix with covariates and individual varying effects:
-beta <- extract(fit_2stateHMM_tpmcov_crencp, 
-                pars=c("beta"), 
-                permute = FALSE)
-randeff <- extract(fit_2stateHMM_tpmcov_crencp, 
-                   pars=c("randeff_tpm"), 
-                   permute = FALSE)
-mu_tpm <- extract(fit_2stateHMM_tpmcov_crencp, 
-                  pars=c("mu_tpm"), 
-                  permute = FALSE)
-
 beta <- fit_2stateHMM_tpmcov_crencp$draws("beta", format = "draws_array")
 randeff <- fit_2stateHMM_tpmcov_crencp$draws("randeff_tpm", format = "draws_array")
 mu_tpm <- fit_2stateHMM_tpmcov_crencp$draws("mu_tpm", format = "draws_array")
