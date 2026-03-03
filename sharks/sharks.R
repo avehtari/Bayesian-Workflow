@@ -74,25 +74,15 @@ ws_HMM <- ws_HMM_full[,c("dateTime",
                     "month", 
                     "CDB")]
 
-#' #' time of day covariates
-#' ws_HMM$tod_cos <- cos((2*pi*(hour(ws_HMM$dateTime)*60 + 
-#'                                minute(ws_HMM$dateTime)))/1440)
-#' ws_HMM$tod_sin <- sin((2*pi*(hour(ws_HMM$dateTime)*60 + 
-#'                                minute(ws_HMM$dateTime)))/1440)
-#' #' chum covariate
-ws_HMM$chum <- ifelse(ws_HMM$CDB == "x", yes = 1, no = 0) 
-ws_HMM$chum[which(is.na(ws_HMM$CDB))] <- 0
-#' 
-#' #' sex covariate
-#' ws_HMM$sex_char <- substring(ws_HMM$SharksexTrackNo, 3, 3)
-#' ws_HMM$sex <- ifelse(ws_HMM$sex_char == "F", yes = 0, no = 1)
-
-#' setting NA's to numeric values for implementation in Stan
+#' For implementation in Stan, we must set the NA's to numeric values, ideally
+#' something non-plausible that can be checked in a for loop during likelihood
+#' evaluation.
 ws_HMM$steplength[is.na (ws_HMM$steplength)] <- -100
 ws_HMM$steplength[which(ws_HMM$steplength > 1.5)] <- -100
 ws_HMM$turnang[is.na(ws_HMM$turnang)] <- -100
 
-#' Plot two tracks of white shark female 1:
+#' We plot two tracks of white shark female 1 that exhibit the distinct 
+#' movement patterns we are hoping to capture with our HMM:
 #| label: fig-sarika_tracks_1_10
 #| fig-height: 5
 #| fig-width: 4
@@ -163,7 +153,7 @@ fit_2stateHMM$summary(variables = c("mu", "sigma", "mixp",
                                     "lp__"))
 
 
-#' Plot MCMC results for certain parameters
+#' Plot MCMC marginal distributions for certain parameters:
 #| label: fig-mcmc_hist_by_chain_2state
 fit_2stateHMM_draws <- fit_2stateHMM$draws(format = "df",
                                            variables = c("mu", "sigma", "mixp",
@@ -174,7 +164,7 @@ fit_2stateHMM_draws <- fit_2stateHMM$draws(format = "df",
                                                          "lp__"))
 mcmc_hist_by_chain(fit_2stateHMM_draws, regex_pars = "mu", pars = "lp__")
 
-#' Plot state-dependent distributions
+#' Plot state-dependent distributions for step length and turning angle:
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73", 
                "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
@@ -254,9 +244,9 @@ angle_sdd <- ggplot(ws_HMM) +
   ggtitle("turning angle state-dependent distributions")
 sl_sdd + angle_sdd
 
-#' Plot state-decodings onto track
+#' Plot state-decodings onto track using the forward-backward algorithm using
+#' the forward-backward algorithm for local state-decoding:
 state_probs_draws <- fit_2stateHMM$draws(variables =c("state_probs"), format = "draws_matrix")
-#state_probs_draws <- extract(fit_2stateHMM, pars=c("state_probs"), permuted = FALSE)
 state_probs_means <- data.frame(state1prob = colMeans(state_probs_draws[1:1000,(4584+1):(2*4584)]), 
                                 state2prob = colMeans(state_probs_draws[1:1000,1:4584])) 
 state1_probs_quants <- data.frame(state1prob025 = apply(state_probs_draws[1:1000,(4584+1):(2*4584)], 2, quantile, probs=0.025), 
@@ -272,15 +262,7 @@ ws_HMM_rep <- ws_HMM_full[,c("dateTime",
                              "month", 
                              "CDB", 
                              "Lat", "Long")] 
-#' time of day covariates
-ws_HMM_rep$tod_cos <- cos((2*pi*(hour(ws_HMM_full$dateTime)*60 + minute(ws_HMM_full$dateTime)))/1440)
-ws_HMM_rep$tod_sin <- sin((2*pi*(hour(ws_HMM_full$dateTime)*60 + minute(ws_HMM_full$dateTime)))/1440)
-#' chum covariate
-ws_HMM_rep$chum <- ifelse(ws_HMM_full$CDB == "x", yes = 1, no = 0) 
-ws_HMM_rep$chum[which(is.na(ws_HMM_rep$CDB))] <- 0
-#' sex covariate
-ws_HMM_rep$sex_char <- substring(ws_HMM_full$SharksexTrackNo, 3, 3)
-ws_HMM_rep$sex <- ifelse(ws_HMM_rep$sex_char == "F", yes = 0, no = 1)
+
 ws_HMM_rep$state1prob <- state_probs_means[,1]
 ws_HMM_rep$state2prob <- state_probs_means[,2]
 ws_HMM_rep$state1prob025 <- state1_probs_quants[,1]
@@ -359,7 +341,10 @@ sim_state_counts <- apply(state_samples[1:91,], 2, table)
 sim_state_props <- sim_state_counts/91
 post_state_samples_counts <- apply(post_state_samples[,1,1:91], 1, table)
 post_state_samples_props <- post_state_samples_counts/91
-chum_ws1_tr1 <- which(ws_HMM$chum[1:91] == 1)
+
+ws_HMM_rep$chum <- ifelse(ws_HMM_full$CDB == "x", yes = 1, no = 0) 
+ws_HMM_rep$chum[which(is.na(ws_HMM_rep$CDB))] <- 0
+chum_ws1_tr1 <- which(ws_HMM_rep$chum[1:91] == 1)
 post_state_samples_chumcounts <- apply(post_state_samples[,1,chum_ws1_tr1], 1, table)
 post_state_samples_st2chumprops <- numeric(42)
 for (j in 1:1000) {
@@ -418,12 +403,7 @@ fit_2stateHMM_covariates <- model_2stateHMM_covariates$sample(
   chains=4
 )
 
-#' # 2-state HMM with covariates in transition probability matrix and individual varying effects
-HMM_covar <- matrix(data = c(rep(1, dim(ws_HMM)[1]), 
-                             ws_HMM$chum, 
-                             ws_HMM$sex, 
-                             ws_HMM$tod_cos, 
-                             ws_HMM$tod_sin), nrow = dim(ws_HMM)[1], ncol = 5)
+#' # 2-state HMM covariates in transition probability matrix and individual varying effects
 
 #' HMM with 2 state, covariates in tpm and non-centered parametrization for varying effects
 stanHMM_2states_tpmcov_crencp <- list(Nstates = 2,
