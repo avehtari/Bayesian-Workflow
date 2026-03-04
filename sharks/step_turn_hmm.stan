@@ -180,7 +180,7 @@ generated quantities{
 
   lbeta_mat[Tlen] = rep_vector(0, Nstates);
 
-  for(tt in 1:(Tlen-1)){
+  for(tt in 1:(Tlen-1)) {
     if(track_index[Tlen - tt+1]!=track_index[Tlen - tt]){
       lbeta_mat[Tlen-tt] = rep_vector(0, Nstates);
     } else{
@@ -209,18 +209,18 @@ generated quantities{
   
   // forward-filtering backward-sampling for state sequence samples
   state_sequence[Tlen] = categorical_rng(state_probs[Tlen]);  
-  for(t in 2:Tlen){
-    if(track_index[Tlen - t+1]!=track_index[Tlen - t + 2]){
-      state_sequence[Tlen - t + 1] = categorical_rng(state_probs[Tlen - t + 1]);
+  for(t in (Tlen-1):1) {
+    if(track_index[t]!=track_index[t +1]){
+      state_sequence[t] = categorical_rng(state_probs[t]);
     }else{
-      ffbs_prob_unnorm = exp(log_tpm_tr[state_sequence[Tlen-t +2]] + lalpha_mat[Tlen-t +1]);
+      ffbs_prob_unnorm = exp(log_tpm_tr[state_sequence[t+1]] + lalpha_mat[t]);
       ffbs_prob_norm = ffbs_prob_unnorm/sum(ffbs_prob_unnorm);
-      state_sequence[Tlen - t + 1] = categorical_rng(ffbs_prob_norm);
+      state_sequence[t] = categorical_rng(ffbs_prob_norm);
     }
   }
   
   // forecast pseudo-residuals
-  for(tt in 1:Tlen){
+  for(tt in 1:Tlen) {
     if(tt == 1 || track_index[tt] != track_index[tt-1] || steplength[tt] < 0){
       pseudo_residuals[tt] =  0;      
     } else {
