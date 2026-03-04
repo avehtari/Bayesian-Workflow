@@ -208,14 +208,17 @@ generated quantities{
   }
   
   // forward-filtering backward-sampling for state sequence samples
-  state_sequence[Tlen] = categorical_rng(state_probs[Tlen]);  
-  for(t in (Tlen-1):1) {
-    if(track_index[t]!=track_index[t +1]){
-      state_sequence[t] = categorical_rng(state_probs[t]);
-    }else{
-      ffbs_prob_unnorm = exp(log_tpm_tr[state_sequence[t+1]] + lalpha_mat[t]);
+  int t_star; 
+  state_sequence[Tlen] = categorical_rng(state_probs[Tlen]);
+  for(t in 1:(Tlen-1)) {
+    t_star = Tlen - t;
+    if(track_index[t_star]!=track_index[t_star +1]) {
+      state_sequence[t_star] = categorical_rng(state_probs[t_star]);
+    } else {
+      ffbs_prob_unnorm = exp(log_tpm_tr[state_sequence[t_star+1]] + 
+        lalpha_mat[t_star]);
       ffbs_prob_norm = ffbs_prob_unnorm/sum(ffbs_prob_unnorm);
-      state_sequence[t] = categorical_rng(ffbs_prob_norm);
+      state_sequence[t_star] = categorical_rng(ffbs_prob_norm);
     }
   }
   

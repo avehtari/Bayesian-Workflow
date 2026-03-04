@@ -133,6 +133,7 @@ stanHMM_2states <-  list(
               steplength = ws_HMM$steplength, 
               angle = ws_HMM$turnang,
               Ntracks = length(unique(ws_HMM$SharksexTrackNo)))
+
 #| label: fit_2stateHMM
 #| cache: true
 #| results: hide
@@ -244,8 +245,8 @@ angle_sdd <- ggplot(ws_HMM) +
   ggtitle("turning angle state-dependent distributions")
 sl_sdd + angle_sdd
 
-#' Plot state-decodings onto track using the forward-backward algorithm using
-#' the forward-backward algorithm for local state-decoding:
+#' Plot state-decodings onto track using the forward-backward algorithm 
+#' for local state-decoding:
 state_probs_draws <- fit_2stateHMM$draws(variables =c("state_probs"), format = "draws_matrix")
 state_probs_means <- data.frame(state1prob = colMeans(state_probs_draws[1:1000,(4584+1):(2*4584)]), 
                                 state2prob = colMeans(state_probs_draws[1:1000,1:4584])) 
@@ -341,6 +342,11 @@ sim_state_counts <- apply(state_samples[1:91,], 2, table)
 sim_state_props <- sim_state_counts/91
 post_state_samples_counts <- apply(post_state_samples[,1,1:91], 1, table)
 post_state_samples_props <- post_state_samples_counts/91
+
+sim_state_props_test <- apply(state_samples[1:91,], 2,
+                         function(x) c(sum(x == 1)/91, sum(x == 2)/91))
+post_state_samples_props_test <- apply(post_state_samples[,1,1:91], 1,
+                                  function(x) c(sum(x == 1)/91, sum(x == 2)/91))
 
 ws_HMM_rep$chum <- ifelse(ws_HMM_full$CDB == "x", yes = 1, no = 0) 
 ws_HMM_rep$chum[which(is.na(ws_HMM_rep$CDB))] <- 0
