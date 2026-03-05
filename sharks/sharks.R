@@ -41,6 +41,9 @@ library(bayesplot)
 library(tidyr)
 library(cmdstanr)
 options(mc.cores = 4)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("sharks", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("sharks", "stan_output"))
 
 #' # Shark movement data
 #' The positions, in longitude and latitude, of multiple sharks were taken
@@ -86,6 +89,7 @@ ws_HMM$turnang[is.na(ws_HMM$turnang)] <- -100
 #| label: fig-sarika_tracks_1_10
 #| fig-height: 5
 #| fig-width: 4
+#| warning: false
 ggplot(data = sharks.HMMtracks.df |>
          dplyr::filter(SharksexTrackNo ==
                          c("WSF1 T1", "WSF1 T10")),
@@ -136,7 +140,7 @@ stanHMM_2states <-  list(
 )
 
 #| label: fit_2stateHMM
-#| cache: false
+#| cache: true
 #| results: hide
 model_2stateHMM <- cmdstan_model(
   root("sharks", "step_turn_hmm.stan")
@@ -165,9 +169,10 @@ fit_2stateHMM_draws <- fit_2stateHMM$draws(format = "df",
 mcmc_hist_by_chain(fit_2stateHMM_draws, regex_pars = "mu", pars = "lp__")
 
 #' Plot state-dependent distributions for step length and turning angle:
+#| results: hide
+#| warning: false
 cbPalette <- c("#999999", "#E69F00", "#56B4E9", "#009E73",
                "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
-
 eval_gamma_sdd <- function(post_draws, no_samples) {
   # setup
   xval <- seq(0.001, 1, len = 200)
@@ -188,7 +193,6 @@ eval_gamma_sdd <- function(post_draws, no_samples) {
                     sample = rep(1:no_samples, each= 200))
   sdd
 }
-
 eval_vonMises_sdd <- function(post_draws, no_samples) {
   # setup
   xval <- seq(-pi, pi, len = 200)
@@ -209,10 +213,10 @@ eval_vonMises_sdd <- function(post_draws, no_samples) {
                     sample = rep(1:no_samples, each= 200))
   sdd
 }
-
 sdd_steplength <- eval_gamma_sdd(fit_2stateHMM_draws, no_samples = 1000)
 sdd_angle <- eval_vonMises_sdd(fit_2stateHMM_draws, no_samples = 1000)
 #| label: fig-hmm_2state_distributions
+#| warning: false
 sl_sdd <- ggplot(ws_HMM) +
   geom_histogram(aes(steplength, y=after_stat(density)), bins=100, alpha=0.2) +
   xlim(-0.01, 1) +
@@ -227,7 +231,6 @@ sl_sdd <- ggplot(ws_HMM) +
   annotate("text", x = 0.3, y = 4, label = "state 1", color = cbPalette[2])  +
   annotate("text", x = 0.45, y = 1.5, label = "state 2", color = cbPalette[3]) +
   ggtitle("step length state-dependent distributions")
-
 angle_sdd <- ggplot(ws_HMM) +
   geom_histogram(aes(turnang, y=after_stat(density)), bins=100, alpha=0.2) +
   xlim(-pi, pi) +
@@ -274,6 +277,7 @@ ws_HMM_rep$state1prob975 <- state1_probs_quants[,2]
 ws_HMM_rep$state2prob025 <- state2_probs_quants[,1]
 ws_HMM_rep$state2prob975 <- state2_probs_quants[,2]
 #| label: fig-hmm_2state_decodings
+#| warning: false
 ggplot(data = ws_HMM_rep |>
          dplyr::filter(SharksexTrackNo ==
                          c("WSF1 T1", "WSF1 T10")),
@@ -286,6 +290,7 @@ ggplot(data = ws_HMM_rep |>
   ylab("Latitude") + xlab("Longitude") + coord_map()
 
 #| label: fig-hmm_2state_decodings2
+#| warning: false
 ggplot(data = ws_HMM_rep |>
          dplyr::filter(SharksexTrackNo ==
                          c("WSF1 T1", "WSF1 T10")),
@@ -395,7 +400,7 @@ stanHMM_2states_covariates <- list(Nstates = 2,
                                    covs = HMM_covar)
 
 #| label: fit_2stateHMM_covariates
-#| cache: false
+#| cache: true
 #| results: hide
 model_2stateHMM_covariates <- cmdstan_model(
   root("sharks", "step_turn_hmm_covariates.stan")
@@ -421,7 +426,7 @@ stanHMM_2states_tpmcov_crencp <- list(
   shark_index = as.numeric(as.factor(ws_HMM$SharksexTrackNo))
 )
 #| label: fit_2stateHMM_tpmcov_crencp
-#| cache: false
+#| cache: true
 #| results: hide
 model_2stateHMM_tpmcov_crencp <- cmdstan_model(
   root("sharks", "step_turn_hmm_covariates_cre_ncp.stan")
