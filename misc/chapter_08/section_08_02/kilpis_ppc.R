@@ -32,7 +32,8 @@ knitr::opts_chunk$set(
 library(loo)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 1)
-library(bayesplot)
+devtools::load_all("~/proj/bayesplot")
+## library(bayesplot)
 ggplot2::theme_set(bayesplot::theme_default(base_family = "sans", base_size=14))
 SEED <- 48927 # set random seed for reproducibility
 
