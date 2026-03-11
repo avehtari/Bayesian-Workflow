@@ -1,0 +1,31 @@
+---
+title: "Bayesian Workflow book: Other code"
+date: 2026-03-11
+date-modified: today
+date-format: iso
+format:
+  html:
+    number-sections: false
+---
+
+::: {.content-visible when-profile="draft"}
+
+*Code will be provided here when the book is published.*
+
+:::
+
+::: {.content-visible unless-profile="draft"}
+
+This page links to code that is not part of complete case studies, but is useful
+for regenerating many figures and reproducing various small examples throughout
+the book. The code for figures that are part of case studies but are also reused
+in other chapters is not reproduced here and can be found in the case studies.
+
+* [Chapter 6](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_06)
+* [Chapter 7](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_07)
+* [Chapter 8](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_08)
+* [Chapter 10](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_10)
+* [Chapter 11](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_11)
+* [Chapter 12](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_12)
+
+:::

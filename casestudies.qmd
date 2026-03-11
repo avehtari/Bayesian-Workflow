@@ -97,11 +97,6 @@ regenerating some figures in Chapters 6--12, can be found in the GitHub `misc` d
 - [Ch 31: Simulation based calibration checking (SBC)](sbc/sbc.html)
 
 
-## Miscellaneous code
-
-Code that is not part of complete case studies, but may be useful for 
-regenerating some figures in Chapters 6--12, can be found in the [GitHub `misc` directory](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc).
-
 :::
 
 ## Software versions
