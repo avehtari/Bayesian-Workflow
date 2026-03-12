@@ -528,10 +528,32 @@ loo_compare(
   )
 )
 
+#' ## LOO-CV predictive checking
+#' 
+#' LOO-CV predictive checking with LOO-PIT for the binary Poisson
+#' model looks fine.
+ppc_loo_pit_ecdf(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_bipois$draws(format = "matrix", variables = "y_rep"),
+  psis_object = loo_bipois$psis_object,
+  method = "correlated"
+)
+
+#' LOO-CV predictive checking with LOO-PIT for the Poisson difference
+#' model looks fine.
+ppc_loo_pit_ecdf(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_poisdif$draws(format = "matrix", variables = "y_rep"),
+  psis_object = loo_poisdif$psis_object,
+  method = "correlated"
+)
+
 #' In this case study, we used many other models for illustration, but
 #' for real football score modeling, it is a good idea to start with
-#' the bivariate Poisson model.
-
+#' the bivariate Poisson model. For real football analysis footBayes R
+#' package [@Egidi-MacriDemartino-Palaskas:2024] has several different
+#' models including dynamic models allowing the latent performance to
+#' evolve in time.
 #' 
 #' <br />
 #' 
