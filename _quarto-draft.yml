@@ -12,6 +12,8 @@ website:
         href: casestudies.html
       - text: "Exercises"
         href: exercises.html
+      - text: "Other code"
+        href: other_code.html
       - text: "Errata"
         href: errata.html
       - text: "Resources"
