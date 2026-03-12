@@ -107,6 +107,7 @@ pp_check(fit_lin, type="intervals")
 #| label: fig-kilpis_ppc_pit_ecdf
 #| fig-height: 4
 #| fig-width: 4
+set.seed(SEED)
 pp_check(fit_lin, type="pit_ecdf", method = "correlated")
 
 #' There can be a lot of white space in an ECDF plot, and sometimes we
@@ -115,7 +116,8 @@ pp_check(fit_lin, type="pit_ecdf", method = "correlated")
 #| label: fig-kilpis_ppc_pit_ecdf_diff
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_lin, type="pit_ecdf", plot_diff=TRUE, method = "correlated")
+set.seed(SEED)
+pp_check(fit_lin, type="pit_ecdf", method = "correlated", plot_diff=TRUE)
 
 #' In this example, the number of observations is much higher than the
 #' number of parameters in the model and there is not much difference
@@ -131,4 +133,5 @@ pp_check(fit_lin, type="loo_intervals")
 #| label: fig-kilpis_ppc_loo_pit_ecdf_diff
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_lin, type="loo_pit_ecdf", plot_diff=TRUE, method = "correlated")
+set.seed(SEED)
+pp_check(fit_lin, type="loo_pit_ecdf", method = "correlated", plot_diff=TRUE)
