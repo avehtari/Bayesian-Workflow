@@ -90,7 +90,8 @@ if (interactive()) {
   handlers(global = TRUE)
 }
 library(ggplot2)
-library(bayesplot)
+## library(bayesplot)
+devtools::load_all("~/proj/bayesplot")
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
 library(RColorBrewer)
 set1 <- brewer.pal(7, "Set1")
@@ -564,10 +565,10 @@ pp_check(fitm, type = "hist", ndraws = 5)
 
 #' LOO-PIT-ECDF plots shows that otherwise the normal model is quite well
 #' calibrated.
-#| label: fig-fitm-ppc-pitecdf
+#| label: fig-fitm-ppc_loo_pit
 #| fig-height: 4
-#| fig-width: 5
-pp_check(fitm, type = "loo_pit_ecdf")
+#| fig-width: 4
+pp_check(fitm, type = "loo_pit_ecdf", method = "correlated")
 
 #' We could use truncated normal as more accurate model, but for
 #' example beta-binomial model cannot be used for median exam scores

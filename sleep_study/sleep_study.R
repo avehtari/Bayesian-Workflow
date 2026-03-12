@@ -44,7 +44,8 @@ knitr::opts_chunk$set(
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(ggplot2)
-library(bayesplot)
+## library(bayesplot)
+devtools::load_all("~/proj/bayesplot")
 theme_set(bayesplot::theme_default(base_family = "sans"))
 library(patchwork)
 library(dplyr)
@@ -348,8 +349,7 @@ fit4 <- brm(
   data = sleepstudy,
   family = gaussian(),
   prior = prior4, 
-  file = paste0(BRMS_MODEL_DIR, "fit4"),
-  file_refit = "on_change"
+  save_pars = save_pars(all = TRUE)
 ) 
 
 #' Posterior summary
@@ -362,6 +362,9 @@ plot(conditional_effects(fit4), plot = FALSE)[[1]] +
   labs(y = "Reaction time (ms)")
 
 #' Posterior predictive checking
+#| label: fig-sleepstudy-pp_check-fit4
+#| fig-height: 2.5
+#| fig-width: 5
 pp_check(fit4) +
   theme_sub_axis_y(line = element_blank())
 
@@ -777,17 +780,17 @@ pp_check(fit4t, type = "loo_intervals") +
 
 #' The LOO predictive intervals look better now.
 
-#| label: fig-sleepstudy-ppc-loo_intervals-fit4-fit5-fit4t
+#| label: fig-sleepstudy-ppc-loo_pit-fit4-fit4t
 #| fig-height: 3.5
-#| fig-width: 11
-pp_check(fit4, type = "loo_pit_ecdf", ndraws = 4000) +
-  pp_check(fit5, type = "loo_pit_ecdf", ndraws = 4000) +
-  pp_check(fit4t, type = "loo_pit_ecdf", ndraws = 4000) 
+#| fig-width: 7.5
+theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
+pp_check(fit4, type = "loo_pit_ecdf", method = "correlated", moment_match = TRUE) +
+  pp_check(fit4t, type = "loo_pit_ecdf", method = "correlated") 
 
-#' We see that normal and log-normal models have too wide predictive
-#' distribution for most observations, which is due to a few outliers
-#' inflating the residual scale. LOO-PIT plot for Student's $t$ model
-#' looks better.
+#' Looking at the LOO-PIT plots, we see that normal and log-normal
+#' models have too wide predictive distribution for most observations,
+#' which is due to a few outliers inflating the residual
+#' scale. LOO-PIT plot for Student's $t$ model looks better.
 
 #' Compare normal and Student's $t$ models
 loo_compare(fit4, fit4t)

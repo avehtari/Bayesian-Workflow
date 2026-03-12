@@ -45,6 +45,8 @@ knitr::opts_chunk$set(
 
 #' **Load packages**
 #| cache: FALSE
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(tidyr)
 library(dplyr)
 library(tibble)
@@ -53,13 +55,18 @@ library(loo)
 library(bridgesampling)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 4)
+library(cmdstanr)
+# CmdStanR output directory makes Quarto cache to work
+dir.create(root("nabiximols", "stan_output"), showWarnings = FALSE)
+options(cmdstanr_output_dir = root("nabiximols", "stan_output"))
 library(rstan)
 library(posterior)
 options(posterior.num_args = list(digits = 2))
 library(pillar)
 options(pillar.negative = FALSE)
 library(ggplot2)
-library(bayesplot)
+## library(bayesplot)
+devtools::load_all("~/proj/bayesplot")
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 14))
 library(tidybayes)
 library(ggdist)
@@ -351,10 +358,11 @@ pp_check(fit_binomial, type = "bars", ndraws = 4000) +
 #' This effect can be seen also in LOO-PIT-ECDF calibration check plot
 #' [@Sailynoja+etal:2022:PIT-ECDF] which shows that the pointwise predictive
 #' distributions are too narrow.
-#| label: fig-ppc_pit_ecdf-binomial
+#| label: fig-ppc_loo_pit_ecdf-binomial
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_binomial, type = "loo_pit_ecdf")
+#| out-width: "90%"
+pp_check(fit_binomial, type = "loo_pit_ecdf", method = "correlated")
 
 #' We see that binomial model has too many PIT values near $0$ and $1$,
 #' which indicates the posterior predictive intervals are too narrow,
@@ -377,10 +385,12 @@ pp_check(fit_normal, type = "hist", ndraws = 3) +
 #' LOO-PIT-ECDF calibration check plot for normal model does indicate
 #' some problem with too few PIT values near 0.5, but surprisingly the
 #' miscalibration effects at left and right cancel each other out.
-#| label: fig-ppc_pit_ecdf-normal
+#| label: fig-ppc_loo_pit_ecdf-normal
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_normal, type = "loo_pit_ecdf", moment_match = TRUE)
+#| out-width: "90%"
+pp_check(fit_normal, type = "loo_pit_ecdf", moment_match = TRUE,
+         method = "correlated")
 
 
 #' We can also examine PIT values computed by comparing all posterior
@@ -389,6 +399,7 @@ pp_check(fit_normal, type = "loo_pit_ecdf", moment_match = TRUE)
 #| label: fig-ppc_marginal_pit_ecdf-normal
 #| fig-height: 4
 #| fig-width: 4
+#| out-width: "90%"
 marginal_pit <- function(y, x) {
   pit <- vapply(seq_len(length(y)), function(j) {
     sel_min <- x < y[j]
@@ -408,7 +419,8 @@ marginal_pit <- function(y, x) {
   pit
   }, FUN.VALUE = 1.0)
 }
-ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal))) +
+ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal)),
+             method = "correlated")  +
   labs(x = "Marginal posterior PIT")
 
 #' # Model extension
@@ -485,7 +497,9 @@ pp_check(fit_betabinomial, type = "bars", ndraws = 4000) +
 #| label: fig-loo_pit_ecdf-betabinomial
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_betabinomial, type = "loo_pit_ecdf", moment_match = TRUE)
+#| out-width: "90%"
+pp_check(fit_betabinomial, type = "loo_pit_ecdf", moment_match = TRUE,
+         method = "correlated")
 
 #' The hierarchical beta-binomial model can also be used to illustrate
 #' the importance for using crossvalidation for computing PIT
@@ -495,7 +509,8 @@ pp_check(fit_betabinomial, type = "loo_pit_ecdf", moment_match = TRUE)
 #| label: fig-ppc_pit_ecdf-betabinomial
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_betabinomial, type = "pit_ecdf")
+#| out-width: "90%"
+pp_check(fit_betabinomial, type = "pit_ecdf", method = "correlated")
 
 #' The data included many counts of $0$ and $28$, and we can further
 #' check whether we might need to include zero-inflation or
@@ -594,10 +609,10 @@ loo_compare(fit_betabinomial, fit_betabinomial2)
 #| label: fit_betabinomial2b
 #| results: hide
 #| cache: true
-cu_df_b <- cu_df |> filter(week != 0) |>
+cu_df_b <- cu_df |> dplyr::filter(week != 0) |>
   mutate(week = droplevels(week))
 cu_df_b <- left_join(cu_df_b,
-                     cu_df |> filter(week == 0) |> select(id, cu),
+                     cu_df |> dplyr::filter(week == 0) |> select(id, cu),
                      by = "id",
                      suffix = c("", "_baseline"))
 fit_betabinomial2b <- brm(formula = cu | trials(set) ~ group*week + cu_baseline + (1 | id),
@@ -649,8 +664,9 @@ pp_check(fit_betabinomial2b, type = "bars", ndraws = 4000) +
 #| label: fig-ppc_pit_ecdf-betabinomial2b
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_betabinomial2b, type = "loo_pit_ecdf", moment_match = TRUE)
-
+#| out-width: "90%"
+pp_check(fit_betabinomial2b, type = "loo_pit_ecdf", moment_match = TRUE,
+         method = "correlated")
 
 #' Calibration check with reliability diagrams for $0$ vs others and
 #' $28$ vs others look better than for the previous model.
@@ -902,18 +918,21 @@ fit_normal2b <- add_criterion(fit_normal2b, criterion = "loo",
                                     save_psis = TRUE, moment_match = TRUE)
 
 #'
-#' LOO-PIT-ECDF hints slight miscalibration
+#' LOO-PIT-ECDF shows miscalibration
 #| label: fig-ppc_loo_pit_ecdf-normal2b
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_normal2b, type = "loo_pit_ecdf")
-
-#'
+#| out-width: "90%"
+pp_check(fit_normal2b, type = "loo_pit_ecdf", moment_match = TRUE,
+         method = "correlated")
+         
 #' Marginal PIT-ECDF shows clear miscalibration
 #| label: fig-ppc_pit_ecdf-normal2b
 #| fig-height: 4
 #| fig-width: 4
-ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal2b))) +
+#| out-width: "90%"
+ppc_pit_ecdf(pit = marginal_pit(cu_df$cu, posterior_predict(fit_normal2b)),
+             method = "correlated") +
   labs(x = "Marginal posterior PIT")
 
 #' The beta-binomial model beats the normal model big time. 
