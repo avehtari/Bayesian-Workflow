@@ -62,11 +62,6 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 - Ch 30: Planetary motion: Computational challenge of multimodality
 - Ch 31: Simulation based calibration checking (SBC)
 
-## Miscellaneous code
-
-Code that is not part of complete case studies, but may be useful for 
-regenerating some figures in Chapters 6--12, can be found in the GitHub `misc` directory.
-
 :::
 
 ::: {.content-visible unless-profile="draft"}
