@@ -89,4 +89,4 @@ p2<-ggplot() +
 #| height: 3
 p1+p2
 
-#ggsave(root("Digits","kilpisjarvi_priorcheck.pdf"), width=9, height=3)
+#ggsave(root("kilpisjarvi_priorcheck.pdf", width=9, height=3)
