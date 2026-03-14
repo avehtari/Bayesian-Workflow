@@ -160,7 +160,10 @@ print_stan_file <- function(file) {
 
 #' ## Kilpisjärvi data and model
 #' 
-#' Load Kilpisjärvi summer month average temperatures 1952-2013:
+#' Load Kilpisjärvi summer month average temperatures 1952-2013
+#' recorded by Finnish Meteorological Institute (CC BY
+#' 4.0). Kilpisjärvi is in northwestern Finnish Lapland (about
+#' 69°03'N, 20°50'E).
 data_kilpis <- read.delim(root("digits/data", "kilpisjarvi-summer-temp.csv"), sep = ";")
 data_lin <- list(N = nrow(data_kilpis),
                  x = data_kilpis$year,
