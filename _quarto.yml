@@ -34,6 +34,8 @@ website:
 #              href: bioassay/bioassay.html
             - text: "Ch 4: Modeling performance on a multiple choice exam"
 #              href: multiple_choice/multiple_choice.html
+            - text: "Sec 9.4: Model selection using predictive performance"
+#              href: loo_comparison/loo_comparison.html
             - text: "Sec 11.4 and 11.6: How many iterations to run and how many digits to report"
 #              href: digits/digits.html
             - text: "Sec 12.3: Illustration of problematic posteriors"
