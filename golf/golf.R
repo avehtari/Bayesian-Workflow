@@ -41,6 +41,10 @@ options(mc.cores = 4)
 library(bayesplot)
 library(loo)
 library(posterior)
+options(pillar.neg = FALSE,
+        pillar.subtle = FALSE,
+        pillar.sigfig = 2)
+options(width = 90)
 # utility functions
 logit <- qlogis
 invlogit <- plogis
@@ -980,7 +984,7 @@ print(loo_6)
 print(loo_7)
 print(loo_8)
 
-#' Finally we compare the expected predictive performances
+#' Finally we compare the expected predictive performances.
 loo_compare(
   list(
     `Distance tolerance and overshot fixed` = loo_6,
@@ -994,6 +998,123 @@ loo_compare(
 #' fit. However the model which has both `distance_tolerance` and
 #' `overshot` has posterior that is more informative on what can be
 #' learned about this aspect of the model.
+#' 
+#' # Binomial with simplified error term
+#'
+#' Now we fit a new set of models where the error term epsilon is a
+#' constant rather than a vector.  Now epsilon is simply the
+#' probability of completely blowing your shot.
+model_9 <- cmdstan_model(root("golf", "golf_angle_distance_binomial_with_constant_errors.stan"))
+#| results: hide
+fit_9 <- model_9$sample(
+  data = golf_new_data,
+  refresh = 0
+)
+#'
+fit_9$summary(variables = c("sigma_angle", "sigma_distance", "epsilon"))
+
+model_10 <- cmdstan_model(root("golf", "golf_angle_distance_binomial_with_constant_errors_2.stan"))
+#| results: hide
+pth_10 <- model_10$pathfinder(
+  data = golf_new_data,
+  refresh = 0,
+  num_paths = 40,
+  max_lbfgs_iters = 100,
+  init = fit_9
+)
+fit_10 <- model_10$sample(
+  data = golf_new_data,
+  refresh = 0,
+  init = pth_10
+)
+#'
+fit_10$summary(variables = c("sigma_angle", "sigma_distance", "epsilon"))
+
+model_11 <- cmdstan_model(root("golf", "golf_angle_distance_binomial_with_constant_errors_3.stan"))
+#| results: hide
+pth_11 <- model_11$pathfinder(
+  data = golf_new_data,
+  refresh = 0,
+  num_paths = 40,
+  max_lbfgs_iters = 100,
+  init = fit_10
+)
+fit_11 <- model_11$sample(
+  data = golf_new_data,
+  refresh = 0,
+  init = pth_11
+)
+#'
+fit_11$summary(variables = c("sigma_angle", "sigma_distance", "distance_tolerance", "overshot", "epsilon"))
+
+#' We graph the new data and the fitted model 11:
+#| label: fig-golf-fit-11
+#| fig-width: 4.5
+#| fig-height: 4
+draws_11 <- fit_11$draws(format = "df")
+sigma_angle_hat <- mean(draws_8$sigma_angle)
+sigma_distance_hat <- mean(draws_8$sigma_distance)
+distance_tolerance <- mean(draws_8$distance_tolerance)
+overshot <- mean(draws_8$overshot)
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(0, 0, xlim = c(0, 1.1 * max(golf_new$x)), ylim = c(0, 1.02), 
+     xaxs = "i", yaxs = "i", pch = 20, bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "Probability of success", 
+     main = "Checking model fit", type = "n")
+x_grid <- seq(R-r, 1.1*max(golf_new$x), .01)
+p_angle_grid <- 2*pnorm(asin((R-r)/x_grid) / sigma_angle_hat) - 1
+p_distance_grid <- pnorm((distance_tolerance - overshot) / ((x_grid + overshot)*sigma_distance_hat)) -
+  pnorm(-overshot / ((x_grid + overshot)*sigma_distance_hat))
+lines(c(0, R-r, x_grid), c(1, 1, p_angle_grid * p_distance_grid), col = "red")
+points(golf_new$x, golf_new$y/golf_new$n, pch = 20, col = "red")
+
+#| label: fig-golf-res-11
+#| fig-width: 4.5
+#| fig-height: 4
+posterior_mean_residual <- mean(as_draws_rvars(draws_11)$residual)
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(golf_new$x, posterior_mean_residual, xlim = c(0, 1.1 * max(golf_new$x)), 
+     xaxs = "i", pch = 20, bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "y/n - fitted E(y/n)", 
+     main = "Residuals from fitted model", type = "n")
+abline(0, 0, col = "gray", lty = 2)
+lines(golf_new$x, posterior_mean_residual)
+
+#' Finally we compare the expected predictive performances
+#| results: hide
+gq_ll_c <- cmdstan_model(root("golf", "golf_log_lik_constant_errors.stan"))
+loo_11 <- gq_ll_c$generate_quantities(
+  fit_11$draws(variables = "p"),
+  data = golf_new_data)$draws(variables = "log_lik") |> loo()
+
+#' We compare the predictive performance of the varying errors and
+#' constant error models.
+loo_compare(
+  list(
+    `Model 8 with varying error terms` = loo_8,
+    `Model 11 with constant error term` = loo_11
+  )
+)
+
+#' The constant error term is clearly worse with respect to expected
+#' log predictive probability, but that difference is small enough
+#' that it is difficult to see when plotting the prediction on top of
+#' the data.
+#'
+#' If we examine the predictive performance difference at different
+#' distances, we see that the constant error model tends to be worse
+#' specifically at short distances.
+pointwise_elpd_diff <- pointwise(loo_8, "elpd_loo")- pointwise(loo_11, "elpd_loo")
+par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)
+plot(golf_new$x, pointwise_elpd_diff, xlim = c(0, 1.1 * max(golf_new$x)), 
+     xaxs = "i", pch = 20, bty = "l", 
+     xlab = "Distance from hole (feet)", 
+     ylab = "pointwise elpd_loo difference", 
+     main = "Predictive performance difference Model 8 vs Model 11")
+abline(0, 0, col = "gray", lty = 2)
+
 #' 
 #' <br />
 #' 

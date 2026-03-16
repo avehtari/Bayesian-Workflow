@@ -1,5 +1,5 @@
 #' ---
-#' title: "Kilpisjärvi PIT demo for Workflow book"
+#' title: "Kilpisjärvi PIT demo for Bayesian Workflow book"
 #' author: "Aki Vehtari"
 #' date: 2024-06-27
 #' date-modified: today
@@ -29,6 +29,8 @@ knitr::opts_chunk$set(
 #' 
 #' **Load packages**
 #| cache: FALSE
+library(rprojroot)
+root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
 library(loo)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 1)
@@ -39,10 +41,11 @@ SEED <- 48927 # set random seed for reproducibility
 
 #' # Linear Gaussian model
 #' 
-#' Use the Kilpisjärvi summer month temperatures 1952--2022 data from `aaltobda` package. We can read data directly from a URL.
-load(url("https://github.com/avehtari/BDA_course_Aalto/raw/master/rpackage/data/kilpisjarvi2022.rda"))
-data_lin <- data.frame(year = kilpisjarvi2022$year,
-                       temp = kilpisjarvi2022$temp.summer)
+#' Use the Kilpisjärvi summer month temperatures 1952--2022 data
+#' recorded by Finnish Meteorological Institute.
+data_kilpis <- read.delim(root("digits/data", "kilpisjarvi-summer-temp-2022.csv"), sep = ";")
+data_lin <- data.frame(year = data_kilpis$year,
+                       temp = data_kilpis$temp.summer)
 
 #' To analyse whether there has been change in the average summer month
 #' temperature we use a linear model with Gaussian model for the
@@ -107,6 +110,7 @@ pp_check(fit_lin, type="intervals")
 #| label: fig-kilpis_ppc_pit_ecdf
 #| fig-height: 4
 #| fig-width: 4
+set.seed(SEED)
 pp_check(fit_lin, type="pit_ecdf", method = "correlated")
 
 #' There can be a lot of white space in an ECDF plot, and sometimes we
@@ -115,7 +119,8 @@ pp_check(fit_lin, type="pit_ecdf", method = "correlated")
 #| label: fig-kilpis_ppc_pit_ecdf_diff
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_lin, type="pit_ecdf", plot_diff=TRUE, method = "correlated")
+set.seed(SEED)
+pp_check(fit_lin, type="pit_ecdf", method = "correlated", plot_diff=TRUE)
 
 #' In this example, the number of observations is much higher than the
 #' number of parameters in the model and there is not much difference
@@ -131,4 +136,5 @@ pp_check(fit_lin, type="loo_intervals")
 #| label: fig-kilpis_ppc_loo_pit_ecdf_diff
 #| fig-height: 4
 #| fig-width: 4
-pp_check(fit_lin, type="loo_pit_ecdf", plot_diff=TRUE, method = "correlated")
+set.seed(SEED)
+pp_check(fit_lin, type="loo_pit_ecdf", method = "correlated", plot_diff=TRUE)

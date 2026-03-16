@@ -50,14 +50,17 @@ options(mc.cores = 4)
 library(ggplot2)
 library(khroma)
 library(ggdist)
-library(bayesplot)
+#library(bayesplot)
+devtools::load_all("~/proj/bayesplot")
 theme_set(bayesplot::theme_default(base_family = "sans", base_size = 16))
 library(posterior)
+## devtools::load_all("~/proj/posterior")
 options(posterior.num_args = list(digits = 2))
 library(priorsense)
 library(dplyr)
 library(tibble)
 library(reliabilitydiag)
+set.seed(298465)
 
 print_stan_file <- function(file) {
   code <- readLines(file)
@@ -304,7 +307,7 @@ pp_check(fit_nb, "intervals") +
 #| label: fig-ppc_pit-nb
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fit_nb, type = "pit_ecdf")
+pp_check(fit_nb, type = "pit_ecdf", method = "correlated")
 
 #' Now that posterior predictive check looks quite good, it is useful
 #' to be more careful and use LOO predictive checking, too. We first
@@ -347,11 +350,12 @@ pp_check(fit_nb, "loo_intervals", moment_match = TRUE) +
   theme(legend.position = "inside",
         legend.position.inside = c(0.9, 0.9))
 
-#| label: fig-ppc_loopit-nb 
+#| label: fig-ppc_loo_pit-nb 
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fit_nb, type = "loo_pit_ecdf", moment_match = TRUE)
-#'
+pp_check(fit_nb, type = "loo_pit_ecdf", moment_match = TRUE,
+         method = "correlated")
+
 #' As we guessed, there is not much difference between LOO and
 #' posterior intervals, and LOO-PIT-ECDF and PIT-ECDF.
 #'
@@ -574,7 +578,7 @@ pp_check(fit_pvi, type = "rootogram", style = "discrete") +
 #| label: fig-ppc_pit-poisson_varying
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fit_pvi, type = "pit_ecdf")
+pp_check(fit_pvi, type = "pit_ecdf", method = "correlated")
 
 #' There are too many PIT values near 0.5. If we look at the
 #' predictive intervals and observations, we see that many the
@@ -594,10 +598,10 @@ pp_check(fit_pvi, "intervals") +
 #' computation works.  In this case LOO-PIT's look slightly better,
 #' but still showing problems, but this is because PSIS-LOO fails (as
 #' discussed above)
-#| label: fig-ppc_loopit-poisson_varying
+#| label: fig-ppc_loo_pit-poisson_varying
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fit_pvi, type = "loo_pit_ecdf")
+pp_check(fit_pvi, type = "loo_pit_ecdf", method = "correlated")
 
 #' # Poisson model with varying intercept and integrated LOO
 #' 
@@ -690,11 +694,12 @@ loo_compare(list(`Poisson var. int. int-LOO` = loo_p_vi, `Neg-bin` = loo_nb))
 #' challenging posterior than for negative binomial model.
 #| fig-height: 4
 #| fig-width: 5
-#| label: fig-ppc_loopit-poisson_varying_int
+#| label: fig-ppc_loo_pit-poisson_varying_int
 ppc_loo_pit_ecdf(
   y = roaches$y,
   yrep = fit_p_vi$draws(variables = "y_loorep", format = "matrix"),
-  psis_object = loo_p_vi$psis_object
+  psis_object = loo_p_vi$psis_object,
+  method = "correlated"
 )
 
 #' We check the calibration of predictive probabilities for zeros vs
@@ -777,16 +782,12 @@ pp_check(fit_zinb, type = "rootogram", style = "discrete") +
   theme(legend.position = "inside",
         legend.position.inside = c(0.8, 0.8))
 
-#| label: fig-ppc_pit-zinb
-#| fig-height: 4
-#| fig-width: 5
-pp_check(fit_zinb, type = "pit_ecdf")
-
 #' LOO-PIT-ECDF
-#| label: fig-ppc_loopit-zinb
+#| label: fig-ppc_loo_pit-zinb
 #| fig-height: 4
 #| fig-width: 5
-pp_check(fit_zinb, type = "loo_pit_ecdf", moment_match = TRUE)
+pp_check(fit_zinb, type = "loo_pit_ecdf", moment_match = TRUE,
+         method = "correlated")
 
 #' Reliability diagram assessing the calibration of predicted
 #' probabilities of zero vs non-zero looks clearly better than the one

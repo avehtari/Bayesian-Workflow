@@ -1,3 +1,5 @@
+## kilpisjarvi-summer-temp.csv
+
 Summer months temperature 1952-2013 at Kilpisjärvi, Finland,
 by Finnish Meteorological Institute (FMI)
 with Creative Commons Attribution 4.0 International license (CC BY 4.0).
@@ -9,3 +11,7 @@ kilpisjarvi-summer-temp.csv columns
  - temp.july   = average temperature in July
  - temp.august = average temperature in August
  - temp.summer = average of temp.june, temp.july and temp.august
+
+## kilpisjarvi-summer-temp-2022.csv
+
+Otherwise the same, except years until 2022

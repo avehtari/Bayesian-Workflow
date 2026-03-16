@@ -26,23 +26,11 @@ format:
     - [Authors' webpage for the book](https://avehtari.github.io/ActiveStatistics/).
     - [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/ActiveStatistics.pdf).
 
-## Related software
+## Related case studies
 
-- [Stan](https://mc-stan.org/)
-- [CmdStanR](https:://mc-stan.org/cmdstanr/)
-- [brms](https://paulbuerkner.com/brms/)
-- [rstanarm](https:://mc-stan.org/rstanarm/)
-- [bayesplot](https:://mc-stan.org/bayesplot/)
-- [loo](https:://mc-stan.org/loo/)
-- [posterior](https:://mc-stan.org/posterior/)
-- [priorsense](https://n-kall.github.io/priorsense/)
-- [projpred](https:://mc-stan.org/projpred/)
-- [ggdist](https://mjskay.github.io/ggdist/)
-- [ArviZ](https://python.arviz.org/)
-
-## More case studies
-
-- [Aki Vehtari's case studies](https://users.aalto.fi/~ave/casestudies.html)
+- [Uncertainty in LOO-CV model comparison](https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html): Related to Section 9.4 Model selection using predictive checking and predictive
+performance.
+- [Disc golf putting](https://users.aalto.fi/~ave/casestudies/disc_putting/disc_putting.html): Extends the ball golf putting model with an additional dimension and a distance-dependent component. Also illustrates the use of distances known only within some interval.
 
 ## R programming and visualization with R
 
@@ -56,3 +44,17 @@ format:
     - [ggdist: Visualizations of distributions and uncertainty](https://mjskay.github.io/ggdist/)
     - [tidybayes: Bayesian analysis + tidy data + geoms](http://mjskay.github.io/tidybayes/)
     - [Claus O. Wilke, Fundamentals of Data Visualization](https://serialmentor.com/dataviz/)
+
+## Related software
+
+- [Stan](https://mc-stan.org/)
+- [CmdStanR](https:://mc-stan.org/cmdstanr/)
+- [brms](https://paulbuerkner.com/brms/)
+- [rstanarm](https:://mc-stan.org/rstanarm/)
+- [bayesplot](https:://mc-stan.org/bayesplot/)
+- [loo](https:://mc-stan.org/loo/)
+- [posterior](https:://mc-stan.org/posterior/)
+- [priorsense](https://n-kall.github.io/priorsense/)
+- [projpred](https:://mc-stan.org/projpred/)
+- [ggdist](https://mjskay.github.io/ggdist/)
+- [ArviZ](https://python.arviz.org/)

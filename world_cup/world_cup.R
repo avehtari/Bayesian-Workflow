@@ -56,7 +56,8 @@ options(
   pillar.subtle = FALSE,
   pillar.sigfig = 2
 )
-library(bayesplot)
+devtools::load_all("~/proj/bayesplot")
+## library(bayesplot)
 library(ggplot2)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size=14))
 library(arm)
@@ -65,7 +66,7 @@ library(dplyr)
 library(readr)
 
 print_stan_code <- function(code) {
-  if (isTRUE(getOption("knitr.in.progress")) &
+  if (isTRUE(getOption("knitr.in.progress")) &&
         identical(knitr::opts_current$get("results"), "asis")) {
     # In render: emit as-is so Pandoc/Quarto does syntax highlighting
     block <- paste0("```stan", "\n", paste(code, collapse = "\n"), "\n", "```")
@@ -292,7 +293,7 @@ print_stan_code(model_discr$code())
 #| results: hide
 #| cache: true
 fit_discr <- model_discr$sample(data = stan_data, refresh = 0)
-loo_discr <- fit_discr$loo()
+loo_discr <- fit_discr$loo(save_psis = TRUE)
 
 #| label: fit_discr_summary
 fit_discr$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_z"))
@@ -427,7 +428,7 @@ print_stan_code(model_sqrt_cont$code())
 #| results: hide
 #| cache: true
 fit_sqrt_cont <- model_sqrt_cont$sample(data = stan_data, refresh = 0)
-loo_sqrt_cont <- fit_sqrt_cont$loo()
+loo_sqrt_cont <- fit_sqrt_cont$loo(save_psis = TRUE)
 
 #| label: fit_sqrt_cont_summary
 fit_sqrt_cont$summary(c("a[1]", "a[32]", "b", "sigma_a", "sigma_y"))
@@ -470,20 +471,25 @@ loo_compare(
   )
 )
 
-#' # Posterior predictive checking
+#' ## LOO-CV predictive checking
 #' 
-#' Posterior predictive checking for the discrete model looks fine
-ppc_pit_ecdf(
+#' LOO-CV predictive checking with LOO-PIT for the discrete model
+#' looks fine
+ppc_loo_pit_ecdf(
   y = stan_data$score_1 - stan_data$score_2,
-  yrep = fit_discr$draws(format = "matrix", variables = "y_rep")
+  yrep = fit_discr$draws(format = "matrix", variables = "y_rep"),
+  psis_object = loo_discr$psis_object,
+  method = "correlated"
 )
 
-#' Posterior predictive checking for the continuous model indicates
+#' LOO-CV predictive checking for the continuous model indicates
 #' slight miscalibration with too many low PIT values (left tail of
 #' the predictive distribution is shorter than expected)
-ppc_pit_ecdf(
+ppc_loo_pit_ecdf(
   y = stan_data$score_1 - stan_data$score_2,
-  yrep = fit_sqrt_cont$draws(format = "matrix", variables = "y_rep")
+  yrep = fit_sqrt_cont$draws(format = "matrix", variables = "y_rep"),
+  psis_object = loo_sqrt_cont$psis_object,
+  method = "correlated"
 )
 
 #' # Bivariate Poisson and Poisson difference models
@@ -492,7 +498,6 @@ ppc_pit_ecdf(
 #' [@Karlis-Ntzoufras:2003]. If we care only about the score
 #' difference we can also use Poisson difference model
 #' [@Karlis-Ntzoufras:2003].
-#'
 model_bipois <- cmdstan_model(stan_file = root("world_cup", "worldcup_bivariate_poisson.stan"))
 #| results: asis
 print_stan_code(model_bipois$code())
@@ -504,7 +509,7 @@ fit_bipois <- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta = 0
 #| label: fit_bipois_summary
 fit_bipois$summary(c("a","o[1]","o[32]","d[1]","d[32]","b_o","b_d","sigma_o","sigma_d"))
 #'
-(loo_bipois <- fit_bipois$loo())
+(loo_bipois <- fit_bipois$loo(save_psis = TRUE))
 
 model_poisdif <- cmdstan_model(stan_file = root("world_cup", "worldcup_poisson_difference.stan"))
 #| results: asis
@@ -516,7 +521,7 @@ fit_poisdif <- model_poisdif$sample(data = stan_data, refresh = 0)
 
 #| label: fit_poisdif_summary
 fit_poisdif$summary(c("a[1]", "a[32]", "b", "sigma_a"))
-(loo_poisdif <- fit_poisdif$loo())
+(loo_poisdif <- fit_poisdif$loo(save_psis = TRUE))
 
 #' The set in this case study is small, and we don't see practical
 #' difference in the predictive performance.
@@ -528,10 +533,32 @@ loo_compare(
   )
 )
 
+#' ## LOO-CV predictive checking
+#' 
+#' LOO-CV predictive checking with LOO-PIT for the binary Poisson
+#' model looks fine.
+ppc_loo_pit_ecdf(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_bipois$draws(format = "matrix", variables = "y_rep"),
+  psis_object = loo_bipois$psis_object,
+  method = "correlated"
+)
+
+#' LOO-CV predictive checking with LOO-PIT for the Poisson difference
+#' model looks fine.
+ppc_loo_pit_ecdf(
+  y = stan_data$score_1 - stan_data$score_2,
+  yrep = fit_poisdif$draws(format = "matrix", variables = "y_rep"),
+  psis_object = loo_poisdif$psis_object,
+  method = "correlated"
+)
+
 #' In this case study, we used many other models for illustration, but
 #' for real football score modeling, it is a good idea to start with
-#' the bivariate Poisson model.
-
+#' the bivariate Poisson model. For real football analysis footBayes R
+#' package [@Egidi-MacriDemartino-Palaskas:2024] has several different
+#' models including dynamic models allowing the latent performance to
+#' evolve in time.
 #' 
 #' <br />
 #' 

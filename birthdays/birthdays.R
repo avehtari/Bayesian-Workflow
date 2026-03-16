@@ -18,7 +18,7 @@
 #'
 #' # Introduction
 #'
-#' We analyse the relative number of births per day in USA 1969-1988
+#' We analyse the relative number of births per day in USA 1969--1988
 #' using Gaussian process time series model with several model
 #' components that can explain the long term, seasonal, weekly, day of
 #' year, and special floating day variation. We use Hilbert space
@@ -54,7 +54,7 @@ mytoc <- \() {
   })}
 library(cmdstanr)
 # CmdStanR output directory makes Quarto cache to work
-dir.create(root("birthdays", "stan_output"))
+dir.create(root("birthdays", "stan_output"), showWarnings = FALSE)
 options(cmdstanr_output_dir = root("birthdays", "stan_output"))
 library(posterior)
 options(pillar.neg = FALSE,
@@ -67,6 +67,7 @@ options(tinytable_format_num_fmt = "significant_cell",
 library(loo)
 library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans"))
+library(ggdist)
 library(patchwork)
 library(ggrepel)
 library(RColorBrewer)
@@ -1694,6 +1695,47 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
   geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
 
+#' The following plot shows the day of year effect with 90% posterior intervals.
+#| code-fold: true
+#| label: fig-births-fit6-day-of-year
+#| fig-width: 8
+#| fig-height: 3
+draws6r <- as_draws_rvars(draws6)
+Ef4r <- exp(draws6r$beta_f4*sd(log(birthdays$births_relative100)))
+draws6 <- as_draws_matrix(draws6)
+Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4)
+f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
+pf2c <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4, ydist = Ef4r) |>
+  ggplot(aes(x = x, y = y, ydist = ydist)) +
+  stat_pointinterval(.width = 0.9, color=set1[1], alpha=0.3, size=0.5) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  geom_hline(yintercept = 1, color='gray') +
+  labs(x = "Date", y = "Relative number of births") +
+  annotate("text",x=as.Date("1988-01-01")+2,y=Ef4[1]-.02,label="New year") +
+  annotate("text",x=as.Date("1988-02-14"),y=Ef4[45]+.02,label="Valentine's day") +
+  annotate("text",x=as.Date("1988-02-29"),y=Ef4[60]-.03,label="Leap day") +
+  annotate("text",x=as.Date("1988-04-01"),y=Ef4[92]-.025,label="April 1st") + 
+  annotate("text",x=as.Date("1988-07-04")+6,y=Ef4[186]-.02,label="Independence day") +
+  annotate("text",x=as.Date("1988-10-31"),y=Ef4[305]-.02,label="Halloween") + 
+  annotate("text",x=as.Date("1988-12-24"),y=Ef4[360]-.025,label="Christmas") +
+  geom_point(data=f13, aes(x=date, y=y), inherit.aes = FALSE, size=3, shape=1)
+pf2c
+
+#| echo: false
+f13r <- birthdays |>
+  filter(year == 1988) |>
+  select(day, date) |>
+  mutate(ydist = Ef4r) |>
+  filter(day == 13)
+#' In this plot, it seems like almost all 13th days have fewer
+#' births. If we look at the mean effect over all 13th days, the probability
+#' that the relative number of births is less than 1 is
+#' `r round(mean(rvar_mean(f13r$ydist)<1), 3)*100`%, although
+#' with a small estimated effect of
+#' `r round(mean(1-rvar_mean(f13r$ydist)),3)*100`% fewer births.
+#'
+
 #' ### Model 7: long term smooth + seasonal + weekday + day of year normal + floating special days
 #'
 #' We can see in the model 6 results that day of year effects have
@@ -1833,7 +1875,7 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
 #' Turn of the PSIS resampling in Stan to get distinct draws for initialization.
 #| label: pth7_noresample
 #| cache: true
-tic('Sampling from Pathfinder approximation of model 6 posterior')
+tic('Sampling from Pathfinder approximation of model 7 posterior')
 pth7 <- model7$pathfinder(data = standata7, init = 0.1,
                           num_paths = 10, single_path_draws = 40, draws = 400,
                           history_size = 50, max_lbfgs_iters = 100,
@@ -1952,6 +1994,59 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
   geom_text_repel() +
   geom_abline(linetype = "dotted") +
   labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+
+#' The following plot shows the day of year effect with 90% posterior intervals.
+#| code-fold: true
+#| label: fig-births-fit7-day-of-year
+#| fig-width: 8
+#| fig-height: 3
+draws7r <- as_draws_rvars(draws7)
+Ef4r <- exp(draws7r$beta_f4*sd(log(birthdays$births_relative100)))
+Efloatsr <- exp(draws7r$beta_f5*sd(log(birthdays$births_relative100)))
+floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
+Ef4floatr <- Ef4r
+Ef4floatr[floats1988] <- Ef4floatr[floats1988] * Efloatsr[c(1, 2, 2, 3, 3)]
+draws7 <- as_draws_matrix(draws7)
+Ef4 <- apply(subset(draws7, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4)
+Efloats <- apply(subset(draws7, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats)
+floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
+Ef4float <- Ef4
+Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)]
+f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2c <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float, ydist = Ef4floatr) |>
+  ggplot(aes(x = x, y = y, ydist = ydist)) +
+  stat_pointinterval(.width = 0.9, color=set1[1], alpha=0.3, size=0.5) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  geom_hline(yintercept = 1, color='gray') +
+  labs(x = "Date", y = "Relative number of births") +
+  annotate("text",x=as.Date("1988-01-01")+2,y=Ef4float[1]-.02,label="New year") +
+  annotate("text",x=as.Date("1988-02-14"),y=Ef4float[45]+.02,label="Valentine's day") +
+  annotate("text",x=as.Date("1988-02-29"),y=Ef4float[60]-.03,label="Leap day") +
+  annotate("text",x=as.Date("1988-04-01"),y=Ef4float[92]-.025,label="April 1st") + 
+  annotate("text",x=as.Date("1988-07-04")+6,y=Ef4float[186]-.02,label="Independence day") +
+  annotate("text",x=as.Date("1988-10-31"),y=Ef4float[305]-.02,label="Halloween") + 
+  annotate("text",x=as.Date("1988-12-24"),y=Ef4float[360]-.025,label="Christmas") +
+  annotate("text",x=as.Date("1988-05-30")-5,y=Ef4float[151]-.025,label="Memorial day") +
+  annotate("text",x=as.Date("1988-09-05")+2,y=Ef4float[249]-.03,label="Labor day") + 
+  annotate("text",x=as.Date("1988-11-24")-2,y=Ef4float[329]-.023,label="Thanksgiving") +
+  geom_point(data=f13, aes(x=date, y=y), inherit.aes = FALSE, size=3, shape=1)
+pf2c
+
+#| echo: false
+f13r <- birthdays |>
+  filter(year == 1988) |>
+  select(day, date) |>
+  mutate(ydist = Ef4floatr) |>
+  filter(day == 13)
+#' In this plot, it seems like almost all 13th days have fewer
+#' births. If we look at the mean effect over all 13th days, the probability
+#' that the relative number of births is less than 1 is
+#' `r round(mean(rvar_mean(f13r$ydist)<1), 3)*100`%, although
+#' with a small estimated effect of
+#' `r round(mean(1-rvar_mean(f13r$ydist)),3)*100`% fewer births.
+#'
 
 #' ### Model 8: long term smooth + seasonal + weekday with time dependent magnitude + day of year + special
 #'
@@ -2400,7 +2495,7 @@ loo_compare(list(`Model 8 normal` = loo8, `Model 8 Student's t` = loo8tnu)) |>
 #' Compare the mean and sd of parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
 #| code-fold: true
-#| label: fig-births--pth8tnu-vs-fit8tnu
+#| label: fig-births-pth8tnu-vs-fit8tnu
 variables <- names(model8tnu$variables()$parameters)
 sp <- summarise_draws(subset(pth8tnu$draws(), variable = variables))
 sm <- summarise_draws(subset(draws8tnu, variable = variables))
@@ -2482,7 +2577,7 @@ mytoc()
 #'
 #' Check whether parameters have reasonable values
 draws8rhs <- fit8rhs$draws()
-summarise_draws(subset(draws8rhs, variable = c("sigma_", "lengthscale_", "sigma", "nu_"), regex = TRUE)) |>
+summarise_draws(subset(draws8rhs, variable = c("sigma_", "lengthscale_", "sigma"), regex = TRUE)) |>
   tt()
 
 #' Compare the model to the data
@@ -2495,7 +2590,7 @@ Ef <- exp(apply(subset(draws8, variable = "f"), 2, median))
 Ef1 <- apply(subset(draws8, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws8, variable = "f2"), 2, median)
-Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
+f2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
 Ef_day_of_week <- apply(subset(draws8, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef3 <- apply(subset(draws8, variable = "f3"), 2, median)
@@ -2597,6 +2692,7 @@ ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm
 #' differences between Pathfinder and MCMC than for other parameters.
 #' 
 
+
 #' ### Further improvements for the day of year effect
 #' 
 #' It's unlikely that day of year effect would be unstructured with
@@ -2666,7 +2762,7 @@ birthdays |>
 #' study. 
 #'
 #' The best model so far explains already 95% of the variance (LOO-R2).
-draws8 <- as_draws_matrix(draws8rhs)
+draws8 <- as_draws_matrix(draws8tnu)
 f <- exp(subset(draws8, variable = "f"))
 loo8tnu <- fit8tnu$loo(save_psis = TRUE)
 Efloo <- E_loo(f, psis_object = loo8tnu$psis_object)$value
@@ -2750,8 +2846,7 @@ mytoc()
 #' distinct draws to initialize MCMC.
 #'
 #' Alternatively we could run just one path with 4 draw from the
-#' normal approximation. At the moment (2024-01-21) there is a bug so
-#' that minimum number of draws per path is 25.
+#' normal approximation. 
 #| label: pth8rhs_nogq_single
 #| cache: true
 tic('Sampling from Pathfinder approximation of model 8rhs posterior')
@@ -2845,9 +2940,77 @@ data.frame(varid = 1:nrow(sp), sd_ratio = sp$sd / sm$sd) |>
 #' has serious problems and it should be considered whether
 #' re-parameterization, better data or more informative priors could
 #' help).
-## fit8rhs <- model8rhs$sample(data = standata8, chains = 4, parallel_chains = 4,
-##                             adapt_delta = 0.95, max_treedepth = 15)
+#| label: fit8tnu_4000draws
+#| results: hide
+#| cache: true
+tic('MCMC sampling 4000 draws from model 8tnu posterior with earlier fit initialization')
+fit8tnu <- model8tnu$sample(data = standata8, chains = 4, parallel_chains = 4,
+                            iter_warmup = 500, adapt_delta = 0.95, init = fit8tnu)
+#'
+#| cache: true
+mytoc()
 
+#' Using this final model which is the best model based on LOO-CV
+#' comparison, we show the day of year effect with 90% posterior intervals.
+#| code-fold: true
+#| label: fig-births-fit8tnu-day-of-year
+#| fig-width: 8
+#| fig-height: 3
+draws8tnur <- as_draws_rvars(draws8tnu)
+Ef4r <- exp(draws8tnur$beta_f4*sd(log(birthdays$births_relative100)))
+Efloatsr <- exp(draws8tnur$beta_f5*sd(log(birthdays$births_relative100)))
+floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
+Ef4floatr <- Ef4r
+Ef4floatr[floats1988] <- Ef4floatr[floats1988] * Efloatsr[c(1, 2, 2, 3, 3)]
+draws8tnu <- as_draws_matrix(draws8tnu)
+Ef4 <- apply(subset(draws8tnu, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
+Ef4 <- exp(Ef4)
+Efloats <- apply(subset(draws8tnu, variable = "beta_f5"), 2, median) * sd(log(birthdays$births_relative100))
+Efloats <- exp(Efloats)
+floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
+Ef4float <- Ef4
+Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)]
+f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2c <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float, ydist = Ef4floatr) |>
+  ggplot(aes(x = x, y = y, ydist = ydist)) +
+  stat_pointinterval(.width = 0.9, color=set1[1], alpha=0.3, size=0.5) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  geom_hline(yintercept = 1, color='gray') +
+  labs(x = "Date", y = "Relative number of births") +
+  annotate("text",x=as.Date("1988-01-01")+2,y=Ef4float[1]-.02,label="New year") +
+  annotate("text",x=as.Date("1988-02-14"),y=Ef4float[45]+.025,label="Valentine's day") +
+  annotate("text",x=as.Date("1988-02-29"),y=Ef4float[60]-.03,label="Leap day") +
+  annotate("text",x=as.Date("1988-04-01"),y=Ef4float[92]-.025,label="April 1st") + 
+  annotate("text",x=as.Date("1988-07-04")+6,y=Ef4float[186]-.02,label="Independence day") +
+  annotate("text",x=as.Date("1988-10-31"),y=Ef4float[305]-.025,label="Halloween") + 
+  annotate("text",x=as.Date("1988-12-24"),y=Ef4float[360]-.02,label="Christmas") +
+  annotate("text",x=as.Date("1988-05-30")-5,y=Ef4float[151]-.025,label="Memorial day") +
+  annotate("text",x=as.Date("1988-09-05"),y=Ef4float[249]-.015,label="Labor day") + 
+  annotate("text",x=as.Date("1988-11-24"),y=Ef4float[329]-.015,label="Thanksgiving") +
+  geom_point(data=f13, aes(x=date, y=y), inherit.aes = FALSE, size=3, shape=1)
+pf2c
+
+
+#| echo: false
+f13r <- birthdays |>
+  filter(year == 1988) |>
+  select(day, date) |>
+  mutate(ydist = Ef4floatr) |>
+  filter(day == 13)
+#' In this plot, it seems like there is no 13th day effect. However,
+#' if we look at the mean effect over all 13th days, the probability
+#' that the relative number of births is less than 1 is
+#' `r round(mean(rvar_mean(f13r$ydist)<1), 4)*100`%, although
+#' with a small estimated effect of
+#' `r round(mean(1-rvar_mean(f13r$ydist)),3)*100`% fewer births.
+#' 
+#' Although the final model used here for the day of year effects was
+#' the best according to LOO-CV, it is likely that there are similarly
+#' good models with slightly different priors that can influence how
+#' much the effects are shrunk to mean. In this case, this modeling is
+#' just for illustration of the computational workflow and for real
+#' life prediction models, much more thinking can be done to improve
+#' the model
 #'
 #' # References {.unnumbered}
 #'
