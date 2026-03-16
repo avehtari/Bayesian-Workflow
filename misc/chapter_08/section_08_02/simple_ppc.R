@@ -1,5 +1,5 @@
 #' ---
-#' title: "Kilpisjärvi PIT demo for Bayesian Workflow book"
+#' title: "Simple posterior predictive checking demo"
 #' author: "Martin Modrák"
 #' date: 2020-10-07
 #' date-modified: today
@@ -32,8 +32,8 @@ knitr::opts_chunk$set(
 library(dplyr)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 4)
-library(bayesplot)
 library(ggplot2)
+library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans"))
 library(patchwork)
 

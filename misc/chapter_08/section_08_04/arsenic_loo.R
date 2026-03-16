@@ -1,5 +1,5 @@
 #' ---
-#' title: "Kilpisjärvi PIT demo for Bayesian Workflow book"
+#' title: "Pointwise LOO-CV comparison demo"
 #' author: "Aki Vehtari"
 #' date: 2024-06-27
 #' date-modified: today
