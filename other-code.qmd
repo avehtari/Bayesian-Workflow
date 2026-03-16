@@ -21,11 +21,13 @@ for regenerating many figures and reproducing various small examples throughout
 the book. The code for figures that are part of case studies but are also reused
 in other chapters is not reproduced here and can be found in the case studies.
 
+* [Chapter 5](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_05)
 * [Chapter 6](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_06)
 * [Chapter 7](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_07)
 * [Chapter 8](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_08)
 * [Chapter 10](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_10)
 * [Chapter 11](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_11)
 * [Chapter 12](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_12)
+* [Chapter 14](https://github.com/avehtari/Bayesian-Workflow/tree/main/misc/chapter_14)
 
 :::
