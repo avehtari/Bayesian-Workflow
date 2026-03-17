@@ -11,25 +11,23 @@ format:
 ## Related books on Bayesian methods and modeling
 
 - Gelman, Carlin, Stern, Dunson, Vehtari and Rubin (2013). *Bayesian Data Analysis*, Third Edition. Chapman and Hall/CRC.
-    - [Publisher's webpage for the book](https://www.crcpress.com/Bayesian-Data-Analysis-Third-Edition/Gelman-Carlin-Stern-Dunson-Vehtari-Rubin/9781439840955).
-    - [Authors' web page for the book](https://www.stat.columbia.edu/~gelman/book/).<br>
+    - [The book web page](https://www.stat.columbia.edu/~gelman/book/).<br>
     - [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/BDA3.pdf).<br>
+    - [Buy the book](https://www.crcpress.com/Bayesian-Data-Analysis-Third-Edition/Gelman-Carlin-Stern-Dunson-Vehtari-Rubin/9781439840955).
 - McElreath (2020). *Statistical Rethinking*, Second Edition. Chapman and Hall.
-    - [Publisher's webpage for the book](https://www.crcpress.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919).
-    - [Author's web page for the book](https://xcelab.net/rm/).
+    - [The book web page](https://xcelab.net/rm/).
+    - [Buy the book](https://www.crcpress.com/Statistical-Rethinking-A-Bayesian-Course-with-Examples-in-R-and-STAN/McElreath/p/book/9780367139919).
 - Gelman, Hill and Vehtari (2020). *Regression and other stories*. Cambridge University Press.<br>
-    - [Publisher's webpage for the book](https://www.cambridge.org/fi/academic/subjects/statistics-probability/statistical-theory-and-methods/regression-and-other-stories).
-    - [Authors' webpage for the book](https://avehtari.github.io/ROS-Examples/).
+    - [The book web page](https://avehtari.github.io/ROS-Examples/).
     - [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/ROS.pdf).<br>
+    - [Buy the book](https://www.cambridge.org/fi/academic/subjects/statistics-probability/statistical-theory-and-methods/regression-and-other-stories).
 - Gelman and Vehtari (2024). *Active Statistics*. Cambridge University Press.
-    - [Publisher's webpage for the book](https://www.cambridge.org/core/books/active-statistics/4E066112B3F82CA44C81CB4097960808)
-    - [Authors' webpage for the book](https://avehtari.github.io/ActiveStatistics/).
+    - [The book web page](https://avehtari.github.io/ActiveStatistics/).
     - [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/ActiveStatistics.pdf).
+    - [Buy the book](https://www.cambridge.org/core/books/active-statistics/4E066112B3F82CA44C81CB4097960808)
 
 ## Related case studies
 
-- [Uncertainty in LOO-CV model comparison](https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html): Related to Section 9.4 Model selection using predictive checking and predictive
-performance.
 - [Disc golf putting](https://users.aalto.fi/~ave/casestudies/disc_putting/disc_putting.html): Extends the ball golf putting model with an additional dimension and a distance-dependent component. Also illustrates the use of distances known only within some interval.
 
 ## R programming and visualization with R
