@@ -28,8 +28,9 @@ format:
 
 ## Related case studies
 
-- [Uncertainty in LOO-CV model comparison](https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html)
-- [Disc golf putting](https://users.aalto.fi/~ave/casestudies/disc_putting/disc_putting.html)
+- [Uncertainty in LOO-CV model comparison](https://users.aalto.fi/~ave/casestudies/LOO_uncertainty/loo_uncertainty.html): Related to Section 9.4 Model selection using predictive checking and predictive
+performance.
+- [Disc golf putting](https://users.aalto.fi/~ave/casestudies/disc_putting/disc_putting.html): Extends the ball golf putting model with an additional dimension and a distance-dependent component. Also illustrates the use of distances known only within some interval.
 
 ## R programming and visualization with R
 

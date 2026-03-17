@@ -41,6 +41,7 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 
 - Sec 3.5: Bioassay
 - Ch 4: Modeling performance on a multiple choice exam
+- Sec 9.4: Model selection using predictive performance
 - Sec 11.4-6: How many iterations to run and how many digits to report
 - Sec 12.3: Illustration of problematic posteriors
 - Sec 12.4: Declining exponentials
@@ -70,6 +71,7 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 
 - [Sec 3.5: Bioassay](bioassay/bioassay.html)
 - [Ch 4: Modeling performance on a multiple choice exam](multiple_choice/multiple_choice.html)
+- [Sec 9.4: Model selection using predictive performance](loo_comparison/loo_comparison.html)
 - [Sec 11.4-6: How many iterations to run and how many digits to report](digits/digits.html)
 - [Sec 12.3: Illustration of problematic posteriors](problems/problems.html)
 - [Sec 12.4: Declining exponentials](declining_exponentials/declining_exponentials.html)
