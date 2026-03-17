@@ -88,14 +88,14 @@
     "href": "resources.html",
     "title": "Bayesian Workflow book: Resources",
     "section": "",
-    "text": "Gelman, Carlin, Stern, Dunson, Vehtari and Rubin (2013). Bayesian Data Analysis, Third Edition. Chapman and Hall/CRC.\n\nPublisher’s webpage for the book.\nAuthors’ web page for the book.\nElectronic edition for non-commercial purposes only.\n\nMcElreath (2020). Statistical Rethinking, Second Edition. Chapman and Hall.\n\nPublisher’s webpage for the book.\nAuthor’s web page for the book.\n\nGelman, Hill and Vehtari (2020). Regression and other stories. Cambridge University Press.\n\nPublisher’s webpage for the book.\nAuthors’ webpage for the book.\nElectronic edition for non-commercial purposes only.\n\nGelman and Vehtari (2024). Active Statistics. Cambridge University Press.\n\nPublisher’s webpage for the book\nAuthors’ webpage for the book.\nElectronic edition for non-commercial purposes only."
+    "text": "Gelman, Carlin, Stern, Dunson, Vehtari and Rubin (2013). Bayesian Data Analysis, Third Edition. Chapman and Hall/CRC.\n\nThe book web page.\nElectronic edition for non-commercial purposes only.\nBuy the book.\n\nMcElreath (2020). Statistical Rethinking, Second Edition. Chapman and Hall.\n\nThe book web page.\nBuy the book.\n\nGelman, Hill and Vehtari (2020). Regression and other stories. Cambridge University Press.\n\nThe book web page.\nElectronic edition for non-commercial purposes only.\nBuy the book.\n\nGelman and Vehtari (2024). Active Statistics. Cambridge University Press.\n\nThe book web page.\nElectronic edition for non-commercial purposes only.\nBuy the book"
   },
   {
     "objectID": "resources.html#related-books-on-bayesian-methods-and-modeling",
     "href": "resources.html#related-books-on-bayesian-methods-and-modeling",
     "title": "Bayesian Workflow book: Resources",
     "section": "",
-    "text": "Gelman, Carlin, Stern, Dunson, Vehtari and Rubin (2013). Bayesian Data Analysis, Third Edition. Chapman and Hall/CRC.\n\nPublisher’s webpage for the book.\nAuthors’ web page for the book.\nElectronic edition for non-commercial purposes only.\n\nMcElreath (2020). Statistical Rethinking, Second Edition. Chapman and Hall.\n\nPublisher’s webpage for the book.\nAuthor’s web page for the book.\n\nGelman, Hill and Vehtari (2020). Regression and other stories. Cambridge University Press.\n\nPublisher’s webpage for the book.\nAuthors’ webpage for the book.\nElectronic edition for non-commercial purposes only.\n\nGelman and Vehtari (2024). Active Statistics. Cambridge University Press.\n\nPublisher’s webpage for the book\nAuthors’ webpage for the book.\nElectronic edition for non-commercial purposes only."
+    "text": "Gelman, Carlin, Stern, Dunson, Vehtari and Rubin (2013). Bayesian Data Analysis, Third Edition. Chapman and Hall/CRC.\n\nThe book web page.\nElectronic edition for non-commercial purposes only.\nBuy the book.\n\nMcElreath (2020). Statistical Rethinking, Second Edition. Chapman and Hall.\n\nThe book web page.\nBuy the book.\n\nGelman, Hill and Vehtari (2020). Regression and other stories. Cambridge University Press.\n\nThe book web page.\nElectronic edition for non-commercial purposes only.\nBuy the book.\n\nGelman and Vehtari (2024). Active Statistics. Cambridge University Press.\n\nThe book web page.\nElectronic edition for non-commercial purposes only.\nBuy the book"
   },
   {
     "objectID": "resources.html#related-software",
@@ -137,7 +137,7 @@
     "href": "resources.html#related-case-studies",
     "title": "Bayesian Workflow book: Resources",
     "section": "Related case studies",
-    "text": "Related case studies\n\nUncertainty in LOO-CV model comparison: Related to Section 9.4 Model selection using predictive checking and predictive performance.\nDisc golf putting: Extends the ball golf putting model with an additional dimension and a distance-dependent component. Also illustrates the use of distances known only within some interval."
+    "text": "Related case studies\n\nDisc golf putting: Extends the ball golf putting model with an additional dimension and a distance-dependent component. Also illustrates the use of distances known only within some interval."
   },
   {
     "objectID": "other_code.html",
