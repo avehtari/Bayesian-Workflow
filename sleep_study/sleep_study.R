@@ -104,6 +104,8 @@ prior_lin_base <- prior(normal(200, 100), class = b, coef = "Intercept") +
   prior(exponential(0.02), class = sigma)
 #'
 #' Model base and sample from the posterior
+#' 
+#| label: fit_lin_base
 #| results: hide
 #| cache: true
 fit_lin_base <- brm(
@@ -140,6 +142,9 @@ prior1 <- prior(normal(250, 100), class = Intercept) +
   prior(exponential(0.02), class = sigma)
 
 #' Sample from the prior 1
+#| label: fit1_prior
+#| results: hide
+#| cache: true
 fit1_prior <- brm(
   Reaction ~ 1 + Days, 
   data = sleepstudy,
@@ -160,6 +165,9 @@ pp_check(fit1_prior, ndraws = 100) +
   theme_sub_axis_y(line = element_blank())
 
 #' Model 1: sample from the posterior
+#| label: fit1
+#| results: hide
+#| cache: true
 fit1 <- brm(
   Reaction ~ 1 + Days, 
   data = sleepstudy,
@@ -205,6 +213,9 @@ prior2 <- prior(normal(250, 100), class = Intercept) +
   prior(exponential(0.02), class = sigma)
 
 #' Model 2: sample from the posterior
+#| label: fit2
+#| results: hide
+#| cache: true
 fit2 <- brm(
   Reaction ~ 1 + Days, 
   data = sleepstudy,
@@ -241,6 +252,9 @@ prior2b <- prior(normal(250, 100), class = Intercept) +
   prior(exponential(0.02), class = sigma)
 
 #' Model 2b: sample from the posterior
+#| label: fit2b
+#| results: hide
+#| cache: true
 fit2b <- brm(
   Reaction ~ 1 + Days, 
   data = sleepstudy,
@@ -301,6 +315,9 @@ prior3 <- prior(normal(250, 100), class = Intercept) +
   prior(exponential(0.02), class = sd)
 
 #' Model 3: sample from the posterior
+#| label: fit3
+#| results: hide
+#| cache: true
 fit3 <- brm(
   Reaction ~ 1 + Days + (1 | Subject), 
   data = sleepstudy,
@@ -344,6 +361,9 @@ prior4 <- prior(normal(250, 100), class = Intercept) +
   prior(lkj(1), class = cor)
 
 #' Model 4: sample from the posterior
+#| label: fit4
+#| results: hide
+#| cache: true
 fit4 <- brm(
   Reaction ~ 1 + Days + (1 + Days | Subject), 
   data = sleepstudy,
@@ -404,6 +424,9 @@ prior_ln1 <- prior(normal(250, 100), class = Intercept) +
   prior(exponential(0.02), class = sigma)
 
 #' Sample from the prior ln1
+#| label: fit_ln1_prior
+#| results: hide
+#| cache: true
 fit_ln1_prior <- brm(
   Reaction ~ 1 + Days, 
   data = sleepstudy,
@@ -437,6 +460,9 @@ prior_ln2 <- prior(normal(5, 0.55), class = Intercept) +
   prior(exponential(3), class = sigma)
 
 #' Sample from the prior ln2
+#| label: fit_ln2_prior
+#| results: hide
+#| cache: true
 fit_ln2_prior <- brm(
   Reaction ~ 1 + Days, 
   data = sleepstudy,
@@ -471,6 +497,9 @@ gg_ln2_prior <- ggplot(prp_ln_dat, aes(y, yrep)) +
 gg_ln1_prior + gg_ln2_prior
 
 #' Sample from the posterior
+#| label: fit_ln2
+#| results: hide
+#| cache: true
 fit_ln2 <- brm(
   Reaction ~ 1 + Days, 
   data = sleepstudy,
@@ -517,6 +546,9 @@ prior5 <- prior(normal(5, 0.55), class = Intercept) +
   prior(lkj(1), class = cor)
 
 #' Model5: sample from the posterior
+#| label: fit5
+#| results: hide
+#| cache: true
 fit5 <- brm(
   Reaction ~ 1 + Days + (1 + Days | Subject), 
   data = sleepstudy,
@@ -596,6 +628,9 @@ prior6 <- prior(normal(5.5, 0.55), class = Intercept) +
   prior(lkj(1), class = cor)
 
 #' Model 6: sample from the posterior
+#| label: fit6
+#| results: hide
+#| cache: true
 fit6 <- brm(
   bf(Reaction ~ 1 + Days + (1 + Days |S| Subject),
      sigma ~ 1 + (1 |S| Subject)),
@@ -641,6 +676,9 @@ prior7 <- prior(normal(250, 100), class = Intercept) +
   prior(lkj(1), class = cor)
 
 #' Model 7: sample from the posterior
+#| label: fit7
+#| results: hide
+#| cache: true
 fit7 <- brm(
   bf(Reaction ~ 1 + Days + (1 + Days |S| Subject),
      sigma ~ 1 + (1 |S| Subject)), 
@@ -673,6 +711,9 @@ plot(conditional_effects(fit7, conditions = conditions, re_formula = NULL),
 #' - default priors are already chosen in an effort to be sensible(ish)
 #'
 #' Model 8: sample from the posterior
+#| label: fit8
+#| results: hide
+#| cache: true
 fit8 <- brm(
   bf(Reaction ~ 1 + Days + (1 + Days |S| Subject),
      sigma ~ 1 + (1 |S| Subject)), 
@@ -716,6 +757,9 @@ prior9 <- get_prior(
 prior9$prior <- ""
 
 #' Model 9: sample from the posterior
+#| label: fit9
+#| results: hide
+#| cache: true
 fit9 <- brm(
   bf(Reaction ~ 1 + Days + (1 + Days |S| Subject),
      sigma ~ 1 + (1 |S| Subject)), 
@@ -762,6 +806,7 @@ pp_check(fit4, type = "loo_intervals") +
 #'
 #' Create varying intercept (fit3t) and varying intercept and slope
 #' (fit4t) models with Student's $t$ data model
+#| label: fit3t_fit4t
 #| results: hide
 #| cache: true
 fit3t <- update(fit3, family = student())
