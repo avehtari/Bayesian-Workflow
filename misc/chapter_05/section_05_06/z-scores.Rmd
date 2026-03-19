@@ -1,0 +1,405 @@
+---
+title: "Supplement:  \nA proposal for informative default priors scaled by the standard error of estimates"
+author: "Erik van Zwet and Andrew Gelman"
+header-includes:
+  - \usepackage{amsmath}
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    keep_tex: TRUE
+    extra_dependencies: ['amsthm','amsmath'] 
+---
+
+
+# Figure 1
+
+\newcommand\SE{\mathit{S}}
+\newcommand\se{\mathit{s}}
+\newcommand\SNR{\mathrm{SNR}}
+\newcommand\E{\mathbb{E}}
+\newcommand\Prob{\mathbb{P}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{corollary}{Corollary}
+
+
+Let $b$ denote an unbiased, nornmally distributed estimator of $\beta$. Let $s$ be the known standard error of $b$. We take $s=1$ and plot the conditional bias
+$$\E(b - \beta \mid |b|/s > 1.96)$$
+and the exaggeration ratio
+
+$$\E(|b /\beta| \mid |b|/s > 1.96)$$
+
+
+```{r fig1, fig.width=10, fig.height=4, warning=FALSE, message=FALSE, echo=TRUE}
+
+library(dplyr)
+library(flexmix)
+library(ggplot2)
+library(cowplot)       # arrange multiple plots
+
+set.seed(123)
+
+z=rnorm(10^7)
+M=seq(0.1,5,0.1)
+bias=numeric(2*length(M)+1)
+bias[length(M)+1]=mean(z[abs(z)>1.96])
+for (i in 1:length(M)){
+  x=z+M[i]
+  bias[length(M) + 1 + i]=mean(x[abs(x)>1.96]) - M[i]
+  bias[length(M) + 1 - i]=-bias[length(M) + 1 + i]
+}
+
+df=data.frame(SNR=seq(-5,5,0.1),bias)
+ggp1=ggplot(df,aes(x=SNR,y=bias))+geom_line() +
+  scale_y_continuous(breaks = c(-1,0,1),minor_breaks=seq(-1.5,1.5,0.5))+
+  labs(y='')+
+  theme_minimal() +
+  ggtitle("Bias")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+
+alpha=0.05
+z=qnorm(1-alpha/2)
+m=NULL
+SNR=seq(0.2,5,0.01)
+X=rnorm(10^6)
+for (snr in SNR){
+  x=X + snr
+  xtrunc=x[abs(x)>z]
+  m=c(m,mean(abs(xtrunc) / abs(snr)))
+}
+
+df=data.frame(SNR=c(-rev(SNR),SNR),exaggeration=c(rev(m),m))
+ggp2=ggplot(df,aes(x=SNR,y=exaggeration))+geom_line()+
+  scale_y_continuous(breaks =seq(1,11,2),minor_breaks=1:10,limits=c(1,10))+
+  labs(y='')+
+  theme_minimal()+
+  ggtitle("Exaggeration")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+plot_grid(ggp1, ggp2)
+
+```
+
+
+# Proof of Theorem 2
+
+We start with the following lemma.
+
+\begin{lemma}
+Suppose $X$ and $Y$ are random variables and $Y$ is positive. Then
+\begin{equation}\label{premise}
+f_{X|Y=y}(x) = c f_{X|Y=cy}(cx) 
+\end{equation}
+for every $c>0$, if and only if $Z=X/Y$ and $Y$ are independent.
+\end{lemma}
+
+\begin{proof}
+Note that
+\begin{equation}\label{l:1}
+f_{Z \mid Y=y}(x/y) = y f_{X \mid Y=y}(x).
+\end{equation}
+Now, suppose (\ref{premise}) holds. If we choose $c=1/y$ then
+\begin{equation}\label{l:2}
+f_{X|Y=y}(x) = \frac{1}{y} f_{X|Y=1}(x/y) = \frac{1}{y} f_{Z |Y=1}(x/y).
+\end{equation}
+Combining (\ref{l:2}) with (\ref{l:1}), we find
+\begin{equation}\label{key}
+f_{Z \mid Y=y}(x/y) =  f_{Z |Y=1}(x/y).
+\end{equation}
+Since this equality holds for every $x$ and $y>0$, we see that $Z$ and $Y$ are independent.
+
+\medskip \noindent
+To prove the converse,  independence of $Z$ and $Y$ implies
+\begin{equation}\label{l:3}
+f_{Z|Y=y}(x/y)=f_{Z|Y=cy}(x/y)=cyf_{X|Y=cy}(cx).
+\end{equation}
+Combining (\ref{l:3}) with (\ref{l:1}), we find  (\ref{premise}).
+\end{proof}
+
+\medskip \noindent
+We recall requirement (3) from the paper:
+\begin{equation*}
+p(\beta \mid b, s) =|c|\, p(c \beta \mid cb, |c|s), \mbox{ for all } c\neq 0.
+\end{equation*}
+The requirement means that posterior inference about $\beta$ is equivariant under linear transformations of the data. It has the following interpretation in terms of the SNR $\beta/s$.
+
+\setcounter{theorem}{1}
+\begin{theorem}
+The requirement holds if and only if
+\begin{enumerate}
+\item $s$ and $\beta/s$ are independent.
+\item The distribution of $\beta/s$ is symmetric around zero.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+Conditionally on $\beta$ and $s$, $b$ has the normal distribution with mean $\beta$ and standard deviation $s$,
+$$f(b \mid \beta,s) = \frac{1}{\sqrt{2\pi\, s^2}} e^{-\frac{(b - \beta)^2}{2s^2}},$$
+It is easy to verify that
+\begin{equation}
+f(b \mid \beta, s) =|c| f(c b \mid c\beta, |c|s).
+\end{equation}
+for every $c \neq 0$. So, the requirement is equivalent with
+\begin{equation} \label{p:1}
+f(\beta \mid s)=|c| f(c\beta \mid |c|s),
+\end{equation}
+for every $c \neq 0$. Now, by lemma 1 we have that (\ref{p:1}) holds for all $c>0$ if and only if $s$ and $\beta/s$ are independent. Taking $c=-1$  in (\ref{p:1}), we see that the conditional distribution of $\beta$ given $s$ is symmetric around zero. It follows that the marginal distribution of $\beta/s$ is also symmetric. 
+\end{proof}
+
+# Theory: Two-part normal mixtures 
+We model the distribution of the SNR as a mixture of two zero-mean normal distributions. We write the mixture model in terms of a mixture indicator $d$ that can take the values 1 or 2:
+\begin{itemize}
+\item $\mbox{Pr}(d=1)=1-\mbox{Pr}(d=2)=p$.
+\item Given $d=i$, $\beta/s$ has the normal distribution with mean 0 and standard deviation $\tau_i$ ($i=1,2$).
+\item Given $d$ and $\beta/s$, $z$ has the normal distribution with mean $\beta/s$ and standard deviation 1.
+\end{itemize}
+The marginal distribution $g$ of $z$ is a mixture of two zero-mean normals with standard deviations $\sqrt{\tau_1^2+1}$ and $\sqrt{\tau_2^2+1}$, and mixing proportion $p$,
+\begin{equation}
+g(z) = \frac{p}{\sqrt{\tau_1^2+1}} \, \varphi \left( \frac{z}{\sqrt{\tau_1^2+1}} \right)  +  \frac{1-p}{\sqrt{\tau_2^2+1}} \, \varphi \left( \frac{z}{\sqrt{\tau_2^2+1}} \right), 
+\end{equation}
+where $\varphi$ is the standard normal density function. We can easily fit this model from a sample $z_1,z_2,\dots,z_n$, using maximum likelihood or Bayesian inference. Upon fitting this model, we can obtain the conditional distribution of $\beta$ given $b$ and $s$. This posterior distribution is again a mixture of two normals. The mixing proportion is
+\begin{align}
+\mbox{Pr}(d=1 \mid b,s) = \frac{p}{\sqrt{\tau_1^2+1}} \varphi \left( \frac{b}{s \sqrt{\tau_1^2+1}} \right) \frac{1}{g(b/s)}
+\end{align}
+and the two normals have  means
+\begin{equation}
+\mu_i = s\,  \E(\beta/s \mid b, s, d=i) = \frac{b\, \tau_i^2}{\tau_i^2 +1}
+\end{equation}
+and variances
+\begin{equation}
+\sigma_i^2 = s^2\, {\rm Var}(\beta/s \mid b, s, d=i) = \frac{s^2\, \tau_i^2}{\tau_i^2 +1}
+\end{equation}
+for $i=1,2$. We define the ``shrinkage factor'' as $b/ \E(\beta \mid b, s)$, which depends on $b$ and $s$ only through $z=b/s$.
+
+
+
+# Data Analysis
+
+## OSC
+### Get data
+```{r, warning=FALSE, message=FALSE, echo=TRUE}
+d=read.csv("rpp_data.csv",header=TRUE)
+
+# get only replication p-values
+# exclude missing ones
+d=d[!is.na(d$T_pval_USE..R.),]
+
+# also exclude F tests.
+Ftests=c("F (2, 67) = 1.70","F(1.48, 41.458) = 1.401","F(18, 660) = 12.98",
+         "F(2, 137) = 1.99", "F(2, 174) = 252.83","F(2, 72) = 1.97",
+         "F(2, 99) = 2.601","F(2,122) = 0.24","F(2.33, 90) = .38",
+         "F(21, 455304) = 261.93","F(3, 59) = 5.681","F(3,12)= 13.06",
+         "F(4, 150) = .58")
+d=d[!(d$Test.statistic..R. %in% Ftests),]
+
+ind=which(d$X..Tails..R.==1)                         # one-tailed tests
+d$T_pval_USE..R.[ind]=2*d$T_pval_USE..R.[ind]        # multiply p-value by 2
+
+d$z=abs(qnorm(d$T_pval_USE..R./2))                   # absolute z-values
+z1=d$z
+
+nrow(d)
+```
+
+### Fit mixture model
+```{r, warning=FALSE, message=FALSE, echo=TRUE}
+
+fit=flexmix(z ~ 0, data=d, k = 2)
+for (i in 1:10){                       # try few restarts
+  fit1=flexmix(z ~ 0, data=d, k = 2)
+  if (fit1@logLik > fit@logLik) fit = fit1
+}
+
+p1=summary(fit)@comptab$prior
+ind=order(parameters(fit))
+sd11=parameters(fit)[ind[1]]
+sd12=parameters(fit)[ind[2]]
+p1=p1[ind[1]]
+
+cat("distr of z: p=",p1,"\t sd1=",sd11,"\t sd2=",sd12,"\n")
+tau11=sqrt(sd11^2 - 1)
+tau12=sqrt(sd12^2 - 1)
+cat("distr of snr: p=",p1,"\t tau1=",tau11,"\t tau2=",tau12,"\n")
+```
+
+## Phase 3 RCTs
+
+### Get data
+
+```{r, warning=FALSE, message=FALSE, echo=TRUE}
+d=read.csv("CochraneEffects.csv")
+
+d=d %>% filter(outcome.group=="efficacy")
+d=d %>% filter(outcome.nr==1)
+d=d %>% filter(phase=="phase 3")
+d=d %>% filter(comparator=="placebo")
+d=group_by(d,study.id.sha1) %>% sample_n(size=1)   # select single outcome per study
+
+z2=d$z
+nrow(d)
+```
+
+### Fit mixture model
+
+```{r, warning=FALSE, message=FALSE, echo=TRUE}
+fit=flexmix(z ~ 0, data=d, k = 2)
+for (i in 1:10){                        # try few restarts
+  fit1=flexmix(z ~ 0, data=d, k = 2)
+  if (fit1@logLik > fit@logLik) fit = fit1
+}
+
+p2=summary(fit)@comptab$prior
+ind=order(parameters(fit))
+sd21=parameters(fit)[ind[1]]
+sd22=parameters(fit)[ind[2]]
+p2=p2[ind[1]]
+
+cat("distr of z: p=",p2,"\t sd1=",sd21,"\t sd2=",sd22,"\n")
+tau21=sqrt(sd21^2 - 1)
+tau22=sqrt(sd22^2 - 1)
+cat("distr of snr: p=",p2,"\t tau1=",tau21,"\t tau2=",tau22,"\n")
+```
+
+# Figures 2 and 3
+
+```{r fig2, echo=TRUE, fig.height=4, fig.width=10, message=FALSE, warning=FALSE}
+
+# distribution of the z-values
+x=seq(-10,10,0.01)
+f1=p1*dnorm(x,0,sd11) + (1-p1)*dnorm(x,0,sd12)  # OSC
+f2=p2*dnorm(x,0,sd21) + (1-p2)*dnorm(x,0,sd22)  # RCT phase III
+
+df1=data.frame(z=c(-z1,z1))
+df2=data.frame(z=x,f1)
+breaks=seq(-10,10,length=31)
+ggp1=ggplot(df1,aes(x=z)) + 
+ geom_histogram(aes(y=..density..),breaks=breaks, colour="darkgrey", fill="white") +
+  geom_line(data=df2,aes(x=z,y=f1))+
+  labs(x='',y='') +
+  xlim(-10,10)+ theme_minimal()+
+  ggtitle("z-values from OSC replications (n=86)")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+df1=data.frame(z=z2)
+df2=data.frame(z=x,f2)
+ggp2=ggplot(df1,aes(x=z)) + 
+ geom_histogram(aes(y=..density..),breaks=breaks, colour="darkgrey", fill="white") +
+  geom_line(data=df2,aes(x=z,y=f2))+
+  labs(x='',y='') +
+  xlim(-10,10)+ theme_minimal()+
+  ggtitle("z-values from phase III RCTs (n=178)")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+plot_grid(ggp1,ggp2)
+
+```
+
+```{r fig3, echo=TRUE, fig.height=4, fig.width=10, message=FALSE, warning=FALSE}
+posterior = function(b,s,p,tau){                           
+  z=b/s
+  tau2=tau^2
+  q=p*dnorm(z,0,sqrt(tau2+1)) 
+  q=q/sum(q)                      # conditional mixing probs
+  pm=b*tau2/(tau2+1)              # conditional means
+  pv=s^2*tau2/(tau2+1)            # conditional variances
+  ps=sqrt(pv)                     # conditional std devs
+  data.frame(q,pm,pv,ps)
+}
+
+shrink = function(b,s,p,tau){ 
+  post=posterior(b,s,p,tau)
+  b/sum(post$q * post$pm)
+}
+
+# distribution of the SNR
+
+f1=p1*dnorm(x,0,tau11) + (1-p1)*dnorm(x,0,tau12) # OSC
+f2=p2*dnorm(x,0,tau21) + (1-p2)*dnorm(x,0,tau22) # RCT phase III
+
+n=length(x)
+df=data.frame(x=rep(x,2),f=c(f1,f2),corpus=c(rep("OSC",n),rep("RCT",n)))
+ggp1=ggplot(df,aes(x=x,y=f,color=corpus, size=corpus)) + geom_line(show=FALSE) + 
+  scale_size_manual( values = c(0.6,1) ) +
+  scale_colour_grey(start = 0, end =0.7) + 
+  labs(x='',y='') + 
+  ggtitle("Estimated Distribution of the SNR") + theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) 
+
+z=seq(-5,5,0.01)
+n=length(z)
+shrink1=sapply(z,function(z){shrink(b=z,s=1,p=c(p1,1-p1),tau=c(tau11,tau12))})
+shrink2=sapply(z,function(z){shrink(b=z,s=1,p=c(p2,1-p2),tau=c(tau21,tau22))})
+
+df=data.frame(z=rep(z,2),shrink=c(shrink1,shrink2),
+              corpus=c(rep("OSC",n),rep("RCT",n)))
+
+ggp2=ggplot(df,aes(x=z,y=shrink,color=corpus, size=corpus)) + geom_line() + 
+  scale_size_manual( values = c(0.6,1) ) +
+  scale_colour_grey(start = 0, end =0.7) + 
+  labs(x='z-value',y='') + 
+  theme_minimal() +
+  scale_y_continuous(breaks = seq(1,2.5,0.5),minor_breaks=seq(1,2.5,0.25),
+                     limits = c(1,2.5)) +
+  ggtitle("Shrinkage factor")+
+  theme(plot.title = element_text(hjust = 0.5))
+
+plot_grid(ggp1,ggp2)
+
+```
+
+# Computations for section 4.3
+
+
+```{r, warning=FALSE, message=FALSE, echo=TRUE}
+# pdf, cdf and quantile functions for normal mixture distributions
+dmix = function(x,p,m,s){ # density (vector x)
+  p %*% sapply(x, function(x) dnorm(x,mean=m,sd=s))
+}
+
+pmix = function(x,p,m,s){ # cumulative distr (vector x)
+  p %*% sapply(x, function(x) pnorm(x,mean=m,sd=s))
+}
+
+rmix = function(n,p,m,s){
+  d=rmultinom(n,1,p)
+  rnorm(n,m%*%d,s%*%d)
+}
+
+qfun = function(q,p,m,s){ # quantile function scalar q
+  uniroot(function(x) pmix(x,p,m,s)-q, interval=c(-20,20))$root
+}
+
+qmix = function(q,p,m,s){ # quantile function vector q
+  sapply(q, function(q) qfun(q,p=p,m=m,s=s) )
+}
+
+
+# OSC
+b=0.3
+s=0.2
+ci=c(b-1.96*s,b+1.96*s)
+ci                              # 95% Wald interval for log OR
+exp(ci)                         # 95% Wald interval for OR
+p=c(0.57,0.43)
+tau=c(0.7,4.0)
+post=posterior(b,s,p,tau)
+post                            # posterior mixture distr of log OR
+betahat=sum(post$q * post$pm)   # shrinkage estimator of log OR
+betahat
+shrinkage=b/betahat             # shrinkage factor
+shrinkage
+exp(betahat)                    # shrinkage estimator of OR
+
+pmix(0,post$q,post$pm,post$ps)  # prob. of sign error
+
+ci=qmix(c(0.025,0.975),post$q,post$pm,post$ps)
+ci                              # 95% posterior interval for log OR
+exp(ci)                         # 95% posterior interval for OR
+```
+
