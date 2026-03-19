@@ -46,7 +46,7 @@ library(lme4)
 library(cmdstanr)
 options(mc.cores = 4)
 # CmdStanR output directory makes Quarto cache to work
-dir.create(root("park_rule", "stan_output"))
+dir.create(root("park_rule", "stan_output"), showWarnings = FALSE)
 options(cmdstanr_output_dir = root("park_rule", "stan_output"))
 library(ggplot2)
 library(bayesplot)
