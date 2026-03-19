@@ -14,7 +14,7 @@
 #' ---
 #' 
 #' This notebook includes part of the code for the Bayesian Workflow
-#' book Section 5.9 about prior predictive checking.
+#' book Section 5.9 about prior predictive checking. 
 
 #+ setup, include=FALSE
 knitr::opts_chunk$set(
