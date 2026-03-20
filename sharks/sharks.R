@@ -63,7 +63,7 @@ options(cmdstanr_output_dir = root("sharks", "stan_output"))
 #' model extensions.
 load(root("sharks/data","whiteshark_trackdata.RData"))
 sharks.HMMtracks.df$ID <- sharks.HMMtracks.df$SharksexTrackNo
-moveHMM_wsdata <- prepData(sharks.HMMtracks.df[,c("ID", "Long", "Lat")], type=c("LL"), coordNames = c("Long", "Lat"))
+moveHMM_wsdata <- prepData(sharks.HMMtracks.df[, c("ID", "Long", "Lat")], type = c("LL"), coordNames = c("Long", "Lat"))
 sharks.HMMtracks.df$steplength <- moveHMM_wsdata$step
 sharks.HMMtracks.df$turnang <- moveHMM_wsdata$angle
 ws_HMM_full <- sharks.HMMtracks.df |>
@@ -94,8 +94,8 @@ ggplot(data = sharks.HMMtracks.df |>
          dplyr::filter(SharksexTrackNo ==
                          c("WSF1 T1", "WSF1 T10")),
        aes(Long, Lat)) +
-  geom_path(aes(group = SharksexTrackNo), alpha=.5, color="grey") +
-  geom_point(alpha=.5) +
+  geom_path(aes(group = SharksexTrackNo), alpha = 0.5, color = "grey") +
+  geom_point(alpha = 0.5) +
   facet_wrap(~SharksexTrackNo) + theme_classic() +
   ylab("Latitude") + xlab("Longitude") + coord_map()
 
@@ -110,14 +110,14 @@ ggplot(data = sharks.HMMtracks.df |>
 init_fun_mu <- function(no_states, no_chains) {
   mu_init <- list()
   for (n in 1:no_chains) {
-    mu_init[[n]] <- list(mu = sort(runif(no_states, min=0, max=0.5)))
+    mu_init[[n]] <- list(mu = sort(runif(no_states, min = 0, max = 0.5)))
   }
   mu_init
 }
 init_fun_logmu <- function(no_states, no_chains) {
   log_mu_init <- list()
   for (n in 1:no_chains) {
-    log_mu_init[[n]] <- list(log_mu = log(sort(runif(no_states, min=0, max=0.5))))
+    log_mu_init[[n]] <- list(log_mu = log(sort(runif(no_states, min = 0, max = 0.5))))
   }
   log_mu_init
 }
@@ -181,11 +181,11 @@ eval_gamma_sdd <- function(post_draws, no_samples) {
 
   for (j in 1:no_samples) {
     state1_dens[,j] <- dgamma(xval,
-                              shape = as.numeric(post_draws[j,"shape[1]"]),
-                              rate = as.numeric(post_draws[j,"rate[1]"]))
+                              shape = as.numeric(post_draws[j, "shape[1]"]), 
+                              rate = as.numeric(post_draws[j, "rate[1]"]))
     state2_dens[,j] <- dgamma(xval,
-                              shape = as.numeric(post_draws[j,"shape[2]"]),
-                              rate = as.numeric(post_draws[j,"rate[2]"]))
+                              shape = as.numeric(post_draws[j, "shape[2]"]), 
+                              rate = as.numeric(post_draws[j, "rate[2]"]))
   }
   sdd <- data.frame(xval = rep(xval, times = no_samples),
                     state1_dens = c(state1_dens),
@@ -201,11 +201,11 @@ eval_vonMises_sdd <- function(post_draws, no_samples) {
 
   for (j in 1:no_samples) {
     state1_dens[,j] <- dvm(xval,
-                           mu = as.numeric(post_draws[j,"loc[1]"]),
-                           kappa = as.numeric(post_draws[j,"kappa[1]"]))
+                           mu = as.numeric(post_draws[j, "loc[1]"]), 
+                           kappa = as.numeric(post_draws[j, "kappa[1]"]))
     state2_dens[,j] <- dvm(xval,
-                           mu =  as.numeric(post_draws[j,"loc[2]"]),
-                           kappa = as.numeric(post_draws[j,"kappa[2]"]))
+                           mu =  as.numeric(post_draws[j, "loc[2]"]), 
+                           kappa = as.numeric(post_draws[j, "kappa[2]"]))
   }
   sdd <- data.frame(xval = rep(xval, times = no_samples),
                     state1_dens = c(state1_dens),
@@ -218,28 +218,28 @@ sdd_angle <- eval_vonMises_sdd(fit_2stateHMM_draws, no_samples = 1000)
 #| label: fig-hmm_2state_distributions
 #| warning: false
 sl_sdd <- ggplot(ws_HMM) +
-  geom_histogram(aes(steplength, y=after_stat(density)), bins=100, alpha=0.2) +
+  geom_histogram(aes(steplength, y = after_stat(density)), bins = 100, alpha = 0.2) +
   xlim(-0.01, 1) +
-  geom_line(data=sdd_steplength, aes(xval, 0.5*state1_dens, group=sample),
-            color = cbPalette[2], alpha=0.2) +
-  geom_line(data=sdd_steplength, aes(xval, 0.5*state2_dens, group=sample),
-            color=cbPalette[3], alpha=0.2) +
-  geom_line(data=sdd_steplength, aes(xval, 0.5*state1_dens + 0.5*state2_dens, group=sample),
-            color = "darkgrey", alpha=0.02) +
+  geom_line(data = sdd_steplength, aes(xval, 0.5 * state1_dens, group = sample), 
+            color = cbPalette[2], alpha = 0.2) +
+  geom_line(data = sdd_steplength, aes(xval, 0.5 * state2_dens, group = sample), 
+            color = cbPalette[3], alpha = 0.2) +
+  geom_line(data = sdd_steplength, aes(xval, 0.5 * state1_dens + 0.5 * state2_dens, group = sample), 
+            color = "darkgrey", alpha = 0.02) +
   theme_classic() + xlab("") +
   ylab("density") +
   annotate("text", x = 0.3, y = 4, label = "state 1", color = cbPalette[2])  +
   annotate("text", x = 0.45, y = 1.5, label = "state 2", color = cbPalette[3]) +
   ggtitle("step length state-dependent distributions")
 angle_sdd <- ggplot(ws_HMM) +
-  geom_histogram(aes(turnang, y=after_stat(density)), bins=100, alpha=0.2) +
+  geom_histogram(aes(turnang, y = after_stat(density)), bins = 100, alpha = 0.2) +
   xlim(-pi, pi) +
-  geom_line(data=sdd_angle, aes(xval, 0.5*state1_dens, group=sample),
-            color = cbPalette[2], alpha=0.2) +
-  geom_line(data=sdd_angle, aes(xval, 0.5*state2_dens, group=sample),
-            color=cbPalette[3], alpha=0.2) +
-  geom_line(data=sdd_angle, aes(xval, 0.5*state1_dens + 0.5*state2_dens, group=sample),
-            color = "darkgrey", alpha=0.02) +
+  geom_line(data=sdd_angle, aes(xval, 0.5 * state1_dens, group = sample), 
+            color = cbPalette[2], alpha = 0.2) +
+  geom_line(data = sdd_angle, aes(xval, 0.5 * state2_dens, group = sample), 
+            color = cbPalette[3], alpha = 0.2) +
+  geom_line(data = sdd_angle, aes(xval, 0.5 * state1_dens + 0.5 * state2_dens, group = sample), 
+            color = "darkgrey", alpha = 0.02) +
   theme_classic() + xlab("") +
   ylab("density") +
   annotate("text", x = -2.5, y = 0.25, label = "state 1", color = cbPalette[2])  +
@@ -250,15 +250,15 @@ sl_sdd + angle_sdd
 #' Plot state-decodings onto track using the forward-backward algorithm 
 #' for local state-decoding:
 state_probs_draws <- fit_2stateHMM$draws(variables =c("state_probs"), format = "draws_matrix")
-state_probs_means <- data.frame(state1prob = colMeans(state_probs_draws[1:1000,(4584+1):(2*4584)]),
-                                state2prob = colMeans(state_probs_draws[1:1000,1:4584]))
+state_probs_means <- data.frame(state1prob = colMeans(state_probs_draws[1:1000, (4584 + 1):(2 * 4584)]), 
+                                state2prob = colMeans(state_probs_draws[1:1000, 1:4584]))
 state1_probs_quants <- data.frame(
-  state1prob025 = apply(state_probs_draws[1:1000,(4584+1):(2*4584)], 2, quantile, probs=0.025),
-  state1prob975 = apply(state_probs_draws[1:1000,(4584+1):(2*4584)], 2, quantile, probs=0.975)
+  state1prob025 = apply(state_probs_draws[1:1000, (4584 + 1):(2 * 4584)], 2, quantile, probs=0.025),
+  state1prob975 = apply(state_probs_draws[1:1000, (4584 + 1):(2 * 4584)], 2, quantile, probs=0.975)
 )
 state2_probs_quants <- data.frame(
-  state1prob025 = apply(state_probs_draws[1:1000,1:(4584)], 2, quantile, probs=0.025),
-  state1prob975 = apply(state_probs_draws[1:1000,1:(4584)], 2, quantile, probs=0.975)
+  state1prob025 = apply(state_probs_draws[1:1000, 1:(4584)], 2, quantile, probs=0.025),
+  state1prob975 = apply(state_probs_draws[1:1000, 1:(4584)], 2, quantile, probs=0.975)
 )
 ws_HMM_rep <- ws_HMM_full[,c("dateTime",
                              "SharkName",
@@ -282,8 +282,8 @@ ggplot(data = ws_HMM_rep |>
          dplyr::filter(SharksexTrackNo ==
                          c("WSF1 T1", "WSF1 T10")),
        aes(Long, Lat)) +
-  geom_path(aes(group = SharksexTrackNo), alpha=.5, color="grey") +
-  geom_point(aes(color=state1prob)) +
+  geom_path(aes(group = SharksexTrackNo), alpha = .5, color = "grey") +
+  geom_point(aes(color = state1prob)) +
   labs(color = "State 1 \nProbability") +
   scale_color_viridis_c(breaks = c(0, 0.25, 0.5, 0.75, 1)) +
   facet_wrap(~SharksexTrackNo) + theme_classic() +
@@ -296,17 +296,17 @@ ggplot(data = ws_HMM_rep |>
                          c("WSF1 T1", "WSF1 T10")),
        aes(dateTime, state1prob)) + theme_classic() +
   geom_point() + geom_ribbon(aes(ymin = state1prob025,
-                                 ymax=state1prob975), alpha=0.5) +
-  facet_wrap(~SharksexTrackNo, nrow=2, scales="free_x") +
+                                 ymax = state1prob975), alpha = 0.5) +
+  facet_wrap( ~ SharksexTrackNo, nrow = 2, scales = "free_x") +
   ylab("State 1 Probability") + xlab("Time")
 
 #' Plot pseudo-residuals
 # plot pseudo residuals
 pseudo_residuals <- fit_2stateHMM$draws(variables = "pseudo_residuals",
-                                        format="draws_matrix")
-pr_mean <- colMeans(pseudo_residuals[1:1000,])
-pr_025 <- apply(pseudo_residuals[1:1000,], 2, quantile, probs=0.025)
-pr_975 <- apply(pseudo_residuals[1:1000,], 2, quantile, probs=0.975)
+                                        format = "draws_matrix")
+pr_mean <- colMeans(pseudo_residuals[1:1000, ])
+pr_025 <- apply(pseudo_residuals[1:1000, ], 2, quantile, probs = 0.025)
+pr_975 <- apply(pseudo_residuals[1:1000, ], 2, quantile, probs = 0.975)
 pr_missing_index <- which(pr_mean == 0)
 df <- data.frame(y = pr_mean[-pr_missing_index])
 
@@ -331,45 +331,45 @@ sdd_angle_loc <- fit_2stateHMM$draws("loc", format = "draws_array")
 sdd_angle_conc <- fit_2stateHMM$draws("kappa", format = "draws_array")
 post_state_samples <- fit_2stateHMM$draws("state_sequence", format = "draws_array")
 
-state_samples <- matrix(NA, nrow=4584, ncol = 1000)
-state_samples[1,1] <- sample(x = 2:1, size = 1, prob = init_dist[1,1,])
+state_samples <- matrix(NA, nrow = 4584, ncol = 1000)
+state_samples[1, 1] <- sample(x = 2:1, size = 1, prob = init_dist[1,1,])
 for (j in 1:1000) {
-  tpm_iter <- matrix(data = tpm[j, 1,4:1], nrow=2)
+  tpm_iter <- matrix(data = tpm[j, 1, 4:1], nrow = 2)
   state_samples[1,j] <- sample(x = 2:1, size = 1, prob = init_dist[j,1,])
   for (t in 2:4584) {
     if(ws_HMM$SharksexTrackNo[t]==ws_HMM$SharksexTrackNo[t-1]) {
       state_samples[t, j] <- sample(x = 2:1,
                                     size = 1,
-                                    prob = tpm_iter[state_samples[t-1,j],])
+                                    prob = tpm_iter[state_samples[t - 1, j], ])
     } else {
-      state_samples[t,j] <- sample(x = 2:1, size = 1, prob = init_dist[j,1,])
+      state_samples[t,j] <- sample(x = 2:1, size = 1, prob = init_dist[j, 1, ])
     }
   }
 }
-sim_state_counts <- apply(state_samples[1:91,], 2, table)
+sim_state_counts <- apply(state_samples[1:91, ], 2, table)
 sim_state_props <- sim_state_counts/91
-post_state_samples_counts <- apply(post_state_samples[,1,1:91], 1, table)
+post_state_samples_counts <- apply(post_state_samples[, 1, 1:91], 1, table)
 post_state_samples_props <- post_state_samples_counts/91
 
 ws_HMM_rep$chum <- ifelse(ws_HMM_full$CDB == "x", yes = 1, no = 0) 
 ws_HMM_rep$chum[which(is.na(ws_HMM_rep$CDB))] <- 0
 chum_ws1_tr1 <- which(ws_HMM_rep$chum[1:91] == 1)
-post_state_samples_chumcounts <- apply(post_state_samples[,1,chum_ws1_tr1], 1, table)
+post_state_samples_chumcounts <- apply(post_state_samples[, 1, chum_ws1_tr1], 1, table)
 post_state_samples_st2chumprops <- numeric(42)
 for (j in 1:1000) {
   post_state_samples_st2chumprops[j] <-
     max(post_state_samples_chumcounts[[j]])/42
 }
 #| label: fig-hmm_2state_decoding_histograms
-ggplot(data=data.frame(y=sim_state_props[1,]), aes(y)) +
-  geom_histogram(bins = 100, fill="darkgrey") + theme_classic() + xlim(-0.05, 1) +
-  annotate("text", label="Posterior\nPredictive\nSimulations", x=0.63, y=200, col="darkgrey") +
+ggplot(data = data.frame(y = sim_state_props[1, ]), aes(y)) +
+  geom_histogram(bins = 100, fill = "darkgrey") + theme_classic() + xlim(-0.05, 1) +
+  annotate("text", label = "Posterior\nPredictive\nSimulations", x = 0.63, y = 200, col = "darkgrey") +
   geom_histogram(data = data.frame(x = post_state_samples_props[1,]),
-                 aes(x), bins=100, fill="black") +
+                 aes(x), bins = 100, fill = "black") +
   annotate("text", label="State\nDecodings", x=0.35, y=200, col="black") +
-  geom_histogram(data=data.frame(p = 1-post_state_samples_st2chumprops),
-                 aes(p), bins=100, fill="blue") +
-  annotate("text", label="Chum", x=0.07, y=200, col="blue") +
+  geom_histogram(data = data.frame(p = 1 - post_state_samples_st2chumprops), 
+                 aes(p), bins = 100, fill = "blue") +
+  annotate("text", label = "Chum", x = 0.07, y = 200, col = "blue") +
   xlab("Proportion of State 1 Observations") +
   ylab("Count")
 
@@ -407,8 +407,8 @@ model_2stateHMM_covariates <- cmdstan_model(
 )
 fit_2stateHMM_covariates <- model_2stateHMM_covariates$sample(
   data = stanHMM_2states_covariates,
-  init=init_fun_mu(2, 4),
-  chains=4
+  init = init_fun_mu(2, 4), 
+  chains = 4
 )
 
 #' # 2-state HMM covariates in transition probability matrix and individual varying effects
@@ -421,7 +421,7 @@ stanHMM_2states_tpmcov_crencp <- list(
   steplength = ws_HMM$steplength,
   angle = ws_HMM$turnang,
   nCovs = 4,
-  covs = HMM_covar[,-1],
+  covs = HMM_covar[, -1], 
   Nsharks = length(unique(ws_HMM$SharksexTrackNo)),
   shark_index = as.numeric(as.factor(ws_HMM$SharksexTrackNo))
 )
@@ -494,36 +494,36 @@ for (i in 1:2) {
       tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                      beta = t(beta_mat),
                                      covs = DM_male_nochum)
-      lines(grid_tod, tpm[i,j,], col="grey", lwd=.1)
+      lines(grid_tod, tpm[i, j, ], col = "grey", lwd = .1)
     }
   }
 }
-beta_mat <- rbind(c(mu_tpm[1,1,1],
-                    beta[1,1,c(1, 3, 5, 7)]),
-                  c(mu_tpm[1,1,2],
-                    beta[1,1,c(2, 4, 6, 8)]))
+beta_mat <- rbind(c(mu_tpm[1, 1, 1], 
+                    beta[1, 1, c(1, 3, 5, 7)]), 
+                  c(mu_tpm[1, 1, 2], 
+                    beta[1, 1, c(2, 4, 6, 8)]))
 tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                beta = t(beta_mat),
                                covs = DM_male_nochum)
-male_chum_tpm <- data.frame(omega11 = tpm[1,1,],
-                            omega12 = tpm[1,2,],
-                            omega21 = tpm[2,1,],
-                            omega22 = tpm[2,2,],
-                            dateTime = 480:1200,
+male_chum_tpm <- data.frame(omega11 = tpm[1, 1, ], 
+                            omega12 = tpm[1, 2, ], 
+                            omega21 = tpm[2, 1, ], 
+                            omega22 = tpm[2, 2, ], 
+                            dateTime = 480:1200, 
                             draw = 1)
 for (k in 2:500) {
-  beta_mat <- rbind(c(mu_tpm[k,1,1],
-                      beta[k,1,c(1, 3, 5, 7)]),
-                    c(mu_tpm[k,1,2],
-                      beta[k,1,c(2, 4, 6, 8)]))
+  beta_mat <- rbind(c(mu_tpm[k, 1, 1], 
+                      beta[k, 1, c(1, 3, 5, 7)]), 
+                    c(mu_tpm[k, 1, 2], 
+                      beta[k, 1, c(2, 4, 6, 8)]))
   tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                  beta = t(beta_mat),
                                  covs = DM_male_nochum)
   male_chum_tpm <- rbind(male_chum_tpm,
-                         data.frame(omega11 = tpm[1,1,],
-                                    omega12 = tpm[1,2,],
-                                    omega21 = tpm[2,1,],
-                                    omega22 = tpm[2,2,],
+                         data.frame(omega11 = tpm[1, 1, ], 
+                                    omega12 = tpm[1, 2, ], 
+                                    omega21 = tpm[2, 1, ], 
+                                    omega22 = tpm[2, 2, ], 
                                     dateTime = 480:1200,
                                     draw = k))
 }
@@ -534,8 +534,8 @@ colnames(male_chum_tpm)[4] <- "omega[22](t)"
 male_chum_tpm_long <- male_chum_tpm |>
   pivot_longer(!c(dateTime, draw), names_to = "omega")
 p1 <- ggplot(male_chum_tpm_long, aes(dateTime, value)) +
-  geom_line(aes(group = draw), alpha=0.1, col="darkgrey") +
-  facet_wrap(~omega, nrow=2, ncol=2, labeller = label_parsed) +
+  geom_line(aes(group = draw), alpha = 0.1, col = "darkgrey") +
+  facet_wrap(~omega, nrow = 2, ncol = 2, labeller = label_parsed) +
   theme_classic() + ylab("Probability") +
   xlab("Time") +
   scale_x_continuous(breaks = c(540, 720, 900, 1080),
@@ -546,10 +546,10 @@ par(mfrow = c(2, 2))
 for (i in 1:2) {
   for (j in 1:2) {
 
-    beta_mat <- rbind(c(mu_tpm[1,1,1],
-                        beta[1,1,c(1, 3, 5, 7)]),
-                      c(mu_tpm[1,1,1],
-                        beta[1,1,c(2, 4, 6, 8)]))
+    beta_mat <- rbind(c(mu_tpm[1, 1, 1], 
+                        beta[1, 1, c(1, 3, 5, 7)]), 
+                      c(mu_tpm[1, 1, 1], 
+                        beta[1, 1, c(2, 4, 6, 8)]))
 
     tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                    beta = t(beta_mat),
@@ -562,48 +562,48 @@ for (i in 1:2) {
 
     for (k in 2:100) {
 
-      beta_mat <- rbind(c(mu_tpm[k,1,1],
-                          beta[k,1,c(1, 3, 5, 7)]),
-                        c(mu_tpm[k,1,2],
-                          beta[k,1,c(2, 4, 6, 8)]))
+      beta_mat <- rbind(c(mu_tpm[k, 1, 1], 
+                          beta[k, 1, c(1, 3, 5, 7)]), 
+                        c(mu_tpm[k, 1, 2], 
+                          beta[k, 1, c(2, 4, 6, 8)]))
 
       tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                      beta = t(beta_mat),
                                      covs = DM_female_nochum)
-      lines(grid_tod, tpm[i,j,], col="grey", lwd=.1)
+      lines(grid_tod, tpm[i, j, ], col = "grey", lwd = .1)
     }
   }
 }
 
-beta_mat <- rbind(c(mu_tpm[1,1,1],
-                    beta[1,1,c(1, 3, 5, 7)]),
-                  c(mu_tpm[1,1,2],
-                    beta[1,1,c(2, 4, 6, 8)]))
+beta_mat <- rbind(c(mu_tpm[1, 1, 1], 
+                    beta[1, 1, c(1, 3, 5, 7)]), 
+                  c(mu_tpm[1, 1, 2], 
+                    beta[1, 1, c(2, 4, 6, 8)]))
 tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                beta = t(beta_mat),
                                covs = DM_male_nochum)
 female_chum_tpm <- data.frame(
-  omega11 = tpm[1,1,],
-  omega12 = tpm[1,2,],
-  omega21 = tpm[2,1,],
-  omega22 = tpm[2,2,],
+  omega11 = tpm[1, 1, ], 
+  omega12 = tpm[1, 2, ], 
+  omega21 = tpm[2, 1, ], 
+  omega22 = tpm[2, 2, ], 
   dateTime = 480:1200,
   draw = 1
 )
 for (k in 2:500) {
-  beta_mat <- rbind(c(mu_tpm[1,1,1],
-                      beta[k,1,c(1, 3, 5, 7)]),
-                    c(mu_tpm[1,1,2],
-                      beta[k,1,c(2, 4, 6, 8)]))
+  beta_mat <- rbind(c(mu_tpm[1, 1, 1], 
+                      beta[k, 1, c(1, 3, 5, 7)]), 
+                    c(mu_tpm[1, 1, 2], 
+                      beta[k, 1, c(2, 4, 6, 8)]))
   tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                  beta = t(beta_mat),
                                  covs = DM_female_nochum)
   female_chum_tpm <- rbind(
     female_chum_tpm,
-    data.frame(omega11 = tpm[1,1,],
-               omega12 = tpm[1,2,],
-               omega21 = tpm[2,1,],
-               omega22 = tpm[2,2,],
+    data.frame(omega11 = tpm[1, 1, ], 
+               omega12 = tpm[1, 2, ], 
+               omega21 = tpm[2, 1, ], 
+               omega22 = tpm[2, 2, ], 
                dateTime = 480:1200,
                draw = k)
   )
@@ -616,8 +616,8 @@ colnames(female_chum_tpm)[4] <- "omega[22](t)"
 female_chum_tpm_long <- female_chum_tpm |>
   pivot_longer(!c(dateTime, draw), names_to = "omega")
 p2 <- ggplot(female_chum_tpm_long, aes(dateTime, value)) +
-  geom_line(aes(group = draw), alpha=0.1, col="darkgrey") +
-  facet_wrap(~omega, nrow=2, ncol=2, labeller = label_parsed) +
+  geom_line(aes(group = draw), alpha = 0.1, col = "darkgrey") +
+  facet_wrap(~omega, nrow = 2, ncol = 2, labeller = label_parsed) +
   theme_classic() + ylab("Probability") +
   xlab("Time") +
   scale_x_continuous(breaks = c(540, 720, 900, 1080),
@@ -629,37 +629,37 @@ wsf1_t1_covar <- HMM_covar[wsf1_t1,]
 wsf1_dateTime <- 60*hour(ws_HMM$dateTime[seq_along(wsf1_t1)]) +
   minute(ws_HMM$dateTime[seq_along(wsf1_t1)])
 dim(HMM_covar)
-beta_mat <- rbind(c(randeff[1,1,1],
-                    beta[1,1,c(1, 3, 5, 7)]),
-                  c(randeff[1,1,2],
-                    beta[1,1,c(2, 4, 6, 8)]))
+beta_mat <- rbind(c(randeff[1, 1, 1], 
+                    beta[1, 1, c(1, 3, 5, 7)]), 
+                  c(randeff[1, 1, 2], 
+                    beta[1, 1, c(2, 4, 6, 8)]))
 tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                beta = t(beta_mat),
                                covs = wsf1_t1_covar)
 wsf1_chum_tpm <- data.frame(
-  omega11 = tpm[1,1,],
-  omega12 = tpm[1,2,],
-  omega21 = tpm[2,1,],
-  omega22 = tpm[2,2,],
+  omega11 = tpm[1, 1, ], 
+  omega12 = tpm[1, 2, ], 
+  omega21 = tpm[2, 1, ], 
+  omega22 = tpm[2, 2, ], 
   dateTime = 60*hour(ws_HMM$dateTime[seq_along(wsf1_t1)]) +
     minute(ws_HMM$dateTime[seq_along(wsf1_t1)]),
   draw = 1
 )
 for (k in 2:500) {
-  beta_mat <- rbind(c(mu_tpm[k,1,1],
-                      beta[k,1,c(1, 3, 5, 7)]),
-                    c(mu_tpm[k,1,2],
-                      beta[k,1,c(2, 4, 6, 8)]))
+  beta_mat <- rbind(c(mu_tpm[k, 1, 1], 
+                      beta[k, 1, c(1, 3, 5, 7)]), 
+                    c(mu_tpm[k, 1, 2], 
+                      beta[k, 1, c(2, 4, 6, 8)]))
   tpm <- moveHMM:::trMatrix_rcpp(nbStates = 2,
                                  beta = t(beta_mat),
                                  covs = wsf1_t1_covar)
   wsf1_chum_tpm <- rbind(
     wsf1_chum_tpm,
     data.frame(
-      omega11 = tpm[1,1,],
-      omega12 = tpm[1,2,],
-      omega21 = tpm[2,1,],
-      omega22 = tpm[2,2,],
+      omega11 = tpm[1, 1, ], 
+      omega12 = tpm[1, 2, ], 
+      omega21 = tpm[2, 1, ], 
+      omega22 = tpm[2, 2, ], 
       dateTime = 60*hour(ws_HMM$dateTime[seq_along(wsf1_t1)]) +
         minute(ws_HMM$dateTime[seq_along(wsf1_t1)]),
       draw = k
@@ -676,10 +676,10 @@ wsf1_chum_tpm_long <- wsf1_chum_tpm |>
 
 p3 <- ggplot(wsf1_chum_tpm_long, aes(dateTime, value)) +
   geom_line(aes(group = draw),
-            alpha=0.1, col="darkgrey") +
+            alpha = 0.1, col = "darkgrey") +
   geom_vline(xintercept = wsf1_dateTime[wsf1_chum],
-             linetype =1, col="lightgrey", alpha=0.15) +
-  facet_wrap(~omega, nrow=2, ncol=2, labeller = label_parsed) +
+             linetype = 1, col = "lightgrey", alpha = 0.15) +
+  facet_wrap(~omega, nrow = 2, ncol = 2, labeller = label_parsed) +
   theme_classic() + ylab("Probability") +
   xlab("Time") +
   scale_x_continuous(breaks = c(540, 720, 900, 1080),
