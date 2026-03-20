@@ -543,7 +543,7 @@ logistic_first_sim_estimated
 #' An additional useful diagnostic in this case is running SBC for a
 #' derived quantity: the SBC equality has to be satisfied not only for
 #' parameters of the model, but also for all quantities derived from
-#' parameters and data. Quite often, adding the model likelihood as an
+#' parameters and data. Quite often, adding the likelihood as an
 #' additional quantity increases sensitivity of SBC checks, as the
 #' likelihood is a complex function of all parameters. So lets do just
 #' that. We don't need to refit the models, we just call

@@ -559,7 +559,7 @@ points(golf_new$x, golf_new$y / golf_new$n, pch = 20, col = "red")
 #' Here are the first few rows of the data:
 print(golf_new[1:5,])
 
-#' With such large values of $n_j$, the binomial likelihood enforces
+#' With such large values of $n_j$, the likelihood enforces
 #' an extremely close fit at these first few points, and that drives
 #' the entire fit of the model.
 #'
