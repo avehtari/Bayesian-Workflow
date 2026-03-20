@@ -1,5 +1,6 @@
 # Stan temporary files
 *.rds
+!pga-tour-2024.rds
 
 # History files
 *~
