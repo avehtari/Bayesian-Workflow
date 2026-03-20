@@ -24,5 +24,5 @@ model {
   beta ~ normal(pmubeta, psbeta);          // prior
   sigma ~ normal(0, pssigma);              // as sigma is constrained to be positive,
                                            // this is same as half-normal prior
-  y ~ normal(alpha_c + beta*x_c, sigma); // observation model / likelihood
+  y ~ normal(alpha_c + beta*x_c, sigma);   // data model
 }
