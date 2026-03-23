@@ -75,6 +75,9 @@ set1 <- brewer.pal(7, "Set1")
 #' Use English for names of weekdays and months
 Sys.setlocale("LC_TIME", "en_GB.utf8")
 
+#' Source common helpers for figures
+source(root("birthdays", "plot_helpers.R"))
+
 #' # Data
 #'
 #' Load birthdays per day in USA 1969-1988:
@@ -94,7 +97,7 @@ birthdays <- birthdays |>
 #| fig-width: 8
 birthdays |>
   ggplot(aes(x = date, y = births)) +
-  geom_point(color = set1[2]) +
+  geom_point(color = col_data) +
   labs(x = "Date", y = "Relative number of births")
 
 #' ## Plot all births as relative to mean
@@ -104,8 +107,8 @@ birthdays |>
 #| label: fig-births-data-all-relative
 birthdays |>
   ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2]) +
-  geom_hline(yintercept = 100, color = "gray") +
+  geom_point(color = col_data) +
+  layers_hline100 +
   labs(x = "Date", y = "Relative births per day")
 
 #' ## Plot mean per day of year
@@ -119,9 +122,9 @@ birthdays |>
   group_by(day_of_year2) |>
   summarise(meanbirths = mean(births_relative100)) |>
   ggplot(aes(x = as.Date("1986-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
+  geom_point(color = col_data) +
+  layers_hline100 +
+  layers_scale_doy +
   labs(x = "Day of year", y = "Relative births per day of year")
 
 #' ## Plot mean per day of week
@@ -133,9 +136,9 @@ birthdays |>
   group_by(day_of_week) |>
   summarise(meanbirths = mean(births_relative100)) |>
   ggplot(aes(x = day_of_week, y = meanbirths)) +
-  geom_point(color = set1[2], size = 4) +
-  geom_hline(yintercept = 100, color = "gray") +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
+  geom_point(color = col_data, size = 4) +
+  layers_hline100 +
+  layers_scale_weekday +
   labs(x = "Day of week", y = "Relative number of births of week")
 
 #' # Previous analyses
@@ -258,16 +261,9 @@ subset(odraws1, variable = c("intercept", "sigma_f1", "lengthscale_f1", "sigma")
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-opt1-vs-data
 oEf <- exp(as.numeric(subset(odraws1, variable = "f")))
-birthdays |>
-  mutate(oEf = oEf) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = oEf), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
+make_pf(birthdays, oEf) + layers_hline100
 
 #' We can obtain a bit more information by making a normal
 #' approximation at the mode in the unconstrained parameter space. As
@@ -412,34 +408,27 @@ summarise_draws(subset(draws1, variable = c("intercept", "sigma_f1", "lengthscal
   tt()
 #' Trace plot shows slow mixing but no multimodality.
 #| label: fig-births-fit1-trace
+#| out-width: 100%
 mcmc_trace(draws1, regex_pars = c("intercept", "sigma_f1", "lengthscale_f1", "sigma"))
 
 #' The model result from short MCMC chains looks very similar to the
 #' optimization result.
-#| code-fold: true
 #| label: fig-births-fit1-vs-data
 #| fig-height: 4
 #| fig-width: 8
 draws1 <- as_draws_matrix(draws1)
 Ef <- exp(apply(subset(draws1, variable = "f"), 2, median))
-birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
+make_pf(birthdays, Ef) + layers_hline100
 
 #' If we compare the result from short sampling to optimizing, we
 #' don't see practical difference in the predictions (although we see
 #' later more differences between optimization and MCMC).
-#| code-fold: true
 #| label: fig-births-opt1-vs-fit1
 birthdays |>
   mutate(Ef = Ef,
          oEf = oEf) |>
   ggplot(aes(x = Ef, y = oEf)) +
-  geom_point(color = set1[2]) +
+  geom_point(color = col_data) +
   geom_abline() +
   labs(x = "Ef from short Markov chain", y = "Ef from optimizing")
 
@@ -490,6 +479,7 @@ summarise_draws(subset(draws1b, variable = c("sigma_f1", "lengthscale_f1", "sigm
   tt()
 #' Examining the trace plots don't show multimodality
 #| label: fig-births-fit1b-trace
+#| out-width: 100%
 mcmc_trace(draws1b, regex_pars = c("sigma_f1", "lengthscale_f1", "sigma"))
 
 #' We drop global intercept from the rest of the models, but continue
@@ -500,20 +490,11 @@ mcmc_trace(draws1b, regex_pars = c("sigma_f1", "lengthscale_f1", "sigma"))
 #' to underestimate the posterior variance, which makes it less useful
 #' for setting the initial mass matrix. Thus, here we are using Pathfinder
 #' only to get initial values for MCMC.
-#| code-fold: true
 #| label: fig-births-pth1-vs-fit1
 variables <- names(model1b$variables()$parameters)
 sp <- summarise_draws(subset(pth1b$draws(), variable = variables))
 sm <- summarise_draws(subset(draws1b, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd, 
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd, 
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' 
 #' ### Model 2: Slow trend + yearly seasonal trend
@@ -589,7 +570,6 @@ summarise_draws(subset(pdraws2, variable = c("sigma_", "lengthscale_", "sigma"),
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-pth2-vs-data
 draws2 <- as_draws_matrix(pdraws2)
 Ef <- exp(apply(subset(draws2, variable = "f"), 2, median))
@@ -597,31 +577,10 @@ Ef1 <- apply(subset(draws2, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws2, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |> 
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf / (pf1 + pf2)
+pf  <- make_pf(birthdays, Ef) + layers_hline100
+pf1 <- make_pf1(birthdays, Ef1)
+pf2 <- make_pf2(birthdays, Ef2)
+compose_3panel(pf, pf1, pf2)
 
 #' Even Pareto-$\hat{k}$ indicated that Pathfinder approximation was
 #' not good enough to be reliably adjusted using importance sampling,
@@ -652,7 +611,6 @@ summarise_draws(subset(draws2, variable = c("sigma_", "lengthscale_", "sigma"), 
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit2-vs-data
 draws2 <- as_draws_matrix(draws2)
 Ef <- exp(apply(subset(draws2, variable = "f"), 2, median))
@@ -660,50 +618,20 @@ Ef1 <- apply(subset(draws2, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws2, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |> 
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf / (pf1 + pf2)
+pf  <- make_pf(birthdays, Ef) + layers_hline100
+pf1 <- make_pf1(birthdays, Ef1)
+pf2 <- make_pf2(birthdays, Ef2)
+compose_3panel(pf, pf1, pf2)
 
 #' Seasonal component has reasonable fit to the data.
 #' 
 
 #' Compare the mean and sd of  parameters from Pathfinder and MCMC.
-#| code-fold: true
 #| label: fig-births-pth2-vs-fit2
 variables <- names(model2$variables()$parameters)
 sp <- summarise_draws(subset(pdraws2, variable = variables))
 sm <- summarise_draws(subset(draws2, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd, 
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' ### Model 3: Slow trend + yearly seasonal trend + day of week
 #'
@@ -765,7 +693,6 @@ summarise_draws(subset(pdraws3, variable = c("sigma_", "lengthscale_", "sigma", 
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-pth3-vs-data
 draws3 <- as_draws_matrix(pdraws3)
 Ef <- exp(apply(subset(draws3, variable = "f"), 2, median))
@@ -775,36 +702,11 @@ Ef2 <- apply(subset(draws3, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
 Ef_day_of_week <- apply(subset(draws3, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-(pf + pf1) / (pf2 + pf3)
+pf  <- make_pf(birthdays, Ef)
+pf1 <- make_pf1(birthdays, Ef1)
+pf2 <- make_pf2(birthdays, Ef2)
+pf3 <- make_pf3(birthdays, Ef_day_of_week)
+compose_4panel(pf, pf1, pf2, pf3)
 
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
@@ -828,7 +730,6 @@ summarise_draws(subset(draws3, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit3-vs-data
 draws3 <- as_draws_matrix(draws3)
 Ef <- exp(apply(subset(draws3, variable = "f"), 2, median))
@@ -838,55 +739,21 @@ Ef2 <- apply(subset(draws3, variable = "f2"), 2, median)
 Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
 Ef_day_of_week <- apply(subset(draws3, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "2 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-(pf + pf1) / (pf2 + pf3)
+pf  <- make_pf(birthdays, Ef)
+pf1 <- make_pf1(birthdays, Ef1)
+pf2 <- make_pf2(birthdays, Ef2, date_breaks = "2 month")
+pf3 <- make_pf3(birthdays, Ef_day_of_week)
+compose_4panel(pf, pf1, pf2, pf3)
 
 #' Weekday effects are easy to estimate as there are about thousand
 #' observations per weekday.
 #' 
 #' Compare the mean and sd of  parameters from Pathfinder and MCMC.
-#| code-fold: true
 #| label: fig-births-pth3-vs-fit3
 variables <- names(model3$variables()$parameters)
 sp <- summarise_draws(subset(pdraws3, variable = variables))
 sm <- summarise_draws(subset(draws3, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
  
 #' ### Model 4: long term smooth + seasonal + weekday with increasing magnitude
 #'
@@ -956,7 +823,6 @@ summarise_draws(subset(pdraws4, variable = c("sigma_", "lengthscale_", "sigma", 
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-pth4-vs-data
 draws4 <- as_draws_matrix(pdraws4)
 Ef <- exp(apply(subset(draws4, variable = "f"), 2, median))
@@ -968,44 +834,11 @@ Ef_day_of_week <- apply(subset(draws4, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef3 <- apply(subset(draws4, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3b <- birthdays |>
-  mutate(Ef3 = Ef3) |>
-  ggplot(aes(x = date, y = births_relative100 / Ef1 / Ef2 * 100 * 100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-(pf + pf1) / (pf2 + pf3b)
+pf   <- make_pf(birthdays, Ef) + layers_hline100
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3b <- make_pf3b(birthdays, Ef3)
+compose_4panel(pf, pf1, pf2, pf3b)
 
 #' Sample short chains using the Pathfinder result as initial values
 #' (although the result from short chains can be useful in a quick
@@ -1029,7 +862,6 @@ summarise_draws(subset(draws4, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit4-vs-data
 draws4 <- as_draws_matrix(draws4)
 Ef <- exp(apply(subset(draws4, variable = "f"), 2, median))
@@ -1041,66 +873,22 @@ Ef_day_of_week <- apply(subset(draws4, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef3 <- apply(subset(draws4, variable = "f3"), 2, median)
 Ef3 <- exp(Ef3 - mean(Ef3) + mean(log(birthdays$births_relative100)))
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "2 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3b <- birthdays |>
-  mutate(Ef3 = Ef3) |>
-  ggplot(aes(x = date, y = births_relative100 / Ef1 / Ef2 * 100 * 100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-(pf + pf1) / (pf2 + pf3b)
+pf   <- make_pf(birthdays, Ef) + layers_hline100
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2, date_breaks = "2 month")
+pf3b <- make_pf3b(birthdays, Ef3)
+compose_4panel(pf, pf1, pf2, pf3b)
 
 #' The model fits well the different branches visible in plotted daily
 #' relative number of births, that is, it is able to model the
 #' increasing weekend effect.
 #'
 #' Compare the mean and sd of  parameters from Pathfinder and MCMC.
-#| code-fold: true
 #| label: fig-births-pth4-vs-fit4
 variables <- names(model4$variables()$parameters)
 sp <- summarise_draws(subset(pdraws4, variable = variables))
 sm <- summarise_draws(subset(draws4, variable = variables))
-ggplot(data = NULL, aes(
-        x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-        label = sm$variable
-)) +
-        geom_point(color = 4) +
-        geom_errorbar(width = 0, color = 4) +
-        geom_errorbarh(height = 0, color = 4) +
-        geom_text_repel() +
-        geom_abline(linetype = "dotted") +
-        labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' ### Model 5: long term smooth + seasonal + weekday with time dependent magnitude + day of year RHS
 #'
@@ -1186,7 +974,6 @@ summarise_draws(subset(pdraws5, variable = c("beta_f3")),
 #' We now get only one or couple distinct draws (depending on luck),
 #' so we don't get much information about the posterior width, but the
 #' draws are still providing a useful approximation.
-#| code-fold: true
 #| label: fig-births-pth5-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -1195,10 +982,10 @@ Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays
 Ef4 <- exp(Ef4) * 100
 data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
+  geom_line(color = col_fit) +
+  layers_scale_doy +
+  layers_hline100 +
+  layers_labs_date
 draws5 <- as_draws_matrix(pdraws5)
 Ef <- exp(apply(subset(draws5, variable = "f"), 2, median))
 Ef1 <- apply(subset(draws5, variable = "f1"), 2, median)
@@ -1209,51 +996,13 @@ Ef_day_of_week <- apply(subset(draws5, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
 Ef4 <- exp(Ef4) * 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4[360] - 1.5, label = "Christmas") +
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3) / pf2b
+pf   <- make_pf(birthdays, Ef)
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3  <- make_pf3(birthdays, Ef_day_of_week)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4, f13, holidays = "fixed")
+compose_6panel(pf, pf1, pf2, pf3, pf2b)
 
 #' The quick model fit looks reasonable for a quick fit.
 #'
@@ -1329,7 +1078,6 @@ summarise_draws(subset(draws5, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit5-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -1338,10 +1086,10 @@ Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays
 Ef4 <- exp(Ef4) * 100
 data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
+  geom_line(color = col_fit) +
+  layers_scale_doy +
+  layers_hline100 +
+  layers_labs_date
 draws5 <- as_draws_matrix(draws5)
 Ef <- exp(apply(subset(draws5, variable = "f"), 2, median))
 Ef1 <- apply(subset(draws5, variable = "f1"), 2, median)
@@ -1352,51 +1100,13 @@ Ef_day_of_week <- apply(subset(draws5, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef4 <- apply(subset(draws5, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
 Ef4 <- exp(Ef4) * 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4[360] - 1.5, label = "Christmas") +
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3) / pf2b
+pf   <- make_pf(birthdays, Ef)
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3  <- make_pf3(birthdays, Ef_day_of_week)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4, f13, holidays = "fixed")
+compose_6panel(pf, pf1, pf2, pf3, pf2b)
 
 #' The plot looks quite good.
 
@@ -1404,20 +1114,11 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
 #' MCMC. In this case, we are using the non-resampled Pathfinder draws
 #' (the resampled draws had only one distinct draw).
 #' Compare the mean and sd of  parameters from Pathfinder and MCMC. We see that MCMC estimates of sd for some parameters is super high, indicating bad model. Instead of trying the get the computation work better, we drop this model at the moment.
-#| code-fold: true
 #| label: fig-births-pth5-vs-fit5
 variables <- names(model5$variables()$parameters)
 sp <- summarise_draws(subset(pth5$draws(), variable = variables))
 sm <- summarise_draws(subset(draws5, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' ### Model 6: long term smooth + seasonal + weekday + day of year
 #'
@@ -1487,7 +1188,6 @@ summarise_draws(subset(pdraws6, variable = c("beta_f3")),
 #' draws are still providing a useful approximation.
 #'
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-pth6-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -1496,10 +1196,10 @@ Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays
 Ef4 <- exp(Ef4) * 100
 data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
+  geom_line(color = col_fit) +
+  layers_scale_doy +
+  layers_hline100 +
+  layers_labs_date
 draws6 <- as_draws_matrix(draws6)
 Ef <- exp(apply(subset(draws6, variable = "f"), 2, median))
 Ef1 <- apply(subset(draws6, variable = "f1"), 2, median)
@@ -1510,51 +1210,13 @@ Ef_day_of_week <- apply(subset(draws6, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
 Ef4 <- exp(Ef4) * 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4[360] - 1.5, label = "Christmas") +
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3) / pf2b
+pf   <- make_pf(birthdays, Ef)
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3  <- make_pf3(birthdays, Ef_day_of_week)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4, f13, holidays = "fixed")
+compose_6panel(pf, pf1, pf2, pf3, pf2b)
 
 #' We recognize some familiar structure in the day of year effect and
 #' proceed to sampling.
@@ -1597,7 +1259,6 @@ summarise_draws(subset(draws6, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit6-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -1606,10 +1267,10 @@ Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays
 Ef4 <- exp(Ef4) * 100
 data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
   ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
+  geom_line(color = col_fit) +
+  layers_scale_doy +
+  layers_hline100 +
+  layers_labs_date
 draws6 <- as_draws_matrix(draws6)
 Ef <- exp(apply(subset(draws6, variable = "f"), 2, median))
 Ef1 <- apply(subset(draws6, variable = "f1"), 2, median)
@@ -1620,51 +1281,13 @@ Ef_day_of_week <- apply(subset(draws6, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
 Ef4 <- exp(Ef4) * 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4[360] - 1.5, label = "Christmas") +
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3) / pf2b
+pf   <- make_pf(birthdays, Ef)
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3  <- make_pf3(birthdays, Ef_day_of_week)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4, f13, holidays = "fixed")
+compose_6panel(pf, pf1, pf2, pf3, pf2b)
 
 #' The short sampling result looks reasonable and thus the problem is
 #' not in adding the day of year effect itself.  In the bottom plot,
@@ -1680,23 +1303,13 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4) |>
 #' 
 #' Compare the mean and sd of parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
-#| code-fold: true
 #| label: fig-births-pth6-vs-fit6
 variables <- names(model6$variables()$parameters)
 sp <- summarise_draws(subset(pth6$draws(), variable = variables))
 sm <- summarise_draws(subset(draws6, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' The following plot shows the day of year effect with 90% posterior intervals.
-#| code-fold: true
 #| label: fig-births-fit6-day-of-year
 #| fig-width: 8
 #| fig-height: 3
@@ -1705,21 +1318,8 @@ Ef4r <- exp(draws6r$beta_f4*sd(log(birthdays$births_relative100)))
 draws6 <- as_draws_matrix(draws6)
 Ef4 <- apply(subset(draws6, variable = "beta_f4"), 2, median) * sd(log(birthdays$births_relative100))
 Ef4 <- exp(Ef4)
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
-pf2c <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4, ydist = Ef4r) |>
-  ggplot(aes(x = x, y = y, ydist = ydist)) +
-  stat_pointinterval(.width = 0.9, color=set1[1], alpha=0.3, size=0.5) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 1, color='gray') +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text",x=as.Date("1988-01-01")+2,y=Ef4[1]-.02,label="New year") +
-  annotate("text",x=as.Date("1988-02-14"),y=Ef4[45]+.02,label="Valentine's day") +
-  annotate("text",x=as.Date("1988-02-29"),y=Ef4[60]-.03,label="Leap day") +
-  annotate("text",x=as.Date("1988-04-01"),y=Ef4[92]-.025,label="April 1st") + 
-  annotate("text",x=as.Date("1988-07-04")+6,y=Ef4[186]-.02,label="Independence day") +
-  annotate("text",x=as.Date("1988-10-31"),y=Ef4[305]-.02,label="Halloween") + 
-  annotate("text",x=as.Date("1988-12-24"),y=Ef4[360]-.025,label="Christmas") +
-  geom_point(data=f13, aes(x=date, y=y), inherit.aes = FALSE, size=3, shape=1)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4) |> filter(day == 13)
+pf2c <- make_pf2c(Ef4, Ef4r, f13, holidays = "fixed")
 pf2c
 
 #| echo: false
@@ -1804,7 +1404,6 @@ summarise_draws(subset(pdraws7, variable = c("beta_f3")),
 #' Again we get only one or couple distinct draws (depending on luck).
 #' 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-pth7-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -1823,54 +1422,13 @@ Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4float[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4float[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4float[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4float[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4float[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4float[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4float[360] - 2, label = "Christmas") +
-  annotate("text", x = as.Date("1988-05-30"), y = Ef4float[151] - 1.5, label = "Memorial day") +
-  annotate("text", x = as.Date("1988-09-05"), y = Ef4float[249] - 1.5, label = "Labor day") + 
-  annotate("text", x = as.Date("1988-11-24"), y = Ef4float[329] - 1, label = "Thanksgiving")+
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3) / (pf2b)
+pf   <- make_pf(birthdays, Ef)
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3  <- make_pf3(birthdays, Ef_day_of_week)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4float, f13, holidays = "floating")
+compose_6panel(pf, pf1, pf2, pf3, pf2b)
 
 #' Turn of the PSIS resampling in Stan to get distinct draws for initialization.
 #| label: pth7_noresample
@@ -1906,7 +1464,6 @@ summarise_draws(subset(draws7, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit7-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -1925,54 +1482,13 @@ Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef), color = set1[1], alpha = 0.75) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4float[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4float[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4float[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4float[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4float[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4float[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4float[360] - 2, label = "Christmas") +
-  annotate("text", x = as.Date("1988-05-30"), y = Ef4float[151] - 1.5, label = "Memorial day") +
-  annotate("text", x = as.Date("1988-09-05"), y = Ef4float[249] - 1.5, label = "Labor day") + 
-  annotate("text", x = as.Date("1988-11-24"), y = Ef4float[329] - 1, label = "Thanksgiving")+
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3) / (pf2b)
+pf   <- make_pf(birthdays, Ef)
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3  <- make_pf3(birthdays, Ef_day_of_week)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4float, f13, holidays = "floating")
+compose_6panel(pf, pf1, pf2, pf3, pf2b)
 
 #' The day of year and floating special day effects are shown for year
 #' 1988 (which is also a leap year) and the results seem reasonable.
@@ -1980,23 +1496,13 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
 
 #' Compare the mean and sd of parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
-#| code-fold: true
 #| label: fig-births-pth7-vs-fit7
 variables <- names(model7$variables()$parameters)
 sp <- summarise_draws(subset(pth7$draws(), variable = variables))
 sm <- summarise_draws(subset(draws7, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' The following plot shows the day of year effect with 90% posterior intervals.
-#| code-fold: true
 #| label: fig-births-fit7-day-of-year
 #| fig-width: 8
 #| fig-height: 3
@@ -2014,24 +1520,8 @@ Efloats <- exp(Efloats)
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)]
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2c <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float, ydist = Ef4floatr) |>
-  ggplot(aes(x = x, y = y, ydist = ydist)) +
-  stat_pointinterval(.width = 0.9, color=set1[1], alpha=0.3, size=0.5) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 1, color='gray') +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text",x=as.Date("1988-01-01")+2,y=Ef4float[1]-.02,label="New year") +
-  annotate("text",x=as.Date("1988-02-14"),y=Ef4float[45]+.02,label="Valentine's day") +
-  annotate("text",x=as.Date("1988-02-29"),y=Ef4float[60]-.03,label="Leap day") +
-  annotate("text",x=as.Date("1988-04-01"),y=Ef4float[92]-.025,label="April 1st") + 
-  annotate("text",x=as.Date("1988-07-04")+6,y=Ef4float[186]-.02,label="Independence day") +
-  annotate("text",x=as.Date("1988-10-31"),y=Ef4float[305]-.02,label="Halloween") + 
-  annotate("text",x=as.Date("1988-12-24"),y=Ef4float[360]-.025,label="Christmas") +
-  annotate("text",x=as.Date("1988-05-30")-5,y=Ef4float[151]-.025,label="Memorial day") +
-  annotate("text",x=as.Date("1988-09-05")+2,y=Ef4float[249]-.03,label="Labor day") + 
-  annotate("text",x=as.Date("1988-11-24")-2,y=Ef4float[329]-.023,label="Thanksgiving") +
-  geom_point(data=f13, aes(x=date, y=y), inherit.aes = FALSE, size=3, shape=1)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2c <- make_pf2c(Ef4float, Ef4floatr, f13, holidays = "floating")
 pf2c
 
 #| echo: false
@@ -2112,7 +1602,6 @@ summarise_draws(subset(pdraws8, variable = c("beta_f3")),
 #' Again we get only one or couple distinct draws (depending on luck).
 #' 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-pth8-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -2133,63 +1622,13 @@ Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef), color = set1[1], alpha = 0.2) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-N <- length(birthdays$id)
-pf3b <- birthdays |>
-  mutate(Ef3 = Ef3 * Ef1 / 100) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4float[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4float[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4float[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4float[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4float[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4float[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4float[360] - 2, label = "Christmas") +
-  annotate("text", x = as.Date("1988-05-30"), y = Ef4float[151] - 2, label = "Memorial day") +
-  annotate("text", x = as.Date("1988-09-05"), y = Ef4float[249] - 1.5, label = "Labor day") + 
-  annotate("text", x = as.Date("1988-11-24"), y = Ef4float[329] - 1, label = "Thanksgiving")+
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3b) / (pf2b)
+pf   <- make_pf(birthdays, Ef, fit_geom = "point")
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3b <- make_pf3b(birthdays, Ef3, Ef1_vec = Ef1, weekday_labels = TRUE)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4float, f13, holidays = "floating")
+compose_6panel(pf, pf1, pf2, pf3b, pf2b)
 
 #' We turn of the PSIS resampling in Stan.
 #| label: pth8_noresample
@@ -2225,7 +1664,6 @@ summarise_draws(subset(draws8, variable = c("beta_f3"))) |>
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit8-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -2246,63 +1684,13 @@ Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef), color = set1[1], alpha = 0.2) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-N <- length(birthdays$id)
-pf3b <- birthdays |>
-  mutate(Ef3 = Ef3 * Ef1 / 100) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4float[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4float[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4float[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4float[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4float[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4float[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4float[360] - 2, label = "Christmas") +
-  annotate("text", x = as.Date("1988-05-30"), y = Ef4float[151] - 2, label = "Memorial day") +
-  annotate("text", x = as.Date("1988-09-05"), y = Ef4float[249] - 1.5, label = "Labor day") + 
-  annotate("text", x = as.Date("1988-11-24"), y = Ef4float[329] - 1, label = "Thanksgiving")+
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3b) / (pf2b)
+pf   <- make_pf(birthdays, Ef, fit_geom = "point")
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3b <- make_pf3b(birthdays, Ef3, Ef1_vec = Ef1, weekday_labels = TRUE)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4float, f13, holidays = "floating")
+compose_6panel(pf, pf1, pf2, pf3b, pf2b)
 
 #' The inference for the model works fine, which hints that our RHS
 #' implementation for the model 5 had challenging posterior. Before
@@ -2313,20 +1701,11 @@ pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
 #'
 #' Compare the mean and sd of parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
-#| code-fold: true
 #| label: fig-births-pth8-vs-fit8
 variables <- names(model8$variables()$parameters)
 sp <- summarise_draws(subset(pth8$draws(), variable = variables))
 sm <- summarise_draws(subset(draws8, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #'
 #' ### Model 8+t_nu: day of year effect with Student's t prior
@@ -2382,7 +1761,6 @@ summarise_draws(subset(draws8tnu, variable = c("intercept", "sigma_", "lengthsca
 #' normal.
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit8tnu-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -2403,63 +1781,13 @@ Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef), color = set1[1], alpha = 0.2) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-N <- length(birthdays$id)
-pf3b <- birthdays |>
-  mutate(Ef3 = Ef3 * Ef1 / 100) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4float[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4float[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4float[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4float[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4float[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4float[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4float[360] - 2, label = "Christmas") +
-  annotate("text", x = as.Date("1988-05-30"), y = Ef4float[151] - 2, label = "Memorial day") +
-  annotate("text", x = as.Date("1988-09-05"), y = Ef4float[249] - 1.5, label = "Labor day") + 
-  annotate("text", x = as.Date("1988-11-24"), y = Ef4float[329] - 1, label = "Thanksgiving")+
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3b) / (pf2b)
+pf   <- make_pf(birthdays, Ef, fit_geom = "point")
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3b <- make_pf3b(birthdays, Ef3, Ef1_vec = Ef1, weekday_labels = TRUE)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4float, f13, holidays = "floating")
+compose_6panel(pf, pf1, pf2, pf3b, pf2b)
 
 #' The other effects seem to be quite similar as with the previous
 #' model, but the day of year effects are clearly different with most
@@ -2494,20 +1822,11 @@ loo_compare(list(`Model 8 normal` = loo8, `Model 8 Student's t` = loo8tnu)) |>
 #' 
 #' Compare the mean and sd of parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
-#| code-fold: true
 #| label: fig-births-pth8tnu-vs-fit8tnu
 variables <- names(model8tnu$variables()$parameters)
 sp <- summarise_draws(subset(pth8tnu$draws(), variable = variables))
 sm <- summarise_draws(subset(draws8tnu, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' ### Model 8+RHS: day of year effect with RHS prior
 #'
@@ -2581,7 +1900,6 @@ summarise_draws(subset(draws8rhs, variable = c("sigma_", "lengthscale_", "sigma"
   tt()
 
 #' Compare the model to the data
-#| code-fold: true
 #| label: fig-births-fit8rhs-vs-data
 #| fig-width: 8
 #| fig-height: 7
@@ -2590,7 +1908,7 @@ Ef <- exp(apply(subset(draws8, variable = "f"), 2, median))
 Ef1 <- apply(subset(draws8, variable = "f1"), 2, median)
 Ef1 <- exp(Ef1 - mean(Ef1) + mean(log(birthdays$births_relative100)))
 Ef2 <- apply(subset(draws8, variable = "f2"), 2, median)
-f2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
+Ef2 <- exp(Ef2 - mean(Ef2) + mean(log(birthdays$births_relative100)))
 Ef_day_of_week <- apply(subset(draws8, variable = "f_day_of_week"), 2, median)
 Ef_day_of_week <- exp(Ef_day_of_week - mean(Ef_day_of_week) + mean(log(birthdays$births_relative100)))
 Ef3 <- apply(subset(draws8, variable = "f3"), 2, median)
@@ -2602,63 +1920,13 @@ Efloats <- exp(Efloats) * 100
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)] / 100
-pf <- birthdays |>
-  mutate(Ef = Ef) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef), color = set1[1], alpha = 0.2) +
-  labs(x = "Date", y = "Relative number of births")
-pf1 <- birthdays |>
-  mutate(Ef1 = Ef1) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_line(aes(y = Ef1), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf2 <- birthdays |>
-  mutate(Ef2 = Ef2) |>
-  group_by(day_of_year2) |>
-  summarise(meanbirths = mean(births_relative100), meanEf2 = mean(Ef2)) |>
-  ggplot(aes(x = as.Date("1987-12-31") + day_of_year2, y = meanbirths)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_line(aes(y = meanEf2), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-pf3 <- ggplot(data = birthdays, aes(x = day_of_week, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  scale_x_continuous(breaks = 1:7, labels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")) +
-  geom_line(data = data.frame(x = 1:7, y = Ef_day_of_week), aes(x = x, y = Ef_day_of_week), color = set1[1]) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births")
-N <- length(birthdays$id)
-pf3b <- birthdays |>
-  mutate(Ef3 = Ef3 * Ef1 / 100) |>
-  ggplot(aes(x = date, y = births_relative100)) +
-  geom_point(color = set1[2], alpha = 0.2) +
-  geom_point(aes(y = Ef3), color = set1[1], size = 0.1) +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1989-08-01"), y = (Ef3 * Ef1 / 100)[c((N - 5):(N - 4), N, N - 6)], label = c("Mon", "Tue", "Sat", "Sun"))
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2b <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float) |>
-  ggplot(aes(x = x, y = y)) +
-  geom_line(color = set1[1]) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 100, color = "gray") +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text", x = as.Date("1988-01-01"), y = Ef4float[1] - 1, label = "New year") +
-  annotate("text", x = as.Date("1988-02-14"), y = Ef4float[45] + 1.5, label = "Valentine's day") +
-  annotate("text", x = as.Date("1988-02-29"), y = Ef4float[60] - 2.5, label = "Leap day") +
-  annotate("text", x = as.Date("1988-04-01"), y = Ef4float[92] - 1.5, label = "April 1st") + 
-  annotate("text", x = as.Date("1988-07-04"), y = Ef4float[186] - 1.5, label = "Independence day") +
-  annotate("text", x = as.Date("1988-10-31"), y = Ef4float[305] - 1.5, label = "Halloween") + 
-  annotate("text", x = as.Date("1988-12-24"), y = Ef4float[360] - 2, label = "Christmas") +
-  annotate("text", x = as.Date("1988-05-30"), y = Ef4float[151] - 2, label = "Memorial day") +
-  annotate("text", x = as.Date("1988-09-05"), y = Ef4float[249] - 1.5, label = "Labor day") + 
-  annotate("text", x = as.Date("1988-11-24"), y = Ef4float[329] - 1, label = "Thanksgiving")+
-  geom_point(data = f13, aes(x = date, y = y), size = 3, shape = 1)
-(pf + pf1) / (pf2 + pf3b) / (pf2b)
+pf   <- make_pf(birthdays, Ef, fit_geom = "point")
+pf1  <- make_pf1(birthdays, Ef1)
+pf2  <- make_pf2(birthdays, Ef2)
+pf3b <- make_pf3b(birthdays, Ef3, Ef1_vec = Ef1, weekday_labels = TRUE)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2b <- make_pf2b(Ef4float, f13, holidays = "floating")
+compose_6panel(pf, pf1, pf2, pf3b, pf2b)
 
 #' Visually we get quite similar result as with $t_\nu$ prior. When we
 #' compare the models with LOO-CV [@Vehtari+Gelman+Gabry:2017:psisloo],
@@ -2672,20 +1940,11 @@ loo_compare(list(`Model 8 Student's t` = loo8tnu, `Model 8 RHS` = loo8rhs)) |>
 
 #' Compare the mean and sd of parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
-#| code-fold: true
 #| label: fig-births-pth8rhs-vs-fit8rhs
 variables <- names(model8rhs$variables()$parameters)
 sp <- summarise_draws(subset(pth8rhs$draws(), variable = variables))
 sm <- summarise_draws(subset(draws8rhs, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel() +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp)
 
 #' `lambda_f4` is a vector parameter for scale mixture presentation of
 #' RHS prior, and it is a weakly identifiable which can explain bigger
@@ -2748,7 +2007,7 @@ Ef <- exp(apply(subset(draws8, variable = "f"), 2, median))
 birthdays |>
   mutate(Ef = Ef) |>
   ggplot(aes(x = date, y = log(births_relative100 / Ef))) +
-  geom_point(color = set1[2]) +
+  geom_point(color = col_data) +
   geom_hline(yintercept = 0, color = "gray") +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   theme(panel.grid.major.x = element_line(color = "gray", linewidth = 1))
@@ -2882,47 +2141,26 @@ mytoc()
 
 #' Compare the mean and sd of some parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
-#| code-fold: true
 #| label: fig-births-pth8rhs-vs-fit8rhs-2
 variables <- names(model8rhs$variables()$parameters)
 sp <- summarise_draws(subset(pth8rhs$draws(), variable = variables))
 sm <- summarise_draws(subset(draws8rhs, variable = variables))
-ggplot(data = NULL, aes(x = sm$mean, xmin = sm$mean - sm$sd, xmax = sm$mean + sm$sd,
-                        y = sp$mean, ymin = sp$mean - sp$sd, ymax = sp$mean + sp$sd,
-                        label = sm$variable)) +
-  geom_point(color = 4) +
-  geom_errorbar(width = 0, color = 4) +
-  geom_errorbarh(height = 0, color = 4) +
-  geom_text_repel(max.overlaps = 20) +
-  geom_abline(linetype = "dotted") +
-  labs(x = "MCMC mean and sd", y = "Pathfinder mean and sd")
+make_pth_vs_fit(sm, sp, max.overlaps = 20)
 
 #' Plot the sd from Pathfinder divided by sd from MCMC. We see that
 #' for some parameters the order of magnitude is fine, but for some sd
 #' is underestimated by 2-3 orders of magnitude, which would make these
 #' estimates bad for initializing the mass matrix.
-#| code-fold: true
 #| label: fig-births-pth8rhs-vs-fit8rhs-sd-ratio
-data.frame(varid = 1:nrow(sp), sd_ratio = sp$sd / sm$sd) |>
-  ggplot(aes(x = varid, y = sd_ratio)) +
-  geom_point() +
-  scale_y_log10() +
-  labs(x = "Variable number", y = "sd(pathfinder) / sd(MCMC)") +
-  geom_hline(yintercept = 1, color = "gray")
+make_sd_ratio(sm, sp)
  
 #' In case of simpler models, Pathfinder estimates can be much
 #' better. For example, for the model 1b we get the following
-#| code-fold: true
 #| label: fig-births-pth1b-vs-fit1b-sd-ratio
 variables <- names(model1b$variables()$parameters)
 sp <- summarise_draws(subset(pth1b$draws(), variable = variables))
 sm <- summarise_draws(subset(draws1b, variable = variables))
-data.frame(varid = 1:nrow(sp), sd_ratio = sp$sd / sm$sd) |>
-  ggplot(aes(x = varid, y = sd_ratio)) +
-  geom_point() +
-  scale_y_log10() +
-  labs(x = "Variable number", y = "sd(pathfinder) / sd(MCMC)") +
-  geom_hline(yintercept = 1, color = "gray")
+make_sd_ratio(sm, sp)
 
 #' ### More accurate inference
 #' 
@@ -2952,7 +2190,6 @@ mytoc()
 
 #' Using this final model which is the best model based on LOO-CV
 #' comparison, we show the day of year effect with 90% posterior intervals.
-#| code-fold: true
 #| label: fig-births-fit8tnu-day-of-year
 #| fig-width: 8
 #| fig-height: 3
@@ -2970,24 +2207,8 @@ Efloats <- exp(Efloats)
 floats1988 <- c(memorial_days[20], labor_days[c(20, 40)], thanksgiving_days[c(20, 40)]) - 6939
 Ef4float <- Ef4
 Ef4float[floats1988] <- Ef4float[floats1988] * Efloats[c(1, 2, 2, 3, 3)]
-f13 <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
-pf2c <- data.frame(x = as.Date("1988-01-01") + 0:365, y = Ef4float, ydist = Ef4floatr) |>
-  ggplot(aes(x = x, y = y, ydist = ydist)) +
-  stat_pointinterval(.width = 0.9, color=set1[1], alpha=0.3, size=0.5) +
-  scale_x_date(date_breaks = "1 month", date_labels = "%b") +
-  geom_hline(yintercept = 1, color='gray') +
-  labs(x = "Date", y = "Relative number of births") +
-  annotate("text",x=as.Date("1988-01-01")+2,y=Ef4float[1]-.02,label="New year") +
-  annotate("text",x=as.Date("1988-02-14"),y=Ef4float[45]+.025,label="Valentine's day") +
-  annotate("text",x=as.Date("1988-02-29"),y=Ef4float[60]-.03,label="Leap day") +
-  annotate("text",x=as.Date("1988-04-01"),y=Ef4float[92]-.025,label="April 1st") + 
-  annotate("text",x=as.Date("1988-07-04")+6,y=Ef4float[186]-.02,label="Independence day") +
-  annotate("text",x=as.Date("1988-10-31"),y=Ef4float[305]-.025,label="Halloween") + 
-  annotate("text",x=as.Date("1988-12-24"),y=Ef4float[360]-.02,label="Christmas") +
-  annotate("text",x=as.Date("1988-05-30")-5,y=Ef4float[151]-.025,label="Memorial day") +
-  annotate("text",x=as.Date("1988-09-05"),y=Ef4float[249]-.015,label="Labor day") + 
-  annotate("text",x=as.Date("1988-11-24"),y=Ef4float[329]-.015,label="Thanksgiving") +
-  geom_point(data=f13, aes(x=date, y=y), inherit.aes = FALSE, size=3, shape=1)
+f13  <- birthdays |> filter(year == 1988) |> select(day, date) |> mutate(y = Ef4float) |> filter(day == 13)
+pf2c <- make_pf2c(Ef4float, Ef4floatr, f13, holidays = "floating")
 pf2c
 
 
