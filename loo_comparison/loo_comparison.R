@@ -511,7 +511,8 @@ loo_compare(M_3, M_4) |>
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

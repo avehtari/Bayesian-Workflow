@@ -2184,7 +2184,6 @@ make_sd_ratio(sm, sp)
 tic('MCMC sampling 4000 draws from model 8tnu posterior with earlier fit initialization')
 fit8tnu <- model8tnu$sample(data = standata8, chains = 4, parallel_chains = 4,
                             iter_warmup = 500, adapt_delta = 0.95, init = fit8tnu)
-#'
 #| cache: true
 mytoc()
 
@@ -2235,7 +2234,8 @@ f13r <- birthdays |>
 #'
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

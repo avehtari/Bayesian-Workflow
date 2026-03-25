@@ -1129,7 +1129,8 @@ bridgesampling::bf(br2b, br3b)
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' <br />
 #' 

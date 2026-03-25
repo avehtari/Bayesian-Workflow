@@ -688,7 +688,8 @@ as_draws_df(bfit_4sh) |>
 #'
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #'

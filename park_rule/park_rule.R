@@ -600,7 +600,8 @@ ggplot(data=NULL) +
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #' 
 #' # Licenses {.unnumbered}
 #' 

@@ -498,7 +498,8 @@ ggplot(ribbon_df, aes(x = sigma_spec)) +
 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

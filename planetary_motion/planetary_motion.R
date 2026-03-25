@@ -835,7 +835,8 @@ ppc_plot2D(fit2p, data_pred = data_pred, plot_star = TRUE)
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #'

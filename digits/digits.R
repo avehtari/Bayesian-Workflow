@@ -510,7 +510,8 @@ draws |>
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #' 
 #' # Licenses {.unnumbered}
 #' 

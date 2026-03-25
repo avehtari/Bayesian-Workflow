@@ -810,7 +810,8 @@ plot(cv_proportions(rankp, cumulate = TRUE))
 #'
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #'

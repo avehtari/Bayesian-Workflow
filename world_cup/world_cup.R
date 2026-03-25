@@ -564,7 +564,8 @@ ppc_loo_pit_ecdf(
 #' 
 #' # References {.unnumbered}
 #' 
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #' 
 #' # Licenses {.unnumbered}
 #' 

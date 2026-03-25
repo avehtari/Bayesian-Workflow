@@ -693,7 +693,8 @@ p3 <- ggplot(wsf1_chum_tpm_long, aes(dateTime, value)) +
 #'
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #'

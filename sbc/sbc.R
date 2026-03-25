@@ -965,7 +965,8 @@ mean(sign(stats_beta2$q5) == sign(stats_beta2$q95))
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

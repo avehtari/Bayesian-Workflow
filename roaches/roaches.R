@@ -971,7 +971,8 @@ loo_compare(fit_zinb, fit_zinb_m2,
 #' 
 #' # References {.unnumbered}
 #' 
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #' 
 #' # Licenses {.unnumbered}
 #' 

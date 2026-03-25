@@ -1120,7 +1120,8 @@ abline(0, 0, col = "gray", lty = 2)
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #' 
 #' # Licenses {.unnumbered}
 #' 
