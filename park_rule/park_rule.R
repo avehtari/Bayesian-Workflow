@@ -1,5 +1,5 @@
 #' ---
-#' title: "No vehicles in the park"
+#' title: "Sampling problems with latent variables: No vehicles in the park"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2025-09-16
 #' date-modified: today

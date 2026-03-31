@@ -1,5 +1,5 @@
 #' ---
-#' title: "Stochastic learning in dogs"
+#' title: "Posterior predictive checking: Stochastic learning in dogs"
 #' author: "Aki Vehtari and Andrew Gelman"
 #' date: 2024-04-20
 #' date-modified: today
@@ -13,8 +13,8 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' This notebook includes the `brms` code code for the Bayesian Workflow book
-#' Chapter 18 *Posterior predictive checking: Stochastic learning in dogs*.
+#' This notebook includes the `brms` code for the Bayesian Workflow book
+#' Chapter 21 *Posterior predictive checking: Stochastic learning in dogs*.
 #' 
 #' # Introduction
 #'

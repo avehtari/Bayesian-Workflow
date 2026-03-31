@@ -1,5 +1,5 @@
 #' ---
-#' title: "World Cup continuous vs discrete models"
+#' title: "Debugging a model: World Cup football"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2021-01-12
 #' date-modified: today
@@ -13,7 +13,7 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' This notebook includes the the code code for the Bayesian Workflow book
+#' This notebook includes the code for the Bayesian Workflow book
 #' Chapter 23 *Debugging a model: World Cup football*.
 #' 
 #' # World Cup 2014 team performance analysis

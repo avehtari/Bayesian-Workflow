@@ -1,5 +1,5 @@
 #' ---
-#' title: "Simulation based calibration checking workflow"
+#' title: "Simulation-based calibration checking in model development workflow"
 #' author: "Martin Modrák"
 #' date: 2022-12-16
 #' date-modified: today

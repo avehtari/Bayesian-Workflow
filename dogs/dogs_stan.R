@@ -1,5 +1,5 @@
 #' ---
-#' title: "Stochastic learning in dogs"
+#' title: "Posterior predictive checking: Stochastic learning in dogs"
 #' author: "Andrew Gelman"
 #' date: 2022-07-16
 #' date-modified: today
@@ -14,7 +14,7 @@
 #' ---
 #' 
 #' This notebook includes the `CmdStanR` code for the Bayesian Workflow book
-#' Chapter 18 *Posterior predictive checking: Stochastic learning in dogs*.
+#' Chapter 21 *Posterior predictive checking: Stochastic learning in dogs*.
 #'
 #' # Introduction
 #'

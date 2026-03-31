@@ -1,5 +1,5 @@
 #' ---
-#' title: "Model building and expansion for golf putting"
+#' title: "Model building and expansion: Golf putting"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2019-09-24
 #' date-modified: today

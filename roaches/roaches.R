@@ -1,5 +1,5 @@
 #' ---
-#' title: "Roaches cross-validation model checking and comparison"
+#' title: "Leave-one-out cross validation model checking and comparison: Roaches"
 #' author: "Aki Vehtari"
 #' date: 2017-01-10
 #' date-modified: today
@@ -13,8 +13,8 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #' 
-#' This notebook includes the the code code for the Bayesian Workflow
-#' book Chapter 24 *Leave-one-out cross validation model checking and
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 24 *Leave-one-out cross validation model checking and
 #' comparison: Roaches*.
 #' 
 #' # Introduction

@@ -1,5 +1,5 @@
 #' ---
-#' title: "Sharks and model building with latent variables"
+#' title: "Model building with latent variables: Markov models for animal movement"
 #' author: "Vianey Leos Barajas"
 #' date: 2025-12-14
 #' date-modified: today

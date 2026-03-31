@@ -1,5 +1,5 @@
 #' ---
-#' title: "Birthdays and time-series decomposition"
+#' title: "Model building: Time-series decomposition for birthdays"
 #' author: "Aki Vehtari"
 #' date: 2020-12-28
 #' date-modified: today

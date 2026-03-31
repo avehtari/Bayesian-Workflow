@@ -1,5 +1,5 @@
 #' ---
-#' title: "Student grades and variable selection with projpred"
+#' title: "Models for regression coefficients and variable selection: Student grades"
 #' author: "Aki Vehtari"
 #' date: 2023-12-14
 #' date-modified: today
@@ -13,9 +13,9 @@
 #' bibliography: ../casestudies.bib
 #' ---
 #'
-#' This notebook includes the code for Bayesian Workflow book Chapter
-#' 27 *Models for regression coefficients and variable selection: Student
-#' grades*.
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 28 *Models for regression coefficients and variable
+#' selection: Student grades*.
 #'
 #' # Introduction
 #'
