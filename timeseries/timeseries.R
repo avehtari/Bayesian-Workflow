@@ -1,5 +1,5 @@
 #' ---
-#' title: "Mixture model for time series competition"
+#' title: "Using a fitted model for decision analysis: Mixture model for time series competition"
 #' author: "Andrew Gelman"
 #' date: 2022-08-18
 #' date-modified: today

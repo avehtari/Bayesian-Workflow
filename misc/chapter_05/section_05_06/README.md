@@ -1,0 +1,3 @@
+*   `z-scores.Rmd` is from the supplementary material for Zwet, E. van, & Gelman, A. (2022). A Proposal for Informative Default Priors Scaled by the Standard Error of Estimates. *The American Statistician*, 76(1), 1–9. https://doi.org/10.1080/00031305.2021.1938225
+*   `CochraneEffects.csv.zip` (must be unzipped before use) is from Schwab, S. (2020). Re-estimating 400,000 treatment effects from intervention studies in the Cochrane Database of Systematic Reviews \[Data set\]. Open Science Framework. https://doi.org/10.17605/OSF.IO/XJV9G License: CC BY 4.0.
+*   `rpp_data.csv` is from Open Science Collaboration. (2016). RP:P Analyses \[Data set\]. Open Science Framework. https://osf.io/ytpuq/ License: CC0 1.0 Universal.

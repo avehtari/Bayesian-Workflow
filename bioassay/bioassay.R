@@ -332,7 +332,8 @@ ggplot_LD50_mg_ml +
 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

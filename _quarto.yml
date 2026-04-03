@@ -31,51 +31,51 @@ website:
         - section: "Case studies"
           contents:
             - text: "Sec 3.5: Bioassay"
-#              href: bioassay/bioassay.html
+              href: bioassay/bioassay.html
             - text: "Ch 4: Modeling performance on a multiple choice exam"
-#              href: multiple_choice/multiple_choice.html
+              href: multiple_choice/multiple_choice.html
             - text: "Sec 9.4: Model selection using predictive performance"
-#              href: loo_comparison/loo_comparison.html
+              href: loo_comparison/loo_comparison.html
             - text: "Sec 11.4 and 11.6: How many iterations to run and how many digits to report"
-#              href: digits/digits.html
+              href: digits/digits.html
             - text: "Sec 12.3: Illustration of problematic posteriors"
-#              href: problems/problems.html
+              href: problems/problems.html
             - text: "Sec 12.4: Declining exponentials"
-#              href: declining_exponentials/declining_exponentials.html
-            - text: "Ch 16: Simulated data of movie ratings"
-#              href: movies/movies.html
-            - text: "Ch 17: Sleep study: Prior specification and model checking"
-#              href: sleep_study/sleep_study.html
-            - text: "Ch 18: Nabiximols treatment efficiency"
-#              href: nabiximols/nabiximols.html
-            - text: "Ch 19: Sensitivity and specificity in coronavirus testing"
-#              href: coronavirus/coronavirus.html
-            - text: "Ch 20: Mixture model for time series competition"
-#              href: timeseries/timeseries.html
-            - text: "Ch 21: Stochastic learning in dogs -- brms"
-#              href: dogs/dogs.html
-            - text: "Ch 21: Stochastic learning in dogs -- Stan"
-#              href: dogs/dogs_stan.html
-            - text: "Ch 22: Survival analysis and black cat adoptions"
-#              href: cat_adoptions/cat_adoptions.html
-            - text: "Ch 23: World Cup continuous vs discrete models"
-#              href: world_cup/world_cup.html
-            - text: "Ch 24: Roaches cross-validation model checking and comparison"
-#              href: roaches/roaches.html
-            - text: "Ch 25: Model building and expansion for golf putting"
-#              href: golf/golf.html
-            - text: "Ch 26: Sharks and model building with latent variables"
-#              href: sharks/sharks.html
-            - text: "Ch 27: Birthdays and time-series decomposition"
-#              href: birthdays/birthdays.html
-            - text: "Ch 28: Variable selection"
-#              href: variable_selection/variable_selection.html
-            - text: "Ch 29: Park rule: No vehicles in the park"
-#              href: park_rule/park_rule.html
-            - text: "Ch 30: Planetary motion: Computational challenge of multimodality"
-#              href: planetary_motion/planetary_motion.html
-            - text: "Ch 31: Simulation based calibration checking (SBC)"
-#              href: sbc/sbc.html
+              href: declining_exponentials/declining_exponentials.html
+            - text: "Ch 16: Coding a series of models: Simulated data of movie ratings"
+              href: movies/movies.html
+            - text: "Ch 17: Prior specification for regression models: Reanalysis of a sleep study"
+              href: sleep_study/sleep_study.html
+            - text: "Ch 18: Predictive model checking and comparison: Clinical trial"
+              href: nabiximols/nabiximols.html
+            - text: "Ch 19: Building up to a hierarchical model: Coronavirus testing"
+              href: coronavirus/coronavirus.html
+            - text: "Ch 20: Using a fitted model for decision analysis: Mixture model for time series competition"
+              href: timeseries/timeseries.html
+            - text: "Ch 21: Posterior predictive checking: Stochastic learning in dogs -- brms"
+              href: dogs/dogs.html
+            - text: "Ch 21: Posterior predictive checking: Stochastic learning in dogs -- Stan"
+              href: dogs/dogs_stan.html
+            - text: "Ch 22: Incremental development and testing: Black cat adoptions"
+              href: cat_adoptions/cat_adoptions.html
+            - text: "Ch 23: Debugging a model: World Cup football"
+              href: world_cup/world_cup.html
+            - text: "Ch 24: Leave-one-out cross validation model checking and comparison: Roaches"
+              href: roaches/roaches.html
+            - text: "Ch 25: Model building and expansion: Golf putting"
+              href: golf/golf.html
+            - text: "Ch 26: Model building with latent variables: Markov models for animal movement"
+              href: sharks/sharks.html
+            - text: "Ch 27: Model building: Time-series decomposition for birthdays"
+              href: birthdays/birthdays.html
+            - text: "Ch 28: Models for regression coefficients and variable selection: Student grades"
+              href: variable_selection/variable_selection.html
+            - text: "Ch 29: Sampling problems with latent variables: No vehicles in the park"
+              href: park_rule/park_rule.html
+            - text: "Ch 30: Challenge of multimodality: Differential equation for planetary motion"
+              href: planetary_motion/planetary_motion.html
+            - text: "Ch 31: Simulation-based calibration checking in model development workflow"
+              href: sbc/sbc.html
 
 format:
   html:

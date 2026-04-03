@@ -1,5 +1,5 @@
 #' ---
-#' title: "Survival analysis and black cat adoptions"
+#' title: "Incremental development and testing: Black cat adoptions"
 #' author: "Richard McElreath and Aki Vehtari"
 #' date: 2025-12-27
 #' date-modified: today

@@ -137,14 +137,14 @@ loo_comp |>
 #' baseline, and the probability that a model has better predictive
 #' performance than the baseline.
 loo_comp2 <- sapply(list(loo1, loo2, loo3, loo4), \(x) pointwise(x, "elpd_loo")) 
-colnames(loo_comp2) <- c("M_1","M_2","M_3","M_4")
+colnames(loo_comp2) <- c("M_1", "M_2", "M_3", "M_4")
 loo_comp2 <- loo_comp2 |>
   as_tibble() |>
   mutate(across(M_1:M_4, ~ .x - M_1))
 tibble(model=colnames(loo_comp2),
        elpd_diff = apply(loo_comp2, 2, sum),
        se_diff = apply(loo_comp2, 2, \(x) sd(x) * sqrt(length(x)))) |>
-  mutate(p = ifelse(elpd_diff==0,NA,pnorm(0, -elpd_diff, se_diff))) |>
+  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, -elpd_diff, se_diff))) |> 
   tt() |>
   format_tt(replace = "-")
 
@@ -207,7 +207,7 @@ tibble(model=colnames(loo_comp2),
 #' with sleep restricted to 3 hours per night for 7 consecutive
 #' nights (days 0 and 1 were adaptation and training and removed
 #' from this analysis).
-data(sleepstudy, package="lme4")
+data(sleepstudy, package = "lme4")
 sleepstudy2 <- sleepstudy |>
   filter(Days >= 2)
 
@@ -243,28 +243,28 @@ sleepstudy2 <- sleepstudy |>
 M_1 <- brm(Reaction ~ Days,
            data = sleepstudy2,
            family = gaussian(),
-           refresh=0) |>
-  add_criterion(criterion="loo", save_psis=TRUE, reloo=TRUE)
+           refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, reloo = TRUE)
 M_2 <- brm(Reaction ~ Days + (1 | Subject),
            data = sleepstudy2,
            family = gaussian(),
-           refresh=0) |>
-  add_criterion(criterion="loo", save_psis=TRUE, reloo=TRUE)
+           refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, reloo = TRUE)
 M_3 <- brm(Reaction ~ Days + (Days | Subject),
            data = sleepstudy2,
            family = gaussian(),
-           refresh=0) |>
-  add_criterion(criterion="loo", save_psis=TRUE, reloo=TRUE)
+           refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, reloo = TRUE)
 
 #' We compare the models $\mathrm{M}_1, \mathrm{M}_2,\mathrm{M}_3,\mathrm{M}_4$
 loo_compare(M_1, M_2, M_3) |>
   as.data.frame() |>
   rownames_to_column("model") |>
   dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff==0,NA,pnorm(0, elpd_diff, se_diff))) |>
+  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
   tt() |>
-  format_tt(j=4, replace = "-") |>
-  format_tt(i=3, j=4, digits=5)
+  format_tt(j = 4, replace = "-") |> 
+  format_tt(i = 3, j = 4, digits = 5)
 
 #' Model $\mathrm{M}_3$ is estimated to have better predictive
 #' performance, but only with 0.9 probability of having better
@@ -301,8 +301,8 @@ pp_check(M_3, type="loo_intervals") +
 ggplot(data=NULL, aes(x=1:nrow(sleepstudy2),
            pointwise(M_3$criteria$loo, "elpd_loo")-pointwise(M_2$criteria$loo, "elpd_loo"))) +
   geom_point() +
-  hline_0(alpha=0.5) +
-  labs(x="Data index", y="pointwise elpd_diff")
+  hline_0(alpha = 0.5) +
+  labs(x = "Data index", y = "pointwise elpd_diff")
 
 #' We also fitted models using a Student's $t$ model to create models
 #' $\mathrm{M}_{1t}$, $\mathrm{M}_{2t}$, and $\mathrm{M}_{3t}$. Based
@@ -313,26 +313,26 @@ ggplot(data=NULL, aes(x=1:nrow(sleepstudy2),
 M_1t <- brm(Reaction ~ Days,
             data = sleepstudy2,
             family = student(),
-            refresh=0) |>
-  add_criterion(criterion="loo", save_psis=TRUE, reloo=TRUE)
+            refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, reloo = TRUE)
 M_2t <- brm(Reaction ~ Days + (1 | Subject),
             data = sleepstudy2,
             family = student(),
-            refresh=0) |>
-  add_criterion(criterion="loo", save_psis=TRUE, reloo=TRUE)
+            refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, reloo = TRUE)
 M_3t <- brm(Reaction ~ Days + (Days | Subject),
             data = sleepstudy2,
             family = student(),
-            refresh=0) |>
-  add_criterion(criterion="loo", save_psis=TRUE, reloo=TRUE)
+            refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, reloo = TRUE)
 
 #' LOO predictive intervals look now better.
-pp_check(M_2t, type="loo_intervals") +
-  labs(y="Reaction time (ms)") +
+pp_check(M_2t, type = "loo_intervals") +
+  labs(y = "Reaction time (ms)") +
   bayesplot::theme_default(base_family = "sans", base_size = 18)
 
-pp_check(M_3t, type="loo_intervals") +
-  labs(y="Reaction time (ms)") +
+pp_check(M_3t, type = "loo_intervals") +
+  labs(y = "Reaction time (ms)") +
   bayesplot::theme_default(base_family = "sans", base_size = 18)
 
 #' We first compare $\mathrm{M}_{3}$ and $\mathrm{M}_{3t}$ to see
@@ -341,9 +341,9 @@ loo_compare(M_3, M_3t) |>
   as.data.frame() |>
   rownames_to_column("model") |>
   dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff==0,NA,pnorm(0, elpd_diff, se_diff))) |>
+  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
   tt() |>
-  format_tt(j=4, replace = "-", digits=3)
+  format_tt(j = 4, replace = "-", digits = 3)
 
 #' Although in this comparison $\mathrm{M}_3$ is misspecified, the
 #' better specified model $\mathrm{M}_{3t}$ shows much better
@@ -356,9 +356,9 @@ loo_compare(M_1t, M_2t, M_3t) |>
   as.data.frame() |>
   rownames_to_column("model") |>
   dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff==0,NA,pnorm(0, elpd_diff, se_diff))) |>
+  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
   tt() |>
-  format_tt(j=4, replace = "-")
+  format_tt(j = 4, replace = "-")
 
 #' The probability that model $\mathrm{M}_{3t}$ is better than models
 #' $\mathrm{M}_{1t}$ and $\mathrm{M}_{2t}$ is close to 1. The models
@@ -371,11 +371,13 @@ loo_compare(M_1t, M_2t, M_3t) |>
 #' distribution of pointwise elpd differences is such that the normal
 #' approximation for quantifying uncertainty in elpd_diff is likely to
 #' be accurate.
-ggplot(data=NULL, aes(x=1:nrow(sleepstudy2),
-           pointwise(M_3t$criteria$loo, "elpd_loo")-pointwise(M_2t$criteria$loo, "elpd_loo"))) +
+ggplot(data = NULL, aes(
+  x = 1:nrow(sleepstudy2),
+  pointwise(M_3t$criteria$loo, "elpd_loo") - pointwise(M_2t$criteria$loo, "elpd_loo")
+)) +
   geom_point() +
-  hline_0(alpha=0.5) +
-  labs(x="Data index", y="pointwise elpd_diff")
+  hline_0(alpha = 0.5) +
+  labs(x = "Data index", y = "pointwise elpd_diff")
 
 #' In this case, the effect of days with sleep constrained to 3 hours
 #' is so big that the main conclusion stays the same with all the
@@ -436,34 +438,34 @@ roaches$sqrt_roach1 <- sqrt(roaches$roach1)
 #| results: hide
 #| cache: true
 M_1 <- brm(y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
-           family=poisson(), data=roaches,
-           prior=c(prior(normal(0,1), class='b')),
-           seed=1704009, refresh=0) |>
-  add_criterion(criterion='loo', save_psis=TRUE, reloo=TRUE)
+           family = poisson(), data = roaches, 
+           prior = c(prior(normal(0, 1), class = "b")), 
+           seed = 1704009, refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, reloo = TRUE)
 M_2 <- brm(y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
-           family=negbinomial(), data=roaches,
-           prior=c(prior(normal(0,1), class='b'),
-                   prior(inv_gamma(0.4, 0.3), class='shape')),
-           seed=1704009, refresh=0) |>
-  add_criterion(criterion='loo', save_psis=TRUE, moment_match=TRUE)
+           family = negbinomial(), data = roaches, 
+           prior = c(prior(normal(0, 1), class = "b"), 
+                     prior(inv_gamma(0.4, 0.3), class = "shape")), 
+           seed = 1704009, refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, moment_match = TRUE)
 M_3 <- brm(bf(y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
               zi ~ sqrt_roach1 + treatment + senior + offset(log(exposure2))),
-           family=zero_inflated_negbinomial(), data=roaches,
-           prior=c(prior(normal(0,1), class='b'),
-                   prior(normal(0,1), class='b', dpar='zi'),
-                   prior(normal(0,1), class='Intercept', dpar='zi'),
-                   prior(inv_gamma(0.4, 0.3), class='shape')),
-           seed=1704009, refresh=0) |>
-  add_criterion(criterion='loo', save_psis=TRUE, moment_match=TRUE)
+           family = zero_inflated_negbinomial(), data = roaches, 
+           prior = c(prior(normal(0, 1), class = "b"), 
+                     prior(normal(0, 1), class = "b", dpar = "zi"), 
+                     prior(normal(0, 1), class = "Intercept", dpar = "zi"), 
+                     prior(inv_gamma(0.4, 0.3), class = "shape")), 
+           seed = 1704009, refresh = 0) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, moment_match = TRUE)
 
 #' 
 loo_compare(M_1, M_2, M_3) |>
   as.data.frame() |>
   rownames_to_column("model") |>
   dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff==0,NA,pnorm(0, elpd_diff, se_diff))) |>
+  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
   tt() |>
-  format_tt(j=4, replace = "-", digits=4)
+  format_tt(j = 4, replace = "-", digits = 4)
 
 #' The zero-inflated negative-binomial model ($\mathrm{M}_3$) is
 #' clearly the best. Based on model checking, the Poisson model
@@ -483,23 +485,23 @@ loo_compare(M_1, M_2, M_3) |>
 #| cache: true
 M_4 <- brm(bf(y ~ s(sqrt_roach1) + treatment + senior + offset(log(exposure2)),
               zi ~ s(sqrt_roach1) + treatment + senior + offset(log(exposure2))),
-           family=zero_inflated_negbinomial(), data=roaches,
-           prior=c(prior(normal(0,1), class='b'),
-                   prior(normal(0,1), class='b', dpar='zi'),
-                   prior(normal(0,1), class='Intercept', dpar='zi'),
-                   prior(inv_gamma(0.4, 0.3), class='shape')),
+           family = zero_inflated_negbinomial(), data = roaches, 
+           prior = c(prior(normal(0, 1), class = "b"), 
+                     prior(normal(0, 1), class = "b", dpar = "zi"), 
+                     prior(normal(0, 1), class = "Intercept", dpar = "zi"), 
+                     prior(inv_gamma(0.4, 0.3), class = "shape")), 
            save_pars = save_pars(all = TRUE),
-           seed=1704009) |> 
-  add_criterion(criterion='loo', save_psis=TRUE, moment_match=TRUE)
+           seed = 1704009) |> 
+  add_criterion(criterion = "loo", save_psis = TRUE, moment_match = TRUE)
 
 #' 
 loo_compare(M_3, M_4) |>
   as.data.frame() |>
   rownames_to_column("model") |>
   dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff==0,NA,pnorm(0, elpd_diff, se_diff))) |>
+  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
   tt() |>
-  format_tt(j=4, replace = "-")
+  format_tt(j = 4, replace = "-")
 
 
 #' Model $\mathrm{M}_4$ (with spline) seems to be slightly better, but
@@ -509,7 +511,8 @@ loo_compare(M_3, M_4) |>
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

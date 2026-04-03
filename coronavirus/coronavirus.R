@@ -1,5 +1,5 @@
 #' ---
-#' title: "Sensitivity and specificity in coronavirus testing"
+#' title: "Building up to a hierarchical model: Coronavirus testing"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2022-08-22
 #' date-modified: today
@@ -498,7 +498,8 @@ ggplot(ribbon_df, aes(x = sigma_spec)) +
 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

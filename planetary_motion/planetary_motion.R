@@ -1,5 +1,5 @@
 #' ---
-#' title: "Planetary motion: Computational challenge of multimodality"
+#' title: "Challenge of multimodality: Differential equation for planetary motion"
 #' author: Charles C. Margossian, Andrew Gelman and Aki Vehtari
 #' date: 2020-11-09
 #' date-modified: today
@@ -13,9 +13,9 @@
 #' bibliography: references.bib
 #' ---
 #'
-#' This notebook includes the code for Bayesian Workflow book Chapter
-#' 30 *Computational challenge of multimodality: Differential equation
-#' for planetary motion*.
+#' This notebook includes the code for the Bayesian Workflow book
+#' Chapter 30 *Challenge of multimodality: Differential equation for
+#' planetary motion*.
 #'
 #' # Introduction
 #' 
@@ -835,7 +835,8 @@ ppc_plot2D(fit2p, data_pred = data_pred, plot_star = TRUE)
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #'

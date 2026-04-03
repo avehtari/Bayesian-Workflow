@@ -51,7 +51,13 @@ Cornell University.
 
 ### Chapter 13
 
-- [cd4.csv](http://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_13/cd4.csv): CD4 percentages for a set of young children with HIV measured several times over two years; downloaded from [sites.stat.columbia.edu/gelman/bda.course/cd4.csv](https://sites.stat.columbia.edu/gelman/bda.course/cd4.csv).
+- [cd4.csv](https://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_13/cd4.csv): CD4 percentages for a set of young children with HIV measured several times over two years; downloaded from [sites.stat.columbia.edu/gelman/bda.course/cd4.csv](https://sites.stat.columbia.edu/gelman/bda.course/cd4.csv).
+
+### Chapter 25
+
+- [pga-tour-2024.rds](https://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_25/pga-tour-2024.rds): Anonymized data for the 2024 PGA Tour golf season. Data courtesy of PGA TOUR ShotLink System.
+- [StrokeExportDefinitions.pdf](https://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_25/StrokeExportDefinitions.pdf): Data dictionary for the golf data. Data courtesy of PGA TOUR ShotLink System.
+- [Code to extract putting data](https://github.com/avehtari/Bayesian-Workflow/blob/main/exercises/chapter_25/README.md)
 
 ### Chapter 27
 

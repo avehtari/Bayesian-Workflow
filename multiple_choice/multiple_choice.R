@@ -576,7 +576,8 @@ plot_logit_grid_2(
 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #' 

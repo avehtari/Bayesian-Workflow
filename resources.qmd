@@ -28,7 +28,9 @@ format:
 
 ## Related case studies
 
+- [Motorcycle](https://users.aalto.fi/~ave/casestudies/Motorcycle/motorcycle.html): Demonstration of benefits of integration in Bayesian inference with Gaussian processes with heteroscedastic noise model and Hilbert basis function and covariance matrix implementations.
 - [Disc golf putting](https://users.aalto.fi/~ave/casestudies/disc_putting/disc_putting.html): Extends the ball golf putting model with an additional dimension and a distance-dependent component. Also illustrates the use of distances known only within some interval.
+- [Jacobian](https://users.aalto.fi/~ave/casestudies/Jacobian/jacobian.html): Illustration of Laplace method and Jacobian of parameter transformation.
 
 ## R programming and visualization with R
 

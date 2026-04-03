@@ -1,6 +1,3 @@
-# Stan temporary files
-*.rds
-
 # History files
 *~
 *#
@@ -41,12 +38,14 @@ vignettes/*.pdf
 *.utf8.md
 *.knit.md
 .Rproj.user
-Bayesian_Workflow_book.pdf
 /.quarto/
 **/*.quarto_ipynb
 
 # Stan output
 stan_output
+
+# Stan temporary files
+/sleep_study/models/
 
 # Stan model binaries
 digits/linear
@@ -161,6 +160,6 @@ world_cup/worldcup_bivariate_poisson
 world_cup/worldcup_with_replication
 world_cup/worldcup_sqrt_continuous_nojacobian
 
-# Grayscale review rendered pages
+# Book PDFs
+Bayesian_Workflow_book.pdf
 Bayesian_Workflow_book_gray.pdf
-gray_review_pages/

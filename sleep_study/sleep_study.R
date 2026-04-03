@@ -1,5 +1,5 @@
 #' ---
-#' title: "Sleep study: Prior specification and model checking"
+#' title: "Prior specification for regression models: Reanalysis of a sleep study"
 #' author: "Paul Bürkner and Aki Vehtari"
 #' date: 2025-10-22
 #' date-modified: today
@@ -15,7 +15,7 @@
 #' 
 #' This notebook includes the code for the Bayesian Workflow book
 #' Chapter 17 *Prior specification for regression models: Reanalysis
-#' of sleep study*.
+#' of a sleep study*.
 #'
 #' # Introduction
 #'
@@ -854,7 +854,8 @@ loo_compare(fit3t, fit4t)
 #' 
 #' # References {.unnumbered}
 #'
-#' <div id="refs"></div>
+#' ::: {#refs}
+#' :::
 #'
 #' # Licenses {.unnumbered}
 #'
