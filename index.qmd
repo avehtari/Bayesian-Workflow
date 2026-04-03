@@ -10,6 +10,9 @@ format:
 
 ## Information
 
+:::: {layout="[ 85, 15 ]"}
+
+::: {#first-column}
 Website for the **Bayesian Workflow** book by 
 [Andrew Gelman](http://www.stat.columbia.edu/~gelman/), 
 [Aki Vehtari](https://users.aalto.fi/ave/),
@@ -50,6 +53,13 @@ BibTeX entry:
 }
 ```
 </details>
+:::
+
+::: {#second-column}
+![](9780367490188.png)
+:::
+
+::::
 
 ## Description
 
