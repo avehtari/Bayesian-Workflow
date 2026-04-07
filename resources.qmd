@@ -31,6 +31,13 @@ format:
 - [Motorcycle](https://users.aalto.fi/~ave/casestudies/Motorcycle/motorcycle.html): Demonstration of benefits of integration in Bayesian inference with Gaussian processes with heteroscedastic noise model and Hilbert basis function and covariance matrix implementations.
 - [Disc golf putting](https://users.aalto.fi/~ave/casestudies/disc_putting/disc_putting.html): Extends the ball golf putting model with an additional dimension and a distance-dependent component. Also illustrates the use of distances known only within some interval.
 - [Jacobian](https://users.aalto.fi/~ave/casestudies/Jacobian/jacobian.html): Illustration of Laplace method and Jacobian of parameter transformation.
+- [Friends](https://users.aalto.fi/~ave/casestudies/Friends/friends.html): model checking and comprison before model interpretation
+- [mesquite](https://users.aalto.fi/~ave/casestudies/mesquite/mesquite.html), [bodyfat](https://users.aalto.fi/~ave/casestudies/bodyfat/bodyfat.html), [candy](https://users.aalto.fi/~ave/casestudies/candy/candy.html): Variable selection
+- [winequality-red](https://users.aalto.fi/~ave/casestudies/winequality-red/winequality-red.html) ordinal model variable selection
+
+## Cross-validation FAQ
+
+- [CV-FAQ](https://users.aalto.fi/~ave/CV-FAQ.html)
 
 ## R programming and visualization with R
 

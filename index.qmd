@@ -6,6 +6,7 @@ date-format: iso
 format:
   html:
     number-sections: false
+lightbox: true
 ---
 
 ## Information
@@ -56,7 +57,7 @@ BibTeX entry:
 :::
 
 ::: {#second-column}
-![](9780367490188.png)
+![](9780367490188.png){width=120 fig-alt="Cover of the Bayesian Workflow book"}
 :::
 
 ::::
