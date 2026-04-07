@@ -8,7 +8,7 @@ data {
 parameters {
   real alpha;
   vector[M] beta;
-  real gamma;
+  real gamma; // intentionally not used in the model
 }
 model {
   alpha ~ normal(0,1);

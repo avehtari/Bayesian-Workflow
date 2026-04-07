@@ -10,7 +10,6 @@ transformed data {
 }
 parameters {
   real a, b;
-  real<lower=0, upper=1> p0;
 }
 model {
   a ~ normal(mu_a, sigma_a);
