@@ -142,7 +142,7 @@ loo_comp2 <- loo_comp2 |>
   as_tibble() |>
   mutate(across(M_1:M_4, ~ .x - M_1))
 tibble(model=colnames(loo_comp2),
-       elpd_diff = apply(loo_comp2, 2, sum),
+       elpd_diff = colSums(loo_comp2),
        se_diff = apply(loo_comp2, 2, \(x) sd(x) * sqrt(length(x)))) |>
   mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, -elpd_diff, se_diff))) |> 
   tt() |>

@@ -6,12 +6,11 @@ data {
 }
 parameters {
   simplex[K] theta;
-  real sigma;
+  real<lower=0> sigma;
 }
 model {
   array[K] real ps;
-  sigma ~ cauchy(0, 2.5);
-  mu ~ normal(0, 10);
+  sigma ~ exponential(0.1);
   for (n in 1:N) {
     for (k in 1:K) {
       ps[k] = log(theta[k]) + normal_lpdf(y[n] | mu[k], sigma);
