@@ -21,10 +21,10 @@ website:
         href: errata.html
       - text: "Resources"
         href: resources.html
-   right:
-     - icon: github
-       href: https://github.com/avehtari/Bayesian-Workflow
-       text: GitHub
+    right:
+      - icon: github
+        href: https://github.com/avehtari/Bayesian-Workflow
+        text: GitHub
   sidebar:
       style: "docked"
       contents:
