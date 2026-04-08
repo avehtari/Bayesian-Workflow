@@ -133,7 +133,9 @@ mcmc_areas(fit_p, regex_pars = c("sqrt_roach1", "treatment", "senior"),
 #| fig-width: 7
 pp_check(fit_p, type = "dens_overlay", ndraws = 20) +
   scale_x_sqrt(breaks = c(0, 1, 3, 10, 30, 100, 300),
-               lim = c(0, 400))
+               lim = c(0, 400)) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.8))
 
 #' We see that the marginal distribution of model replicated data is
 #' clearly different from the observed data which are more
@@ -263,7 +265,9 @@ mcmc_areas(fit_nb, regex_pars = c("sqrt_roach1", "treatment", "senior"),
 #| fig-width: 7
 pp_check(fit_nb, type = "dens_overlay", ndraws = 20) +
   scale_x_sqrt(breaks = c(0, 1, 3, 10, 30, 100, 300),
-               lim = c(0, 400))
+               lim = c(0, 400)) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.8))
 
 #' We see that the negative-binomial model is much better although it
 #' seems that the model predictive distribution has more mass for
@@ -558,7 +562,9 @@ loo_compare(waic(fit_nb), waic(fit_pvi))
 #| fig-width: 7
 pp_check(fit_pvi, type = "dens_overlay", ndraws = 20) +
   scale_x_sqrt(breaks = c(0, 1, 3, 10, 30, 100, 300),
-               lim = c(0, 400))
+               lim = c(0, 400)) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.8))
 #' The match looks perfect, but that can be explained with having one
 #' parameter for each observation and kernel density estimate hiding something.
 #'
@@ -770,7 +776,9 @@ loo_compare(fit_nb, fit_zinb,
 #| fig-width: 7
 pp_check(fit_zinb, type = "dens_overlay", ndraws = 20) +
   scale_x_sqrt(breaks = c(0, 1, 3, 10, 30, 100, 300),
-               lim = c(0, 400))
+               lim = c(0, 400)) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.8, 0.8))
 
 #| label: fig-ppc_rootogram-zinb
 #| fig-height: 4
