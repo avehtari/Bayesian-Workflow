@@ -479,7 +479,7 @@ fit_pvi <- add_criterion(fit_pvi, criterion = "loo")
 loo(fit_pvi)
 
 #' `p_loo` is about 164, which is less than the number of parameters
-#' 267, but it is relatively large compared to to the number of
+#' 267, but it is relatively large compared to the number of
 #' observations (`p_loo >>N/5`), which indicates very flexible
 #' model. In this case, this is due to having an intercept parameter for
 #' each observation. Removing one observation changes the posterior
@@ -817,7 +817,7 @@ autoplot(rd) +
 #' be see in LOO-PIT values. Both negative-binomial and zero-inflated
 #' negative binomial are close enough the LOO-PIT can't see
 #' discrepancy from the data, but elpd_loo and calibration plot were
-#' able to to show that zero-inflation component improves the
+#' able to show that zero-inflation component improves the
 #' predictive accuracy and calibration.
 #' 
 #' ## Analyse posterior

@@ -614,7 +614,7 @@ loo(fit4, fit5)
 #' - In theory, we would not need the
 #'   exponential link on sigma but then we had to care for the positivity of the
 #'   varying intercepts on sigma and hence would have to specify, for example, an
-#'   hierarchical Gamma rather than an hierarchical normal prior.
+#'   hierarchical Gamma rather than a hierarchical normal prior.
 #' - Look at prior predictions for the correlations to demonstrate
 #'   the effect of the LKJ prior for larger than 2x2 matrices
 #' 
