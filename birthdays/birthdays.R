@@ -305,7 +305,7 @@ ldraws1 |>
 #' Here `khat` is larger than 0.7 indicating that importance sampling
 #' even with Pareto smoothing is not able to provide accurate
 #' adjustment. `min_ss` indicates how many draws would be needed to
-#' get an accurate importance weighting adjustment, and in this that
+#' get an accurate importance weighting adjustment, and in this case the
 #' number is impractically big. Even the Laplace approximation can be
 #' useful, this diagnostic shows that we would eventually want to run
 #' MCMC for more accurate inference.

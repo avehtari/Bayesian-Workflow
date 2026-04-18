@@ -391,7 +391,7 @@ loo_compare(list(`Poisson` = loo_p1, `Neg-bin` = loo_nb1))
 #' cross validation model comparison, we could have also seen that
 #' Poisson is not a good model by looking at the posterior of the
 #' over-dispersion parameter (which gets very small values), and there
-#' would not have been need to fit Poisson model at all.
+#' would not have been a need to fit the Poisson model at all.
 #| label: fig-posterior-nb_dispersion
 #| fig-height: 2
 #| fig-width: 6
