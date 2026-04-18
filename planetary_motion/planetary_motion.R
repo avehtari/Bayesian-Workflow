@@ -822,9 +822,9 @@ ppc_plot2D(fit2p, data_pred = data_pred, plot_star = TRUE)
 #'
 #' The Pathfinder algorithm can be used to find many modes and obtain
 #' approximate posterior draws. If the Pareto-$\hat{k}$ diagnostic for
-#' the Pathfinder approximation looks good, then the after the
+#' the Pathfinder approximation looks good, then after the
 #' importance sampling those draws would be good enough and there
-#' would not be need to run MCMC. Pathfinder provides a great way to
+#' would not be a need to run MCMC. Pathfinder provides a great way to
 #' fit and fail fast. Further posterior draws can be obtained using
 #' MCMC with Pathfinder initialization.
 #' 
