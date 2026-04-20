@@ -63,7 +63,7 @@ data_lin <- data.frame(year = data_kilpis$year,
 
 #' In this case, we are happy with the default prior for the
 #' intercept. In this specific case, the flat prior on coefficient is
-#' also fine, but we add an weakly informative prior just for the
+#' also fine, but we add a weakly informative prior just for the
 #' illustration. Let's assume we expect the temperature to change less
 #' than 1°C in 10 years. With `student_t(3, 0, 0.03)` about 95% prior
 #' mass has less than 0.1°C change in year, and with low degrees of

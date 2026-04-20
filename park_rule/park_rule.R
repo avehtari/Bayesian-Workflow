@@ -263,7 +263,7 @@ print(fit_1)
 fit_1$sampler_diagnostics() |> as_draws_rvars()
 
 #' We are specifically interested in how efficient each Hamiltonian
-#' Monte Carlo iteration is. This can be measured by the the number of
+#' Monte Carlo iteration is. This can be measured by the number of
 #' leapfrog steps `n_leapfrog__`, which is close to the number of log
 #' density and gradient evaluations. Instead of examining
 #' `n_leapfrog__` directly, it is common to examine `treedepth__` as

@@ -305,7 +305,7 @@ ldraws1 |>
 #' Here `khat` is larger than 0.7 indicating that importance sampling
 #' even with Pareto smoothing is not able to provide accurate
 #' adjustment. `min_ss` indicates how many draws would be needed to
-#' get an accurate importance weighting adjustment, and in this that
+#' get an accurate importance weighting adjustment, and in this case the
 #' number is impractically big. Even the Laplace approximation can be
 #' useful, this diagnostic shows that we would eventually want to run
 #' MCMC for more accurate inference.
@@ -626,7 +626,7 @@ compose_3panel(pf, pf1, pf2)
 #' Seasonal component has reasonable fit to the data.
 #' 
 
-#' Compare the mean and sd of  parameters from Pathfinder and MCMC.
+#' Compare the mean and sd of parameters from Pathfinder and MCMC.
 #| label: fig-births-pth2-vs-fit2
 variables <- names(model2$variables()$parameters)
 sp <- summarise_draws(subset(pdraws2, variable = variables))
@@ -748,7 +748,7 @@ compose_4panel(pf, pf1, pf2, pf3)
 #' Weekday effects are easy to estimate as there are about thousand
 #' observations per weekday.
 #' 
-#' Compare the mean and sd of  parameters from Pathfinder and MCMC.
+#' Compare the mean and sd of parameters from Pathfinder and MCMC.
 #| label: fig-births-pth3-vs-fit3
 variables <- names(model3$variables()$parameters)
 sp <- summarise_draws(subset(pdraws3, variable = variables))
@@ -883,7 +883,7 @@ compose_4panel(pf, pf1, pf2, pf3b)
 #' relative number of births, that is, it is able to model the
 #' increasing weekend effect.
 #'
-#' Compare the mean and sd of  parameters from Pathfinder and MCMC.
+#' Compare the mean and sd of parameters from Pathfinder and MCMC.
 #| label: fig-births-pth4-vs-fit4
 variables <- names(model4$variables()$parameters)
 sp <- summarise_draws(subset(pdraws4, variable = variables))
@@ -1113,7 +1113,7 @@ compose_6panel(pf, pf1, pf2, pf3, pf2b)
 #' Compare the mean and sd of parameters from Pathfinder and
 #' MCMC. In this case, we are using the non-resampled Pathfinder draws
 #' (the resampled draws had only one distinct draw).
-#' Compare the mean and sd of  parameters from Pathfinder and MCMC. We see that MCMC estimates of sd for some parameters is super high, indicating bad model. Instead of trying the get the computation work better, we drop this model at the moment.
+#' Compare the mean and sd of parameters from Pathfinder and MCMC. We see that MCMC estimates of sd for some parameters are super high, indicating a bad model. Instead of trying to get the computation to work better, we drop this model at the moment.
 #| label: fig-births-pth5-vs-fit5
 variables <- names(model5$variables()$parameters)
 sp <- summarise_draws(subset(pth5$draws(), variable = variables))
