@@ -4277,7 +4277,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-05</p>
     </div>
   </div>
     
@@ -4398,7 +4398,7 @@ Figure 1
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>fit_normal <span class="ot">&lt;-</span> <span class="fu">add_criterion</span>(fit_normal, <span class="at">criterion =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">save_psis =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                            <span class="at">moment_match =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The second provided models is binomial model with the number of trials being <span class="math inline">28</span> for each outcome (<code>cu</code>)</p>
+<p>The second provided model is a binomial model with the number of trials being <span class="math inline">28</span> for each outcome (<code>cu</code>)</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>fit_binomial <span class="ot">&lt;-</span> <span class="fu">brm</span>(<span class="at">formula =</span> cu <span class="sc">|</span> <span class="fu">trials</span>(set)  <span class="sc">~</span> group<span class="sc">*</span>week <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> id),</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">data =</span> cu_df,</span>
@@ -4429,9 +4429,9 @@ LOO.</code></pre>
 match)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>             elpd_diff se_diff
-fit_normal      0.0       0.0 
-fit_binomial -311.8     118.5 </code></pre>
+<pre><code>        model elpd_diff se_diff p_worse diag_diff       diag_elpd
+   fit_normal       0.0     0.0      NA                          
+ fit_binomial    -311.8   118.5    1.00           62 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 </section>
@@ -4601,9 +4601,9 @@ perform moment matching for problematic observations.</code></pre>
 match)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                  elpd_diff se_diff
-fit_normal_scaled    0.0       0.0 
-fit_normal        -913.2       0.9 </code></pre>
+<pre><code>             model elpd_diff se_diff p_worse diag_diff      diag_elpd
+ fit_normal_scaled       0.0     0.0      NA           5 k_psis &gt; 0.7
+        fit_normal    -913.2     0.9    1.00                         </code></pre>
 </div>
 </div>
 <p>However to make a fair comparison, we need to take into account the scaling we used. To get the probabilities for integer counts, the densities need to be multiplied by the discretization binwidth <span class="math inline">0.093</span>. Correspondingly in log scale we add <span class="math inline">\log(0.093)</span> to each log-density, and the total adjustment is</p>
@@ -4777,10 +4777,10 @@ perform moment matching for problematic observations.</code></pre>
 match)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                 elpd_diff se_diff
-fit_betabinomial    0.0       0.0 
-fit_normal       -538.2      33.5 
-fit_binomial     -850.0     111.8 </code></pre>
+<pre><code>            model elpd_diff se_diff p_worse diag_diff       diag_elpd
+ fit_betabinomial       0.0     0.0      NA           13 k_psis &gt; 0.7
+       fit_normal    -538.2    33.5    1.00                          
+     fit_binomial    -850.0   111.8    1.00           62 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 <p>The beta-binomial model beats the normal model big time. The difference is so big that it is unlikely that fixing Pareto-<span class="math inline">k</span> warnings matter.</p>
@@ -4802,10 +4802,10 @@ fit_binomial     -850.0     111.8 </code></pre>
 match)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                 elpd_diff se_diff
-fit_betabinomial    0.0       0.0 
-fit_normal       -538.9      33.5 
-fit_binomial     -850.7     111.8 </code></pre>
+<pre><code>            model elpd_diff se_diff p_worse diag_diff       diag_elpd
+ fit_betabinomial       0.0     0.0      NA                          
+       fit_normal    -538.9    33.5    1.00                          
+     fit_binomial    -850.7   111.8    1.00           62 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 <p>Truncated normal might get closer to beta-binomial than normal, but as I said it had difficulties here, and since beta-binomial is proper discrete observation model, I continue with that.</p>
@@ -5402,15 +5402,6 @@ vertical-align: text-top;
 .tinytable tfoot tr:nth-child(n+2) td {
 line-height: var(--tt-line-height-footnote-tight);
 }
-
-@media (prefers-color-scheme: dark) {
-.tinytable {
---tt-text-color: #e0e0e0;
---tt-line-color: #888888;
---tt-striped-bg: rgba(255, 255, 255, .03);
---tt-hover-bg: rgba(255, 255, 255, .06);
-}
-}
 </style>
     <style>
 
@@ -5977,15 +5968,6 @@ vertical-align: text-top;
 .tinytable tfoot tr:nth-child(n+2) td {
 line-height: var(--tt-line-height-footnote-tight);
 }
-
-@media (prefers-color-scheme: dark) {
-.tinytable {
---tt-text-color: #e0e0e0;
---tt-line-color: #888888;
---tt-striped-bg: rgba(255, 255, 255, .03);
---tt-hover-bg: rgba(255, 255, 255, .06);
-}
-}
 </style>
     <style>
 
@@ -6086,9 +6068,9 @@ line-height: var(--tt-line-height-footnote-tight);
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit_betabinomial, fit_betabinomial2)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                  elpd_diff se_diff
-fit_betabinomial2  0.0       0.0   
-fit_betabinomial  -1.2       2.6   </code></pre>
+<pre><code>             model elpd_diff se_diff p_worse       diag_diff diag_elpd
+ fit_betabinomial2       0.0     0.0      NA                          
+  fit_betabinomial      -1.2     2.6    0.68 |elpd_diff| &lt; 4          </code></pre>
 </div>
 </div>
 </section>
@@ -6133,9 +6115,9 @@ observations directly.</code></pre>
 match)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   elpd_diff se_diff
-fit_betabinomial2b   0.0       0.0  
-fit_betabinomial2  -35.5       9.7  </code></pre>
+<pre><code>              model elpd_diff se_diff p_worse diag_diff      diag_elpd
+ fit_betabinomial2b       0.0     0.0      NA           3 k_psis &gt; 0.7
+  fit_betabinomial2     -35.5     9.7    1.00                         </code></pre>
 </div>
 </div>
 <p>The quick fix to exclude week 0, does not change the <code>yhash</code> and we get a warning which we can ignore. The new model is clearly better than the previous best model.</p>
@@ -6597,15 +6579,6 @@ vertical-align: text-top;
 
 .tinytable tfoot tr:nth-child(n+2) td {
 line-height: var(--tt-line-height-footnote-tight);
-}
-
-@media (prefers-color-scheme: dark) {
-.tinytable {
---tt-text-color: #e0e0e0;
---tt-line-color: #888888;
---tt-striped-bg: rgba(255, 255, 255, .03);
---tt-hover-bg: rgba(255, 255, 255, .06);
-}
 }
 </style>
     <style>
@@ -7106,15 +7079,6 @@ vertical-align: text-top;
 .tinytable tfoot tr:nth-child(n+2) td {
 line-height: var(--tt-line-height-footnote-tight);
 }
-
-@media (prefers-color-scheme: dark) {
-.tinytable {
---tt-text-color: #e0e0e0;
---tt-line-color: #888888;
---tt-striped-bg: rgba(255, 255, 255, .03);
---tt-hover-bg: rgba(255, 255, 255, .06);
-}
-}
 </style>
     <style>
 
@@ -7565,9 +7529,9 @@ Figure 26
 match)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   elpd_diff se_diff
-fit_betabinomial2b    0.0       0.0 
-fit_normal2b       -268.3      23.2 </code></pre>
+<pre><code>              model elpd_diff se_diff p_worse diag_diff      diag_elpd
+ fit_betabinomial2b       0.0     0.0      NA           3 k_psis &gt; 0.7
+       fit_normal2b    -268.3    23.2    1.00           5 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 <p>Next we build models predicting total cu for all weeks (except 0), by dropping week covariate.</p>
@@ -7675,14 +7639,14 @@ Figure 27
 <div class="cell-output cell-output-stdout">
 <pre><code>Running MCMC with 4 parallel chains...
 
-Chain 3 finished in 2.8 seconds.
-Chain 1 finished in 3.2 seconds.
-Chain 4 finished in 3.6 seconds.
-Chain 2 finished in 4.3 seconds.
+Chain 3 finished in 7.9 seconds.
+Chain 1 finished in 8.4 seconds.
+Chain 2 finished in 9.9 seconds.
+Chain 4 finished in 9.8 seconds.
 
 All 4 chains finished successfully.
-Mean chain execution time: 3.5 seconds.
-Total execution time: 4.4 seconds.</code></pre>
+Mean chain execution time: 9.0 seconds.
+Total execution time: 10.2 seconds.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>fit_betabinomial3b <span class="ot">&lt;-</span> <span class="fu">add_criterion</span>(fit_betabinomial3b, <span class="at">criterion =</span> <span class="st">&quot;loo&quot;</span>, </span>
 <span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">save_psis =</span> <span class="cn">TRUE</span>, <span class="at">moment_match =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -7701,13 +7665,13 @@ observations directly.</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit_betabinomial2b, fit_betabinomial3b)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   elpd_diff se_diff
-fit_betabinomial3b  0.0       0.0   
-fit_betabinomial2b -1.1       2.4   </code></pre>
+<pre><code>              model elpd_diff se_diff p_worse       diag_diff      diag_elpd
+ fit_betabinomial3b       0.0     0.0      NA                 3 k_psis &gt; 0.7
+ fit_betabinomial2b      -1.1     2.4    0.68 |elpd_diff| &lt; 4 3 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 <p>There are a few high Pareto k values for PSIS-LOO even after moment matching, and for final results we would use also <code>reloo=TRUE</code> argument, but the conclusions are likely to be the same.</p>
-<p>There is a negligible difference in predictive performance for predicting cannabis use in a 4-week period for a new person. This is probably due to 1. the actual effect not being very far from 0, 2. the aleatoric uncertainty (modelled by the beta-binomial) for a new 4-week period is big, that is the predictive distribution is very wide and due to the constrained range has also thick tails (actually U shape), which makes the log score not to be sensitive in tails.</p>
+<p>There is a negligible difference in predictive performance for predicting cannabis use in a 4-week period for a new person. This is probably due to 1. the actual effect not being very far from 0, 2. the aleatoric uncertainty (modelled by the beta-binomial) for a new 4-week period is big, that is the predictive distribution is very wide and due to the constrained range has also thick tails (actually U shape), which makes the log score not sensitive in the tails.</p>
 <p>As the predictive distribution is wide with thick tails, we can also focus on comparing absolute error of using means of the predictive distributions as point estimates. This approach has the benefit that we can improve accuracy of the finite MCMC sample by dropping the sampling from the varying intercept population distribution and from the beta-binomial distribution (using <code>posterior_epred(, re_formula=NA)</code>. <code>E_loo</code> is used to go from posterior predictive draws to the mean of leave-one-out predictive distribution.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>ae2 <span class="ot">&lt;-</span> <span class="fu">abs</span>(cu_df_b<span class="sc">$</span>cu <span class="sc">-</span> <span class="fu">E_loo</span>(<span class="fu">posterior_epred</span>(fit_betabinomial2b, <span class="at">re_formula =</span> <span class="cn">NA</span>),</span>
@@ -8404,7 +8368,7 @@ Vehtari, Aki, Daniel Simpson, Andrew Gelman, Yuling Yao, and Jonah Gabry. 2024. 
 <span id="cb115-151"><a href="#cb115-151" aria-hidden="true" tabindex="-1"></a>fit_normal &lt;- add_criterion(fit_normal, criterion = &quot;loo&quot;, save_psis = TRUE,</span>
 <span id="cb115-152"><a href="#cb115-152" aria-hidden="true" tabindex="-1"></a>                            moment_match = TRUE)</span>
 <span id="cb115-153"><a href="#cb115-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb115-154"><a href="#cb115-154" aria-hidden="true" tabindex="-1"></a>#&#39; The second provided models is binomial model with the number of</span>
+<span id="cb115-154"><a href="#cb115-154" aria-hidden="true" tabindex="-1"></a>#&#39; The second provided model is a binomial model with the number of</span>
 <span id="cb115-155"><a href="#cb115-155" aria-hidden="true" tabindex="-1"></a>#&#39; trials being $28$ for each outcome (<span class="in">`cu`</span>)</span>
 <span id="cb115-156"><a href="#cb115-156" aria-hidden="true" tabindex="-1"></a>#| label: fit_binomial</span>
 <span id="cb115-157"><a href="#cb115-157" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
@@ -9334,7 +9298,7 @@ Vehtari, Aki, Daniel Simpson, Andrew Gelman, Yuling Yao, and Jonah Gabry. 2024. 
 <span id="cb115-1081"><a href="#cb115-1081" aria-hidden="true" tabindex="-1"></a>#&#39;    for a new 4-week period is big, that is the predictive</span>
 <span id="cb115-1082"><a href="#cb115-1082" aria-hidden="true" tabindex="-1"></a>#&#39;    distribution is very wide and due to the constrained range</span>
 <span id="cb115-1083"><a href="#cb115-1083" aria-hidden="true" tabindex="-1"></a>#&#39;    has also thick tails (actually U shape), which makes the log</span>
-<span id="cb115-1084"><a href="#cb115-1084" aria-hidden="true" tabindex="-1"></a>#&#39;    score not to be sensitive in tails.</span>
+<span id="cb115-1084"><a href="#cb115-1084" aria-hidden="true" tabindex="-1"></a>#&#39;    score not sensitive in the tails.</span>
 <span id="cb115-1085"><a href="#cb115-1085" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
 <span id="cb115-1086"><a href="#cb115-1086" aria-hidden="true" tabindex="-1"></a>#&#39; As the predictive distribution is wide with thick tails, we can</span>
 <span id="cb115-1087"><a href="#cb115-1087" aria-hidden="true" tabindex="-1"></a>#&#39; also focus on comparing absolute error of using means of the</span>

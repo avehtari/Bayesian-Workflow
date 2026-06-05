@@ -4278,7 +4278,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-05</p>
     </div>
   </div>
     
@@ -5365,9 +5365,9 @@ Pareto k diagnostic values:
 See help(&#39;pareto-k-diagnostic&#39;) for details.
 
 Model comparisons:
-     elpd_diff se_diff
-fit5   0.0       0.0  
-fit4 -11.6       4.7  </code></pre>
+ model elpd_diff se_diff p_worse diag_diff      diag_elpd
+  fit5       0.0     0.0      NA           3 k_psis &gt; 0.7
+  fit4     -11.6     4.7    0.99           3 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 </section>
@@ -5377,7 +5377,7 @@ fit4 -11.6       4.7  </code></pre>
 <ul>
 <li>Parameters for standard deviations on the log or log-log scale or hard to understand and hence set priors on.</li>
 <li>This is specifically true for standard deviations of standard deviations on the log or log-log scale.</li>
-<li>In theory, we would not need the exponential link on sigma but then we had to care for the positivity of the varying intercepts on sigma and hence would have to specify, for example, an hierarchical Gamma rather than an hierarchical normal prior.</li>
+<li>In theory, we would not need the exponential link on sigma but then we had to care for the positivity of the varying intercepts on sigma and hence would have to specify, for example, an hierarchical Gamma rather than a hierarchical normal prior.</li>
 <li>Look at prior predictions for the correlations to demonstrate the effect of the LKJ prior for larger than 2x2 matrices</li>
 </ul>
 <p>Prior 6</p>
@@ -5753,9 +5753,9 @@ Figure 31
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit4, fit5)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     elpd_diff se_diff
-fit5   0.0       0.0  
-fit4 -12.2       5.0  </code></pre>
+<pre><code> model elpd_diff se_diff p_worse diag_diff diag_elpd
+  fit5       0.0     0.0      NA                    
+  fit4     -12.2     5.0    0.99                    </code></pre>
 </div>
 </div>
 <p>Log-normal is not different from normal model, which makes sense as all reaction times are fra from 0.</p>
@@ -5826,9 +5826,9 @@ Figure 34
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit4, fit4t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      elpd_diff se_diff
-fit4t   0.0       0.0  
-fit4  -40.8      13.7  </code></pre>
+<pre><code> model elpd_diff se_diff p_worse diag_diff diag_elpd
+ fit4t       0.0     0.0      NA                    
+  fit4     -40.8    13.7    1.00                    </code></pre>
 </div>
 </div>
 <p>Student’s <span class="math inline">t</span> model has much better predictive performance.</p>
@@ -5836,18 +5836,18 @@ fit4  -40.8      13.7  </code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit3, fit4)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>     elpd_diff se_diff
-fit4   0.0       0.0  
-fit3 -13.6      10.3  </code></pre>
+<pre><code> model elpd_diff se_diff p_worse diag_diff diag_elpd
+  fit4       0.0     0.0      NA                    
+  fit3     -13.6    10.3    0.91                    </code></pre>
 </div>
 </div>
 <p>Examine how much adding varying slope improved predictive performance in case of Student’s <span class="math inline">t</span> data model:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit3t, fit4t)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      elpd_diff se_diff
-fit4t   0.0       0.0  
-fit3t -45.6       8.6  </code></pre>
+<pre><code> model elpd_diff se_diff p_worse diag_diff diag_elpd
+ fit4t       0.0     0.0      NA                    
+ fit3t     -45.6     8.6    1.00                    </code></pre>
 </div>
 </div>
 <p>When using Student’s <span class="math inline">t</span> model, the predictive performance difference between not using or using varying slope is bigger.</p>
@@ -6943,7 +6943,7 @@ Belenky, G., N. J. Wesensten, D. R. Thorne, M. L. Thomas, H. C. Sing, D. P. Redm
 <span id="cb106-614"><a href="#cb106-614" aria-hidden="true" tabindex="-1"></a>#&#39; - In theory, we would not need the</span>
 <span id="cb106-615"><a href="#cb106-615" aria-hidden="true" tabindex="-1"></a>#&#39;   exponential link on sigma but then we had to care for the positivity of the</span>
 <span id="cb106-616"><a href="#cb106-616" aria-hidden="true" tabindex="-1"></a>#&#39;   varying intercepts on sigma and hence would have to specify, for example, an</span>
-<span id="cb106-617"><a href="#cb106-617" aria-hidden="true" tabindex="-1"></a>#&#39;   hierarchical Gamma rather than an hierarchical normal prior.</span>
+<span id="cb106-617"><a href="#cb106-617" aria-hidden="true" tabindex="-1"></a>#&#39;   hierarchical Gamma rather than a hierarchical normal prior.</span>
 <span id="cb106-618"><a href="#cb106-618" aria-hidden="true" tabindex="-1"></a>#&#39; - Look at prior predictions for the correlations to demonstrate</span>
 <span id="cb106-619"><a href="#cb106-619" aria-hidden="true" tabindex="-1"></a>#&#39;   the effect of the LKJ prior for larger than 2x2 matrices</span>
 <span id="cb106-620"><a href="#cb106-620" aria-hidden="true" tabindex="-1"></a>#&#39; </span>

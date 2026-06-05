@@ -4284,7 +4284,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-05</p>
     </div>
   </div>
     
@@ -4808,18 +4808,18 @@ Figure 6
 <pre><code>Running MCMC with 8 parallel chains...</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Chain 5 finished in 1.1 seconds.
-Chain 1 finished in 1.3 seconds.
+<pre><code>Chain 8 finished in 1.0 seconds.
 Chain 4 finished in 1.3 seconds.
+Chain 7 finished in 1.3 seconds.
+Chain 1 finished in 1.6 seconds.
 Chain 2 finished in 1.5 seconds.
-Chain 3 finished in 1.5 seconds.
+Chain 5 finished in 1.5 seconds.
 Chain 6 finished in 1.5 seconds.
-Chain 7 finished in 1.5 seconds.
-Chain 8 finished in 1.5 seconds.
+Chain 3 finished in 1.7 seconds.
 
 All 8 chains finished successfully.
 Mean chain execution time: 1.4 seconds.
-Total execution time: 1.7 seconds.</code></pre>
+Total execution time: 1.9 seconds.</code></pre>
 </div>
 </div>
 <p>Convergence diagnostics look good</p>
@@ -5086,7 +5086,7 @@ Figure 10
 <p>In the planetary motion example, we are confronted with a multimodal posterior distribution. This geometry prevents our chains from cohesively exploring the parameter space and leads to biased Monte Carlo estimates. It is important to understand how these local modes arise and what their contribution to the posterior probability mass might be. We do so using posterior predictive checks. It is not uncommon for minor modes, with negligible probability mass, to trap a Markov chain. The possibility of such ill-fitting modes implies we should always run multiple chains, perhaps more than our current default of <span class="math inline">4</span>.</p>
 <p>This case study also raises the question of what role starting points may play. Ideally a Markov chain forgets its initial value but in a non-asymptotic regime this may not be the case. Just as there is no universal default prior, there is no universal default initial point. Modelers often need to depart from defaults to ensure a numerically stable evaluation of the joint density and improve MCMC computation. At the same time we want dispersed initial points in order to have reliable convergence diagnostics and to potentially explore all the relevant modes. As with other tuning parameters of an inference algorithm, picking starting points can be an iterative process, with adjustments made after a first attempt at fitting the model.</p>
 <p>We do not advocate mindlessly discarding misbehaving chains. It is important to analyze where this poor behavior comes from, and whether it hints at serious flaws in our model and in our inference.</p>
-<p>The Pathfinder algorithm can be used to find many modes and obtain approximate posterior draws. If the Pareto-<span class="math inline">\hat{k}</span> diagnostic for the Pathfinder approximation looks good, then the after the importance sampling those draws would be good enough and there would not be need to run MCMC. Pathfinder provides a great way to fit and fail fast. Further posterior draws can be obtained using MCMC with Pathfinder initialization.</p>
+<p>The Pathfinder algorithm can be used to find many modes and obtain approximate posterior draws. If the Pareto-<span class="math inline">\hat{k}</span> diagnostic for the Pathfinder approximation looks good, then after the importance sampling those draws would be good enough and there would not be a need to run MCMC. Pathfinder provides a great way to fit and fail fast. Further posterior draws can be obtained using MCMC with Pathfinder initialization.</p>
 </section>
 <section id="acknowledgement" class="level1 unnumbered">
 <h1 class="unnumbered">Acknowledgement</h1>
@@ -6418,9 +6418,9 @@ Zhang, L., B. Carpenter, A. Gelman, and A. Vehtari. 2022. <span>“Pathfinder: P
 <span id="cb40-822"><a href="#cb40-822" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
 <span id="cb40-823"><a href="#cb40-823" aria-hidden="true" tabindex="-1"></a>#&#39; The Pathfinder algorithm can be used to find many modes and obtain</span>
 <span id="cb40-824"><a href="#cb40-824" aria-hidden="true" tabindex="-1"></a>#&#39; approximate posterior draws. If the Pareto-$\hat{k}$ diagnostic for</span>
-<span id="cb40-825"><a href="#cb40-825" aria-hidden="true" tabindex="-1"></a>#&#39; the Pathfinder approximation looks good, then the after the</span>
+<span id="cb40-825"><a href="#cb40-825" aria-hidden="true" tabindex="-1"></a>#&#39; the Pathfinder approximation looks good, then after the</span>
 <span id="cb40-826"><a href="#cb40-826" aria-hidden="true" tabindex="-1"></a>#&#39; importance sampling those draws would be good enough and there</span>
-<span id="cb40-827"><a href="#cb40-827" aria-hidden="true" tabindex="-1"></a>#&#39; would not be need to run MCMC. Pathfinder provides a great way to</span>
+<span id="cb40-827"><a href="#cb40-827" aria-hidden="true" tabindex="-1"></a>#&#39; would not be a need to run MCMC. Pathfinder provides a great way to</span>
 <span id="cb40-828"><a href="#cb40-828" aria-hidden="true" tabindex="-1"></a>#&#39; fit and fail fast. Further posterior draws can be obtained using</span>
 <span id="cb40-829"><a href="#cb40-829" aria-hidden="true" tabindex="-1"></a>#&#39; MCMC with Pathfinder initialization.</span>
 <span id="cb40-830"><a href="#cb40-830" aria-hidden="true" tabindex="-1"></a>#&#39; </span>

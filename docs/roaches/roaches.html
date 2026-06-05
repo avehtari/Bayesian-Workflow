@@ -4285,7 +4285,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-08</p>
+      <p class="date-modified">2026-06-05</p>
     </div>
   </div>
     
@@ -4491,11 +4491,11 @@ See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;Poisson w/o treatment&quot;</span>,</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                            <span class="st">&quot;Poisson w/o senior&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                         elpd_diff se_diff
-Poisson w/o senior           0.0       0.0
-Poisson full model         -13.0     180.6
-Poisson w/o treatment     -216.7     228.2
-Poisson w/o sqrt(roach1) -2750.4     638.1</code></pre>
+<pre><code>                    model elpd_diff se_diff p_worse diag_diff diag_elpd
+       Poisson w/o senior       0.0     0.0      NA                    
+       Poisson full model     -13.0   180.6    0.53                    
+    Poisson w/o treatment    -216.7   228.2    0.83                    
+ Poisson w/o sqrt(roach1)   -2750.4   638.1    1.00                    </code></pre>
 </div>
 </div>
 <p>Based on <code>elpd_diff</code> and <code>se_diff</code> the roaches covariate would be relevant, but although dropping treatment or senior covariate will make a large change to elpd, the uncertainty is also very large and cross-validation indicates that these covariates are not necessarily relevant. The posterior marginals are conditional on the model, but cross-validation is more cautious by not using any model for the future data distribution. The column <code>p_worse</code> provides a normal approximation base probability that the model is worse than the model with the best performance. The column <code>diag_diff</code> indicates that the distributions of the pointwise performance differences are likely to have so thick tails that the normal approximation based on <code>elpd_diff</code> and <code>diff_se</code> is not well calibrated, and we can’t trust the <code>p_worse</code> values. In this case, the thick tails in the pointwise performance differences are likely due to Poisson model being underdispersed compared to the data.</p>
@@ -4677,9 +4677,9 @@ Figure 10
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit_p, fit_nb, <span class="at">model_names =</span> <span class="fu">c</span>(<span class="st">&quot;Poisson&quot;</span>, <span class="st">&quot;Neg-bin&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        elpd_diff se_diff
-Neg-bin     0.0       0.0
-Poisson -4597.3     680.1</code></pre>
+<pre><code>   model elpd_diff se_diff p_worse diag_diff diag_elpd
+ Neg-bin       0.0     0.0      NA                    
+ Poisson   -4597.3   680.1    1.00                    </code></pre>
 </div>
 </div>
 <p>In LOO model comparison the negative binomial model is much better than the Poisson model. The diagnostic <code>diag_diff</code> indicates the pointwise performance differences are likely to have thick tails, which is again likely due to the Poisson model being underdispersed. As we have made the model checking, we know that the Poisson model is misspecified and could be dropped just based on that fact. As the difference is very big and many times bigger than <code>diff_se</code>, we can also be certain that negative binomials model has better predictive performance.</p>
@@ -4687,13 +4687,13 @@ Poisson -4597.3     680.1</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">`</span><span class="at">Poisson</span><span class="st">`</span> <span class="ot">=</span> loo_p1, <span class="st">`</span><span class="at">Neg-bin</span><span class="st">`</span> <span class="ot">=</span> loo_nb1))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        elpd_diff se_diff
-Neg-bin     0.0       0.0
-Poisson -4579.0     674.3</code></pre>
+<pre><code>   model elpd_diff se_diff p_worse diag_diff       diag_elpd
+ Neg-bin       0.0     0.0      NA            1 k_psis &gt; 0.7
+ Poisson   -4579.0   674.3    1.00           19 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 <p>The difference is now a bit smaller, but still the difference is huge. The column <code>diag_elpd</code> is reminding us that there were high Pareto k values in PSIS-LOO computation. This illustrates that we don’t always need to improve PSIS-LOO computation to get rid of all high Pareto-<span class="math inline">\hat{k}</span>’s, if the difference between the models is clearly bigger than possible bias.</p>
-<p>As Poisson is a special case of negative-Binomial, instead of using cross validation model comparison, we could have also seen that Poisson is not a good model by looking at the posterior of the over-dispersion parameter (which gets very small values), and there would not have been need to fit Poisson model at all.</p>
+<p>As Poisson is a special case of negative-Binomial, instead of using cross validation model comparison, we could have also seen that Poisson is not a good model by looking at the posterior of the over-dispersion parameter (which gets very small values), and there would not have been a need to fit the Poisson model at all.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcmc_areas</span>(fit_nb, <span class="at">pars =</span> <span class="st">&quot;shape&quot;</span>, <span class="at">prob_outer =</span> <span class="fl">0.999</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
@@ -4794,7 +4794,7 @@ Pareto k diagnostic values:
 See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 </div>
 </div>
-<p><code>p_loo</code> is about 164, which is less than the number of parameters 267, but it is relatively large compared to to the number of observations (<code>p_loo &gt;&gt;N/5</code>), which indicates very flexible model. In this case, this is due to having an intercept parameter for each observation. Removing one observation changes the posterior for that intercept so much that importance sampling fails (even with Pareto smoothing). Also the very large number of high <span class="math inline">k</span> values is probably due to having very flexible model. We can try to improve computation with moment matching. By default <code>brm()</code> does not store the varying coefficients and we need to re-run with <code>save_pars = save_pars(all = TRUE)</code> before using moment matching.</p>
+<p><code>p_loo</code> is about 164, which is less than the number of parameters 267, but it is relatively large compared to the number of observations (<code>p_loo &gt;&gt;N/5</code>), which indicates very flexible model. In this case, this is due to having an intercept parameter for each observation. Removing one observation changes the posterior for that intercept so much that importance sampling fails (even with Pareto smoothing). Also the very large number of high <span class="math inline">k</span> values is probably due to having very flexible model. We can try to improve computation with moment matching. By default <code>brm()</code> does not store the varying coefficients and we need to re-run with <code>save_pars = save_pars(all = TRUE)</code> before using moment matching.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>fit_pvi <span class="ot">&lt;-</span> <span class="fu">update</span>(fit_pvi, <span class="at">save_pars =</span> <span class="fu">save_pars</span>(<span class="at">all =</span> <span class="cn">TRUE</span>))</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>fit_pvi <span class="ot">&lt;-</span> <span class="fu">add_criterion</span>(fit_pvi, <span class="at">criterion =</span> <span class="st">&quot;loo&quot;</span>, <span class="at">moment_match =</span> <span class="cn">TRUE</span>, <span class="at">overwrite =</span> <span class="cn">TRUE</span>)</span>
@@ -4808,9 +4808,9 @@ See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">`</span><span class="at">Neg-bin</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">loo</span>(fit_nb), <span class="st">`</span><span class="at">Poisson var. int.</span><span class="st">`</span> <span class="ot">=</span> kcvpvi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                  elpd_diff se_diff
-Poisson var. int.  0.0       0.0   
-Neg-bin           -0.3       7.1   </code></pre>
+<pre><code>             model elpd_diff se_diff p_worse       diag_diff diag_elpd
+ Poisson var. int.       0.0     0.0      NA                          
+           Neg-bin      -0.3     7.1    0.52 |elpd_diff| &lt; 4          </code></pre>
 </div>
 </div>
 <p>There is not much difference, and the uncertainty is big. The column <code>diag_diff</code> shows that the distribution of the differences have thick tails, which indicates that <code>elpd_diff</code>, <code>diff_se</code>, and <code>p_worse</code> can not be fully trusted, and the conclusion is that we can’t know which model has better predictive performance.</p>
@@ -4830,9 +4830,9 @@ kfoldic      1759.1 75.8</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">`</span><span class="at">Neg-bin</span><span class="st">`</span> <span class="ot">=</span> kcvnb, <span class="st">`</span><span class="at">Poisson var. int.</span><span class="st">`</span> <span class="ot">=</span> kcvpvi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                  elpd_diff se_diff
-Neg-bin            0.0       0.0   
-Poisson var. int. -2.1       6.7   </code></pre>
+<pre><code>             model elpd_diff se_diff p_worse       diag_diff diag_elpd
+           Neg-bin       0.0     0.0      NA                          
+ Poisson var. int.      -2.1     6.7    0.62 |elpd_diff| &lt; 4          </code></pre>
 </div>
 </div>
 <p>The difference in predictive performance is very similar, and the small change can be partially explained by the higher variability due to thick tailed distribution of the pointwise differences.</p>
@@ -4840,9 +4840,9 @@ Poisson var. int. -2.1       6.7   </code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit_nb, fit_pvi)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        elpd_diff se_diff
-fit_pvi    0.0       0.0 
-fit_nb  -275.8      18.4 </code></pre>
+<pre><code>   model elpd_diff se_diff p_worse diag_diff       diag_elpd
+ fit_pvi       0.0     0.0      NA           55 k_psis &gt; 0.7
+  fit_nb    -275.8    18.4    1.00                          </code></pre>
 </div>
 </div>
 <p>If we would have ignored Pareto-<span class="math inline">k</span> warnings, we would have mistakenly assumed that varying intercept model is much better. The column <code>diag_elpd</code> is reminding that there are many high Pareto-<span class="math inline">k</span> values in the elpd computation.</p>
@@ -4850,9 +4850,9 @@ fit_nb  -275.8      18.4 </code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(<span class="fu">waic</span>(fit_nb), <span class="fu">waic</span>(fit_pvi))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        elpd_diff se_diff
-fit_pvi    0.0       0.0 
-fit_nb  -310.5      18.2 </code></pre>
+<pre><code>   model elpd_diff se_diff p_worse diag_diff diag_elpd
+ fit_pvi       0.0     0.0      NA                    
+  fit_nb    -310.5    18.2    1.00                    </code></pre>
 </div>
 </div>
 </section>
@@ -5082,9 +5082,9 @@ See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(<span class="fu">list</span>(<span class="st">`</span><span class="at">Poisson var. int. int-LOO</span><span class="st">`</span> <span class="ot">=</span> loo_p_vi, <span class="st">`</span><span class="at">Neg-bin</span><span class="st">`</span> <span class="ot">=</span> loo_nb))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                          elpd_diff se_diff
-Poisson var. int. int-LOO  0.0       0.0   
-Neg-bin                   -3.5       7.6   </code></pre>
+<pre><code>                     model elpd_diff se_diff p_worse       diag_diff diag_elpd
+ Poisson var. int. int-LOO       0.0     0.0      NA                          
+                   Neg-bin      -3.5     7.6    0.68 |elpd_diff| &lt; 4          </code></pre>
 </div>
 </div>
 <p>Comparing to the negative binomial model there is not much difference, and the difference in <code>elpd_diff</code> compared to <span class="math inline">K</span>-fold-CV may be partially explained by high variability due to thick tails of the pointwise elpd differences (there may be yhash warning, which in this case can be ignored).</p>
@@ -5182,9 +5182,9 @@ See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 <span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">model_names =</span> <span class="fu">c</span>(<span class="st">&quot;Neg-bin&quot;</span>,</span>
 <span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>                          <span class="st">&quot;ZINB&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>        elpd_diff se_diff
-ZINB      0.0       0.0  
-Neg-bin -22.8       6.9  </code></pre>
+<pre><code>   model elpd_diff se_diff p_worse diag_diff diag_elpd
+    ZINB       0.0     0.0      NA                    
+ Neg-bin     -22.8     6.9    1.00                    </code></pre>
 </div>
 </div>
 <p>Posterior predictive checking looks good, but there is no clear difference when looking at marginal predictive distributions or LOO-PIT.</p>
@@ -5266,7 +5266,7 @@ Figure 25
 </div>
 </div>
 </div>
-<p>Although the models are different, with finite data and wide LOO predictive distributions, there is a limit in which differences can be see in LOO-PIT values. Both negative-binomial and zero-inflated negative binomial are close enough the LOO-PIT can’t see discrepancy from the data, but elpd_loo and calibration plot were able to to show that zero-inflation component improves the predictive accuracy and calibration.</p>
+<p>Although the models are different, with finite data and wide LOO predictive distributions, there is a limit in which differences can be see in LOO-PIT values. Both negative-binomial and zero-inflated negative binomial are close enough the LOO-PIT can’t see discrepancy from the data, but elpd_loo and calibration plot were able to show that zero-inflation component improves the predictive accuracy and calibration.</p>
 <section id="analyse-posterior-1" class="level2" data-number="7.1">
 <h2 data-number="7.1" class="anchored" data-anchor-id="analyse-posterior-1"><span class="header-section-number">7.1</span> Analyse posterior</h2>
 <p>Plot posterior</p>
@@ -5411,9 +5411,9 @@ Likelihood selection: all data
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">loo_compare</span>(fit_zinb, fit_zinb_m2,</span>
 <span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">model_names =</span> <span class="fu">c</span>(<span class="st">&quot;ZINB full model&quot;</span>, <span class="st">&quot;ZINB w/o treatment&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   elpd_diff se_diff
-ZINB full model     0.0       0.0   
-ZINB w/o treatment -8.5       4.7   </code></pre>
+<pre><code>              model elpd_diff se_diff p_worse diag_diff diag_elpd
+    ZINB full model       0.0     0.0      NA                    
+ ZINB w/o treatment      -8.5     4.7    0.97                    </code></pre>
 </div>
 </div>
 <p>Treatment effect improves the predictive performance with 96% probability. However, as the distribution of the pointwise differences seem to have a thick tail, the estimated probability using the normal approximation can be sensitive to a few biggest pointwise differences, which are due to the a few biggest numbers of roaches observed. Interestingly in this case, both models pass model checking, seem to be well specified, the distributions of pointwise elpds do not have thick tails, and we are able to reliably estimate <code>elpd_loo</code> for each model. This indicates that <code>elpd_diff</code> is likely to be well estimated, but the distribution of pointwise differences having thicker tail make <code>se_diff</code> and the normal approximation based <code>p_worse</code> unreliable. The conclusion is that the full model has slightly better predictive performance.</p>
@@ -6304,7 +6304,7 @@ Vehtari, Aki, Tommi Mononen, Ville Tolvanen, Tuomas Sivula, and Ole Winther. 201
 <span id="cb87-391"><a href="#cb87-391" aria-hidden="true" tabindex="-1"></a>#&#39; cross validation model comparison, we could have also seen that</span>
 <span id="cb87-392"><a href="#cb87-392" aria-hidden="true" tabindex="-1"></a>#&#39; Poisson is not a good model by looking at the posterior of the</span>
 <span id="cb87-393"><a href="#cb87-393" aria-hidden="true" tabindex="-1"></a>#&#39; over-dispersion parameter (which gets very small values), and there</span>
-<span id="cb87-394"><a href="#cb87-394" aria-hidden="true" tabindex="-1"></a>#&#39; would not have been need to fit Poisson model at all.</span>
+<span id="cb87-394"><a href="#cb87-394" aria-hidden="true" tabindex="-1"></a>#&#39; would not have been a need to fit the Poisson model at all.</span>
 <span id="cb87-395"><a href="#cb87-395" aria-hidden="true" tabindex="-1"></a>#| label: fig-posterior-nb_dispersion</span>
 <span id="cb87-396"><a href="#cb87-396" aria-hidden="true" tabindex="-1"></a>#| fig-height: 2</span>
 <span id="cb87-397"><a href="#cb87-397" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
@@ -6392,7 +6392,7 @@ Vehtari, Aki, Tommi Mononen, Ville Tolvanen, Tuomas Sivula, and Ole Winther. 201
 <span id="cb87-479"><a href="#cb87-479" aria-hidden="true" tabindex="-1"></a>loo(fit_pvi)</span>
 <span id="cb87-480"><a href="#cb87-480" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb87-481"><a href="#cb87-481" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`p_loo`</span> is about 164, which is less than the number of parameters</span>
-<span id="cb87-482"><a href="#cb87-482" aria-hidden="true" tabindex="-1"></a>#&#39; 267, but it is relatively large compared to to the number of</span>
+<span id="cb87-482"><a href="#cb87-482" aria-hidden="true" tabindex="-1"></a>#&#39; 267, but it is relatively large compared to the number of</span>
 <span id="cb87-483"><a href="#cb87-483" aria-hidden="true" tabindex="-1"></a>#&#39; observations (<span class="in">`p_loo &gt;&gt;N/5`</span>), which indicates very flexible</span>
 <span id="cb87-484"><a href="#cb87-484" aria-hidden="true" tabindex="-1"></a>#&#39; model. In this case, this is due to having an intercept parameter for</span>
 <span id="cb87-485"><a href="#cb87-485" aria-hidden="true" tabindex="-1"></a>#&#39; each observation. Removing one observation changes the posterior</span>
@@ -6730,7 +6730,7 @@ Vehtari, Aki, Tommi Mononen, Ville Tolvanen, Tuomas Sivula, and Ole Winther. 201
 <span id="cb87-817"><a href="#cb87-817" aria-hidden="true" tabindex="-1"></a>#&#39; be see in LOO-PIT values. Both negative-binomial and zero-inflated</span>
 <span id="cb87-818"><a href="#cb87-818" aria-hidden="true" tabindex="-1"></a>#&#39; negative binomial are close enough the LOO-PIT can&#39;t see</span>
 <span id="cb87-819"><a href="#cb87-819" aria-hidden="true" tabindex="-1"></a>#&#39; discrepancy from the data, but elpd_loo and calibration plot were</span>
-<span id="cb87-820"><a href="#cb87-820" aria-hidden="true" tabindex="-1"></a>#&#39; able to to show that zero-inflation component improves the</span>
+<span id="cb87-820"><a href="#cb87-820" aria-hidden="true" tabindex="-1"></a>#&#39; able to show that zero-inflation component improves the</span>
 <span id="cb87-821"><a href="#cb87-821" aria-hidden="true" tabindex="-1"></a>#&#39; predictive accuracy and calibration.</span>
 <span id="cb87-822"><a href="#cb87-822" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
 <span id="cb87-823"><a href="#cb87-823" aria-hidden="true" tabindex="-1"></a>#&#39; ## Analyse posterior</span>
