@@ -4239,8 +4239,8 @@ padding: 0 !important;
   <ul class="collapse">
   <li><a href="#stan-data" id="toc-stan-data" class="nav-link" data-scroll-target="#stan-data"><span class="header-section-number">4.1</span> Stan data</a></li>
   <li><a href="#hierarchical-logistic-regression-with-non-centered-parameterization" id="toc-hierarchical-logistic-regression-with-non-centered-parameterization" class="nav-link" data-scroll-target="#hierarchical-logistic-regression-with-non-centered-parameterization"><span class="header-section-number">4.2</span> Hierarchical logistic regression with non-centered parameterization</a></li>
-  <li><a href="#hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization" id="toc-hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization" class="nav-link" data-scroll-target="#hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization"><span class="header-section-number">4.3</span> Hierarchical logistic regression with zero sum-to-zero parameterization</a></li>
-  <li><a href="#hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization-1" id="toc-hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization-1" class="nav-link" data-scroll-target="#hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization-1"><span class="header-section-number">4.4</span> Hierarchical logistic regression with zero sum-to-zero parameterization</a></li>
+  <li><a href="#hierarchical-logistic-regression-with-sum-to-zero-parameterization" id="toc-hierarchical-logistic-regression-with-sum-to-zero-parameterization" class="nav-link" data-scroll-target="#hierarchical-logistic-regression-with-sum-to-zero-parameterization"><span class="header-section-number">4.3</span> Hierarchical logistic regression with sum-to-zero parameterization</a></li>
+  <li><a href="#hierarchical-logistic-regression-with-sum-to-zero-parameterization-1" id="toc-hierarchical-logistic-regression-with-sum-to-zero-parameterization-1" class="nav-link" data-scroll-target="#hierarchical-logistic-regression-with-sum-to-zero-parameterization-1"><span class="header-section-number">4.4</span> Hierarchical logistic regression with sum-to-zero parameterization</a></li>
   <li><a href="#hierarchical-logistic-regression-with-sum-to-zero-parameterization-and-centered-predictors" id="toc-hierarchical-logistic-regression-with-sum-to-zero-parameterization-and-centered-predictors" class="nav-link" data-scroll-target="#hierarchical-logistic-regression-with-sum-to-zero-parameterization-and-centered-predictors"><span class="header-section-number">4.5</span> Hierarchical logistic regression with sum-to-zero parameterization and centered predictors</a></li>
   <li><a href="#comparison-of-lme4-and-bayesian-posterior-estimates" id="toc-comparison-of-lme4-and-bayesian-posterior-estimates" class="nav-link" data-scroll-target="#comparison-of-lme4-and-bayesian-posterior-estimates"><span class="header-section-number">4.6</span> Comparison of lme4 and Bayesian posterior estimates</a></li>
   </ul></li>
@@ -4278,7 +4278,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-05</p>
     </div>
   </div>
     
@@ -4375,7 +4375,7 @@ padding: 0 !important;
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="fu">mytoc</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>lme4 fit 1 took 14 sec</code></pre>
+<pre><code>lme4 fit 1 took 15 sec</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">display</span>(fit_lme4)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -4419,7 +4419,7 @@ deviance = 25971.2 </code></pre>
 <span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="fu">mytoc</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>lme4 fit 2 took 12 sec</code></pre>
+<pre><code>lme4 fit 2 took 13 sec</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">display</span>(fit_lme4)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -4484,7 +4484,7 @@ deviance = 25971.2 </code></pre>
 <span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a><span class="fu">mytoc</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>lme4 fit sim took 12 sec</code></pre>
+<pre><code>lme4 fit sim took 15 sec</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">display</span>(fit_lme4_sim)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -4722,7 +4722,7 @@ $n_leapfrog__: rvar&lt;200,4&gt;[1] mean ± sd:
 [1] 118 ± 22 </code></pre>
 </div>
 </div>
-<p>We are specifically interested in how efficient each Hamiltonian Monte Carlo iteration is. This can be measured by the the number of leapfrog steps <code>n_leapfrog__</code>, which is close to the number of log density and gradient evaluations. Instead of examining <code>n_leapfrog__</code> directly, it is common to examine <code>treedepth__</code> as it scales logarithmically with respect to <code>n_leapfrog__</code>. More specifically, <span class="math inline">\text{treedepth\_\_}=\log_2(\text{treedepth\_\_}+1)</span>. Average <code>treedepth__</code> is about 7 which is not high for hierarchical model posteriors, and the variation measured by standard deviation is low which indicates that the posterior curvature is not highly varying and thus there is no strong funnel shape. As ESSs are low for the parameter <code>a</code>, we check the trace plot.</p>
+<p>We are specifically interested in how efficient each Hamiltonian Monte Carlo iteration is. This can be measured by the number of leapfrog steps <code>n_leapfrog__</code>, which is close to the number of log density and gradient evaluations. Instead of examining <code>n_leapfrog__</code> directly, it is common to examine <code>treedepth__</code> as it scales logarithmically with respect to <code>n_leapfrog__</code>. More specifically, <span class="math inline">\text{treedepth\_\_}=\log_2(\text{treedepth\_\_}+1)</span>. Average <code>treedepth__</code> is about 7 which is not high for hierarchical model posteriors, and the variation measured by standard deviation is low which indicates that the posterior curvature is not highly varying and thus there is no strong funnel shape. As ESSs are low for the parameter <code>a</code>, we check the trace plot.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>draws_1 <span class="ot">&lt;-</span> fit_1<span class="sc">$</span><span class="fu">draws</span>(<span class="at">format =</span> <span class="st">&quot;df&quot;</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
@@ -4809,8 +4809,8 @@ Figure 5
 </div>
 </div>
 </section>
-<section id="hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization" class="level2" data-number="4.3">
-<h2 data-number="4.3" class="anchored" data-anchor-id="hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization"><span class="header-section-number">4.3</span> Hierarchical logistic regression with zero sum-to-zero parameterization</h2>
+<section id="hierarchical-logistic-regression-with-sum-to-zero-parameterization" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="hierarchical-logistic-regression-with-sum-to-zero-parameterization"><span class="header-section-number">4.3</span> Hierarchical logistic regression with sum-to-zero parameterization</h2>
 <p>We can remove the identifiability problem by constraining <code>a_respondent</code> and <code>a_item</code> to have sum zero. This can be easily achieved in Stan with <code>sum_to_zero_vector</code> data type. In addition of potentially improving sampling speed, sum-to-zero constraint reducing posterior dependencies improves also interpretability of the marginal posteriors of the parameters. As <code>sum_to_zero_vector</code> data type does not allow <code>multiplier</code>, we need to change how we implement the non-centered parameterization.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>park_2 <span class="ot">&lt;-</span> <span class="fu">cmdstan_model</span>(<span class="fu">root</span>(<span class="st">&quot;park_rule&quot;</span>, <span class="st">&quot;park_2.stan&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -5000,8 +5000,8 @@ Figure 8
 <p>When non-centered parameterization is used, but the likelihood contribution is strong, we get strong dependency between the latent value <code>z</code> and <code>sigma</code>. In this case, we have a large number of observations per each item, and the centered parameterization is likely to be a better choice.</p>
 <p>In our first model, the non-centered parameterization was implemented using vector data type with <code>&lt;multiplier=...&gt;</code>, which hides the latent parameter, and it is easier to miss how to detect the problem. With the explicit latent parameterization <code>z_item</code>, the issue was easier to detect.</p>
 </section>
-<section id="hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization-1" class="level2" data-number="4.4">
-<h2 data-number="4.4" class="anchored" data-anchor-id="hierarchical-logistic-regression-with-zero-sum-to-zero-parameterization-1"><span class="header-section-number">4.4</span> Hierarchical logistic regression with zero sum-to-zero parameterization</h2>
+<section id="hierarchical-logistic-regression-with-sum-to-zero-parameterization-1" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="hierarchical-logistic-regression-with-sum-to-zero-parameterization-1"><span class="header-section-number">4.4</span> Hierarchical logistic regression with sum-to-zero parameterization</h2>
 <p>We switch to using the centered parameterization for both <code>a_respondent</code> and <code>a_item</code>. We could still use non-centered for <code>a_respondent</code>, but further experiments not shown here, indicate that there is not much difference between the parameterizations for <code>a_respondent</code> and thus we use the simpler form.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>park_3 <span class="ot">&lt;-</span> <span class="fu">cmdstan_model</span>(<span class="fu">root</span>(<span class="st">&quot;park_rule&quot;</span>, <span class="st">&quot;park_3.stan&quot;</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -6074,7 +6074,7 @@ Turner, D. 2024. <span>“No Vehicles in the Park.”</span>
 <span id="cb100-263"><a href="#cb100-263" aria-hidden="true" tabindex="-1"></a>fit_1$sampler_diagnostics() |&gt; as_draws_rvars()</span>
 <span id="cb100-264"><a href="#cb100-264" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb100-265"><a href="#cb100-265" aria-hidden="true" tabindex="-1"></a>#&#39; We are specifically interested in how efficient each Hamiltonian</span>
-<span id="cb100-266"><a href="#cb100-266" aria-hidden="true" tabindex="-1"></a>#&#39; Monte Carlo iteration is. This can be measured by the the number of</span>
+<span id="cb100-266"><a href="#cb100-266" aria-hidden="true" tabindex="-1"></a>#&#39; Monte Carlo iteration is. This can be measured by the number of</span>
 <span id="cb100-267"><a href="#cb100-267" aria-hidden="true" tabindex="-1"></a>#&#39; leapfrog steps <span class="in">`n_leapfrog__`</span>, which is close to the number of log</span>
 <span id="cb100-268"><a href="#cb100-268" aria-hidden="true" tabindex="-1"></a>#&#39; density and gradient evaluations. Instead of examining</span>
 <span id="cb100-269"><a href="#cb100-269" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`n_leapfrog__`</span> directly, it is common to examine <span class="in">`treedepth__`</span> as</span>
@@ -6130,7 +6130,7 @@ Turner, D. 2024. <span>“No Vehicles in the Park.”</span>
 <span id="cb100-319"><a href="#cb100-319" aria-hidden="true" tabindex="-1"></a>  mcmc_scatter(alpha = 0.5) +</span>
 <span id="cb100-320"><a href="#cb100-320" aria-hidden="true" tabindex="-1"></a>  labs(y = &quot;sum(a_item)&quot;)</span>
 <span id="cb100-321"><a href="#cb100-321" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb100-322"><a href="#cb100-322" aria-hidden="true" tabindex="-1"></a>#&#39; ## Hierarchical logistic regression with zero sum-to-zero parameterization</span>
+<span id="cb100-322"><a href="#cb100-322" aria-hidden="true" tabindex="-1"></a>#&#39; ## Hierarchical logistic regression with sum-to-zero parameterization</span>
 <span id="cb100-323"><a href="#cb100-323" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
 <span id="cb100-324"><a href="#cb100-324" aria-hidden="true" tabindex="-1"></a>#&#39; We can remove the identifiability problem by constraining</span>
 <span id="cb100-325"><a href="#cb100-325" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`a_respondent`</span> and <span class="in">`a_item`</span> to have sum zero. This can be easily</span>
@@ -6230,7 +6230,7 @@ Turner, D. 2024. <span>“No Vehicles in the Park.”</span>
 <span id="cb100-419"><a href="#cb100-419" aria-hidden="true" tabindex="-1"></a>#&#39; the problem. With the explicit latent parameterization <span class="in">`z_item`</span>,</span>
 <span id="cb100-420"><a href="#cb100-420" aria-hidden="true" tabindex="-1"></a>#&#39; the issue was easier to detect.</span>
 <span id="cb100-421"><a href="#cb100-421" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb100-422"><a href="#cb100-422" aria-hidden="true" tabindex="-1"></a>#&#39; ## Hierarchical logistic regression with zero sum-to-zero parameterization</span>
+<span id="cb100-422"><a href="#cb100-422" aria-hidden="true" tabindex="-1"></a>#&#39; ## Hierarchical logistic regression with sum-to-zero parameterization</span>
 <span id="cb100-423"><a href="#cb100-423" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
 <span id="cb100-424"><a href="#cb100-424" aria-hidden="true" tabindex="-1"></a>#&#39; We switch to using the centered parameterization for both</span>
 <span id="cb100-425"><a href="#cb100-425" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`a_respondent`</span> and <span class="in">`a_item`</span>.  We could still use non-centered for</span>
