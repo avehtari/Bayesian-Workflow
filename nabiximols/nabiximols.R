@@ -151,7 +151,7 @@ fit_normal <- brm(formula = cu ~ group*week + (1 | id),
 fit_normal <- add_criterion(fit_normal, criterion = "loo", save_psis = TRUE,
                             moment_match = TRUE)
 
-#' The second provided models is binomial model with the number of
+#' The second provided model is a binomial model with the number of
 #' trials being $28$ for each outcome (`cu`)
 #| label: fit_binomial
 #| results: hide
@@ -1081,7 +1081,7 @@ loo_compare(fit_betabinomial2b, fit_betabinomial3b)
 #'    for a new 4-week period is big, that is the predictive
 #'    distribution is very wide and due to the constrained range
 #'    has also thick tails (actually U shape), which makes the log
-#'    score not to be sensitive in tails.
+#'    score not sensitive in the tails.
 #'
 #' As the predictive distribution is wide with thick tails, we can
 #' also focus on comparing absolute error of using means of the

@@ -759,7 +759,7 @@ combined_ranks / combined_ecdf
 #' divergences, but just to complete our tour of possibilities, we'll
 #' show one more option to dealing with this type of problem.
 #'
-#' The general idea is that although we might not want to/be able to
+#' The general idea is that although we might not want to or be able to
 #' express our prior belief about the model (here that the two mixture
 #' components are distinct) by priors on model parameters, we still
 #' may be able to express our prior belief about the data itself.

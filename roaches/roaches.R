@@ -391,7 +391,7 @@ loo_compare(list(`Poisson` = loo_p1, `Neg-bin` = loo_nb1))
 #' cross validation model comparison, we could have also seen that
 #' Poisson is not a good model by looking at the posterior of the
 #' over-dispersion parameter (which gets very small values), and there
-#' would not have been need to fit Poisson model at all.
+#' would not have been a need to fit the Poisson model at all.
 #| label: fig-posterior-nb_dispersion
 #| fig-height: 2
 #| fig-width: 6
@@ -479,7 +479,7 @@ fit_pvi <- add_criterion(fit_pvi, criterion = "loo")
 loo(fit_pvi)
 
 #' `p_loo` is about 164, which is less than the number of parameters
-#' 267, but it is relatively large compared to to the number of
+#' 267, but it is relatively large compared to the number of
 #' observations (`p_loo >>N/5`), which indicates very flexible
 #' model. In this case, this is due to having an intercept parameter for
 #' each observation. Removing one observation changes the posterior
@@ -817,7 +817,7 @@ autoplot(rd) +
 #' be see in LOO-PIT values. Both negative-binomial and zero-inflated
 #' negative binomial are close enough the LOO-PIT can't see
 #' discrepancy from the data, but elpd_loo and calibration plot were
-#' able to to show that zero-inflation component improves the
+#' able to show that zero-inflation component improves the
 #' predictive accuracy and calibration.
 #' 
 #' ## Analyse posterior
