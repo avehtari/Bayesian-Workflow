@@ -7,6 +7,10 @@ execute:
 
 website:
   title: "Bayesian Workflow book"
+  site-url: https://avehtari.github.io/Bayesian-Workflow/
+  description: "Website for the Bayesian Workflow book by Gelman, Vehtari, McElreath, et al. — case studies, code, and exercises in R and Stan."
+  image: social-card.png
+  open-graph: true
   navbar:
     left:
       - text: "Home"

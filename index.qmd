@@ -1,5 +1,6 @@
 ---
 title: "Bayesian Workflow book: Website"
+image: social-card.png
 date: 2026-02-26
 date-modified: today
 date-format: iso
