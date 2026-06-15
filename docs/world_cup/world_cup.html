@@ -3995,6 +3995,12 @@ box-shadow: none !important;
 padding: 0 !important;
 }
 </style>
+<meta property="og:title" content="Debugging a model: World Cup football – Bayesian Workflow book">
+<meta property="og:description" content="Website for the Bayesian Workflow book by Gelman, Vehtari, McElreath, et al. — case studies, code, and exercises in R and Stan.">
+<meta property="og:image" content="https://avehtari.github.io/Bayesian-Workflow/social-cards/world_cup.png">
+<meta property="og:site_name" content="Bayesian Workflow book">
+<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
 </head>
 
 <body class="nav-sidebar docked nav-fixed quarto-light">
@@ -4301,7 +4307,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-15</p>
     </div>
   </div>
     
@@ -5247,11 +5253,11 @@ Figure 7
 <span id="cb67-7"><a href="#cb67-7" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb67-8"><a href="#cb67-8" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                       elpd_diff se_diff
-Hier. w power score     0.0       0.0   
-Power score only       -1.3       1.8   
-Hier. w/o power score  -3.3       2.8   
-Pooled w/o power score -8.4       3.4   </code></pre>
+<pre><code>                  model elpd_diff se_diff p_worse diag_diff      diag_elpd
+    Hier. w power score       0.0     0.0      NA           2 k_psis &gt; 0.7
+       Power score only      -1.3     1.8    0.78   N &lt; 100               
+  Hier. w/o power score      -3.3     2.8    0.89   N &lt; 100 1 k_psis &gt; 0.7
+ Pooled w/o power score      -8.4     3.4    0.99   N &lt; 100               </code></pre>
 </div>
 </div>
 </section>
@@ -5391,10 +5397,14 @@ Pooled w/o power score -8.4       3.4   </code></pre>
 <span id="cb81-6"><a href="#cb81-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb81-7"><a href="#cb81-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                              elpd_diff se_diff
-Continuous model               0.0       0.0   
-Discrete model                -0.6       0.4   
-Continuous + midpoint log_lik -0.6       0.3   </code></pre>
+<pre><code>                         model elpd_diff se_diff p_worse diag_diff
+              Continuous model       0.0     0.0      NA          
+                Discrete model      -0.6     0.4    0.95   N &lt; 100
+ Continuous + midpoint log_lik      -0.6     0.3    0.96   N &lt; 100
+      diag_elpd
+               
+ 2 k_psis &gt; 0.7
+               </code></pre>
 </div>
 </div>
 </section>
@@ -5716,10 +5726,10 @@ Continuous + midpoint log_lik -0.6       0.3   </code></pre>
 <span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                            elpd_diff se_diff
-Cont-sqrt + midp, -Jacobian   0.0       0.0  
-Discrete                    -32.5       5.2  
-Discrete sqrt               -40.3       4.3  </code></pre>
+<pre><code>                       model elpd_diff se_diff p_worse diag_diff      diag_elpd
+ Cont-sqrt + midp, -Jacobian       0.0     0.0      NA           1 k_psis &gt; 0.7
+                    Discrete     -32.5     5.2    1.00   N &lt; 100 2 k_psis &gt; 0.7
+               Discrete sqrt     -40.3     4.3    1.00   N &lt; 100               </code></pre>
 </div>
 </div>
 <p>Taking Jacobian into account, the square root models are worse, and the difference between continuous and discrete square root model is small enough to be explained by Monte Carlo variation.</p>
@@ -5732,10 +5742,10 @@ Discrete sqrt               -40.3       4.3  </code></pre>
 <span id="cb103-6"><a href="#cb103-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb103-7"><a href="#cb103-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                          elpd_diff se_diff
-Discrete                   0.0       0.0   
-Continuous sqrt +Jacobian -7.2       5.5   
-Discrete sqrt             -7.8       5.4   </code></pre>
+<pre><code>                     model elpd_diff se_diff p_worse diag_diff      diag_elpd
+                  Discrete       0.0     0.0      NA           2 k_psis &gt; 0.7
+ Continuous sqrt +Jacobian      -7.2     5.5    0.91   N &lt; 100 2 k_psis &gt; 0.7
+             Discrete sqrt      -7.8     5.4    0.93   N &lt; 100               </code></pre>
 </div>
 </div>
 </section>
@@ -6012,10 +6022,10 @@ See help(&#39;pareto-k-diagnostic&#39;) for details.</code></pre>
 <span id="cb123-6"><a href="#cb123-6" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb123-7"><a href="#cb123-7" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   elpd_diff se_diff
-Poisson difference  0.0       0.0   
-Discrete           -1.7       1.7   
-Bivariate Poisson  -1.8       0.9   </code></pre>
+<pre><code>              model elpd_diff se_diff p_worse diag_diff      diag_elpd
+ Poisson difference       0.0     0.0      NA                         
+           Discrete      -1.7     1.7    0.85   N &lt; 100 2 k_psis &gt; 0.7
+  Bivariate Poisson      -1.8     0.9    0.97   N &lt; 100 7 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 <section id="loo-cv-predictive-checking-1" class="level2" data-number="8.1">
@@ -6207,7 +6217,7 @@ Silver, N. 2014. <span>“It’s Brazil’s World Cup to Lose.”</span> <em>Fiv
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/avehtari\.github\.io\/Bayesian-Workflow\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -6535,579 +6545,580 @@ Silver, N. 2014. <span>“It’s Brazil’s World Cup to Lose.”</span> <em>Fiv
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb127" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Debugging a model: World Cup football&quot;</span>
-<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman and Aki Vehtari&quot;</span>
-<span id="cb127-4"><a href="#cb127-4" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2021-01-12</span>
-<span id="cb127-5"><a href="#cb127-5" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
-<span id="cb127-6"><a href="#cb127-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
-<span id="cb127-7"><a href="#cb127-7" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
-<span id="cb127-8"><a href="#cb127-8" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
-<span id="cb127-9"><a href="#cb127-9" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
-<span id="cb127-10"><a href="#cb127-10" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
-<span id="cb127-11"><a href="#cb127-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
-<span id="cb127-12"><a href="#cb127-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
-<span id="cb127-13"><a href="#cb127-13" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
-<span id="cb127-14"><a href="#cb127-14" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb127-15"><a href="#cb127-15" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-16"><a href="#cb127-16" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
-<span id="cb127-17"><a href="#cb127-17" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 23 *Debugging a model: World Cup football*.</span>
-<span id="cb127-18"><a href="#cb127-18" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-19"><a href="#cb127-19" aria-hidden="true" tabindex="-1"></a>#&#39; # World Cup 2014 team performance analysis</span>
-<span id="cb127-20"><a href="#cb127-20" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-21"><a href="#cb127-21" aria-hidden="true" tabindex="-1"></a>#&#39; We use an item-response model such as described in the previous</span>
-<span id="cb127-22"><a href="#cb127-22" aria-hidden="true" tabindex="-1"></a>#&#39; chapter to fit a model to estimate the abilities of the teams in</span>
-<span id="cb127-23"><a href="#cb127-23" aria-hidden="true" tabindex="-1"></a>#&#39; the 2014 football World Cup.  We use score differentials as data</span>
-<span id="cb127-24"><a href="#cb127-24" aria-hidden="true" tabindex="-1"></a>#&#39; (ignoring the shoot-outs).</span>
-<span id="cb127-25"><a href="#cb127-25" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-26"><a href="#cb127-26" aria-hidden="true" tabindex="-1"></a>#&#39; The forthcoming Bayesian workflow book has more information about</span>
-<span id="cb127-27"><a href="#cb127-27" aria-hidden="true" tabindex="-1"></a>#&#39; the modeling task, but this version of the code was made available</span>
-<span id="cb127-28"><a href="#cb127-28" aria-hidden="true" tabindex="-1"></a>#&#39; early, as it includes illustration of predictive performance</span>
-<span id="cb127-29"><a href="#cb127-29" aria-hidden="true" tabindex="-1"></a>#&#39; comparison of continuous and discrete models.</span>
-<span id="cb127-30"><a href="#cb127-30" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-31"><a href="#cb127-31" aria-hidden="true" tabindex="-1"></a>#&#39; Game scores could be modelled with a discrete bivariate Poisson</span>
-<span id="cb127-32"><a href="#cb127-32" aria-hidden="true" tabindex="-1"></a>#&#39; model, and score differences with Poisson difference models</span>
-<span id="cb127-33"><a href="#cb127-33" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="co">[</span><span class="ot">@Karlis-Ntzoufras:2003</span><span class="co">]</span>, which are commonly used in analysis of</span>
-<span id="cb127-34"><a href="#cb127-34" aria-hidden="true" tabindex="-1"></a>#&#39; sports data. But we&#39;ll start with continuous models and discretized</span>
-<span id="cb127-35"><a href="#cb127-35" aria-hidden="true" tabindex="-1"></a>#&#39; continuous models to illustrate how those can be compared, and</span>
-<span id="cb127-36"><a href="#cb127-36" aria-hidden="true" tabindex="-1"></a>#&#39; eventually build also models using naturally discrete data models.</span>
-<span id="cb127-37"><a href="#cb127-37" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-38"><a href="#cb127-38" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
-<span id="cb127-39"><a href="#cb127-39" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)</span>
-<span id="cb127-40"><a href="#cb127-40" aria-hidden="true" tabindex="-1"></a><span class="fu"># switch this to TRUE to save figures in separate files</span></span>
-<span id="cb127-41"><a href="#cb127-41" aria-hidden="true" tabindex="-1"></a>savefigs &lt;- FALSE</span>
-<span id="cb127-42"><a href="#cb127-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-43"><a href="#cb127-43" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages**</span>
-<span id="cb127-44"><a href="#cb127-44" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
-<span id="cb127-45"><a href="#cb127-45" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
-<span id="cb127-46"><a href="#cb127-46" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
-<span id="cb127-47"><a href="#cb127-47" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
-<span id="cb127-48"><a href="#cb127-48" aria-hidden="true" tabindex="-1"></a><span class="fu"># CmdStanR output directory makes Quarto cache to work</span></span>
-<span id="cb127-49"><a href="#cb127-49" aria-hidden="true" tabindex="-1"></a>dir.create(root(&quot;world_cup&quot;, &quot;stan_output&quot;), showWarnings = FALSE)</span>
-<span id="cb127-50"><a href="#cb127-50" aria-hidden="true" tabindex="-1"></a>options(cmdstanr_output_dir = root(&quot;world_cup&quot;, &quot;stan_output&quot;))</span>
-<span id="cb127-51"><a href="#cb127-51" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
-<span id="cb127-52"><a href="#cb127-52" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
-<span id="cb127-53"><a href="#cb127-53" aria-hidden="true" tabindex="-1"></a>options(</span>
-<span id="cb127-54"><a href="#cb127-54" aria-hidden="true" tabindex="-1"></a>  tibble.print_max = 35,</span>
-<span id="cb127-55"><a href="#cb127-55" aria-hidden="true" tabindex="-1"></a>  pillar.neg = FALSE,</span>
-<span id="cb127-56"><a href="#cb127-56" aria-hidden="true" tabindex="-1"></a>  pillar.subtle = FALSE,</span>
-<span id="cb127-57"><a href="#cb127-57" aria-hidden="true" tabindex="-1"></a>  pillar.sigfig = 2</span>
-<span id="cb127-58"><a href="#cb127-58" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-59"><a href="#cb127-59" aria-hidden="true" tabindex="-1"></a>devtools::load_all(&quot;~/proj/bayesplot&quot;)</span>
-<span id="cb127-60"><a href="#cb127-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## library(bayesplot)</span></span>
-<span id="cb127-61"><a href="#cb127-61" aria-hidden="true" tabindex="-1"></a>library(ggplot2)</span>
-<span id="cb127-62"><a href="#cb127-62" aria-hidden="true" tabindex="-1"></a>theme_set(bayesplot::theme_default(base_family = &quot;sans&quot;, base_size=14))</span>
-<span id="cb127-63"><a href="#cb127-63" aria-hidden="true" tabindex="-1"></a>library(arm)</span>
-<span id="cb127-64"><a href="#cb127-64" aria-hidden="true" tabindex="-1"></a>library(loo)</span>
-<span id="cb127-65"><a href="#cb127-65" aria-hidden="true" tabindex="-1"></a>library(dplyr)</span>
-<span id="cb127-66"><a href="#cb127-66" aria-hidden="true" tabindex="-1"></a>library(readr)</span>
-<span id="cb127-67"><a href="#cb127-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-68"><a href="#cb127-68" aria-hidden="true" tabindex="-1"></a>print_stan_code &lt;- function(code) {</span>
-<span id="cb127-69"><a href="#cb127-69" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;&amp;</span>
-<span id="cb127-70"><a href="#cb127-70" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
-<span id="cb127-71"><a href="#cb127-71" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
-<span id="cb127-72"><a href="#cb127-72" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
-<span id="cb127-73"><a href="#cb127-73" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
-<span id="cb127-74"><a href="#cb127-74" aria-hidden="true" tabindex="-1"></a>  } else {</span>
-<span id="cb127-75"><a href="#cb127-75" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
-<span id="cb127-76"><a href="#cb127-76" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb127-77"><a href="#cb127-77" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb127-78"><a href="#cb127-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-79"><a href="#cb127-79" aria-hidden="true" tabindex="-1"></a>#&#39; # Data</span>
-<span id="cb127-80"><a href="#cb127-80" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-81"><a href="#cb127-81" aria-hidden="true" tabindex="-1"></a>#&#39; Data include 64 game results from World Cup 2014 and Soccer Power</span>
-<span id="cb127-82"><a href="#cb127-82" aria-hidden="true" tabindex="-1"></a>#&#39; Index that was available on the internet a month before the</span>
-<span id="cb127-83"><a href="#cb127-83" aria-hidden="true" tabindex="-1"></a>#&#39; tournament <span class="co">[</span><span class="ot">@Silver:2014</span><span class="co">]</span>.  We took the rankings, with Brazil at</span>
-<span id="cb127-84"><a href="#cb127-84" aria-hidden="true" tabindex="-1"></a>#&#39; the top (getting a score of 32) and Australia at the bottom (with a</span>
-<span id="cb127-85"><a href="#cb127-85" aria-hidden="true" tabindex="-1"></a>#&#39; score of 1), and then for simplicity in interpretation of the</span>
-<span id="cb127-86"><a href="#cb127-86" aria-hidden="true" tabindex="-1"></a>#&#39; parameters we rescaled these to have mean 0 and standard deviation</span>
-<span id="cb127-87"><a href="#cb127-87" aria-hidden="true" tabindex="-1"></a>#&#39; 1/2, to get ``prior scores&#39;&#39; that ranged from $-0.83$ to $+0.83$.</span>
-<span id="cb127-88"><a href="#cb127-88" aria-hidden="true" tabindex="-1"></a>powerindex &lt;- read_csv(root(&quot;world_cup&quot;, &quot;data&quot;,&quot;soccerpowerindex.csv&quot;)) |&gt;</span>
-<span id="cb127-89"><a href="#cb127-89" aria-hidden="true" tabindex="-1"></a>  mutate(prior_score = as.vector(scale(rev(index))/2))</span>
-<span id="cb127-90"><a href="#cb127-90" aria-hidden="true" tabindex="-1"></a>teamnames &lt;- powerindex$team</span>
-<span id="cb127-91"><a href="#cb127-91" aria-hidden="true" tabindex="-1"></a>worldcup2014 &lt;- read_csv(root(&quot;world_cup&quot;, &quot;data&quot;, &quot;worldcup2014.csv&quot;)) |&gt;</span>
-<span id="cb127-92"><a href="#cb127-92" aria-hidden="true" tabindex="-1"></a>  mutate(team_1 = match(team1, teamnames),</span>
-<span id="cb127-93"><a href="#cb127-93" aria-hidden="true" tabindex="-1"></a>         team_2 = match(team2, teamnames))</span>
-<span id="cb127-94"><a href="#cb127-94" aria-hidden="true" tabindex="-1"></a>N_games &lt;- nrow(worldcup2014)</span>
-<span id="cb127-95"><a href="#cb127-95" aria-hidden="true" tabindex="-1"></a>gamenames &lt;- with(worldcup2014,</span>
-<span id="cb127-96"><a href="#cb127-96" aria-hidden="true" tabindex="-1"></a>                  rev(paste(teamnames<span class="co">[</span><span class="ot">team_1</span><span class="co">]</span>, &quot;vs.&quot;, teamnames<span class="co">[</span><span class="ot">team_2</span><span class="co">]</span>)))</span>
-<span id="cb127-97"><a href="#cb127-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-98"><a href="#cb127-98" aria-hidden="true" tabindex="-1"></a>#&#39; ## Data for Stan</span>
-<span id="cb127-99"><a href="#cb127-99" aria-hidden="true" tabindex="-1"></a>stan_data &lt;- with(</span>
-<span id="cb127-100"><a href="#cb127-100" aria-hidden="true" tabindex="-1"></a>  worldcup2014,</span>
-<span id="cb127-101"><a href="#cb127-101" aria-hidden="true" tabindex="-1"></a>  list(</span>
-<span id="cb127-102"><a href="#cb127-102" aria-hidden="true" tabindex="-1"></a>    N_teams = nrow(powerindex),</span>
-<span id="cb127-103"><a href="#cb127-103" aria-hidden="true" tabindex="-1"></a>    N_games = N_games,</span>
-<span id="cb127-104"><a href="#cb127-104" aria-hidden="true" tabindex="-1"></a>    team_1 = team_1,</span>
-<span id="cb127-105"><a href="#cb127-105" aria-hidden="true" tabindex="-1"></a>    score_1 = score1,</span>
-<span id="cb127-106"><a href="#cb127-106" aria-hidden="true" tabindex="-1"></a>    team_2 = team_2,</span>
-<span id="cb127-107"><a href="#cb127-107" aria-hidden="true" tabindex="-1"></a>    score_2 = score2,</span>
-<span id="cb127-108"><a href="#cb127-108" aria-hidden="true" tabindex="-1"></a>    prior_score = powerindex$prior_score,</span>
-<span id="cb127-109"><a href="#cb127-109" aria-hidden="true" tabindex="-1"></a>    df = 7</span>
-<span id="cb127-110"><a href="#cb127-110" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb127-111"><a href="#cb127-111" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-112"><a href="#cb127-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-113"><a href="#cb127-113" aria-hidden="true" tabindex="-1"></a>#&#39; # First model</span>
-<span id="cb127-114"><a href="#cb127-114" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-115"><a href="#cb127-115" aria-hidden="true" tabindex="-1"></a>#&#39; The first model uses Student&#39;s $t$ for square root of score</span>
-<span id="cb127-116"><a href="#cb127-116" aria-hidden="true" tabindex="-1"></a>#&#39; difference. It&#39;s not particularly well justified model, but that is</span>
-<span id="cb127-117"><a href="#cb127-117" aria-hidden="true" tabindex="-1"></a>#&#39; what Andrew first thought and it turned out to be useful for</span>
-<span id="cb127-118"><a href="#cb127-118" aria-hidden="true" tabindex="-1"></a>#&#39; illustration.</span>
-<span id="cb127-119"><a href="#cb127-119" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-120"><a href="#cb127-120" aria-hidden="true" tabindex="-1"></a>#&#39; The model structure is as follows: if game $i$ has teams $j_1$ and</span>
-<span id="cb127-121"><a href="#cb127-121" aria-hidden="true" tabindex="-1"></a>#&#39; team $j_2$ playing, and they score $z_1$ and $z_2$ goals,</span>
-<span id="cb127-122"><a href="#cb127-122" aria-hidden="true" tabindex="-1"></a>#&#39; respectively, then the data point for this game is $y_i =</span>
-<span id="cb127-123"><a href="#cb127-123" aria-hidden="true" tabindex="-1"></a>#&#39; \mbox{sign}(z_1-z_2)*\sqrt{|z_1-z_2|}$, and the data model is: $y_i</span>
-<span id="cb127-124"><a href="#cb127-124" aria-hidden="true" tabindex="-1"></a>#&#39; \sim \mbox{normal}(a_{j_1<span class="co">[</span><span class="ot">i</span><span class="co">]</span>}-a_{j_2<span class="co">[</span><span class="ot">i</span><span class="co">]</span>}, \sigma_y)$, where</span>
-<span id="cb127-125"><a href="#cb127-125" aria-hidden="true" tabindex="-1"></a>#&#39; $a_{j_1}$ and $a_{j_2}$ are the ability parameters (to use</span>
-<span id="cb127-126"><a href="#cb127-126" aria-hidden="true" tabindex="-1"></a>#&#39; psychometrics jargon) for the two teams and $\sigma_y$ is a scale</span>
-<span id="cb127-127"><a href="#cb127-127" aria-hidden="true" tabindex="-1"></a>#&#39; parameter estimated from the data.</span>
-<span id="cb127-128"><a href="#cb127-128" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-129"><a href="#cb127-129" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb127-130"><a href="#cb127-130" aria-hidden="true" tabindex="-1"></a>#&#39; y_i \sim \mbox{t}_{\nu}(a_{j_1[i]}-a_{j_2<span class="co">[</span><span class="ot">i</span><span class="co">]</span>}, \sigma_y),</span>
-<span id="cb127-131"><a href="#cb127-131" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb127-132"><a href="#cb127-132" aria-hidden="true" tabindex="-1"></a>#&#39; setting the degrees of freedom to $\nu=7$.</span>
-<span id="cb127-133"><a href="#cb127-133" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-134"><a href="#cb127-134" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model</span>
-<span id="cb127-135"><a href="#cb127-135" aria-hidden="true" tabindex="-1"></a>model_1 &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_first_try.stan&quot;))</span>
-<span id="cb127-136"><a href="#cb127-136" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-137"><a href="#cb127-137" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_1$code())</span>
-<span id="cb127-138"><a href="#cb127-138" aria-hidden="true" tabindex="-1"></a>#&#39; Fit the model and show the results</span>
-<span id="cb127-139"><a href="#cb127-139" aria-hidden="true" tabindex="-1"></a>#| label: fit_1</span>
-<span id="cb127-140"><a href="#cb127-140" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-141"><a href="#cb127-141" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-142"><a href="#cb127-142" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- model_1$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-143"><a href="#cb127-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-144"><a href="#cb127-144" aria-hidden="true" tabindex="-1"></a>#| label: fit_1_summary</span>
-<span id="cb127-145"><a href="#cb127-145" aria-hidden="true" tabindex="-1"></a>fit_1$summary(c(&quot;a&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-146"><a href="#cb127-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-147"><a href="#cb127-147" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_1</span>
-<span id="cb127-148"><a href="#cb127-148" aria-hidden="true" tabindex="-1"></a>#| fig-height: 7</span>
-<span id="cb127-149"><a href="#cb127-149" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb127-150"><a href="#cb127-150" aria-hidden="true" tabindex="-1"></a>fit_1$draws(&quot;a&quot;) |&gt;</span>
-<span id="cb127-151"><a href="#cb127-151" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
-<span id="cb127-152"><a href="#cb127-152" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
-<span id="cb127-153"><a href="#cb127-153" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals&quot;)</span>
-<span id="cb127-154"><a href="#cb127-154" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_1.pdf&quot;, height=7, width=8))</span>
-<span id="cb127-155"><a href="#cb127-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-156"><a href="#cb127-156" aria-hidden="true" tabindex="-1"></a>#&#39; ## Check fit of the first model</span>
-<span id="cb127-157"><a href="#cb127-157" aria-hidden="true" tabindex="-1"></a>model_1_rep &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_with_replication.stan&quot;))</span>
-<span id="cb127-158"><a href="#cb127-158" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-159"><a href="#cb127-159" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_1_rep$code())</span>
-<span id="cb127-160"><a href="#cb127-160" aria-hidden="true" tabindex="-1"></a>#| label: fit_1_rep</span>
-<span id="cb127-161"><a href="#cb127-161" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-162"><a href="#cb127-162" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-163"><a href="#cb127-163" aria-hidden="true" tabindex="-1"></a>fit_1_rep &lt;- model_1_rep$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-164"><a href="#cb127-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-165"><a href="#cb127-165" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-ppc-intervals-fit_1</span>
-<span id="cb127-166"><a href="#cb127-166" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
-<span id="cb127-167"><a href="#cb127-167" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb127-168"><a href="#cb127-168" aria-hidden="true" tabindex="-1"></a>ppc_intervals(</span>
-<span id="cb127-169"><a href="#cb127-169" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
-<span id="cb127-170"><a href="#cb127-170" aria-hidden="true" tabindex="-1"></a>  yrep = fit_1_rep$draws(&quot;y_rep_original_scale&quot;, format = &quot;draws_matrix&quot;),</span>
-<span id="cb127-171"><a href="#cb127-171" aria-hidden="true" tabindex="-1"></a>  fatten = 0,</span>
-<span id="cb127-172"><a href="#cb127-172" aria-hidden="true" tabindex="-1"></a>  prob = 1e-12</span>
-<span id="cb127-173"><a href="#cb127-173" aria-hidden="true" tabindex="-1"></a>) +</span>
-<span id="cb127-174"><a href="#cb127-174" aria-hidden="true" tabindex="-1"></a>  scale_x_continuous(labels = gamenames, breaks=1:64)+</span>
-<span id="cb127-175"><a href="#cb127-175" aria-hidden="true" tabindex="-1"></a>  labs(y=&quot;Game score differentials\ncompared to 90% predictive interval from model&quot;,</span>
-<span id="cb127-176"><a href="#cb127-176" aria-hidden="true" tabindex="-1"></a>       x=&quot;&quot;) +</span>
-<span id="cb127-177"><a href="#cb127-177" aria-hidden="true" tabindex="-1"></a>  coord_flip() </span>
-<span id="cb127-178"><a href="#cb127-178" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_3.pdf&quot;, height=10, width=8))</span>
-<span id="cb127-179"><a href="#cb127-179" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-180"><a href="#cb127-180" aria-hidden="true" tabindex="-1"></a>#&#39; # Second model without sqrt transformation</span>
-<span id="cb127-181"><a href="#cb127-181" aria-hidden="true" tabindex="-1"></a>model_2 &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_no_sqrt.stan&quot;))</span>
-<span id="cb127-182"><a href="#cb127-182" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-183"><a href="#cb127-183" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_2$code())</span>
-<span id="cb127-184"><a href="#cb127-184" aria-hidden="true" tabindex="-1"></a>#| label: fit_2</span>
-<span id="cb127-185"><a href="#cb127-185" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-186"><a href="#cb127-186" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-187"><a href="#cb127-187" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- model_2$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-188"><a href="#cb127-188" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-189"><a href="#cb127-189" aria-hidden="true" tabindex="-1"></a>#| label: fit_2_summary</span>
-<span id="cb127-190"><a href="#cb127-190" aria-hidden="true" tabindex="-1"></a>fit_2$summary(c(&quot;a&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-191"><a href="#cb127-191" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-192"><a href="#cb127-192" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_2</span>
-<span id="cb127-193"><a href="#cb127-193" aria-hidden="true" tabindex="-1"></a>#| fig-height: 7</span>
-<span id="cb127-194"><a href="#cb127-194" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb127-195"><a href="#cb127-195" aria-hidden="true" tabindex="-1"></a>fit_2$draws(&quot;a&quot;) |&gt;</span>
-<span id="cb127-196"><a href="#cb127-196" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
-<span id="cb127-197"><a href="#cb127-197" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
-<span id="cb127-198"><a href="#cb127-198" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals\n(model with no square root)&quot;)</span>
-<span id="cb127-199"><a href="#cb127-199" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_4.pdf&quot;, height=7, width=8))</span>
-<span id="cb127-200"><a href="#cb127-200" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-201"><a href="#cb127-201" aria-hidden="true" tabindex="-1"></a>#&#39; ## Check fit of the second model to data</span>
-<span id="cb127-202"><a href="#cb127-202" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-ppc-intervals-fit_2</span>
-<span id="cb127-203"><a href="#cb127-203" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
-<span id="cb127-204"><a href="#cb127-204" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb127-205"><a href="#cb127-205" aria-hidden="true" tabindex="-1"></a>ppc_intervals(</span>
-<span id="cb127-206"><a href="#cb127-206" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
-<span id="cb127-207"><a href="#cb127-207" aria-hidden="true" tabindex="-1"></a>  yrep = fit_2$draws(&quot;y_rep&quot;, format = &quot;draws_matrix&quot;),</span>
-<span id="cb127-208"><a href="#cb127-208" aria-hidden="true" tabindex="-1"></a>  fatten = 0,</span>
-<span id="cb127-209"><a href="#cb127-209" aria-hidden="true" tabindex="-1"></a>  prob = 1e-12</span>
-<span id="cb127-210"><a href="#cb127-210" aria-hidden="true" tabindex="-1"></a>) +</span>
-<span id="cb127-211"><a href="#cb127-211" aria-hidden="true" tabindex="-1"></a>  scale_x_continuous(labels = gamenames, breaks = 1:64)+</span>
-<span id="cb127-212"><a href="#cb127-212" aria-hidden="true" tabindex="-1"></a>  labs(y = &quot;Game score differentials ncompared to 90% predictive interval\n(model with no square root)&quot;, x = &quot;&quot;) +</span>
-<span id="cb127-213"><a href="#cb127-213" aria-hidden="true" tabindex="-1"></a>  coord_flip() </span>
-<span id="cb127-214"><a href="#cb127-214" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_5.pdf&quot;, height=10, width=8))</span>
-<span id="cb127-215"><a href="#cb127-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-216"><a href="#cb127-216" aria-hidden="true" tabindex="-1"></a>#&#39; # Fix the first model</span>
-<span id="cb127-217"><a href="#cb127-217" aria-hidden="true" tabindex="-1"></a>model_3 &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_fixed.stan&quot;))</span>
-<span id="cb127-218"><a href="#cb127-218" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-219"><a href="#cb127-219" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_3$code())</span>
-<span id="cb127-220"><a href="#cb127-220" aria-hidden="true" tabindex="-1"></a>#| label: fit_3</span>
-<span id="cb127-221"><a href="#cb127-221" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-222"><a href="#cb127-222" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-223"><a href="#cb127-223" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- model_3$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-224"><a href="#cb127-224" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-225"><a href="#cb127-225" aria-hidden="true" tabindex="-1"></a>#| label: fit_3_summary</span>
-<span id="cb127-226"><a href="#cb127-226" aria-hidden="true" tabindex="-1"></a>fit_3$summary(c(&quot;a&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-227"><a href="#cb127-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-228"><a href="#cb127-228" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_3</span>
-<span id="cb127-229"><a href="#cb127-229" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
-<span id="cb127-230"><a href="#cb127-230" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb127-231"><a href="#cb127-231" aria-hidden="true" tabindex="-1"></a>fit_3$draws(&quot;a&quot;) |&gt;</span>
-<span id="cb127-232"><a href="#cb127-232" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
-<span id="cb127-233"><a href="#cb127-233" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
-<span id="cb127-234"><a href="#cb127-234" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals\n(corrected model)&quot;)</span>
-<span id="cb127-235"><a href="#cb127-235" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_6.pdf&quot;, height=7, width=8))</span>
-<span id="cb127-236"><a href="#cb127-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true" tabindex="-1"></a>#&#39; image: ../social-cards/world_cup.png</span>
+<span id="cb127-3"><a href="#cb127-3" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Debugging a model: World Cup football&quot;</span>
+<span id="cb127-4"><a href="#cb127-4" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman and Aki Vehtari&quot;</span>
+<span id="cb127-5"><a href="#cb127-5" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2021-01-12</span>
+<span id="cb127-6"><a href="#cb127-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
+<span id="cb127-7"><a href="#cb127-7" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
+<span id="cb127-8"><a href="#cb127-8" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
+<span id="cb127-9"><a href="#cb127-9" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
+<span id="cb127-10"><a href="#cb127-10" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
+<span id="cb127-11"><a href="#cb127-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
+<span id="cb127-12"><a href="#cb127-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
+<span id="cb127-13"><a href="#cb127-13" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
+<span id="cb127-14"><a href="#cb127-14" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
+<span id="cb127-15"><a href="#cb127-15" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
+<span id="cb127-16"><a href="#cb127-16" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-17"><a href="#cb127-17" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
+<span id="cb127-18"><a href="#cb127-18" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 23 *Debugging a model: World Cup football*.</span>
+<span id="cb127-19"><a href="#cb127-19" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-20"><a href="#cb127-20" aria-hidden="true" tabindex="-1"></a>#&#39; # World Cup 2014 team performance analysis</span>
+<span id="cb127-21"><a href="#cb127-21" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-22"><a href="#cb127-22" aria-hidden="true" tabindex="-1"></a>#&#39; We use an item-response model such as described in the previous</span>
+<span id="cb127-23"><a href="#cb127-23" aria-hidden="true" tabindex="-1"></a>#&#39; chapter to fit a model to estimate the abilities of the teams in</span>
+<span id="cb127-24"><a href="#cb127-24" aria-hidden="true" tabindex="-1"></a>#&#39; the 2014 football World Cup.  We use score differentials as data</span>
+<span id="cb127-25"><a href="#cb127-25" aria-hidden="true" tabindex="-1"></a>#&#39; (ignoring the shoot-outs).</span>
+<span id="cb127-26"><a href="#cb127-26" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-27"><a href="#cb127-27" aria-hidden="true" tabindex="-1"></a>#&#39; The forthcoming Bayesian workflow book has more information about</span>
+<span id="cb127-28"><a href="#cb127-28" aria-hidden="true" tabindex="-1"></a>#&#39; the modeling task, but this version of the code was made available</span>
+<span id="cb127-29"><a href="#cb127-29" aria-hidden="true" tabindex="-1"></a>#&#39; early, as it includes illustration of predictive performance</span>
+<span id="cb127-30"><a href="#cb127-30" aria-hidden="true" tabindex="-1"></a>#&#39; comparison of continuous and discrete models.</span>
+<span id="cb127-31"><a href="#cb127-31" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-32"><a href="#cb127-32" aria-hidden="true" tabindex="-1"></a>#&#39; Game scores could be modelled with a discrete bivariate Poisson</span>
+<span id="cb127-33"><a href="#cb127-33" aria-hidden="true" tabindex="-1"></a>#&#39; model, and score differences with Poisson difference models</span>
+<span id="cb127-34"><a href="#cb127-34" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="co">[</span><span class="ot">@Karlis-Ntzoufras:2003</span><span class="co">]</span>, which are commonly used in analysis of</span>
+<span id="cb127-35"><a href="#cb127-35" aria-hidden="true" tabindex="-1"></a>#&#39; sports data. But we&#39;ll start with continuous models and discretized</span>
+<span id="cb127-36"><a href="#cb127-36" aria-hidden="true" tabindex="-1"></a>#&#39; continuous models to illustrate how those can be compared, and</span>
+<span id="cb127-37"><a href="#cb127-37" aria-hidden="true" tabindex="-1"></a>#&#39; eventually build also models using naturally discrete data models.</span>
+<span id="cb127-38"><a href="#cb127-38" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-39"><a href="#cb127-39" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
+<span id="cb127-40"><a href="#cb127-40" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(message=FALSE, error=FALSE, warning=FALSE, comment=NA, cache=FALSE)</span>
+<span id="cb127-41"><a href="#cb127-41" aria-hidden="true" tabindex="-1"></a><span class="fu"># switch this to TRUE to save figures in separate files</span></span>
+<span id="cb127-42"><a href="#cb127-42" aria-hidden="true" tabindex="-1"></a>savefigs &lt;- FALSE</span>
+<span id="cb127-43"><a href="#cb127-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-44"><a href="#cb127-44" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages**</span>
+<span id="cb127-45"><a href="#cb127-45" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
+<span id="cb127-46"><a href="#cb127-46" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
+<span id="cb127-47"><a href="#cb127-47" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
+<span id="cb127-48"><a href="#cb127-48" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
+<span id="cb127-49"><a href="#cb127-49" aria-hidden="true" tabindex="-1"></a><span class="fu"># CmdStanR output directory makes Quarto cache to work</span></span>
+<span id="cb127-50"><a href="#cb127-50" aria-hidden="true" tabindex="-1"></a>dir.create(root(&quot;world_cup&quot;, &quot;stan_output&quot;), showWarnings = FALSE)</span>
+<span id="cb127-51"><a href="#cb127-51" aria-hidden="true" tabindex="-1"></a>options(cmdstanr_output_dir = root(&quot;world_cup&quot;, &quot;stan_output&quot;))</span>
+<span id="cb127-52"><a href="#cb127-52" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
+<span id="cb127-53"><a href="#cb127-53" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
+<span id="cb127-54"><a href="#cb127-54" aria-hidden="true" tabindex="-1"></a>options(</span>
+<span id="cb127-55"><a href="#cb127-55" aria-hidden="true" tabindex="-1"></a>  tibble.print_max = 35,</span>
+<span id="cb127-56"><a href="#cb127-56" aria-hidden="true" tabindex="-1"></a>  pillar.neg = FALSE,</span>
+<span id="cb127-57"><a href="#cb127-57" aria-hidden="true" tabindex="-1"></a>  pillar.subtle = FALSE,</span>
+<span id="cb127-58"><a href="#cb127-58" aria-hidden="true" tabindex="-1"></a>  pillar.sigfig = 2</span>
+<span id="cb127-59"><a href="#cb127-59" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-60"><a href="#cb127-60" aria-hidden="true" tabindex="-1"></a>devtools::load_all(&quot;~/proj/bayesplot&quot;)</span>
+<span id="cb127-61"><a href="#cb127-61" aria-hidden="true" tabindex="-1"></a><span class="fu">## library(bayesplot)</span></span>
+<span id="cb127-62"><a href="#cb127-62" aria-hidden="true" tabindex="-1"></a>library(ggplot2)</span>
+<span id="cb127-63"><a href="#cb127-63" aria-hidden="true" tabindex="-1"></a>theme_set(bayesplot::theme_default(base_family = &quot;sans&quot;, base_size=14))</span>
+<span id="cb127-64"><a href="#cb127-64" aria-hidden="true" tabindex="-1"></a>library(arm)</span>
+<span id="cb127-65"><a href="#cb127-65" aria-hidden="true" tabindex="-1"></a>library(loo)</span>
+<span id="cb127-66"><a href="#cb127-66" aria-hidden="true" tabindex="-1"></a>library(dplyr)</span>
+<span id="cb127-67"><a href="#cb127-67" aria-hidden="true" tabindex="-1"></a>library(readr)</span>
+<span id="cb127-68"><a href="#cb127-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-69"><a href="#cb127-69" aria-hidden="true" tabindex="-1"></a>print_stan_code &lt;- function(code) {</span>
+<span id="cb127-70"><a href="#cb127-70" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;&amp;</span>
+<span id="cb127-71"><a href="#cb127-71" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
+<span id="cb127-72"><a href="#cb127-72" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
+<span id="cb127-73"><a href="#cb127-73" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
+<span id="cb127-74"><a href="#cb127-74" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
+<span id="cb127-75"><a href="#cb127-75" aria-hidden="true" tabindex="-1"></a>  } else {</span>
+<span id="cb127-76"><a href="#cb127-76" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
+<span id="cb127-77"><a href="#cb127-77" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb127-78"><a href="#cb127-78" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb127-79"><a href="#cb127-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-80"><a href="#cb127-80" aria-hidden="true" tabindex="-1"></a>#&#39; # Data</span>
+<span id="cb127-81"><a href="#cb127-81" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-82"><a href="#cb127-82" aria-hidden="true" tabindex="-1"></a>#&#39; Data include 64 game results from World Cup 2014 and Soccer Power</span>
+<span id="cb127-83"><a href="#cb127-83" aria-hidden="true" tabindex="-1"></a>#&#39; Index that was available on the internet a month before the</span>
+<span id="cb127-84"><a href="#cb127-84" aria-hidden="true" tabindex="-1"></a>#&#39; tournament <span class="co">[</span><span class="ot">@Silver:2014</span><span class="co">]</span>.  We took the rankings, with Brazil at</span>
+<span id="cb127-85"><a href="#cb127-85" aria-hidden="true" tabindex="-1"></a>#&#39; the top (getting a score of 32) and Australia at the bottom (with a</span>
+<span id="cb127-86"><a href="#cb127-86" aria-hidden="true" tabindex="-1"></a>#&#39; score of 1), and then for simplicity in interpretation of the</span>
+<span id="cb127-87"><a href="#cb127-87" aria-hidden="true" tabindex="-1"></a>#&#39; parameters we rescaled these to have mean 0 and standard deviation</span>
+<span id="cb127-88"><a href="#cb127-88" aria-hidden="true" tabindex="-1"></a>#&#39; 1/2, to get ``prior scores&#39;&#39; that ranged from $-0.83$ to $+0.83$.</span>
+<span id="cb127-89"><a href="#cb127-89" aria-hidden="true" tabindex="-1"></a>powerindex &lt;- read_csv(root(&quot;world_cup&quot;, &quot;data&quot;,&quot;soccerpowerindex.csv&quot;)) |&gt;</span>
+<span id="cb127-90"><a href="#cb127-90" aria-hidden="true" tabindex="-1"></a>  mutate(prior_score = as.vector(scale(rev(index))/2))</span>
+<span id="cb127-91"><a href="#cb127-91" aria-hidden="true" tabindex="-1"></a>teamnames &lt;- powerindex$team</span>
+<span id="cb127-92"><a href="#cb127-92" aria-hidden="true" tabindex="-1"></a>worldcup2014 &lt;- read_csv(root(&quot;world_cup&quot;, &quot;data&quot;, &quot;worldcup2014.csv&quot;)) |&gt;</span>
+<span id="cb127-93"><a href="#cb127-93" aria-hidden="true" tabindex="-1"></a>  mutate(team_1 = match(team1, teamnames),</span>
+<span id="cb127-94"><a href="#cb127-94" aria-hidden="true" tabindex="-1"></a>         team_2 = match(team2, teamnames))</span>
+<span id="cb127-95"><a href="#cb127-95" aria-hidden="true" tabindex="-1"></a>N_games &lt;- nrow(worldcup2014)</span>
+<span id="cb127-96"><a href="#cb127-96" aria-hidden="true" tabindex="-1"></a>gamenames &lt;- with(worldcup2014,</span>
+<span id="cb127-97"><a href="#cb127-97" aria-hidden="true" tabindex="-1"></a>                  rev(paste(teamnames<span class="co">[</span><span class="ot">team_1</span><span class="co">]</span>, &quot;vs.&quot;, teamnames<span class="co">[</span><span class="ot">team_2</span><span class="co">]</span>)))</span>
+<span id="cb127-98"><a href="#cb127-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-99"><a href="#cb127-99" aria-hidden="true" tabindex="-1"></a>#&#39; ## Data for Stan</span>
+<span id="cb127-100"><a href="#cb127-100" aria-hidden="true" tabindex="-1"></a>stan_data &lt;- with(</span>
+<span id="cb127-101"><a href="#cb127-101" aria-hidden="true" tabindex="-1"></a>  worldcup2014,</span>
+<span id="cb127-102"><a href="#cb127-102" aria-hidden="true" tabindex="-1"></a>  list(</span>
+<span id="cb127-103"><a href="#cb127-103" aria-hidden="true" tabindex="-1"></a>    N_teams = nrow(powerindex),</span>
+<span id="cb127-104"><a href="#cb127-104" aria-hidden="true" tabindex="-1"></a>    N_games = N_games,</span>
+<span id="cb127-105"><a href="#cb127-105" aria-hidden="true" tabindex="-1"></a>    team_1 = team_1,</span>
+<span id="cb127-106"><a href="#cb127-106" aria-hidden="true" tabindex="-1"></a>    score_1 = score1,</span>
+<span id="cb127-107"><a href="#cb127-107" aria-hidden="true" tabindex="-1"></a>    team_2 = team_2,</span>
+<span id="cb127-108"><a href="#cb127-108" aria-hidden="true" tabindex="-1"></a>    score_2 = score2,</span>
+<span id="cb127-109"><a href="#cb127-109" aria-hidden="true" tabindex="-1"></a>    prior_score = powerindex$prior_score,</span>
+<span id="cb127-110"><a href="#cb127-110" aria-hidden="true" tabindex="-1"></a>    df = 7</span>
+<span id="cb127-111"><a href="#cb127-111" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb127-112"><a href="#cb127-112" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-113"><a href="#cb127-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-114"><a href="#cb127-114" aria-hidden="true" tabindex="-1"></a>#&#39; # First model</span>
+<span id="cb127-115"><a href="#cb127-115" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-116"><a href="#cb127-116" aria-hidden="true" tabindex="-1"></a>#&#39; The first model uses Student&#39;s $t$ for square root of score</span>
+<span id="cb127-117"><a href="#cb127-117" aria-hidden="true" tabindex="-1"></a>#&#39; difference. It&#39;s not particularly well justified model, but that is</span>
+<span id="cb127-118"><a href="#cb127-118" aria-hidden="true" tabindex="-1"></a>#&#39; what Andrew first thought and it turned out to be useful for</span>
+<span id="cb127-119"><a href="#cb127-119" aria-hidden="true" tabindex="-1"></a>#&#39; illustration.</span>
+<span id="cb127-120"><a href="#cb127-120" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-121"><a href="#cb127-121" aria-hidden="true" tabindex="-1"></a>#&#39; The model structure is as follows: if game $i$ has teams $j_1$ and</span>
+<span id="cb127-122"><a href="#cb127-122" aria-hidden="true" tabindex="-1"></a>#&#39; team $j_2$ playing, and they score $z_1$ and $z_2$ goals,</span>
+<span id="cb127-123"><a href="#cb127-123" aria-hidden="true" tabindex="-1"></a>#&#39; respectively, then the data point for this game is $y_i =</span>
+<span id="cb127-124"><a href="#cb127-124" aria-hidden="true" tabindex="-1"></a>#&#39; \mbox{sign}(z_1-z_2)*\sqrt{|z_1-z_2|}$, and the data model is: $y_i</span>
+<span id="cb127-125"><a href="#cb127-125" aria-hidden="true" tabindex="-1"></a>#&#39; \sim \mbox{normal}(a_{j_1<span class="co">[</span><span class="ot">i</span><span class="co">]</span>}-a_{j_2<span class="co">[</span><span class="ot">i</span><span class="co">]</span>}, \sigma_y)$, where</span>
+<span id="cb127-126"><a href="#cb127-126" aria-hidden="true" tabindex="-1"></a>#&#39; $a_{j_1}$ and $a_{j_2}$ are the ability parameters (to use</span>
+<span id="cb127-127"><a href="#cb127-127" aria-hidden="true" tabindex="-1"></a>#&#39; psychometrics jargon) for the two teams and $\sigma_y$ is a scale</span>
+<span id="cb127-128"><a href="#cb127-128" aria-hidden="true" tabindex="-1"></a>#&#39; parameter estimated from the data.</span>
+<span id="cb127-129"><a href="#cb127-129" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-130"><a href="#cb127-130" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb127-131"><a href="#cb127-131" aria-hidden="true" tabindex="-1"></a>#&#39; y_i \sim \mbox{t}_{\nu}(a_{j_1[i]}-a_{j_2<span class="co">[</span><span class="ot">i</span><span class="co">]</span>}, \sigma_y),</span>
+<span id="cb127-132"><a href="#cb127-132" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb127-133"><a href="#cb127-133" aria-hidden="true" tabindex="-1"></a>#&#39; setting the degrees of freedom to $\nu=7$.</span>
+<span id="cb127-134"><a href="#cb127-134" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-135"><a href="#cb127-135" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model</span>
+<span id="cb127-136"><a href="#cb127-136" aria-hidden="true" tabindex="-1"></a>model_1 &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_first_try.stan&quot;))</span>
+<span id="cb127-137"><a href="#cb127-137" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-138"><a href="#cb127-138" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_1$code())</span>
+<span id="cb127-139"><a href="#cb127-139" aria-hidden="true" tabindex="-1"></a>#&#39; Fit the model and show the results</span>
+<span id="cb127-140"><a href="#cb127-140" aria-hidden="true" tabindex="-1"></a>#| label: fit_1</span>
+<span id="cb127-141"><a href="#cb127-141" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-142"><a href="#cb127-142" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-143"><a href="#cb127-143" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- model_1$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-144"><a href="#cb127-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-145"><a href="#cb127-145" aria-hidden="true" tabindex="-1"></a>#| label: fit_1_summary</span>
+<span id="cb127-146"><a href="#cb127-146" aria-hidden="true" tabindex="-1"></a>fit_1$summary(c(&quot;a&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-147"><a href="#cb127-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-148"><a href="#cb127-148" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_1</span>
+<span id="cb127-149"><a href="#cb127-149" aria-hidden="true" tabindex="-1"></a>#| fig-height: 7</span>
+<span id="cb127-150"><a href="#cb127-150" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb127-151"><a href="#cb127-151" aria-hidden="true" tabindex="-1"></a>fit_1$draws(&quot;a&quot;) |&gt;</span>
+<span id="cb127-152"><a href="#cb127-152" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
+<span id="cb127-153"><a href="#cb127-153" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
+<span id="cb127-154"><a href="#cb127-154" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals&quot;)</span>
+<span id="cb127-155"><a href="#cb127-155" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_1.pdf&quot;, height=7, width=8))</span>
+<span id="cb127-156"><a href="#cb127-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-157"><a href="#cb127-157" aria-hidden="true" tabindex="-1"></a>#&#39; ## Check fit of the first model</span>
+<span id="cb127-158"><a href="#cb127-158" aria-hidden="true" tabindex="-1"></a>model_1_rep &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_with_replication.stan&quot;))</span>
+<span id="cb127-159"><a href="#cb127-159" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-160"><a href="#cb127-160" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_1_rep$code())</span>
+<span id="cb127-161"><a href="#cb127-161" aria-hidden="true" tabindex="-1"></a>#| label: fit_1_rep</span>
+<span id="cb127-162"><a href="#cb127-162" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-163"><a href="#cb127-163" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-164"><a href="#cb127-164" aria-hidden="true" tabindex="-1"></a>fit_1_rep &lt;- model_1_rep$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-165"><a href="#cb127-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-166"><a href="#cb127-166" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-ppc-intervals-fit_1</span>
+<span id="cb127-167"><a href="#cb127-167" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
+<span id="cb127-168"><a href="#cb127-168" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb127-169"><a href="#cb127-169" aria-hidden="true" tabindex="-1"></a>ppc_intervals(</span>
+<span id="cb127-170"><a href="#cb127-170" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
+<span id="cb127-171"><a href="#cb127-171" aria-hidden="true" tabindex="-1"></a>  yrep = fit_1_rep$draws(&quot;y_rep_original_scale&quot;, format = &quot;draws_matrix&quot;),</span>
+<span id="cb127-172"><a href="#cb127-172" aria-hidden="true" tabindex="-1"></a>  fatten = 0,</span>
+<span id="cb127-173"><a href="#cb127-173" aria-hidden="true" tabindex="-1"></a>  prob = 1e-12</span>
+<span id="cb127-174"><a href="#cb127-174" aria-hidden="true" tabindex="-1"></a>) +</span>
+<span id="cb127-175"><a href="#cb127-175" aria-hidden="true" tabindex="-1"></a>  scale_x_continuous(labels = gamenames, breaks=1:64)+</span>
+<span id="cb127-176"><a href="#cb127-176" aria-hidden="true" tabindex="-1"></a>  labs(y=&quot;Game score differentials\ncompared to 90% predictive interval from model&quot;,</span>
+<span id="cb127-177"><a href="#cb127-177" aria-hidden="true" tabindex="-1"></a>       x=&quot;&quot;) +</span>
+<span id="cb127-178"><a href="#cb127-178" aria-hidden="true" tabindex="-1"></a>  coord_flip() </span>
+<span id="cb127-179"><a href="#cb127-179" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_3.pdf&quot;, height=10, width=8))</span>
+<span id="cb127-180"><a href="#cb127-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-181"><a href="#cb127-181" aria-hidden="true" tabindex="-1"></a>#&#39; # Second model without sqrt transformation</span>
+<span id="cb127-182"><a href="#cb127-182" aria-hidden="true" tabindex="-1"></a>model_2 &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_no_sqrt.stan&quot;))</span>
+<span id="cb127-183"><a href="#cb127-183" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-184"><a href="#cb127-184" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_2$code())</span>
+<span id="cb127-185"><a href="#cb127-185" aria-hidden="true" tabindex="-1"></a>#| label: fit_2</span>
+<span id="cb127-186"><a href="#cb127-186" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-187"><a href="#cb127-187" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-188"><a href="#cb127-188" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- model_2$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-189"><a href="#cb127-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-190"><a href="#cb127-190" aria-hidden="true" tabindex="-1"></a>#| label: fit_2_summary</span>
+<span id="cb127-191"><a href="#cb127-191" aria-hidden="true" tabindex="-1"></a>fit_2$summary(c(&quot;a&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-192"><a href="#cb127-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-193"><a href="#cb127-193" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_2</span>
+<span id="cb127-194"><a href="#cb127-194" aria-hidden="true" tabindex="-1"></a>#| fig-height: 7</span>
+<span id="cb127-195"><a href="#cb127-195" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb127-196"><a href="#cb127-196" aria-hidden="true" tabindex="-1"></a>fit_2$draws(&quot;a&quot;) |&gt;</span>
+<span id="cb127-197"><a href="#cb127-197" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
+<span id="cb127-198"><a href="#cb127-198" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
+<span id="cb127-199"><a href="#cb127-199" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals\n(model with no square root)&quot;)</span>
+<span id="cb127-200"><a href="#cb127-200" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_4.pdf&quot;, height=7, width=8))</span>
+<span id="cb127-201"><a href="#cb127-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-202"><a href="#cb127-202" aria-hidden="true" tabindex="-1"></a>#&#39; ## Check fit of the second model to data</span>
+<span id="cb127-203"><a href="#cb127-203" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-ppc-intervals-fit_2</span>
+<span id="cb127-204"><a href="#cb127-204" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
+<span id="cb127-205"><a href="#cb127-205" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb127-206"><a href="#cb127-206" aria-hidden="true" tabindex="-1"></a>ppc_intervals(</span>
+<span id="cb127-207"><a href="#cb127-207" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
+<span id="cb127-208"><a href="#cb127-208" aria-hidden="true" tabindex="-1"></a>  yrep = fit_2$draws(&quot;y_rep&quot;, format = &quot;draws_matrix&quot;),</span>
+<span id="cb127-209"><a href="#cb127-209" aria-hidden="true" tabindex="-1"></a>  fatten = 0,</span>
+<span id="cb127-210"><a href="#cb127-210" aria-hidden="true" tabindex="-1"></a>  prob = 1e-12</span>
+<span id="cb127-211"><a href="#cb127-211" aria-hidden="true" tabindex="-1"></a>) +</span>
+<span id="cb127-212"><a href="#cb127-212" aria-hidden="true" tabindex="-1"></a>  scale_x_continuous(labels = gamenames, breaks = 1:64)+</span>
+<span id="cb127-213"><a href="#cb127-213" aria-hidden="true" tabindex="-1"></a>  labs(y = &quot;Game score differentials ncompared to 90% predictive interval\n(model with no square root)&quot;, x = &quot;&quot;) +</span>
+<span id="cb127-214"><a href="#cb127-214" aria-hidden="true" tabindex="-1"></a>  coord_flip() </span>
+<span id="cb127-215"><a href="#cb127-215" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_5.pdf&quot;, height=10, width=8))</span>
+<span id="cb127-216"><a href="#cb127-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-217"><a href="#cb127-217" aria-hidden="true" tabindex="-1"></a>#&#39; # Fix the first model</span>
+<span id="cb127-218"><a href="#cb127-218" aria-hidden="true" tabindex="-1"></a>model_3 &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_fixed.stan&quot;))</span>
+<span id="cb127-219"><a href="#cb127-219" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-220"><a href="#cb127-220" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_3$code())</span>
+<span id="cb127-221"><a href="#cb127-221" aria-hidden="true" tabindex="-1"></a>#| label: fit_3</span>
+<span id="cb127-222"><a href="#cb127-222" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-223"><a href="#cb127-223" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-224"><a href="#cb127-224" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- model_3$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-225"><a href="#cb127-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-226"><a href="#cb127-226" aria-hidden="true" tabindex="-1"></a>#| label: fit_3_summary</span>
+<span id="cb127-227"><a href="#cb127-227" aria-hidden="true" tabindex="-1"></a>fit_3$summary(c(&quot;a&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-228"><a href="#cb127-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-229"><a href="#cb127-229" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_3</span>
+<span id="cb127-230"><a href="#cb127-230" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
+<span id="cb127-231"><a href="#cb127-231" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb127-232"><a href="#cb127-232" aria-hidden="true" tabindex="-1"></a>fit_3$draws(&quot;a&quot;) |&gt;</span>
+<span id="cb127-233"><a href="#cb127-233" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
+<span id="cb127-234"><a href="#cb127-234" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
+<span id="cb127-235"><a href="#cb127-235" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals\n(corrected model)&quot;)</span>
+<span id="cb127-236"><a href="#cb127-236" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_6.pdf&quot;, height=7, width=8))</span>
 <span id="cb127-237"><a href="#cb127-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-238"><a href="#cb127-238" aria-hidden="true" tabindex="-1"></a>#&#39; ## Check the fit of the fixed first model</span>
-<span id="cb127-239"><a href="#cb127-239" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-ppc-intervals-fit_3</span>
-<span id="cb127-240"><a href="#cb127-240" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
-<span id="cb127-241"><a href="#cb127-241" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb127-242"><a href="#cb127-242" aria-hidden="true" tabindex="-1"></a>ppc_intervals(</span>
-<span id="cb127-243"><a href="#cb127-243" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
-<span id="cb127-244"><a href="#cb127-244" aria-hidden="true" tabindex="-1"></a>  yrep = fit_3$draws(&quot;y_rep_original_scale&quot;, format = &quot;draws_matrix&quot;),</span>
-<span id="cb127-245"><a href="#cb127-245" aria-hidden="true" tabindex="-1"></a>  fatten = 0,</span>
-<span id="cb127-246"><a href="#cb127-246" aria-hidden="true" tabindex="-1"></a>  prob = 1e-12</span>
-<span id="cb127-247"><a href="#cb127-247" aria-hidden="true" tabindex="-1"></a>) +</span>
-<span id="cb127-248"><a href="#cb127-248" aria-hidden="true" tabindex="-1"></a>  scale_x_continuous(labels = gamenames, breaks = 1:64) +</span>
-<span id="cb127-249"><a href="#cb127-249" aria-hidden="true" tabindex="-1"></a>  labs(y = &quot;Game score differentials ncompared to 90% predictive interval\n(corrected model with square root)&quot;, x = &quot;&quot;) +</span>
-<span id="cb127-250"><a href="#cb127-250" aria-hidden="true" tabindex="-1"></a>  coord_flip() </span>
-<span id="cb127-251"><a href="#cb127-251" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_7.pdf&quot;, height=10, width=8))</span>
-<span id="cb127-252"><a href="#cb127-252" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-253"><a href="#cb127-253" aria-hidden="true" tabindex="-1"></a>#&#39; ## Fit the same model without the powerindex prior</span>
-<span id="cb127-254"><a href="#cb127-254" aria-hidden="true" tabindex="-1"></a>#&#39; set b=0 in the data</span>
-<span id="cb127-255"><a href="#cb127-255" aria-hidden="true" tabindex="-1"></a>model_3_no_prior &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_no_prior.stan&quot;))</span>
-<span id="cb127-256"><a href="#cb127-256" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-257"><a href="#cb127-257" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_3_no_prior$code())</span>
-<span id="cb127-258"><a href="#cb127-258" aria-hidden="true" tabindex="-1"></a>#| label: fit_3_no_prior</span>
-<span id="cb127-259"><a href="#cb127-259" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-260"><a href="#cb127-260" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-261"><a href="#cb127-261" aria-hidden="true" tabindex="-1"></a>fit_3_no_prior &lt;- model_3_no_prior$sample(data = c(stan_data, b = 0), refresh = 0)</span>
-<span id="cb127-262"><a href="#cb127-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-263"><a href="#cb127-263" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_3_no_prior</span>
-<span id="cb127-264"><a href="#cb127-264" aria-hidden="true" tabindex="-1"></a>#| fig-height: 7</span>
-<span id="cb127-265"><a href="#cb127-265" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb127-266"><a href="#cb127-266" aria-hidden="true" tabindex="-1"></a>fit_3_no_prior$draws(&quot;a&quot;) |&gt;</span>
-<span id="cb127-267"><a href="#cb127-267" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
-<span id="cb127-268"><a href="#cb127-268" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
-<span id="cb127-269"><a href="#cb127-269" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals\nModel without prior rankings&quot;)</span>
-<span id="cb127-270"><a href="#cb127-270" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_2.pdf&quot;, height=7, width=8))</span>
-<span id="cb127-271"><a href="#cb127-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-238"><a href="#cb127-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-239"><a href="#cb127-239" aria-hidden="true" tabindex="-1"></a>#&#39; ## Check the fit of the fixed first model</span>
+<span id="cb127-240"><a href="#cb127-240" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-ppc-intervals-fit_3</span>
+<span id="cb127-241"><a href="#cb127-241" aria-hidden="true" tabindex="-1"></a>#| fig-height: 10</span>
+<span id="cb127-242"><a href="#cb127-242" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb127-243"><a href="#cb127-243" aria-hidden="true" tabindex="-1"></a>ppc_intervals(</span>
+<span id="cb127-244"><a href="#cb127-244" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
+<span id="cb127-245"><a href="#cb127-245" aria-hidden="true" tabindex="-1"></a>  yrep = fit_3$draws(&quot;y_rep_original_scale&quot;, format = &quot;draws_matrix&quot;),</span>
+<span id="cb127-246"><a href="#cb127-246" aria-hidden="true" tabindex="-1"></a>  fatten = 0,</span>
+<span id="cb127-247"><a href="#cb127-247" aria-hidden="true" tabindex="-1"></a>  prob = 1e-12</span>
+<span id="cb127-248"><a href="#cb127-248" aria-hidden="true" tabindex="-1"></a>) +</span>
+<span id="cb127-249"><a href="#cb127-249" aria-hidden="true" tabindex="-1"></a>  scale_x_continuous(labels = gamenames, breaks = 1:64) +</span>
+<span id="cb127-250"><a href="#cb127-250" aria-hidden="true" tabindex="-1"></a>  labs(y = &quot;Game score differentials ncompared to 90% predictive interval\n(corrected model with square root)&quot;, x = &quot;&quot;) +</span>
+<span id="cb127-251"><a href="#cb127-251" aria-hidden="true" tabindex="-1"></a>  coord_flip() </span>
+<span id="cb127-252"><a href="#cb127-252" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_7.pdf&quot;, height=10, width=8))</span>
+<span id="cb127-253"><a href="#cb127-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-254"><a href="#cb127-254" aria-hidden="true" tabindex="-1"></a>#&#39; ## Fit the same model without the powerindex prior</span>
+<span id="cb127-255"><a href="#cb127-255" aria-hidden="true" tabindex="-1"></a>#&#39; set b=0 in the data</span>
+<span id="cb127-256"><a href="#cb127-256" aria-hidden="true" tabindex="-1"></a>model_3_no_prior &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_no_prior.stan&quot;))</span>
+<span id="cb127-257"><a href="#cb127-257" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-258"><a href="#cb127-258" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_3_no_prior$code())</span>
+<span id="cb127-259"><a href="#cb127-259" aria-hidden="true" tabindex="-1"></a>#| label: fit_3_no_prior</span>
+<span id="cb127-260"><a href="#cb127-260" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-261"><a href="#cb127-261" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-262"><a href="#cb127-262" aria-hidden="true" tabindex="-1"></a>fit_3_no_prior &lt;- model_3_no_prior$sample(data = c(stan_data, b = 0), refresh = 0)</span>
+<span id="cb127-263"><a href="#cb127-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-264"><a href="#cb127-264" aria-hidden="true" tabindex="-1"></a>#| label: fig-worldcup-mcmc-intervals-fit_3_no_prior</span>
+<span id="cb127-265"><a href="#cb127-265" aria-hidden="true" tabindex="-1"></a>#| fig-height: 7</span>
+<span id="cb127-266"><a href="#cb127-266" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb127-267"><a href="#cb127-267" aria-hidden="true" tabindex="-1"></a>fit_3_no_prior$draws(&quot;a&quot;) |&gt;</span>
+<span id="cb127-268"><a href="#cb127-268" aria-hidden="true" tabindex="-1"></a>  mcmc_intervals(prob = 0) +</span>
+<span id="cb127-269"><a href="#cb127-269" aria-hidden="true" tabindex="-1"></a>  scale_y_discrete(labels = rev(teamnames), limits = rev) +</span>
+<span id="cb127-270"><a href="#cb127-270" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Team quality estimate with 90% intervals\nModel without prior rankings&quot;)</span>
+<span id="cb127-271"><a href="#cb127-271" aria-hidden="true" tabindex="-1"></a>#if (savefigs) ggsave(root(&quot;world_cup/figs&quot;,&quot;worldcup_2.pdf&quot;, height=7, width=8))</span>
 <span id="cb127-272"><a href="#cb127-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-273"><a href="#cb127-273" aria-hidden="true" tabindex="-1"></a>#&#39; # Discrete models and LOO-CV comparison</span>
-<span id="cb127-274"><a href="#cb127-274" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-275"><a href="#cb127-275" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with explicit latent z sampled</span>
-<span id="cb127-276"><a href="#cb127-276" aria-hidden="true" tabindex="-1"></a>model_discr_z &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_z.stan&quot;))</span>
-<span id="cb127-277"><a href="#cb127-277" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-278"><a href="#cb127-278" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_z$code())</span>
-<span id="cb127-279"><a href="#cb127-279" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_z</span>
-<span id="cb127-280"><a href="#cb127-280" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-281"><a href="#cb127-281" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-282"><a href="#cb127-282" aria-hidden="true" tabindex="-1"></a>fit_discr_z &lt;- model_discr_z$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-283"><a href="#cb127-283" aria-hidden="true" tabindex="-1"></a>loo_discr_z &lt;- fit_discr_z$loo()</span>
-<span id="cb127-284"><a href="#cb127-284" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-285"><a href="#cb127-285" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_z_summary</span>
-<span id="cb127-286"><a href="#cb127-286" aria-hidden="true" tabindex="-1"></a>fit_discr_z$summary(c(&quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_z&quot;))</span>
-<span id="cb127-287"><a href="#cb127-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-288"><a href="#cb127-288" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with latent z integrated out</span>
-<span id="cb127-289"><a href="#cb127-289" aria-hidden="true" tabindex="-1"></a>model_discr &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete.stan&quot;))</span>
-<span id="cb127-290"><a href="#cb127-290" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-291"><a href="#cb127-291" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr$code())</span>
-<span id="cb127-292"><a href="#cb127-292" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr</span>
-<span id="cb127-293"><a href="#cb127-293" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-294"><a href="#cb127-294" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-295"><a href="#cb127-295" aria-hidden="true" tabindex="-1"></a>fit_discr &lt;- model_discr$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-296"><a href="#cb127-296" aria-hidden="true" tabindex="-1"></a>loo_discr &lt;- fit_discr$loo(save_psis = TRUE)</span>
-<span id="cb127-297"><a href="#cb127-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-298"><a href="#cb127-298" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_summary</span>
-<span id="cb127-299"><a href="#cb127-299" aria-hidden="true" tabindex="-1"></a>fit_discr$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_z&quot;))</span>
-<span id="cb127-300"><a href="#cb127-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-301"><a href="#cb127-301" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with no power score</span>
-<span id="cb127-302"><a href="#cb127-302" aria-hidden="true" tabindex="-1"></a>model_discr_nopower &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_nopower.stan&quot;))</span>
-<span id="cb127-303"><a href="#cb127-303" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-304"><a href="#cb127-304" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_nopower$code())</span>
-<span id="cb127-305"><a href="#cb127-305" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_nopwer</span>
-<span id="cb127-306"><a href="#cb127-306" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-307"><a href="#cb127-307" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-308"><a href="#cb127-308" aria-hidden="true" tabindex="-1"></a>fit_discr_nopower &lt;- model_discr_nopower$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-309"><a href="#cb127-309" aria-hidden="true" tabindex="-1"></a>loo_discr_nopower &lt;- fit_discr_nopower$loo()</span>
-<span id="cb127-310"><a href="#cb127-310" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-311"><a href="#cb127-311" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_nopower_summary</span>
-<span id="cb127-312"><a href="#cb127-312" aria-hidden="true" tabindex="-1"></a>fit_discr_nopower$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;sigma_a&quot;, &quot;sigma_z&quot;))</span>
-<span id="cb127-313"><a href="#cb127-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-273"><a href="#cb127-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-274"><a href="#cb127-274" aria-hidden="true" tabindex="-1"></a>#&#39; # Discrete models and LOO-CV comparison</span>
+<span id="cb127-275"><a href="#cb127-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-276"><a href="#cb127-276" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with explicit latent z sampled</span>
+<span id="cb127-277"><a href="#cb127-277" aria-hidden="true" tabindex="-1"></a>model_discr_z &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_z.stan&quot;))</span>
+<span id="cb127-278"><a href="#cb127-278" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-279"><a href="#cb127-279" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_z$code())</span>
+<span id="cb127-280"><a href="#cb127-280" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_z</span>
+<span id="cb127-281"><a href="#cb127-281" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-282"><a href="#cb127-282" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-283"><a href="#cb127-283" aria-hidden="true" tabindex="-1"></a>fit_discr_z &lt;- model_discr_z$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-284"><a href="#cb127-284" aria-hidden="true" tabindex="-1"></a>loo_discr_z &lt;- fit_discr_z$loo()</span>
+<span id="cb127-285"><a href="#cb127-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-286"><a href="#cb127-286" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_z_summary</span>
+<span id="cb127-287"><a href="#cb127-287" aria-hidden="true" tabindex="-1"></a>fit_discr_z$summary(c(&quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_z&quot;))</span>
+<span id="cb127-288"><a href="#cb127-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-289"><a href="#cb127-289" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with latent z integrated out</span>
+<span id="cb127-290"><a href="#cb127-290" aria-hidden="true" tabindex="-1"></a>model_discr &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete.stan&quot;))</span>
+<span id="cb127-291"><a href="#cb127-291" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-292"><a href="#cb127-292" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr$code())</span>
+<span id="cb127-293"><a href="#cb127-293" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr</span>
+<span id="cb127-294"><a href="#cb127-294" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-295"><a href="#cb127-295" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-296"><a href="#cb127-296" aria-hidden="true" tabindex="-1"></a>fit_discr &lt;- model_discr$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-297"><a href="#cb127-297" aria-hidden="true" tabindex="-1"></a>loo_discr &lt;- fit_discr$loo(save_psis = TRUE)</span>
+<span id="cb127-298"><a href="#cb127-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-299"><a href="#cb127-299" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_summary</span>
+<span id="cb127-300"><a href="#cb127-300" aria-hidden="true" tabindex="-1"></a>fit_discr$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_z&quot;))</span>
+<span id="cb127-301"><a href="#cb127-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-302"><a href="#cb127-302" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with no power score</span>
+<span id="cb127-303"><a href="#cb127-303" aria-hidden="true" tabindex="-1"></a>model_discr_nopower &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_nopower.stan&quot;))</span>
+<span id="cb127-304"><a href="#cb127-304" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-305"><a href="#cb127-305" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_nopower$code())</span>
+<span id="cb127-306"><a href="#cb127-306" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_nopwer</span>
+<span id="cb127-307"><a href="#cb127-307" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-308"><a href="#cb127-308" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-309"><a href="#cb127-309" aria-hidden="true" tabindex="-1"></a>fit_discr_nopower &lt;- model_discr_nopower$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-310"><a href="#cb127-310" aria-hidden="true" tabindex="-1"></a>loo_discr_nopower &lt;- fit_discr_nopower$loo()</span>
+<span id="cb127-311"><a href="#cb127-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-312"><a href="#cb127-312" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_nopower_summary</span>
+<span id="cb127-313"><a href="#cb127-313" aria-hidden="true" tabindex="-1"></a>fit_discr_nopower$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;sigma_a&quot;, &quot;sigma_z&quot;))</span>
 <span id="cb127-314"><a href="#cb127-314" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-315"><a href="#cb127-315" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with power score only</span>
-<span id="cb127-316"><a href="#cb127-316" aria-hidden="true" tabindex="-1"></a>model_discr_poweronly &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_poweronly.stan&quot;))</span>
-<span id="cb127-317"><a href="#cb127-317" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-318"><a href="#cb127-318" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_poweronly$code())</span>
-<span id="cb127-319"><a href="#cb127-319" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_poweronly</span>
-<span id="cb127-320"><a href="#cb127-320" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-321"><a href="#cb127-321" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-322"><a href="#cb127-322" aria-hidden="true" tabindex="-1"></a>fit_discr_poweronly &lt;- model_discr_poweronly$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-323"><a href="#cb127-323" aria-hidden="true" tabindex="-1"></a>loo_discr_poweronly &lt;- fit_discr_poweronly$loo()</span>
-<span id="cb127-324"><a href="#cb127-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-325"><a href="#cb127-325" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_poweronly_summary</span>
-<span id="cb127-326"><a href="#cb127-326" aria-hidden="true" tabindex="-1"></a>fit_discr_poweronly$summary(c(&quot;b0&quot;, &quot;b&quot;, &quot;sigma_z&quot;))</span>
-<span id="cb127-327"><a href="#cb127-327" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-328"><a href="#cb127-328" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with no power score and pooled effect</span>
-<span id="cb127-329"><a href="#cb127-329" aria-hidden="true" tabindex="-1"></a>model_discr_pool &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_pooled.stan&quot;))</span>
-<span id="cb127-330"><a href="#cb127-330" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-331"><a href="#cb127-331" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_pool$code())</span>
-<span id="cb127-332"><a href="#cb127-332" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_pooled</span>
-<span id="cb127-333"><a href="#cb127-333" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-334"><a href="#cb127-334" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-335"><a href="#cb127-335" aria-hidden="true" tabindex="-1"></a>fit_discr_pool &lt;- model_discr_pool$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-336"><a href="#cb127-336" aria-hidden="true" tabindex="-1"></a>loo_discr_pool &lt;- fit_discr_pool$loo()</span>
-<span id="cb127-337"><a href="#cb127-337" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-338"><a href="#cb127-338" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_pool_summary</span>
-<span id="cb127-339"><a href="#cb127-339" aria-hidden="true" tabindex="-1"></a>fit_discr_pool$summary(c(&quot;mu_z&quot;,&quot;sigma_z&quot;))</span>
-<span id="cb127-340"><a href="#cb127-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-341"><a href="#cb127-341" aria-hidden="true" tabindex="-1"></a>#&#39; ## Model comparison</span>
-<span id="cb127-342"><a href="#cb127-342" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-343"><a href="#cb127-343" aria-hidden="true" tabindex="-1"></a>#&#39; Now that we have implemented discrete model, we compare various</span>
-<span id="cb127-344"><a href="#cb127-344" aria-hidden="true" tabindex="-1"></a>#&#39; models with or without different components. Hierarchical model</span>
-<span id="cb127-345"><a href="#cb127-345" aria-hidden="true" tabindex="-1"></a>#&#39; with power score is the best, but not much better than power score</span>
-<span id="cb127-346"><a href="#cb127-346" aria-hidden="true" tabindex="-1"></a>#&#39; only model or hierarchical model without power score. Clearly the</span>
-<span id="cb127-347"><a href="#cb127-347" aria-hidden="true" tabindex="-1"></a>#&#39; power score and the score differences are providing similar</span>
-<span id="cb127-348"><a href="#cb127-348" aria-hidden="true" tabindex="-1"></a>#&#39; information. Looking at the posterior we do see that using them</span>
-<span id="cb127-349"><a href="#cb127-349" aria-hidden="true" tabindex="-1"></a>#&#39; both, does decrease posterior uncertainty, but as the match</span>
-<span id="cb127-350"><a href="#cb127-350" aria-hidden="true" tabindex="-1"></a>#&#39; outcomes still have significant randomness the difference in</span>
-<span id="cb127-351"><a href="#cb127-351" aria-hidden="true" tabindex="-1"></a>#&#39; predictive performance is small.</span>
-<span id="cb127-352"><a href="#cb127-352" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
-<span id="cb127-353"><a href="#cb127-353" aria-hidden="true" tabindex="-1"></a>  list(</span>
-<span id="cb127-354"><a href="#cb127-354" aria-hidden="true" tabindex="-1"></a>    &quot;Hier. w power score&quot; = loo_discr,</span>
-<span id="cb127-355"><a href="#cb127-355" aria-hidden="true" tabindex="-1"></a>    &quot;Power score only&quot; = loo_discr_poweronly,</span>
-<span id="cb127-356"><a href="#cb127-356" aria-hidden="true" tabindex="-1"></a>    &quot;Hier. w/o power score&quot; = loo_discr_nopower,</span>
-<span id="cb127-357"><a href="#cb127-357" aria-hidden="true" tabindex="-1"></a>    &quot;Pooled w/o power score&quot; = loo_discr_pool</span>
-<span id="cb127-358"><a href="#cb127-358" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb127-359"><a href="#cb127-359" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-360"><a href="#cb127-360" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-361"><a href="#cb127-361" aria-hidden="true" tabindex="-1"></a>#&#39; # Discretizing continuous models</span>
-<span id="cb127-362"><a href="#cb127-362" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-363"><a href="#cb127-363" aria-hidden="true" tabindex="-1"></a>#&#39; ## Continuous model with log predictive probability using midpoint rule</span>
-<span id="cb127-364"><a href="#cb127-364" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-365"><a href="#cb127-365" aria-hidden="true" tabindex="-1"></a>model_cont_midp &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_continuous_midpoint_ll.stan&quot;))</span>
-<span id="cb127-366"><a href="#cb127-366" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-367"><a href="#cb127-367" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_cont_midp$code())</span>
-<span id="cb127-368"><a href="#cb127-368" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont_midp</span>
-<span id="cb127-369"><a href="#cb127-369" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-370"><a href="#cb127-370" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-371"><a href="#cb127-371" aria-hidden="true" tabindex="-1"></a>fit_cont_midp &lt;- model_cont_midp$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-372"><a href="#cb127-372" aria-hidden="true" tabindex="-1"></a>loo_cont_midp &lt;- fit_cont_midp$loo()</span>
-<span id="cb127-373"><a href="#cb127-373" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-374"><a href="#cb127-374" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont_midp_summary</span>
-<span id="cb127-375"><a href="#cb127-375" aria-hidden="true" tabindex="-1"></a>fit_cont_midp$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-376"><a href="#cb127-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-377"><a href="#cb127-377" aria-hidden="true" tabindex="-1"></a>#&#39; ## Continuous model with log predictive probability using exact integration</span>
-<span id="cb127-378"><a href="#cb127-378" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-379"><a href="#cb127-379" aria-hidden="true" tabindex="-1"></a>model_cont &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_continuous.stan&quot;))</span>
-<span id="cb127-380"><a href="#cb127-380" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-381"><a href="#cb127-381" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_cont$code())</span>
-<span id="cb127-382"><a href="#cb127-382" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont</span>
-<span id="cb127-383"><a href="#cb127-383" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-384"><a href="#cb127-384" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-385"><a href="#cb127-385" aria-hidden="true" tabindex="-1"></a>fit_cont &lt;- model_cont$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-386"><a href="#cb127-386" aria-hidden="true" tabindex="-1"></a>loo_cont &lt;- fit_cont$loo()</span>
-<span id="cb127-387"><a href="#cb127-387" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-388"><a href="#cb127-388" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont_summary</span>
-<span id="cb127-389"><a href="#cb127-389" aria-hidden="true" tabindex="-1"></a>fit_cont$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-390"><a href="#cb127-390" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-391"><a href="#cb127-391" aria-hidden="true" tabindex="-1"></a>#&#39; ## Model comparison</span>
-<span id="cb127-392"><a href="#cb127-392" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-393"><a href="#cb127-393" aria-hidden="true" tabindex="-1"></a>#&#39; The elpd_diff&#39;s between models are small enough to be caused</span>
-<span id="cb127-394"><a href="#cb127-394" aria-hidden="true" tabindex="-1"></a>#&#39; by Monte Carlo variation</span>
-<span id="cb127-395"><a href="#cb127-395" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
-<span id="cb127-396"><a href="#cb127-396" aria-hidden="true" tabindex="-1"></a>  list(</span>
-<span id="cb127-397"><a href="#cb127-397" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete model&quot; = loo_discr,</span>
-<span id="cb127-398"><a href="#cb127-398" aria-hidden="true" tabindex="-1"></a>    &quot;Continuous + midpoint log_lik&quot; = loo_cont_midp,</span>
-<span id="cb127-399"><a href="#cb127-399" aria-hidden="true" tabindex="-1"></a>    &quot;Continuous model&quot; = loo_cont</span>
-<span id="cb127-400"><a href="#cb127-400" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb127-401"><a href="#cb127-401" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-402"><a href="#cb127-402" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-403"><a href="#cb127-403" aria-hidden="true" tabindex="-1"></a>#&#39; ## More discretized continuous models</span>
-<span id="cb127-404"><a href="#cb127-404" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-405"><a href="#cb127-405" aria-hidden="true" tabindex="-1"></a>#&#39; Continuous sqrt model with log predictive probability using midpoint rule and no Jacobian</span>
-<span id="cb127-406"><a href="#cb127-406" aria-hidden="true" tabindex="-1"></a>model_sqrt_cont_noj &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_sqrt_continuous_nojacobian.stan&quot;))</span>
-<span id="cb127-407"><a href="#cb127-407" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-408"><a href="#cb127-408" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_sqrt_cont_noj$code())</span>
-<span id="cb127-409"><a href="#cb127-409" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont_noj</span>
-<span id="cb127-410"><a href="#cb127-410" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-411"><a href="#cb127-411" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-412"><a href="#cb127-412" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont_noj &lt;- model_sqrt_cont_noj$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-413"><a href="#cb127-413" aria-hidden="true" tabindex="-1"></a>loo_sqrt_cont_noj &lt;- fit_sqrt_cont_noj$loo()</span>
-<span id="cb127-414"><a href="#cb127-414" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-415"><a href="#cb127-415" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont_noj_summary</span>
-<span id="cb127-416"><a href="#cb127-416" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont_noj$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-417"><a href="#cb127-417" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-418"><a href="#cb127-418" aria-hidden="true" tabindex="-1"></a>#&#39; Continuous sqrt model with log predictive probability using</span>
-<span id="cb127-419"><a href="#cb127-419" aria-hidden="true" tabindex="-1"></a>#&#39; midpoint rule and Jacobian is not possible as Jacobian is infinite</span>
-<span id="cb127-420"><a href="#cb127-420" aria-hidden="true" tabindex="-1"></a>#&#39; for midpoint 0</span>
-<span id="cb127-421"><a href="#cb127-421" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-422"><a href="#cb127-422" aria-hidden="true" tabindex="-1"></a>#&#39; Continuous sqrt model with log predictive probability using</span>
-<span id="cb127-423"><a href="#cb127-423" aria-hidden="true" tabindex="-1"></a>#&#39; Jacobian and quadrature integration</span>
-<span id="cb127-424"><a href="#cb127-424" aria-hidden="true" tabindex="-1"></a>model_sqrt_cont &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_sqrt_continuous.stan&quot;))</span>
-<span id="cb127-425"><a href="#cb127-425" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-426"><a href="#cb127-426" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_sqrt_cont$code())</span>
-<span id="cb127-427"><a href="#cb127-427" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont</span>
-<span id="cb127-428"><a href="#cb127-428" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-429"><a href="#cb127-429" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-430"><a href="#cb127-430" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont &lt;- model_sqrt_cont$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-431"><a href="#cb127-431" aria-hidden="true" tabindex="-1"></a>loo_sqrt_cont &lt;- fit_sqrt_cont$loo(save_psis = TRUE)</span>
-<span id="cb127-432"><a href="#cb127-432" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-433"><a href="#cb127-433" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont_summary</span>
-<span id="cb127-434"><a href="#cb127-434" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-435"><a href="#cb127-435" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-436"><a href="#cb127-436" aria-hidden="true" tabindex="-1"></a>#&#39; Discrete sqrt model with log predictive probability using Jacobian</span>
-<span id="cb127-437"><a href="#cb127-437" aria-hidden="true" tabindex="-1"></a>#&#39; and quadrature integration. The sampling is slow as the quadrature</span>
-<span id="cb127-438"><a href="#cb127-438" aria-hidden="true" tabindex="-1"></a>#&#39; integration is done at each HMC/NUTS leapfrog step.</span>
-<span id="cb127-439"><a href="#cb127-439" aria-hidden="true" tabindex="-1"></a>model_sqrt_discr &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_sqrt_discrete.stan&quot;))</span>
-<span id="cb127-440"><a href="#cb127-440" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-441"><a href="#cb127-441" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_sqrt_discr$code())</span>
-<span id="cb127-442"><a href="#cb127-442" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_discr</span>
-<span id="cb127-443"><a href="#cb127-443" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-444"><a href="#cb127-444" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-445"><a href="#cb127-445" aria-hidden="true" tabindex="-1"></a>fit_sqrt_discr &lt;- model_sqrt_discr$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-446"><a href="#cb127-446" aria-hidden="true" tabindex="-1"></a>loo_sqrt_discr &lt;- fit_sqrt_discr$loo()</span>
-<span id="cb127-447"><a href="#cb127-447" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-448"><a href="#cb127-448" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_discr_summary</span>
-<span id="cb127-449"><a href="#cb127-449" aria-hidden="true" tabindex="-1"></a>fit_sqrt_discr$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb127-450"><a href="#cb127-450" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-451"><a href="#cb127-451" aria-hidden="true" tabindex="-1"></a>#&#39; ## Model comparison</span>
-<span id="cb127-452"><a href="#cb127-452" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-453"><a href="#cb127-453" aria-hidden="true" tabindex="-1"></a>#&#39; Without taking Jacobian into account, the continuous model for</span>
-<span id="cb127-454"><a href="#cb127-454" aria-hidden="true" tabindex="-1"></a>#&#39; square root of score difference looks like the best</span>
-<span id="cb127-455"><a href="#cb127-455" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
-<span id="cb127-456"><a href="#cb127-456" aria-hidden="true" tabindex="-1"></a>  list(</span>
-<span id="cb127-457"><a href="#cb127-457" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete&quot; = loo_discr,</span>
-<span id="cb127-458"><a href="#cb127-458" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete sqrt&quot; = loo_sqrt_discr,</span>
-<span id="cb127-459"><a href="#cb127-459" aria-hidden="true" tabindex="-1"></a>    &quot;Cont-sqrt + midp, -Jacobian&quot; = loo_sqrt_cont_noj</span>
-<span id="cb127-460"><a href="#cb127-460" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb127-461"><a href="#cb127-461" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-462"><a href="#cb127-462" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-463"><a href="#cb127-463" aria-hidden="true" tabindex="-1"></a>#&#39; Taking Jacobian into account, the square root models are worse, and</span>
-<span id="cb127-464"><a href="#cb127-464" aria-hidden="true" tabindex="-1"></a>#&#39; the difference between continuous and discrete square root model is</span>
-<span id="cb127-465"><a href="#cb127-465" aria-hidden="true" tabindex="-1"></a>#&#39; small enough to be explained by Monte Carlo variation.</span>
-<span id="cb127-466"><a href="#cb127-466" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
-<span id="cb127-467"><a href="#cb127-467" aria-hidden="true" tabindex="-1"></a>  list(</span>
-<span id="cb127-468"><a href="#cb127-468" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete&quot; = loo_discr,</span>
-<span id="cb127-469"><a href="#cb127-469" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete sqrt&quot; = loo_sqrt_discr,</span>
-<span id="cb127-470"><a href="#cb127-470" aria-hidden="true" tabindex="-1"></a>    &quot;Continuous sqrt +Jacobian&quot; = loo_sqrt_cont</span>
-<span id="cb127-471"><a href="#cb127-471" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb127-472"><a href="#cb127-472" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-473"><a href="#cb127-473" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-474"><a href="#cb127-474" aria-hidden="true" tabindex="-1"></a>#&#39; ## LOO-CV predictive checking</span>
-<span id="cb127-475"><a href="#cb127-475" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-476"><a href="#cb127-476" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking with LOO-PIT for the discrete model</span>
-<span id="cb127-477"><a href="#cb127-477" aria-hidden="true" tabindex="-1"></a>#&#39; looks fine</span>
-<span id="cb127-478"><a href="#cb127-478" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
-<span id="cb127-479"><a href="#cb127-479" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
-<span id="cb127-480"><a href="#cb127-480" aria-hidden="true" tabindex="-1"></a>  yrep = fit_discr$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
-<span id="cb127-481"><a href="#cb127-481" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_discr$psis_object,</span>
-<span id="cb127-482"><a href="#cb127-482" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
-<span id="cb127-483"><a href="#cb127-483" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-484"><a href="#cb127-484" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-485"><a href="#cb127-485" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking for the continuous model indicates</span>
-<span id="cb127-486"><a href="#cb127-486" aria-hidden="true" tabindex="-1"></a>#&#39; slight miscalibration with too many low PIT values (left tail of</span>
-<span id="cb127-487"><a href="#cb127-487" aria-hidden="true" tabindex="-1"></a>#&#39; the predictive distribution is shorter than expected)</span>
-<span id="cb127-488"><a href="#cb127-488" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
-<span id="cb127-489"><a href="#cb127-489" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
-<span id="cb127-490"><a href="#cb127-490" aria-hidden="true" tabindex="-1"></a>  yrep = fit_sqrt_cont$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
-<span id="cb127-491"><a href="#cb127-491" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_sqrt_cont$psis_object,</span>
-<span id="cb127-492"><a href="#cb127-492" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
-<span id="cb127-493"><a href="#cb127-493" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-494"><a href="#cb127-494" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-495"><a href="#cb127-495" aria-hidden="true" tabindex="-1"></a>#&#39; # Bivariate Poisson and Poisson difference models</span>
-<span id="cb127-496"><a href="#cb127-496" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-497"><a href="#cb127-497" aria-hidden="true" tabindex="-1"></a>#&#39; Bivariate Poisson model is commonly used for football scores</span>
-<span id="cb127-498"><a href="#cb127-498" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="co">[</span><span class="ot">@Karlis-Ntzoufras:2003</span><span class="co">]</span>. If we care only about the score</span>
-<span id="cb127-499"><a href="#cb127-499" aria-hidden="true" tabindex="-1"></a>#&#39; difference we can also use Poisson difference model</span>
-<span id="cb127-500"><a href="#cb127-500" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="co">[</span><span class="ot">@Karlis-Ntzoufras:2003</span><span class="co">]</span>.</span>
-<span id="cb127-501"><a href="#cb127-501" aria-hidden="true" tabindex="-1"></a>model_bipois &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_bivariate_poisson.stan&quot;))</span>
-<span id="cb127-502"><a href="#cb127-502" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-503"><a href="#cb127-503" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_bipois$code())</span>
-<span id="cb127-504"><a href="#cb127-504" aria-hidden="true" tabindex="-1"></a>#| label: fit_bipois</span>
-<span id="cb127-505"><a href="#cb127-505" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-506"><a href="#cb127-506" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-507"><a href="#cb127-507" aria-hidden="true" tabindex="-1"></a>fit_bipois &lt;- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta = 0.95)</span>
-<span id="cb127-508"><a href="#cb127-508" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-509"><a href="#cb127-509" aria-hidden="true" tabindex="-1"></a>#| label: fit_bipois_summary</span>
-<span id="cb127-510"><a href="#cb127-510" aria-hidden="true" tabindex="-1"></a>fit_bipois$summary(c(&quot;a&quot;,&quot;o<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;,&quot;o<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;,&quot;d<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;,&quot;d<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;,&quot;b_o&quot;,&quot;b_d&quot;,&quot;sigma_o&quot;,&quot;sigma_d&quot;))</span>
-<span id="cb127-511"><a href="#cb127-511" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb127-512"><a href="#cb127-512" aria-hidden="true" tabindex="-1"></a>(loo_bipois &lt;- fit_bipois$loo(save_psis = TRUE))</span>
-<span id="cb127-513"><a href="#cb127-513" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-514"><a href="#cb127-514" aria-hidden="true" tabindex="-1"></a>model_poisdif &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_poisson_difference.stan&quot;))</span>
-<span id="cb127-515"><a href="#cb127-515" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb127-516"><a href="#cb127-516" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_poisdif$code())</span>
-<span id="cb127-517"><a href="#cb127-517" aria-hidden="true" tabindex="-1"></a>#| label: fit_poisdif</span>
-<span id="cb127-518"><a href="#cb127-518" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb127-519"><a href="#cb127-519" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb127-520"><a href="#cb127-520" aria-hidden="true" tabindex="-1"></a>fit_poisdif &lt;- model_poisdif$sample(data = stan_data, refresh = 0)</span>
-<span id="cb127-521"><a href="#cb127-521" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-522"><a href="#cb127-522" aria-hidden="true" tabindex="-1"></a>#| label: fit_poisdif_summary</span>
-<span id="cb127-523"><a href="#cb127-523" aria-hidden="true" tabindex="-1"></a>fit_poisdif$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;))</span>
-<span id="cb127-524"><a href="#cb127-524" aria-hidden="true" tabindex="-1"></a>(loo_poisdif &lt;- fit_poisdif$loo(save_psis = TRUE))</span>
-<span id="cb127-525"><a href="#cb127-525" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-526"><a href="#cb127-526" aria-hidden="true" tabindex="-1"></a>#&#39; The set in this case study is small, and we don&#39;t see practical</span>
-<span id="cb127-527"><a href="#cb127-527" aria-hidden="true" tabindex="-1"></a>#&#39; difference in the predictive performance.</span>
-<span id="cb127-528"><a href="#cb127-528" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
-<span id="cb127-529"><a href="#cb127-529" aria-hidden="true" tabindex="-1"></a>  list(</span>
-<span id="cb127-530"><a href="#cb127-530" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete&quot; = loo_discr,</span>
-<span id="cb127-531"><a href="#cb127-531" aria-hidden="true" tabindex="-1"></a>    &quot;Bivariate Poisson&quot; = loo_bipois,</span>
-<span id="cb127-532"><a href="#cb127-532" aria-hidden="true" tabindex="-1"></a>    &quot;Poisson difference&quot; = loo_poisdif</span>
-<span id="cb127-533"><a href="#cb127-533" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb127-534"><a href="#cb127-534" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-535"><a href="#cb127-535" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-536"><a href="#cb127-536" aria-hidden="true" tabindex="-1"></a>#&#39; ## LOO-CV predictive checking</span>
-<span id="cb127-537"><a href="#cb127-537" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-538"><a href="#cb127-538" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking with LOO-PIT for the binary Poisson</span>
-<span id="cb127-539"><a href="#cb127-539" aria-hidden="true" tabindex="-1"></a>#&#39; model looks fine.</span>
-<span id="cb127-540"><a href="#cb127-540" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
-<span id="cb127-541"><a href="#cb127-541" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
-<span id="cb127-542"><a href="#cb127-542" aria-hidden="true" tabindex="-1"></a>  yrep = fit_bipois$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
-<span id="cb127-543"><a href="#cb127-543" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_bipois$psis_object,</span>
-<span id="cb127-544"><a href="#cb127-544" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
-<span id="cb127-545"><a href="#cb127-545" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-546"><a href="#cb127-546" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-547"><a href="#cb127-547" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking with LOO-PIT for the Poisson difference</span>
-<span id="cb127-548"><a href="#cb127-548" aria-hidden="true" tabindex="-1"></a>#&#39; model looks fine.</span>
-<span id="cb127-549"><a href="#cb127-549" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
-<span id="cb127-550"><a href="#cb127-550" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
-<span id="cb127-551"><a href="#cb127-551" aria-hidden="true" tabindex="-1"></a>  yrep = fit_poisdif$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
-<span id="cb127-552"><a href="#cb127-552" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_poisdif$psis_object,</span>
-<span id="cb127-553"><a href="#cb127-553" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
-<span id="cb127-554"><a href="#cb127-554" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb127-555"><a href="#cb127-555" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb127-556"><a href="#cb127-556" aria-hidden="true" tabindex="-1"></a>#&#39; In this case study, we used many other models for illustration, but</span>
-<span id="cb127-557"><a href="#cb127-557" aria-hidden="true" tabindex="-1"></a>#&#39; for real football score modeling, it is a good idea to start with</span>
-<span id="cb127-558"><a href="#cb127-558" aria-hidden="true" tabindex="-1"></a>#&#39; the bivariate Poisson model. For real football analysis footBayes R</span>
-<span id="cb127-559"><a href="#cb127-559" aria-hidden="true" tabindex="-1"></a>#&#39; package <span class="co">[</span><span class="ot">@Egidi-MacriDemartino-Palaskas:2024</span><span class="co">]</span> has several different</span>
-<span id="cb127-560"><a href="#cb127-560" aria-hidden="true" tabindex="-1"></a>#&#39; models including dynamic models allowing the latent performance to</span>
-<span id="cb127-561"><a href="#cb127-561" aria-hidden="true" tabindex="-1"></a>#&#39; evolve in time.</span>
-<span id="cb127-562"><a href="#cb127-562" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-563"><a href="#cb127-563" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="dt">&lt;</span><span class="kw">br</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb127-564"><a href="#cb127-564" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-565"><a href="#cb127-565" aria-hidden="true" tabindex="-1"></a>#&#39; # References {.unnumbered}</span>
-<span id="cb127-566"><a href="#cb127-566" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-567"><a href="#cb127-567" aria-hidden="true" tabindex="-1"></a>#&#39; ::: {#refs}</span>
-<span id="cb127-568"><a href="#cb127-568" aria-hidden="true" tabindex="-1"></a>#&#39; :::</span>
-<span id="cb127-569"><a href="#cb127-569" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-570"><a href="#cb127-570" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
-<span id="cb127-571"><a href="#cb127-571" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb127-572"><a href="#cb127-572" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2021--2025, Andrew Gelman, Aki Vehtari, licensed under BSD-3.</span>
-<span id="cb127-573"><a href="#cb127-573" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2021--2025, Andrew Gelman, Aki Vehtari, licensed under CC-BY-NC 4.0.</span>
-<span id="cb127-574"><a href="#cb127-574" aria-hidden="true" tabindex="-1"></a>#&#39; </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
+<span id="cb127-315"><a href="#cb127-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-316"><a href="#cb127-316" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with power score only</span>
+<span id="cb127-317"><a href="#cb127-317" aria-hidden="true" tabindex="-1"></a>model_discr_poweronly &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_poweronly.stan&quot;))</span>
+<span id="cb127-318"><a href="#cb127-318" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-319"><a href="#cb127-319" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_poweronly$code())</span>
+<span id="cb127-320"><a href="#cb127-320" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_poweronly</span>
+<span id="cb127-321"><a href="#cb127-321" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-322"><a href="#cb127-322" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-323"><a href="#cb127-323" aria-hidden="true" tabindex="-1"></a>fit_discr_poweronly &lt;- model_discr_poweronly$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-324"><a href="#cb127-324" aria-hidden="true" tabindex="-1"></a>loo_discr_poweronly &lt;- fit_discr_poweronly$loo()</span>
+<span id="cb127-325"><a href="#cb127-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-326"><a href="#cb127-326" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_poweronly_summary</span>
+<span id="cb127-327"><a href="#cb127-327" aria-hidden="true" tabindex="-1"></a>fit_discr_poweronly$summary(c(&quot;b0&quot;, &quot;b&quot;, &quot;sigma_z&quot;))</span>
+<span id="cb127-328"><a href="#cb127-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-329"><a href="#cb127-329" aria-hidden="true" tabindex="-1"></a>#&#39; ## Discrete model with no power score and pooled effect</span>
+<span id="cb127-330"><a href="#cb127-330" aria-hidden="true" tabindex="-1"></a>model_discr_pool &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_discrete_pooled.stan&quot;))</span>
+<span id="cb127-331"><a href="#cb127-331" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-332"><a href="#cb127-332" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_discr_pool$code())</span>
+<span id="cb127-333"><a href="#cb127-333" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_pooled</span>
+<span id="cb127-334"><a href="#cb127-334" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-335"><a href="#cb127-335" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-336"><a href="#cb127-336" aria-hidden="true" tabindex="-1"></a>fit_discr_pool &lt;- model_discr_pool$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-337"><a href="#cb127-337" aria-hidden="true" tabindex="-1"></a>loo_discr_pool &lt;- fit_discr_pool$loo()</span>
+<span id="cb127-338"><a href="#cb127-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-339"><a href="#cb127-339" aria-hidden="true" tabindex="-1"></a>#| label: fit_discr_pool_summary</span>
+<span id="cb127-340"><a href="#cb127-340" aria-hidden="true" tabindex="-1"></a>fit_discr_pool$summary(c(&quot;mu_z&quot;,&quot;sigma_z&quot;))</span>
+<span id="cb127-341"><a href="#cb127-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-342"><a href="#cb127-342" aria-hidden="true" tabindex="-1"></a>#&#39; ## Model comparison</span>
+<span id="cb127-343"><a href="#cb127-343" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-344"><a href="#cb127-344" aria-hidden="true" tabindex="-1"></a>#&#39; Now that we have implemented discrete model, we compare various</span>
+<span id="cb127-345"><a href="#cb127-345" aria-hidden="true" tabindex="-1"></a>#&#39; models with or without different components. Hierarchical model</span>
+<span id="cb127-346"><a href="#cb127-346" aria-hidden="true" tabindex="-1"></a>#&#39; with power score is the best, but not much better than power score</span>
+<span id="cb127-347"><a href="#cb127-347" aria-hidden="true" tabindex="-1"></a>#&#39; only model or hierarchical model without power score. Clearly the</span>
+<span id="cb127-348"><a href="#cb127-348" aria-hidden="true" tabindex="-1"></a>#&#39; power score and the score differences are providing similar</span>
+<span id="cb127-349"><a href="#cb127-349" aria-hidden="true" tabindex="-1"></a>#&#39; information. Looking at the posterior we do see that using them</span>
+<span id="cb127-350"><a href="#cb127-350" aria-hidden="true" tabindex="-1"></a>#&#39; both, does decrease posterior uncertainty, but as the match</span>
+<span id="cb127-351"><a href="#cb127-351" aria-hidden="true" tabindex="-1"></a>#&#39; outcomes still have significant randomness the difference in</span>
+<span id="cb127-352"><a href="#cb127-352" aria-hidden="true" tabindex="-1"></a>#&#39; predictive performance is small.</span>
+<span id="cb127-353"><a href="#cb127-353" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
+<span id="cb127-354"><a href="#cb127-354" aria-hidden="true" tabindex="-1"></a>  list(</span>
+<span id="cb127-355"><a href="#cb127-355" aria-hidden="true" tabindex="-1"></a>    &quot;Hier. w power score&quot; = loo_discr,</span>
+<span id="cb127-356"><a href="#cb127-356" aria-hidden="true" tabindex="-1"></a>    &quot;Power score only&quot; = loo_discr_poweronly,</span>
+<span id="cb127-357"><a href="#cb127-357" aria-hidden="true" tabindex="-1"></a>    &quot;Hier. w/o power score&quot; = loo_discr_nopower,</span>
+<span id="cb127-358"><a href="#cb127-358" aria-hidden="true" tabindex="-1"></a>    &quot;Pooled w/o power score&quot; = loo_discr_pool</span>
+<span id="cb127-359"><a href="#cb127-359" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb127-360"><a href="#cb127-360" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-361"><a href="#cb127-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-362"><a href="#cb127-362" aria-hidden="true" tabindex="-1"></a>#&#39; # Discretizing continuous models</span>
+<span id="cb127-363"><a href="#cb127-363" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-364"><a href="#cb127-364" aria-hidden="true" tabindex="-1"></a>#&#39; ## Continuous model with log predictive probability using midpoint rule</span>
+<span id="cb127-365"><a href="#cb127-365" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-366"><a href="#cb127-366" aria-hidden="true" tabindex="-1"></a>model_cont_midp &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_continuous_midpoint_ll.stan&quot;))</span>
+<span id="cb127-367"><a href="#cb127-367" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-368"><a href="#cb127-368" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_cont_midp$code())</span>
+<span id="cb127-369"><a href="#cb127-369" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont_midp</span>
+<span id="cb127-370"><a href="#cb127-370" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-371"><a href="#cb127-371" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-372"><a href="#cb127-372" aria-hidden="true" tabindex="-1"></a>fit_cont_midp &lt;- model_cont_midp$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-373"><a href="#cb127-373" aria-hidden="true" tabindex="-1"></a>loo_cont_midp &lt;- fit_cont_midp$loo()</span>
+<span id="cb127-374"><a href="#cb127-374" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-375"><a href="#cb127-375" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont_midp_summary</span>
+<span id="cb127-376"><a href="#cb127-376" aria-hidden="true" tabindex="-1"></a>fit_cont_midp$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-377"><a href="#cb127-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-378"><a href="#cb127-378" aria-hidden="true" tabindex="-1"></a>#&#39; ## Continuous model with log predictive probability using exact integration</span>
+<span id="cb127-379"><a href="#cb127-379" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-380"><a href="#cb127-380" aria-hidden="true" tabindex="-1"></a>model_cont &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_continuous.stan&quot;))</span>
+<span id="cb127-381"><a href="#cb127-381" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-382"><a href="#cb127-382" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_cont$code())</span>
+<span id="cb127-383"><a href="#cb127-383" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont</span>
+<span id="cb127-384"><a href="#cb127-384" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-385"><a href="#cb127-385" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-386"><a href="#cb127-386" aria-hidden="true" tabindex="-1"></a>fit_cont &lt;- model_cont$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-387"><a href="#cb127-387" aria-hidden="true" tabindex="-1"></a>loo_cont &lt;- fit_cont$loo()</span>
+<span id="cb127-388"><a href="#cb127-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-389"><a href="#cb127-389" aria-hidden="true" tabindex="-1"></a>#| label: fit_cont_summary</span>
+<span id="cb127-390"><a href="#cb127-390" aria-hidden="true" tabindex="-1"></a>fit_cont$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-391"><a href="#cb127-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-392"><a href="#cb127-392" aria-hidden="true" tabindex="-1"></a>#&#39; ## Model comparison</span>
+<span id="cb127-393"><a href="#cb127-393" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-394"><a href="#cb127-394" aria-hidden="true" tabindex="-1"></a>#&#39; The elpd_diff&#39;s between models are small enough to be caused</span>
+<span id="cb127-395"><a href="#cb127-395" aria-hidden="true" tabindex="-1"></a>#&#39; by Monte Carlo variation</span>
+<span id="cb127-396"><a href="#cb127-396" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
+<span id="cb127-397"><a href="#cb127-397" aria-hidden="true" tabindex="-1"></a>  list(</span>
+<span id="cb127-398"><a href="#cb127-398" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete model&quot; = loo_discr,</span>
+<span id="cb127-399"><a href="#cb127-399" aria-hidden="true" tabindex="-1"></a>    &quot;Continuous + midpoint log_lik&quot; = loo_cont_midp,</span>
+<span id="cb127-400"><a href="#cb127-400" aria-hidden="true" tabindex="-1"></a>    &quot;Continuous model&quot; = loo_cont</span>
+<span id="cb127-401"><a href="#cb127-401" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb127-402"><a href="#cb127-402" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-403"><a href="#cb127-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-404"><a href="#cb127-404" aria-hidden="true" tabindex="-1"></a>#&#39; ## More discretized continuous models</span>
+<span id="cb127-405"><a href="#cb127-405" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-406"><a href="#cb127-406" aria-hidden="true" tabindex="-1"></a>#&#39; Continuous sqrt model with log predictive probability using midpoint rule and no Jacobian</span>
+<span id="cb127-407"><a href="#cb127-407" aria-hidden="true" tabindex="-1"></a>model_sqrt_cont_noj &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_sqrt_continuous_nojacobian.stan&quot;))</span>
+<span id="cb127-408"><a href="#cb127-408" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-409"><a href="#cb127-409" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_sqrt_cont_noj$code())</span>
+<span id="cb127-410"><a href="#cb127-410" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont_noj</span>
+<span id="cb127-411"><a href="#cb127-411" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-412"><a href="#cb127-412" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-413"><a href="#cb127-413" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont_noj &lt;- model_sqrt_cont_noj$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-414"><a href="#cb127-414" aria-hidden="true" tabindex="-1"></a>loo_sqrt_cont_noj &lt;- fit_sqrt_cont_noj$loo()</span>
+<span id="cb127-415"><a href="#cb127-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-416"><a href="#cb127-416" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont_noj_summary</span>
+<span id="cb127-417"><a href="#cb127-417" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont_noj$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-418"><a href="#cb127-418" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-419"><a href="#cb127-419" aria-hidden="true" tabindex="-1"></a>#&#39; Continuous sqrt model with log predictive probability using</span>
+<span id="cb127-420"><a href="#cb127-420" aria-hidden="true" tabindex="-1"></a>#&#39; midpoint rule and Jacobian is not possible as Jacobian is infinite</span>
+<span id="cb127-421"><a href="#cb127-421" aria-hidden="true" tabindex="-1"></a>#&#39; for midpoint 0</span>
+<span id="cb127-422"><a href="#cb127-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-423"><a href="#cb127-423" aria-hidden="true" tabindex="-1"></a>#&#39; Continuous sqrt model with log predictive probability using</span>
+<span id="cb127-424"><a href="#cb127-424" aria-hidden="true" tabindex="-1"></a>#&#39; Jacobian and quadrature integration</span>
+<span id="cb127-425"><a href="#cb127-425" aria-hidden="true" tabindex="-1"></a>model_sqrt_cont &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_sqrt_continuous.stan&quot;))</span>
+<span id="cb127-426"><a href="#cb127-426" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-427"><a href="#cb127-427" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_sqrt_cont$code())</span>
+<span id="cb127-428"><a href="#cb127-428" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont</span>
+<span id="cb127-429"><a href="#cb127-429" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-430"><a href="#cb127-430" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-431"><a href="#cb127-431" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont &lt;- model_sqrt_cont$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-432"><a href="#cb127-432" aria-hidden="true" tabindex="-1"></a>loo_sqrt_cont &lt;- fit_sqrt_cont$loo(save_psis = TRUE)</span>
+<span id="cb127-433"><a href="#cb127-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-434"><a href="#cb127-434" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_cont_summary</span>
+<span id="cb127-435"><a href="#cb127-435" aria-hidden="true" tabindex="-1"></a>fit_sqrt_cont$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-436"><a href="#cb127-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-437"><a href="#cb127-437" aria-hidden="true" tabindex="-1"></a>#&#39; Discrete sqrt model with log predictive probability using Jacobian</span>
+<span id="cb127-438"><a href="#cb127-438" aria-hidden="true" tabindex="-1"></a>#&#39; and quadrature integration. The sampling is slow as the quadrature</span>
+<span id="cb127-439"><a href="#cb127-439" aria-hidden="true" tabindex="-1"></a>#&#39; integration is done at each HMC/NUTS leapfrog step.</span>
+<span id="cb127-440"><a href="#cb127-440" aria-hidden="true" tabindex="-1"></a>model_sqrt_discr &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_sqrt_discrete.stan&quot;))</span>
+<span id="cb127-441"><a href="#cb127-441" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-442"><a href="#cb127-442" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_sqrt_discr$code())</span>
+<span id="cb127-443"><a href="#cb127-443" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_discr</span>
+<span id="cb127-444"><a href="#cb127-444" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-445"><a href="#cb127-445" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-446"><a href="#cb127-446" aria-hidden="true" tabindex="-1"></a>fit_sqrt_discr &lt;- model_sqrt_discr$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-447"><a href="#cb127-447" aria-hidden="true" tabindex="-1"></a>loo_sqrt_discr &lt;- fit_sqrt_discr$loo()</span>
+<span id="cb127-448"><a href="#cb127-448" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-449"><a href="#cb127-449" aria-hidden="true" tabindex="-1"></a>#| label: fit_sqrt_discr_summary</span>
+<span id="cb127-450"><a href="#cb127-450" aria-hidden="true" tabindex="-1"></a>fit_sqrt_discr$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb127-451"><a href="#cb127-451" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-452"><a href="#cb127-452" aria-hidden="true" tabindex="-1"></a>#&#39; ## Model comparison</span>
+<span id="cb127-453"><a href="#cb127-453" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-454"><a href="#cb127-454" aria-hidden="true" tabindex="-1"></a>#&#39; Without taking Jacobian into account, the continuous model for</span>
+<span id="cb127-455"><a href="#cb127-455" aria-hidden="true" tabindex="-1"></a>#&#39; square root of score difference looks like the best</span>
+<span id="cb127-456"><a href="#cb127-456" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
+<span id="cb127-457"><a href="#cb127-457" aria-hidden="true" tabindex="-1"></a>  list(</span>
+<span id="cb127-458"><a href="#cb127-458" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete&quot; = loo_discr,</span>
+<span id="cb127-459"><a href="#cb127-459" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete sqrt&quot; = loo_sqrt_discr,</span>
+<span id="cb127-460"><a href="#cb127-460" aria-hidden="true" tabindex="-1"></a>    &quot;Cont-sqrt + midp, -Jacobian&quot; = loo_sqrt_cont_noj</span>
+<span id="cb127-461"><a href="#cb127-461" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb127-462"><a href="#cb127-462" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-463"><a href="#cb127-463" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-464"><a href="#cb127-464" aria-hidden="true" tabindex="-1"></a>#&#39; Taking Jacobian into account, the square root models are worse, and</span>
+<span id="cb127-465"><a href="#cb127-465" aria-hidden="true" tabindex="-1"></a>#&#39; the difference between continuous and discrete square root model is</span>
+<span id="cb127-466"><a href="#cb127-466" aria-hidden="true" tabindex="-1"></a>#&#39; small enough to be explained by Monte Carlo variation.</span>
+<span id="cb127-467"><a href="#cb127-467" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
+<span id="cb127-468"><a href="#cb127-468" aria-hidden="true" tabindex="-1"></a>  list(</span>
+<span id="cb127-469"><a href="#cb127-469" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete&quot; = loo_discr,</span>
+<span id="cb127-470"><a href="#cb127-470" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete sqrt&quot; = loo_sqrt_discr,</span>
+<span id="cb127-471"><a href="#cb127-471" aria-hidden="true" tabindex="-1"></a>    &quot;Continuous sqrt +Jacobian&quot; = loo_sqrt_cont</span>
+<span id="cb127-472"><a href="#cb127-472" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb127-473"><a href="#cb127-473" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-474"><a href="#cb127-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-475"><a href="#cb127-475" aria-hidden="true" tabindex="-1"></a>#&#39; ## LOO-CV predictive checking</span>
+<span id="cb127-476"><a href="#cb127-476" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-477"><a href="#cb127-477" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking with LOO-PIT for the discrete model</span>
+<span id="cb127-478"><a href="#cb127-478" aria-hidden="true" tabindex="-1"></a>#&#39; looks fine</span>
+<span id="cb127-479"><a href="#cb127-479" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
+<span id="cb127-480"><a href="#cb127-480" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
+<span id="cb127-481"><a href="#cb127-481" aria-hidden="true" tabindex="-1"></a>  yrep = fit_discr$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
+<span id="cb127-482"><a href="#cb127-482" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_discr$psis_object,</span>
+<span id="cb127-483"><a href="#cb127-483" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
+<span id="cb127-484"><a href="#cb127-484" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-485"><a href="#cb127-485" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-486"><a href="#cb127-486" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking for the continuous model indicates</span>
+<span id="cb127-487"><a href="#cb127-487" aria-hidden="true" tabindex="-1"></a>#&#39; slight miscalibration with too many low PIT values (left tail of</span>
+<span id="cb127-488"><a href="#cb127-488" aria-hidden="true" tabindex="-1"></a>#&#39; the predictive distribution is shorter than expected)</span>
+<span id="cb127-489"><a href="#cb127-489" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
+<span id="cb127-490"><a href="#cb127-490" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
+<span id="cb127-491"><a href="#cb127-491" aria-hidden="true" tabindex="-1"></a>  yrep = fit_sqrt_cont$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
+<span id="cb127-492"><a href="#cb127-492" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_sqrt_cont$psis_object,</span>
+<span id="cb127-493"><a href="#cb127-493" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
+<span id="cb127-494"><a href="#cb127-494" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-495"><a href="#cb127-495" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-496"><a href="#cb127-496" aria-hidden="true" tabindex="-1"></a>#&#39; # Bivariate Poisson and Poisson difference models</span>
+<span id="cb127-497"><a href="#cb127-497" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-498"><a href="#cb127-498" aria-hidden="true" tabindex="-1"></a>#&#39; Bivariate Poisson model is commonly used for football scores</span>
+<span id="cb127-499"><a href="#cb127-499" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="co">[</span><span class="ot">@Karlis-Ntzoufras:2003</span><span class="co">]</span>. If we care only about the score</span>
+<span id="cb127-500"><a href="#cb127-500" aria-hidden="true" tabindex="-1"></a>#&#39; difference we can also use Poisson difference model</span>
+<span id="cb127-501"><a href="#cb127-501" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="co">[</span><span class="ot">@Karlis-Ntzoufras:2003</span><span class="co">]</span>.</span>
+<span id="cb127-502"><a href="#cb127-502" aria-hidden="true" tabindex="-1"></a>model_bipois &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_bivariate_poisson.stan&quot;))</span>
+<span id="cb127-503"><a href="#cb127-503" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-504"><a href="#cb127-504" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_bipois$code())</span>
+<span id="cb127-505"><a href="#cb127-505" aria-hidden="true" tabindex="-1"></a>#| label: fit_bipois</span>
+<span id="cb127-506"><a href="#cb127-506" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-507"><a href="#cb127-507" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-508"><a href="#cb127-508" aria-hidden="true" tabindex="-1"></a>fit_bipois &lt;- model_bipois$sample(data = stan_data, refresh = 0, adapt_delta = 0.95)</span>
+<span id="cb127-509"><a href="#cb127-509" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-510"><a href="#cb127-510" aria-hidden="true" tabindex="-1"></a>#| label: fit_bipois_summary</span>
+<span id="cb127-511"><a href="#cb127-511" aria-hidden="true" tabindex="-1"></a>fit_bipois$summary(c(&quot;a&quot;,&quot;o<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;,&quot;o<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;,&quot;d<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;,&quot;d<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;,&quot;b_o&quot;,&quot;b_d&quot;,&quot;sigma_o&quot;,&quot;sigma_d&quot;))</span>
+<span id="cb127-512"><a href="#cb127-512" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb127-513"><a href="#cb127-513" aria-hidden="true" tabindex="-1"></a>(loo_bipois &lt;- fit_bipois$loo(save_psis = TRUE))</span>
+<span id="cb127-514"><a href="#cb127-514" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-515"><a href="#cb127-515" aria-hidden="true" tabindex="-1"></a>model_poisdif &lt;- cmdstan_model(stan_file = root(&quot;world_cup&quot;, &quot;worldcup_poisson_difference.stan&quot;))</span>
+<span id="cb127-516"><a href="#cb127-516" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb127-517"><a href="#cb127-517" aria-hidden="true" tabindex="-1"></a>print_stan_code(model_poisdif$code())</span>
+<span id="cb127-518"><a href="#cb127-518" aria-hidden="true" tabindex="-1"></a>#| label: fit_poisdif</span>
+<span id="cb127-519"><a href="#cb127-519" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb127-520"><a href="#cb127-520" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb127-521"><a href="#cb127-521" aria-hidden="true" tabindex="-1"></a>fit_poisdif &lt;- model_poisdif$sample(data = stan_data, refresh = 0)</span>
+<span id="cb127-522"><a href="#cb127-522" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-523"><a href="#cb127-523" aria-hidden="true" tabindex="-1"></a>#| label: fit_poisdif_summary</span>
+<span id="cb127-524"><a href="#cb127-524" aria-hidden="true" tabindex="-1"></a>fit_poisdif$summary(c(&quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">32</span><span class="co">]</span>&quot;, &quot;b&quot;, &quot;sigma_a&quot;))</span>
+<span id="cb127-525"><a href="#cb127-525" aria-hidden="true" tabindex="-1"></a>(loo_poisdif &lt;- fit_poisdif$loo(save_psis = TRUE))</span>
+<span id="cb127-526"><a href="#cb127-526" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-527"><a href="#cb127-527" aria-hidden="true" tabindex="-1"></a>#&#39; The set in this case study is small, and we don&#39;t see practical</span>
+<span id="cb127-528"><a href="#cb127-528" aria-hidden="true" tabindex="-1"></a>#&#39; difference in the predictive performance.</span>
+<span id="cb127-529"><a href="#cb127-529" aria-hidden="true" tabindex="-1"></a>loo_compare(</span>
+<span id="cb127-530"><a href="#cb127-530" aria-hidden="true" tabindex="-1"></a>  list(</span>
+<span id="cb127-531"><a href="#cb127-531" aria-hidden="true" tabindex="-1"></a>    &quot;Discrete&quot; = loo_discr,</span>
+<span id="cb127-532"><a href="#cb127-532" aria-hidden="true" tabindex="-1"></a>    &quot;Bivariate Poisson&quot; = loo_bipois,</span>
+<span id="cb127-533"><a href="#cb127-533" aria-hidden="true" tabindex="-1"></a>    &quot;Poisson difference&quot; = loo_poisdif</span>
+<span id="cb127-534"><a href="#cb127-534" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb127-535"><a href="#cb127-535" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-536"><a href="#cb127-536" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-537"><a href="#cb127-537" aria-hidden="true" tabindex="-1"></a>#&#39; ## LOO-CV predictive checking</span>
+<span id="cb127-538"><a href="#cb127-538" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-539"><a href="#cb127-539" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking with LOO-PIT for the binary Poisson</span>
+<span id="cb127-540"><a href="#cb127-540" aria-hidden="true" tabindex="-1"></a>#&#39; model looks fine.</span>
+<span id="cb127-541"><a href="#cb127-541" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
+<span id="cb127-542"><a href="#cb127-542" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
+<span id="cb127-543"><a href="#cb127-543" aria-hidden="true" tabindex="-1"></a>  yrep = fit_bipois$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
+<span id="cb127-544"><a href="#cb127-544" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_bipois$psis_object,</span>
+<span id="cb127-545"><a href="#cb127-545" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
+<span id="cb127-546"><a href="#cb127-546" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-547"><a href="#cb127-547" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-548"><a href="#cb127-548" aria-hidden="true" tabindex="-1"></a>#&#39; LOO-CV predictive checking with LOO-PIT for the Poisson difference</span>
+<span id="cb127-549"><a href="#cb127-549" aria-hidden="true" tabindex="-1"></a>#&#39; model looks fine.</span>
+<span id="cb127-550"><a href="#cb127-550" aria-hidden="true" tabindex="-1"></a>ppc_loo_pit_ecdf(</span>
+<span id="cb127-551"><a href="#cb127-551" aria-hidden="true" tabindex="-1"></a>  y = stan_data$score_1 - stan_data$score_2,</span>
+<span id="cb127-552"><a href="#cb127-552" aria-hidden="true" tabindex="-1"></a>  yrep = fit_poisdif$draws(format = &quot;matrix&quot;, variables = &quot;y_rep&quot;),</span>
+<span id="cb127-553"><a href="#cb127-553" aria-hidden="true" tabindex="-1"></a>  psis_object = loo_poisdif$psis_object,</span>
+<span id="cb127-554"><a href="#cb127-554" aria-hidden="true" tabindex="-1"></a>  method = &quot;correlated&quot;</span>
+<span id="cb127-555"><a href="#cb127-555" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb127-556"><a href="#cb127-556" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb127-557"><a href="#cb127-557" aria-hidden="true" tabindex="-1"></a>#&#39; In this case study, we used many other models for illustration, but</span>
+<span id="cb127-558"><a href="#cb127-558" aria-hidden="true" tabindex="-1"></a>#&#39; for real football score modeling, it is a good idea to start with</span>
+<span id="cb127-559"><a href="#cb127-559" aria-hidden="true" tabindex="-1"></a>#&#39; the bivariate Poisson model. For real football analysis footBayes R</span>
+<span id="cb127-560"><a href="#cb127-560" aria-hidden="true" tabindex="-1"></a>#&#39; package <span class="co">[</span><span class="ot">@Egidi-MacriDemartino-Palaskas:2024</span><span class="co">]</span> has several different</span>
+<span id="cb127-561"><a href="#cb127-561" aria-hidden="true" tabindex="-1"></a>#&#39; models including dynamic models allowing the latent performance to</span>
+<span id="cb127-562"><a href="#cb127-562" aria-hidden="true" tabindex="-1"></a>#&#39; evolve in time.</span>
+<span id="cb127-563"><a href="#cb127-563" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-564"><a href="#cb127-564" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="dt">&lt;</span><span class="kw">br</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb127-565"><a href="#cb127-565" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-566"><a href="#cb127-566" aria-hidden="true" tabindex="-1"></a>#&#39; # References {.unnumbered}</span>
+<span id="cb127-567"><a href="#cb127-567" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-568"><a href="#cb127-568" aria-hidden="true" tabindex="-1"></a>#&#39; ::: {#refs}</span>
+<span id="cb127-569"><a href="#cb127-569" aria-hidden="true" tabindex="-1"></a>#&#39; :::</span>
+<span id="cb127-570"><a href="#cb127-570" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-571"><a href="#cb127-571" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
+<span id="cb127-572"><a href="#cb127-572" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb127-573"><a href="#cb127-573" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2021--2025, Andrew Gelman, Aki Vehtari, licensed under BSD-3.</span>
+<span id="cb127-574"><a href="#cb127-574" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2021--2025, Andrew Gelman, Aki Vehtari, licensed under CC-BY-NC 4.0.</span>
+<span id="cb127-575"><a href="#cb127-575" aria-hidden="true" tabindex="-1"></a>#&#39; </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

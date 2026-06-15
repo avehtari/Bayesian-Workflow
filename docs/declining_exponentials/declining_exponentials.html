@@ -3975,6 +3975,12 @@ box-shadow: none !important;
 padding: 0 !important;
 }
 </style>
+<meta property="og:title" content="Declining exponentials – Bayesian Workflow book">
+<meta property="og:description" content="Website for the Bayesian Workflow book by Gelman, Vehtari, McElreath, et al. — case studies, code, and exercises in R and Stan.">
+<meta property="og:image" content="https://avehtari.github.io/Bayesian-Workflow/social-cards/declining_exponentials.png">
+<meta property="og:site_name" content="Bayesian Workflow book">
+<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
 </head>
 
 <body class="nav-sidebar docked nav-fixed quarto-light">
@@ -4248,7 +4254,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-15</p>
     </div>
   </div>
     
@@ -4843,7 +4849,7 @@ Figure 6
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/avehtari\.github\.io\/Bayesian-Workflow\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -5171,464 +5177,465 @@ Figure 6
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb46" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Declining exponentials&quot;</span>
-<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman&quot;</span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-08-15</span>
-<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
-<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
-<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
-<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
-<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
-<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
-<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
-<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
-<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
-<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
-<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>#&#39; Section 12.4 *Using modeling ideas to address computing problems*.</span>
-<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
-<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>#&#39; * Declining exponential:  A nonlinear model that comes up in many</span>
-<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>#&#39;   science and engineering applications, also illustrating the use of</span>
-<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>#&#39;   bounds in parameter estimation.</span>
-<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>#&#39; * Sum of declining exponentials:  An important class of nonlinear</span>
-<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>#&#39;   models that can be surprisingly difficult to estimate from data.</span>
-<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>#&#39;   This example illustrates how Stan can fail, and also the way in</span>
-<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>#&#39;   which default prior information can add stability to an otherwise</span>
-<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>#&#39;   intractable problem.</span>
-<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
-<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
-<span id="cb46-33"><a href="#cb46-33" aria-hidden="true" tabindex="-1"></a>  cache = FALSE,</span>
-<span id="cb46-34"><a href="#cb46-34" aria-hidden="true" tabindex="-1"></a>  message = FALSE,</span>
-<span id="cb46-35"><a href="#cb46-35" aria-hidden="true" tabindex="-1"></a>  error = FALSE,</span>
-<span id="cb46-36"><a href="#cb46-36" aria-hidden="true" tabindex="-1"></a>  warning = FALSE,</span>
-<span id="cb46-37"><a href="#cb46-37" aria-hidden="true" tabindex="-1"></a>  comment = NA,</span>
-<span id="cb46-38"><a href="#cb46-38" aria-hidden="true" tabindex="-1"></a>  out.width = &#39;95%&#39;</span>
-<span id="cb46-39"><a href="#cb46-39" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb46-40"><a href="#cb46-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-41"><a href="#cb46-41" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages and set options**</span>
-<span id="cb46-42"><a href="#cb46-42" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
-<span id="cb46-43"><a href="#cb46-43" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
-<span id="cb46-44"><a href="#cb46-44" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
-<span id="cb46-45"><a href="#cb46-45" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
-<span id="cb46-46"><a href="#cb46-46" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
-<span id="cb46-47"><a href="#cb46-47" aria-hidden="true" tabindex="-1"></a>options(digits = 2)</span>
-<span id="cb46-48"><a href="#cb46-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## options(htmltools.dir.version = FALSE)</span></span>
-<span id="cb46-49"><a href="#cb46-49" aria-hidden="true" tabindex="-1"></a>set.seed(1123)</span>
-<span id="cb46-50"><a href="#cb46-50" aria-hidden="true" tabindex="-1"></a><span class="fu"># utility functions</span></span>
-<span id="cb46-51"><a href="#cb46-51" aria-hidden="true" tabindex="-1"></a>fround &lt;- function(x, digits) {</span>
-<span id="cb46-52"><a href="#cb46-52" aria-hidden="true" tabindex="-1"></a>  format(round(x, digits), nsmall = digits)</span>
-<span id="cb46-53"><a href="#cb46-53" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb46-54"><a href="#cb46-54" aria-hidden="true" tabindex="-1"></a>print_stan_file &lt;- function(file) {</span>
-<span id="cb46-55"><a href="#cb46-55" aria-hidden="true" tabindex="-1"></a>  code &lt;- readLines(file)</span>
-<span id="cb46-56"><a href="#cb46-56" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;</span>
-<span id="cb46-57"><a href="#cb46-57" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
-<span id="cb46-58"><a href="#cb46-58" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
-<span id="cb46-59"><a href="#cb46-59" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
-<span id="cb46-60"><a href="#cb46-60" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
-<span id="cb46-61"><a href="#cb46-61" aria-hidden="true" tabindex="-1"></a>  } else {</span>
-<span id="cb46-62"><a href="#cb46-62" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
-<span id="cb46-63"><a href="#cb46-63" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb46-64"><a href="#cb46-64" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb46-65"><a href="#cb46-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-66"><a href="#cb46-66" aria-hidden="true" tabindex="-1"></a>#&#39; # Declining exponential</span>
-<span id="cb46-67"><a href="#cb46-67" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-68"><a href="#cb46-68" aria-hidden="true" tabindex="-1"></a>#&#39; Let&#39;s fit the following simple model: $y = ae^{-bx} + \mathrm{error}$,</span>
-<span id="cb46-69"><a href="#cb46-69" aria-hidden="true" tabindex="-1"></a>#&#39; given data $(x,y)_i$:</span>
-<span id="cb46-70"><a href="#cb46-70" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb46-71"><a href="#cb46-71" aria-hidden="true" tabindex="-1"></a>#&#39; y_i = ae^{-bx_i} + \epsilon_i, \text{ for } i=1,\dots,N,</span>
-<span id="cb46-72"><a href="#cb46-72" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb46-73"><a href="#cb46-73" aria-hidden="true" tabindex="-1"></a>#&#39; We shall assume the errors are independent and normally</span>
-<span id="cb46-74"><a href="#cb46-74" aria-hidden="true" tabindex="-1"></a>#&#39; distributed: $\epsilon_i \sim \operatorname{normal}(0,\sigma)$.</span>
-<span id="cb46-75"><a href="#cb46-75" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-76"><a href="#cb46-76" aria-hidden="true" tabindex="-1"></a>#&#39; Here is the model in Stan:</span>
-<span id="cb46-77"><a href="#cb46-77" aria-hidden="true" tabindex="-1"></a>#| output: asis</span>
-<span id="cb46-78"><a href="#cb46-78" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;declining_exponentials&quot;,  &quot;exponential.stan&quot;))</span>
-<span id="cb46-79"><a href="#cb46-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-80"><a href="#cb46-80" aria-hidden="true" tabindex="-1"></a>#&#39; We have given the parameters $a$, and $b$, and $\sigma$ normal</span>
-<span id="cb46-81"><a href="#cb46-81" aria-hidden="true" tabindex="-1"></a>#&#39; prior distributions centered at 0 with standard deviation 10.  In</span>
-<span id="cb46-82"><a href="#cb46-82" aria-hidden="true" tabindex="-1"></a>#&#39; addition, the parameter $\sigma$ is constrained to be positive.</span>
-<span id="cb46-83"><a href="#cb46-83" aria-hidden="true" tabindex="-1"></a>#&#39; The purpose of the prior distributions is to keep the computations</span>
-<span id="cb46-84"><a href="#cb46-84" aria-hidden="true" tabindex="-1"></a>#&#39; at a reasonable value.  If we were working on a problem in which we</span>
-<span id="cb46-85"><a href="#cb46-85" aria-hidden="true" tabindex="-1"></a>#&#39; thought that $a$, $b$, or $\sigma$ could be much greater than 10,</span>
-<span id="cb46-86"><a href="#cb46-86" aria-hidden="true" tabindex="-1"></a>#&#39; we would want to use a weaker prior distribution.</span>
-<span id="cb46-87"><a href="#cb46-87" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-88"><a href="#cb46-88" aria-hidden="true" tabindex="-1"></a>#&#39; Another point about the above Stan program: the model for $y$ is</span>
-<span id="cb46-89"><a href="#cb46-89" aria-hidden="true" tabindex="-1"></a>#&#39; vectorized and could instead have been written more explicitly as a</span>
-<span id="cb46-90"><a href="#cb46-90" aria-hidden="true" tabindex="-1"></a>#&#39; loop:</span>
-<span id="cb46-91"><a href="#cb46-91" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
-<span id="cb46-92"><a href="#cb46-92" aria-hidden="true" tabindex="-1"></a>#&#39; for (i in 1:N) {</span>
-<span id="cb46-93"><a href="#cb46-93" aria-hidden="true" tabindex="-1"></a>#&#39;   y<span class="co">[</span><span class="ot">i</span><span class="co">]</span> ~ normal(a*exp(-b*x<span class="co">[</span><span class="ot">i</span><span class="co">]</span>), sigma);</span>
-<span id="cb46-94"><a href="#cb46-94" aria-hidden="true" tabindex="-1"></a>#&#39; }</span>
-<span id="cb46-95"><a href="#cb46-95" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
-<span id="cb46-96"><a href="#cb46-96" aria-hidden="true" tabindex="-1"></a>#&#39; We prefer the vectorized version as it is more compact and it also</span>
-<span id="cb46-97"><a href="#cb46-97" aria-hidden="true" tabindex="-1"></a>#&#39; runs faster in Stan, for reasons discussed elsewhere in this book.</span>
-<span id="cb46-98"><a href="#cb46-98" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-99"><a href="#cb46-99" aria-hidden="true" tabindex="-1"></a>#&#39; ## Simulated data</span>
-<span id="cb46-100"><a href="#cb46-100" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-101"><a href="#cb46-101" aria-hidden="true" tabindex="-1"></a>#&#39; To demonstrate our exponential model, we fit it to fake data.</span>
-<span id="cb46-102"><a href="#cb46-102" aria-hidden="true" tabindex="-1"></a>#&#39; We&#39;ll simulate $N=100$ data points with predictors $x$ uniformly</span>
-<span id="cb46-103"><a href="#cb46-103" aria-hidden="true" tabindex="-1"></a>#&#39; distributed between 0 and 10, from the above model with $a=0.2$,</span>
-<span id="cb46-104"><a href="#cb46-104" aria-hidden="true" tabindex="-1"></a>#&#39; $b=0.3$, $\sigma=0.5$.</span>
-<span id="cb46-105"><a href="#cb46-105" aria-hidden="true" tabindex="-1"></a>a &lt;- 5</span>
-<span id="cb46-106"><a href="#cb46-106" aria-hidden="true" tabindex="-1"></a>b &lt;- 0.3</span>
-<span id="cb46-107"><a href="#cb46-107" aria-hidden="true" tabindex="-1"></a>sigma &lt;- 0.5</span>
-<span id="cb46-108"><a href="#cb46-108" aria-hidden="true" tabindex="-1"></a>N &lt;- 100</span>
-<span id="cb46-109"><a href="#cb46-109" aria-hidden="true" tabindex="-1"></a>x &lt;- runif(N, 0, 10)</span>
-<span id="cb46-110"><a href="#cb46-110" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, a * exp(-b * x), sigma)</span>
-<span id="cb46-111"><a href="#cb46-111" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-112"><a href="#cb46-112" aria-hidden="true" tabindex="-1"></a>#&#39; Here is a graph of the true curve and the simulated data:</span>
-<span id="cb46-113"><a href="#cb46-113" aria-hidden="true" tabindex="-1"></a>#| label: fig-true-and-simulated</span>
-<span id="cb46-114"><a href="#cb46-114" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb46-115"><a href="#cb46-115" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb46-116"><a href="#cb46-116" aria-hidden="true" tabindex="-1"></a>curve(a * exp(-b * x), from = 0, to = 10, ylim = range(x, y), </span>
-<span id="cb46-117"><a href="#cb46-117" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, bty = &quot;l&quot;, </span>
-<span id="cb46-118"><a href="#cb46-118" aria-hidden="true" tabindex="-1"></a>      main = &quot;Data and true model&quot;, cex.main = 1)</span>
-<span id="cb46-119"><a href="#cb46-119" aria-hidden="true" tabindex="-1"></a>points(x, y, pch = 20, cex = 0.2)</span>
-<span id="cb46-120"><a href="#cb46-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-121"><a href="#cb46-121" aria-hidden="true" tabindex="-1"></a>#&#39; And then we fit the model:</span>
-<span id="cb46-122"><a href="#cb46-122" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-123"><a href="#cb46-123" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-124"><a href="#cb46-124" aria-hidden="true" tabindex="-1"></a>#| label: fit_1</span>
-<span id="cb46-125"><a href="#cb46-125" aria-hidden="true" tabindex="-1"></a>data_1 &lt;- list(N = N, x = x, y = y)</span>
-<span id="cb46-126"><a href="#cb46-126" aria-hidden="true" tabindex="-1"></a>mod_1 &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;exponential.stan&quot;))</span>
-<span id="cb46-127"><a href="#cb46-127" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- mod_1$sample(data = data_1)</span>
-<span id="cb46-128"><a href="#cb46-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-129"><a href="#cb46-129" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-130"><a href="#cb46-130" aria-hidden="true" tabindex="-1"></a>print(fit_1)</span>
-<span id="cb46-131"><a href="#cb46-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-132"><a href="#cb46-132" aria-hidden="true" tabindex="-1"></a>#&#39; Recall that the true parameter values were $a=5.0$, $b=0.3$,</span>
-<span id="cb46-133"><a href="#cb46-133" aria-hidden="true" tabindex="-1"></a>#&#39; $\sigma=0.5$. Here the model is simple enough and the data are</span>
-<span id="cb46-134"><a href="#cb46-134" aria-hidden="true" tabindex="-1"></a>#&#39; clean enough that we can estimate all three of these parameters</span>
-<span id="cb46-135"><a href="#cb46-135" aria-hidden="true" tabindex="-1"></a>#&#39; with reasonable precision from the data, as can be seen from the</span>
-<span id="cb46-136"><a href="#cb46-136" aria-hidden="true" tabindex="-1"></a>#&#39; 95% intervals above.</span>
-<span id="cb46-137"><a href="#cb46-137" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-138"><a href="#cb46-138" aria-hidden="true" tabindex="-1"></a>#&#39; Alternatively, we might want to say ahead of time that we are</span>
-<span id="cb46-139"><a href="#cb46-139" aria-hidden="true" tabindex="-1"></a>#&#39; fitting a declining exponential curve that starts positive and</span>
-<span id="cb46-140"><a href="#cb46-140" aria-hidden="true" tabindex="-1"></a>#&#39; descends to zero. We would thus want to constrain the parameters</span>
-<span id="cb46-141"><a href="#cb46-141" aria-hidden="true" tabindex="-1"></a>#&#39; $a$ and $b$ to be positive, which we can do in the parameters</span>
-<span id="cb46-142"><a href="#cb46-142" aria-hidden="true" tabindex="-1"></a>#&#39; block:</span>
-<span id="cb46-143"><a href="#cb46-143" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
-<span id="cb46-144"><a href="#cb46-144" aria-hidden="true" tabindex="-1"></a>#&#39;   real&lt;lower=0&gt; a;</span>
-<span id="cb46-145"><a href="#cb46-145" aria-hidden="true" tabindex="-1"></a>#&#39;   real&lt;lower=0&gt; b;</span>
-<span id="cb46-146"><a href="#cb46-146" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
-<span id="cb46-147"><a href="#cb46-147" aria-hidden="true" tabindex="-1"></a>#&#39; Otherwise we leave the model unchanged.  In this case the results</span>
-<span id="cb46-148"><a href="#cb46-148" aria-hidden="true" tabindex="-1"></a>#&#39; turn out to be very similar:</span>
-<span id="cb46-149"><a href="#cb46-149" aria-hidden="true" tabindex="-1"></a>#| label: fit_1b</span>
-<span id="cb46-150"><a href="#cb46-150" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-151"><a href="#cb46-151" aria-hidden="true" tabindex="-1"></a>mod_1b &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;,&quot;exponential_positive.stan&quot;))</span>
-<span id="cb46-152"><a href="#cb46-152" aria-hidden="true" tabindex="-1"></a>fit_1b &lt;- mod_1b$sample(data = data_1)</span>
-<span id="cb46-153"><a href="#cb46-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-154"><a href="#cb46-154" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-155"><a href="#cb46-155" aria-hidden="true" tabindex="-1"></a>print(fit_1b)</span>
-<span id="cb46-156"><a href="#cb46-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-157"><a href="#cb46-157" aria-hidden="true" tabindex="-1"></a>#&#39; ## Small simulated data</span>
-<span id="cb46-158"><a href="#cb46-158" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-159"><a href="#cb46-159" aria-hidden="true" tabindex="-1"></a>#&#39; With weaker data, though, the constraints could make a difference.</span>
-<span id="cb46-160"><a href="#cb46-160" aria-hidden="true" tabindex="-1"></a>#&#39; We could experiment on this by doing the same simulation but with</span>
-<span id="cb46-161"><a href="#cb46-161" aria-hidden="true" tabindex="-1"></a>#&#39; just $N=10$ data points:</span>
-<span id="cb46-162"><a href="#cb46-162" aria-hidden="true" tabindex="-1"></a>N &lt;- 10</span>
-<span id="cb46-163"><a href="#cb46-163" aria-hidden="true" tabindex="-1"></a>x &lt;- runif(N, 0, 10)</span>
-<span id="cb46-164"><a href="#cb46-164" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, a * exp(-b * x), sigma)</span>
-<span id="cb46-165"><a href="#cb46-165" aria-hidden="true" tabindex="-1"></a>#| label: fig-10-data-points</span>
-<span id="cb46-166"><a href="#cb46-166" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb46-167"><a href="#cb46-167" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb46-168"><a href="#cb46-168" aria-hidden="true" tabindex="-1"></a>curve(a * exp(-b * x), from = 0, to = 10, ylim = range(x, y),</span>
-<span id="cb46-169"><a href="#cb46-169" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, bty = &quot;l&quot;, </span>
-<span id="cb46-170"><a href="#cb46-170" aria-hidden="true" tabindex="-1"></a>      main = &quot;Just 10 data points&quot;, cex.main = 1)</span>
-<span id="cb46-171"><a href="#cb46-171" aria-hidden="true" tabindex="-1"></a>points(x, y, pch = 20, cex = 0.2)</span>
-<span id="cb46-172"><a href="#cb46-172" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-173"><a href="#cb46-173" aria-hidden="true" tabindex="-1"></a>#&#39; First we fit the unconstrained model:</span>
-<span id="cb46-174"><a href="#cb46-174" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-175"><a href="#cb46-175" aria-hidden="true" tabindex="-1"></a>#| label: fit_2</span>
-<span id="cb46-176"><a href="#cb46-176" aria-hidden="true" tabindex="-1"></a>data_2 &lt;- list(N = N, x = x, y = y)</span>
-<span id="cb46-177"><a href="#cb46-177" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- mod_1$sample(data = data_2)</span>
-<span id="cb46-178"><a href="#cb46-178" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-179"><a href="#cb46-179" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-180"><a href="#cb46-180" aria-hidden="true" tabindex="-1"></a>print(fit_2)</span>
-<span id="cb46-181"><a href="#cb46-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-182"><a href="#cb46-182" aria-hidden="true" tabindex="-1"></a>#&#39; Then we fit the constrained model:</span>
-<span id="cb46-183"><a href="#cb46-183" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-184"><a href="#cb46-184" aria-hidden="true" tabindex="-1"></a>#| label: fit_2b</span>
-<span id="cb46-185"><a href="#cb46-185" aria-hidden="true" tabindex="-1"></a>fit_2b &lt;- mod_1b$sample(data = data_2)</span>
-<span id="cb46-186"><a href="#cb46-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-187"><a href="#cb46-187" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-188"><a href="#cb46-188" aria-hidden="true" tabindex="-1"></a>print(fit_2b)</span>
-<span id="cb46-189"><a href="#cb46-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-190"><a href="#cb46-190" aria-hidden="true" tabindex="-1"></a>#&#39; Different things can happen with different sets of simulated data,</span>
-<span id="cb46-191"><a href="#cb46-191" aria-hidden="true" tabindex="-1"></a>#&#39; but the inference with the positivity constraints will typically be</span>
-<span id="cb46-192"><a href="#cb46-192" aria-hidden="true" tabindex="-1"></a>#&#39; much more stable.  Of course, we would only want to constrain the</span>
-<span id="cb46-193"><a href="#cb46-193" aria-hidden="true" tabindex="-1"></a>#&#39; model in this way if we knew that the positivity restriction is</span>
-<span id="cb46-194"><a href="#cb46-194" aria-hidden="true" tabindex="-1"></a>#&#39; appropriate.</span>
-<span id="cb46-195"><a href="#cb46-195" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-196"><a href="#cb46-196" aria-hidden="true" tabindex="-1"></a>#&#39; ## Positive simulated data</span>
-<span id="cb46-197"><a href="#cb46-197" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-198"><a href="#cb46-198" aria-hidden="true" tabindex="-1"></a>#&#39; Now suppose that the data are also restricted to be positive.  Then</span>
-<span id="cb46-199"><a href="#cb46-199" aria-hidden="true" tabindex="-1"></a>#&#39; we need a different error distribution, as the above model with</span>
-<span id="cb46-200"><a href="#cb46-200" aria-hidden="true" tabindex="-1"></a>#&#39; additive normal errors can yield negative data.</span>
-<span id="cb46-201"><a href="#cb46-201" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-202"><a href="#cb46-202" aria-hidden="true" tabindex="-1"></a>#&#39; Let&#39;s try a multiplicative error, with a lognormal distribution:</span>
-<span id="cb46-203"><a href="#cb46-203" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb46-204"><a href="#cb46-204" aria-hidden="true" tabindex="-1"></a>#&#39; y_i = ae^{-bx_i} * \epsilon_i, \text{ for } i=1,\dots,N<span class="sc">\\</span></span>
-<span id="cb46-205"><a href="#cb46-205" aria-hidden="true" tabindex="-1"></a>#&#39; \log\epsilon_i \sim \operatorname{normal}(0,\log\sigma), \text{ for } i=1,\dots,N</span>
-<span id="cb46-206"><a href="#cb46-206" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb46-207"><a href="#cb46-207" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-208"><a href="#cb46-208" aria-hidden="true" tabindex="-1"></a>#&#39; Here is the model in Stan:</span>
-<span id="cb46-209"><a href="#cb46-209" aria-hidden="true" tabindex="-1"></a>#| output: asis</span>
-<span id="cb46-210"><a href="#cb46-210" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;declining_exponentials&quot;, &quot;exponential_positive_lognormal.stan&quot;))</span>
-<span id="cb46-211"><a href="#cb46-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-212"><a href="#cb46-212" aria-hidden="true" tabindex="-1"></a>#&#39; As before, we can simulate fake data from this model:</span>
-<span id="cb46-213"><a href="#cb46-213" aria-hidden="true" tabindex="-1"></a>a &lt;- 5</span>
-<span id="cb46-214"><a href="#cb46-214" aria-hidden="true" tabindex="-1"></a>b &lt;- 0.3</span>
-<span id="cb46-215"><a href="#cb46-215" aria-hidden="true" tabindex="-1"></a>sigma &lt;- 0.5</span>
-<span id="cb46-216"><a href="#cb46-216" aria-hidden="true" tabindex="-1"></a>N &lt;- 100</span>
-<span id="cb46-217"><a href="#cb46-217" aria-hidden="true" tabindex="-1"></a>x &lt;- runif(N, 0, 10)</span>
-<span id="cb46-218"><a href="#cb46-218" aria-hidden="true" tabindex="-1"></a>epsilon &lt;- exp(rnorm(N, 0, sigma))</span>
-<span id="cb46-219"><a href="#cb46-219" aria-hidden="true" tabindex="-1"></a>y &lt;- a * exp(-b * x) * epsilon</span>
-<span id="cb46-220"><a href="#cb46-220" aria-hidden="true" tabindex="-1"></a>#| label: fig-positive-true-and-simulated</span>
-<span id="cb46-221"><a href="#cb46-221" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb46-222"><a href="#cb46-222" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb46-223"><a href="#cb46-223" aria-hidden="true" tabindex="-1"></a>curve(a * exp(-b * x), from = 0, to = 10, ylim = range(x, y), </span>
-<span id="cb46-224"><a href="#cb46-224" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, bty = &quot;l&quot;, </span>
-<span id="cb46-225"><a href="#cb46-225" aria-hidden="true" tabindex="-1"></a>      main = &quot;Data and true model&quot;, cex.main = 1)</span>
-<span id="cb46-226"><a href="#cb46-226" aria-hidden="true" tabindex="-1"></a>points(x, y, pch = 20, cex = 0.2)</span>
-<span id="cb46-227"><a href="#cb46-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-228"><a href="#cb46-228" aria-hidden="true" tabindex="-1"></a>#&#39; We can then fit the model to the simulated data and check that the</span>
-<span id="cb46-229"><a href="#cb46-229" aria-hidden="true" tabindex="-1"></a>#&#39; parameters are approximately recovered:</span>
-<span id="cb46-230"><a href="#cb46-230" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-231"><a href="#cb46-231" aria-hidden="true" tabindex="-1"></a>#| label: fit_3</span>
-<span id="cb46-232"><a href="#cb46-232" aria-hidden="true" tabindex="-1"></a>data_3 &lt;- list(N = N, x = x, y = y)</span>
-<span id="cb46-233"><a href="#cb46-233" aria-hidden="true" tabindex="-1"></a>mod_3 &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;exponential_positive_lognormal.stan&quot;))</span>
-<span id="cb46-234"><a href="#cb46-234" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- mod_3$sample(data = data_3)</span>
-<span id="cb46-235"><a href="#cb46-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-236"><a href="#cb46-236" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-237"><a href="#cb46-237" aria-hidden="true" tabindex="-1"></a>print(fit_3)</span>
-<span id="cb46-238"><a href="#cb46-238" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-239"><a href="#cb46-239" aria-hidden="true" tabindex="-1"></a>#&#39; # Sum of declining exponentials</span>
-<span id="cb46-240"><a href="#cb46-240" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-241"><a href="#cb46-241" aria-hidden="true" tabindex="-1"></a>#&#39; From the numerical analysis literature, here is an example of an</span>
-<span id="cb46-242"><a href="#cb46-242" aria-hidden="true" tabindex="-1"></a>#&#39; inference problem that appears simple but can be surprisingly</span>
-<span id="cb46-243"><a href="#cb46-243" aria-hidden="true" tabindex="-1"></a>#&#39; difficult.  The challenge is to estimate the parameters of a sum of</span>
-<span id="cb46-244"><a href="#cb46-244" aria-hidden="true" tabindex="-1"></a>#&#39; declining exponentials: $y = a_1e^{-b_1x} + a_2e^{-b_2x}$.  This is</span>
-<span id="cb46-245"><a href="#cb46-245" aria-hidden="true" tabindex="-1"></a>#&#39; also called an inverse problem, and it can be challenging to</span>
-<span id="cb46-246"><a href="#cb46-246" aria-hidden="true" tabindex="-1"></a>#&#39; decompose these two declining functions.</span>
-<span id="cb46-247"><a href="#cb46-247" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-248"><a href="#cb46-248" aria-hidden="true" tabindex="-1"></a>#&#39; This expression, and others like it, arise in many examples,</span>
-<span id="cb46-249"><a href="#cb46-249" aria-hidden="true" tabindex="-1"></a>#&#39; including in pharmacology, where $x$ represents time and $y$ could</span>
-<span id="cb46-250"><a href="#cb46-250" aria-hidden="true" tabindex="-1"></a>#&#39; be the concentration of a drug in the blood of someone who was</span>
-<span id="cb46-251"><a href="#cb46-251" aria-hidden="true" tabindex="-1"></a>#&#39; given a specified dose at time 0.  In a simple _two-compartment</span>
-<span id="cb46-252"><a href="#cb46-252" aria-hidden="true" tabindex="-1"></a>#&#39; model_, the total concentration will look like a sum of declining</span>
-<span id="cb46-253"><a href="#cb46-253" aria-hidden="true" tabindex="-1"></a>#&#39; exponentials.</span>
-<span id="cb46-254"><a href="#cb46-254" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-255"><a href="#cb46-255" aria-hidden="true" tabindex="-1"></a>#&#39; To set this up as a statistics problem, we add some noise to the</span>
-<span id="cb46-256"><a href="#cb46-256" aria-hidden="true" tabindex="-1"></a>#&#39; system.  We want the data to always be positive so our noise will be</span>
-<span id="cb46-257"><a href="#cb46-257" aria-hidden="true" tabindex="-1"></a>#&#39; multiplicative:</span>
-<span id="cb46-258"><a href="#cb46-258" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb46-259"><a href="#cb46-259" aria-hidden="true" tabindex="-1"></a>#&#39; y_i = (a_1e^{-b_1x_i} + a_2e^{-b_2x_i}) * \epsilon_i, \text{ for } i=1,\dots,N,</span>
-<span id="cb46-260"><a href="#cb46-260" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
-<span id="cb46-261"><a href="#cb46-261" aria-hidden="true" tabindex="-1"></a>#&#39; with lognormally-distributed errors $\epsilon$.</span>
-<span id="cb46-262"><a href="#cb46-262" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-263"><a href="#cb46-263" aria-hidden="true" tabindex="-1"></a>#&#39; Here is the model in Stan:</span>
-<span id="cb46-264"><a href="#cb46-264" aria-hidden="true" tabindex="-1"></a>#| output: asis</span>
-<span id="cb46-265"><a href="#cb46-265" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;declining_exponentials&quot;, &quot;sum_of_exponentials.stan&quot;))</span>
-<span id="cb46-266"><a href="#cb46-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-267"><a href="#cb46-267" aria-hidden="true" tabindex="-1"></a>#&#39; The coefficients $a$ and the residual standard deviation $\sigma$</span>
-<span id="cb46-268"><a href="#cb46-268" aria-hidden="true" tabindex="-1"></a>#&#39; are constrained to be positive.  The parameters $b$ are also</span>
-<span id="cb46-269"><a href="#cb46-269" aria-hidden="true" tabindex="-1"></a>#&#39; positive---these are supposed to be declining, not increasing,</span>
-<span id="cb46-270"><a href="#cb46-270" aria-hidden="true" tabindex="-1"></a>#&#39; exponentials---and are also constrained to be ordered, so that</span>
-<span id="cb46-271"><a href="#cb46-271" aria-hidden="true" tabindex="-1"></a>#&#39; $b_1&lt;b_2$.  We need this to keep the model _identified_: Without</span>
-<span id="cb46-272"><a href="#cb46-272" aria-hidden="true" tabindex="-1"></a>#&#39; some sort of restriction, there would be no way from the data to</span>
-<span id="cb46-273"><a href="#cb46-273" aria-hidden="true" tabindex="-1"></a>#&#39; tell which component is labeled 1 and which is 2.  So we</span>
-<span id="cb46-274"><a href="#cb46-274" aria-hidden="true" tabindex="-1"></a>#&#39; arbitrarily label the component with lower value of $b$---that is,</span>
-<span id="cb46-275"><a href="#cb46-275" aria-hidden="true" tabindex="-1"></a>#&#39; the one that declines more slowly---as the first one, and the</span>
-<span id="cb46-276"><a href="#cb46-276" aria-hidden="true" tabindex="-1"></a>#&#39; component with higher value of $b$ to be the second.  We added the</span>
-<span id="cb46-277"><a href="#cb46-277" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`positive_ordered`</span> type to Stan because this sort of identification</span>
-<span id="cb46-278"><a href="#cb46-278" aria-hidden="true" tabindex="-1"></a>#&#39; problem comes up fairly often in applications.</span>
-<span id="cb46-279"><a href="#cb46-279" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-280"><a href="#cb46-280" aria-hidden="true" tabindex="-1"></a>#&#39; We&#39;ll try out our Stan model by simulating fake data from a model</span>
-<span id="cb46-281"><a href="#cb46-281" aria-hidden="true" tabindex="-1"></a>#&#39; where the two curves should be cleanly distinguished, setting</span>
-<span id="cb46-282"><a href="#cb46-282" aria-hidden="true" tabindex="-1"></a>#&#39; $b_1=0.1$ and $b_2=2.0$, a factor of 20 apart in scale.  We&#39;ll</span>
-<span id="cb46-283"><a href="#cb46-283" aria-hidden="true" tabindex="-1"></a>#&#39; simulate 1000 data points where the predictors $x$ are uniformly</span>
-<span id="cb46-284"><a href="#cb46-284" aria-hidden="true" tabindex="-1"></a>#&#39; spaced from 0 to 10, and, somewhat arbitrarily, set $a_1=1.0$,</span>
-<span id="cb46-285"><a href="#cb46-285" aria-hidden="true" tabindex="-1"></a>#&#39; $a_2=0.8$, and $\sigma=0.2$.  We can then simulate from the</span>
-<span id="cb46-286"><a href="#cb46-286" aria-hidden="true" tabindex="-1"></a>#&#39; lognormal distribution to generate the data $y$.</span>
-<span id="cb46-287"><a href="#cb46-287" aria-hidden="true" tabindex="-1"></a>a &lt;- c(1, 0.8)</span>
-<span id="cb46-288"><a href="#cb46-288" aria-hidden="true" tabindex="-1"></a>b &lt;- c(0.1, 2)</span>
-<span id="cb46-289"><a href="#cb46-289" aria-hidden="true" tabindex="-1"></a>N &lt;- 1000</span>
-<span id="cb46-290"><a href="#cb46-290" aria-hidden="true" tabindex="-1"></a>x &lt;- seq(0, 10, length = N)</span>
-<span id="cb46-291"><a href="#cb46-291" aria-hidden="true" tabindex="-1"></a>sigma &lt;- 0.2</span>
-<span id="cb46-292"><a href="#cb46-292" aria-hidden="true" tabindex="-1"></a>epsilon &lt;- exp(rnorm(N, 0, sigma))</span>
-<span id="cb46-293"><a href="#cb46-293" aria-hidden="true" tabindex="-1"></a>y &lt;- (a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x)) * epsilon</span>
-<span id="cb46-294"><a href="#cb46-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-295"><a href="#cb46-295" aria-hidden="true" tabindex="-1"></a>#&#39; Here is a graph of the true curve and the simulated data:</span>
-<span id="cb46-296"><a href="#cb46-296" aria-hidden="true" tabindex="-1"></a>#| label: fig-sumexp-true-and-simulated</span>
-<span id="cb46-297"><a href="#cb46-297" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb46-298"><a href="#cb46-298" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb46-299"><a href="#cb46-299" aria-hidden="true" tabindex="-1"></a>data_graph &lt;- function(a, b, sigma, x, y) {</span>
-<span id="cb46-300"><a href="#cb46-300" aria-hidden="true" tabindex="-1"></a>  curve(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x), </span>
-<span id="cb46-301"><a href="#cb46-301" aria-hidden="true" tabindex="-1"></a>        from = min(x), to = max(x), </span>
-<span id="cb46-302"><a href="#cb46-302" aria-hidden="true" tabindex="-1"></a>        ylim = c(0, 1.05 * max(y)),  xlim = c(0, max(x)), </span>
-<span id="cb46-303"><a href="#cb46-303" aria-hidden="true" tabindex="-1"></a>        xlab = &quot;x&quot;, ylab = &quot;y&quot;, xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, </span>
-<span id="cb46-304"><a href="#cb46-304" aria-hidden="true" tabindex="-1"></a>        main = &quot;Data and true model&quot;, cex.main = 1)</span>
-<span id="cb46-305"><a href="#cb46-305" aria-hidden="true" tabindex="-1"></a>  points(x, y, pch = 20, cex = 0.2)</span>
-<span id="cb46-306"><a href="#cb46-306" aria-hidden="true" tabindex="-1"></a>  text(max(x), 0.5 * max(y), </span>
-<span id="cb46-307"><a href="#cb46-307" aria-hidden="true" tabindex="-1"></a>       paste(&quot;y = &quot;, fround(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>, 1), &quot;*exp(&quot;, fround(-b[1], 1), &quot;*x) + &quot;,  </span>
-<span id="cb46-308"><a href="#cb46-308" aria-hidden="true" tabindex="-1"></a>             fround(a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>, 1), &quot;*exp(&quot;, fround(-b[2], 1), &quot;*x)&quot;, sep = &quot;&quot;), adj = 1)</span>
-<span id="cb46-309"><a href="#cb46-309" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb46-310"><a href="#cb46-310" aria-hidden="true" tabindex="-1"></a>data_graph(a, b, sigma, x, y)</span>
-<span id="cb46-311"><a href="#cb46-311" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-312"><a href="#cb46-312" aria-hidden="true" tabindex="-1"></a>#&#39; And then we fit the model:</span>
-<span id="cb46-313"><a href="#cb46-313" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-314"><a href="#cb46-314" aria-hidden="true" tabindex="-1"></a>#| label: fit_4</span>
-<span id="cb46-315"><a href="#cb46-315" aria-hidden="true" tabindex="-1"></a>data_4 &lt;- list(N = N, x = x, y = y)</span>
-<span id="cb46-316"><a href="#cb46-316" aria-hidden="true" tabindex="-1"></a>mod_4 &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;sum_of_exponentials.stan&quot;))</span>
-<span id="cb46-317"><a href="#cb46-317" aria-hidden="true" tabindex="-1"></a>fit_4 &lt;- mod_4$sample(data = data_4)</span>
-<span id="cb46-318"><a href="#cb46-318" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-319"><a href="#cb46-319" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-320"><a href="#cb46-320" aria-hidden="true" tabindex="-1"></a>print(fit_4)</span>
-<span id="cb46-321"><a href="#cb46-321" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-322"><a href="#cb46-322" aria-hidden="true" tabindex="-1"></a>#&#39; The parameters are recovered well, with the only difficulty being</span>
-<span id="cb46-323"><a href="#cb46-323" aria-hidden="true" tabindex="-1"></a>#&#39; $b_2$, where the estimate is 1.89 but the true value is 2.0---but</span>
-<span id="cb46-324"><a href="#cb46-324" aria-hidden="true" tabindex="-1"></a>#&#39; that is well within the posterior uncertainty.  Stan worked just</span>
-<span id="cb46-325"><a href="#cb46-325" aria-hidden="true" tabindex="-1"></a>#&#39; fine on this nonlinear model.</span>
-<span id="cb46-326"><a href="#cb46-326" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-327"><a href="#cb46-327" aria-hidden="true" tabindex="-1"></a>#&#39; But now let&#39;s make the problem just slightly more difficult.</span>
-<span id="cb46-328"><a href="#cb46-328" aria-hidden="true" tabindex="-1"></a>#&#39; Instead of setting the two parameters $b$ to 0.1 and 2.0, we&#39;ll</span>
-<span id="cb46-329"><a href="#cb46-329" aria-hidden="true" tabindex="-1"></a>#&#39; make them 0.1 and 0.2, so now only a factor of 2 separates the</span>
-<span id="cb46-330"><a href="#cb46-330" aria-hidden="true" tabindex="-1"></a>#&#39; scales of the two declining exponentials.</span>
-<span id="cb46-331"><a href="#cb46-331" aria-hidden="true" tabindex="-1"></a>b &lt;- c(0.1, 0.2)</span>
-<span id="cb46-332"><a href="#cb46-332" aria-hidden="true" tabindex="-1"></a>y_2 &lt;- (a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x)) * epsilon</span>
-<span id="cb46-333"><a href="#cb46-333" aria-hidden="true" tabindex="-1"></a>data_5 &lt;- list(N = N, x = x, y = y_2)</span>
-<span id="cb46-334"><a href="#cb46-334" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-335"><a href="#cb46-335" aria-hidden="true" tabindex="-1"></a>#&#39; This should still be easy to fit in Stan, right?  Wrong:</span>
-<span id="cb46-336"><a href="#cb46-336" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-337"><a href="#cb46-337" aria-hidden="true" tabindex="-1"></a>#| label: fit_5</span>
-<span id="cb46-338"><a href="#cb46-338" aria-hidden="true" tabindex="-1"></a>fit_5 &lt;- mod_4$sample(data = data_5)</span>
-<span id="cb46-339"><a href="#cb46-339" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-340"><a href="#cb46-340" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-341"><a href="#cb46-341" aria-hidden="true" tabindex="-1"></a>print(fit_5)</span>
-<span id="cb46-342"><a href="#cb46-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-343"><a href="#cb46-343" aria-hidden="true" tabindex="-1"></a>#&#39; What happened??  It turns out that these two declining exponentials</span>
-<span id="cb46-344"><a href="#cb46-344" aria-hidden="true" tabindex="-1"></a>#&#39; are _very_ hard to detect.  Look: here&#39;s a graph of the</span>
-<span id="cb46-345"><a href="#cb46-345" aria-hidden="true" tabindex="-1"></a>#&#39; two-component model for the expected data,</span>
-<span id="cb46-346"><a href="#cb46-346" aria-hidden="true" tabindex="-1"></a>#&#39; $y=1.0e^{-0.1x}+0.8e^{-0.2x}$:</span>
-<span id="cb46-347"><a href="#cb46-347" aria-hidden="true" tabindex="-1"></a>#| label: fig-sumexp-true-model</span>
-<span id="cb46-348"><a href="#cb46-348" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb46-349"><a href="#cb46-349" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb46-350"><a href="#cb46-350" aria-hidden="true" tabindex="-1"></a>curve(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x), </span>
-<span id="cb46-351"><a href="#cb46-351" aria-hidden="true" tabindex="-1"></a>      from = 0, to = 10, ylim = c(0, 1.9), xlim = c(0, 10), </span>
-<span id="cb46-352"><a href="#cb46-352" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, </span>
-<span id="cb46-353"><a href="#cb46-353" aria-hidden="true" tabindex="-1"></a>      main = &quot;True model&quot;, cex.main = 1)</span>
-<span id="cb46-354"><a href="#cb46-354" aria-hidden="true" tabindex="-1"></a>text(5.6, 0.7, &quot;y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)&quot;, adj = 1)</span>
-<span id="cb46-355"><a href="#cb46-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-356"><a href="#cb46-356" aria-hidden="true" tabindex="-1"></a>#&#39; And now we&#39;ll overlay a graph of a particular _one-component_ model,</span>
-<span id="cb46-357"><a href="#cb46-357" aria-hidden="true" tabindex="-1"></a>#&#39; $y=1.8e^{-0.135x}$:</span>
-<span id="cb46-358"><a href="#cb46-358" aria-hidden="true" tabindex="-1"></a>#| label: fig-sumexp-true-and-one-component</span>
-<span id="cb46-359"><a href="#cb46-359" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb46-360"><a href="#cb46-360" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb46-361"><a href="#cb46-361" aria-hidden="true" tabindex="-1"></a>curve(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x), from = 0, to = 10, </span>
-<span id="cb46-362"><a href="#cb46-362" aria-hidden="true" tabindex="-1"></a>      ylim = c(0, 1.9), xlim = c(0, 10), </span>
-<span id="cb46-363"><a href="#cb46-363" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, </span>
-<span id="cb46-364"><a href="#cb46-364" aria-hidden="true" tabindex="-1"></a>      main = &quot;True model and scarily-close one-component approximation&quot;, cex.main = 1)</span>
-<span id="cb46-365"><a href="#cb46-365" aria-hidden="true" tabindex="-1"></a>curve(1.8 * exp(-0.135 * x), from = 0, to = 10, add = TRUE)</span>
-<span id="cb46-366"><a href="#cb46-366" aria-hidden="true" tabindex="-1"></a>text(5.6, 0.7, &quot;y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)&quot;, adj = 1)</span>
-<span id="cb46-367"><a href="#cb46-367" aria-hidden="true" tabindex="-1"></a>text(6.1, 1.3, &quot;y = 1.8*exp(-0.135x)&quot;, adj = 1)</span>
-<span id="cb46-368"><a href="#cb46-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-369"><a href="#cb46-369" aria-hidden="true" tabindex="-1"></a>#&#39; The two lines are strikingly close, and it would be essentially</span>
-<span id="cb46-370"><a href="#cb46-370" aria-hidden="true" tabindex="-1"></a>#&#39; impossible to tell them apart based on noisy data, even 1000</span>
-<span id="cb46-371"><a href="#cb46-371" aria-hidden="true" tabindex="-1"></a>#&#39; measurements. So Stan had trouble recovering the true parameters</span>
-<span id="cb46-372"><a href="#cb46-372" aria-hidden="true" tabindex="-1"></a>#&#39; from the data.</span>
-<span id="cb46-373"><a href="#cb46-373" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-374"><a href="#cb46-374" aria-hidden="true" tabindex="-1"></a>#&#39; Still, if the parameters are difficult to fit, this should just</span>
-<span id="cb46-375"><a href="#cb46-375" aria-hidden="true" tabindex="-1"></a>#&#39; result in a high posterior uncertainty.  Why did the Stan fit</span>
-<span id="cb46-376"><a href="#cb46-376" aria-hidden="true" tabindex="-1"></a>#&#39; explode?  The problem in this case is that, since only one term in</span>
-<span id="cb46-377"><a href="#cb46-377" aria-hidden="true" tabindex="-1"></a>#&#39; the model was required to fit these data, the second term was</span>
-<span id="cb46-378"><a href="#cb46-378" aria-hidden="true" tabindex="-1"></a>#&#39; completely free---and the parameter $\beta_2$ was unbounded: there</span>
-<span id="cb46-379"><a href="#cb46-379" aria-hidden="true" tabindex="-1"></a>#&#39; was nothing stopping it from being estimated as arbitrarily large.</span>
-<span id="cb46-380"><a href="#cb46-380" aria-hidden="true" tabindex="-1"></a>#&#39; This sort of unbounded posterior distribution is called _improper_</span>
-<span id="cb46-381"><a href="#cb46-381" aria-hidden="true" tabindex="-1"></a>#&#39; (see Bayesian Data Analysis for a more formal definition), and</span>
-<span id="cb46-382"><a href="#cb46-382" aria-hidden="true" tabindex="-1"></a>#&#39; there is no way of drawing simulations from such a distribution,</span>
-<span id="cb46-383"><a href="#cb46-383" aria-hidden="true" tabindex="-1"></a>#&#39; hence Stan does not converge. The simulations drift off to</span>
-<span id="cb46-384"><a href="#cb46-384" aria-hidden="true" tabindex="-1"></a>#&#39; infinity, as there is nothing in the prior or likelihood that is</span>
-<span id="cb46-385"><a href="#cb46-385" aria-hidden="true" tabindex="-1"></a>#&#39; keeping them from doing so.</span>
-<span id="cb46-386"><a href="#cb46-386" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-387"><a href="#cb46-387" aria-hidden="true" tabindex="-1"></a>#&#39; To fix the problem, we can add some prior information.  Here we</span>
-<span id="cb46-388"><a href="#cb46-388" aria-hidden="true" tabindex="-1"></a>#&#39; shall use our default, which is independent $\operatorname{normal}(0,1)$</span>
-<span id="cb46-389"><a href="#cb46-389" aria-hidden="true" tabindex="-1"></a>#&#39; prior densities on all the parameters; thus, we add these lines to</span>
-<span id="cb46-390"><a href="#cb46-390" aria-hidden="true" tabindex="-1"></a>#&#39; the model block in the Stan program:</span>
-<span id="cb46-391"><a href="#cb46-391" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
-<span id="cb46-392"><a href="#cb46-392" aria-hidden="true" tabindex="-1"></a>#&#39;   a ~ normal(0, 1);</span>
-<span id="cb46-393"><a href="#cb46-393" aria-hidden="true" tabindex="-1"></a>#&#39;   b ~ normal(0, 1);</span>
-<span id="cb46-394"><a href="#cb46-394" aria-hidden="true" tabindex="-1"></a>#&#39;   sigma ~ normal(0, 1);</span>
-<span id="cb46-395"><a href="#cb46-395" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
-<span id="cb46-396"><a href="#cb46-396" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-397"><a href="#cb46-397" aria-hidden="true" tabindex="-1"></a>#&#39; For this particular example, all we really need is a prior on $b$</span>
-<span id="cb46-398"><a href="#cb46-398" aria-hidden="true" tabindex="-1"></a>#&#39; (really, just $b_2$ because of the ordering), but to demonstrate</span>
-<span id="cb46-399"><a href="#cb46-399" aria-hidden="true" tabindex="-1"></a>#&#39; the point we shall assign default priors to everything.  The priors</span>
-<span id="cb46-400"><a href="#cb46-400" aria-hidden="true" tabindex="-1"></a>#&#39; are in addition to the rest of the model; that is, they go on top</span>
-<span id="cb46-401"><a href="#cb46-401" aria-hidden="true" tabindex="-1"></a>#&#39; of the positivity and ordering constraints.  So, for example, the</span>
-<span id="cb46-402"><a href="#cb46-402" aria-hidden="true" tabindex="-1"></a>#&#39; prior for $\sigma$ is the positive half of a normal, which is</span>
-<span id="cb46-403"><a href="#cb46-403" aria-hidden="true" tabindex="-1"></a>#&#39; sometimes written as $\operatorname{normal}^+(0,1)$.</span>
-<span id="cb46-404"><a href="#cb46-404" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-405"><a href="#cb46-405" aria-hidden="true" tabindex="-1"></a>#&#39; We now can fit this new model to our data, and the results are much</span>
-<span id="cb46-406"><a href="#cb46-406" aria-hidden="true" tabindex="-1"></a>#&#39; more stable:</span>
-<span id="cb46-407"><a href="#cb46-407" aria-hidden="true" tabindex="-1"></a>#| label: fit_5_with_priors</span>
-<span id="cb46-408"><a href="#cb46-408" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb46-409"><a href="#cb46-409" aria-hidden="true" tabindex="-1"></a>mod_5_with_priors &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;sum_of_exponentials_with_priors.stan&quot;))</span>
-<span id="cb46-410"><a href="#cb46-410" aria-hidden="true" tabindex="-1"></a>fit_5_with_priors &lt;- mod_5_with_priors$sample(data = data_5)</span>
-<span id="cb46-411"><a href="#cb46-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-412"><a href="#cb46-412" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb46-413"><a href="#cb46-413" aria-hidden="true" tabindex="-1"></a>print(fit_5_with_priors)</span>
-<span id="cb46-414"><a href="#cb46-414" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-415"><a href="#cb46-415" aria-hidden="true" tabindex="-1"></a>#&#39; The fit is far from perfect---compare to the true parameter values,</span>
-<span id="cb46-416"><a href="#cb46-416" aria-hidden="true" tabindex="-1"></a>#&#39; $a_1=1.0$, $a_2=0.8$, $b_1=0.1$, $b_2=0.2$---but we have to expect</span>
-<span id="cb46-417"><a href="#cb46-417" aria-hidden="true" tabindex="-1"></a>#&#39; that.  As explained above, the data at hand do not identify the</span>
-<span id="cb46-418"><a href="#cb46-418" aria-hidden="true" tabindex="-1"></a>#&#39; parameters, so all we can hope for in a posterior distribution is</span>
-<span id="cb46-419"><a href="#cb46-419" aria-hidden="true" tabindex="-1"></a>#&#39; some summary of uncertainty.</span>
-<span id="cb46-420"><a href="#cb46-420" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-421"><a href="#cb46-421" aria-hidden="true" tabindex="-1"></a>#&#39; The question then arises, what about those prior distributions?  We</span>
-<span id="cb46-422"><a href="#cb46-422" aria-hidden="true" tabindex="-1"></a>#&#39; can think about them in a couple different ways.</span>
-<span id="cb46-423"><a href="#cb46-423" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-424"><a href="#cb46-424" aria-hidden="true" tabindex="-1"></a>#&#39; From one direction, we can think of scaling.  We are using priors</span>
-<span id="cb46-425"><a href="#cb46-425" aria-hidden="true" tabindex="-1"></a>#&#39; centered at 0 with a scale of 1; this can be reasonable if the</span>
-<span id="cb46-426"><a href="#cb46-426" aria-hidden="true" tabindex="-1"></a>#&#39; parameters are on &quot;unit scale,&quot; meaning that we expect them to be</span>
-<span id="cb46-427"><a href="#cb46-427" aria-hidden="true" tabindex="-1"></a>#&#39; of order of magnitude around 1.  Not all statistical models are on</span>
-<span id="cb46-428"><a href="#cb46-428" aria-hidden="true" tabindex="-1"></a>#&#39; unit scale.  For example, in the above model, if the data $y_i$ are</span>
-<span id="cb46-429"><a href="#cb46-429" aria-hidden="true" tabindex="-1"></a>#&#39; on unit scale, but the data values $x_i$ take on values in the</span>
-<span id="cb46-430"><a href="#cb46-430" aria-hidden="true" tabindex="-1"></a>#&#39; millions, then we&#39;d probably expect the parameters $b_1$ and $b_2$</span>
-<span id="cb46-431"><a href="#cb46-431" aria-hidden="true" tabindex="-1"></a>#&#39; to be roughly on the scale of $10^{-6}$.  In such a case, we&#39;d want</span>
-<span id="cb46-432"><a href="#cb46-432" aria-hidden="true" tabindex="-1"></a>#&#39; to rescale $x$ so that the coefficients $b$ are more interpretable.</span>
-<span id="cb46-433"><a href="#cb46-433" aria-hidden="true" tabindex="-1"></a>#&#39; Similarly, if the values of $y$ ranged in the millions, then the</span>
-<span id="cb46-434"><a href="#cb46-434" aria-hidden="true" tabindex="-1"></a>#&#39; coefficients $a$ would have to be of order $10^6$, and, again, we</span>
-<span id="cb46-435"><a href="#cb46-435" aria-hidden="true" tabindex="-1"></a>#&#39; would want to rescale the data or the model so that $a$ would be on</span>
-<span id="cb46-436"><a href="#cb46-436" aria-hidden="true" tabindex="-1"></a>#&#39; unit scale.  By using unit scale priors, we are implicitly assuming</span>
-<span id="cb46-437"><a href="#cb46-437" aria-hidden="true" tabindex="-1"></a>#&#39; the model has been scaled.</span>
-<span id="cb46-438"><a href="#cb46-438" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-439"><a href="#cb46-439" aria-hidden="true" tabindex="-1"></a>#&#39; From the other direction, instead of adapting the model to the</span>
-<span id="cb46-440"><a href="#cb46-440" aria-hidden="true" tabindex="-1"></a>#&#39; prior distribution, we could adapt the prior to the model.  That</span>
-<span id="cb46-441"><a href="#cb46-441" aria-hidden="true" tabindex="-1"></a>#&#39; would imply an understanding of a reasonable range of values for</span>
-<span id="cb46-442"><a href="#cb46-442" aria-hidden="true" tabindex="-1"></a>#&#39; the parameters, based on the context of the problem.  In any</span>
-<span id="cb46-443"><a href="#cb46-443" aria-hidden="true" tabindex="-1"></a>#&#39; particular example this could be done by simulating parameter</span>
-<span id="cb46-444"><a href="#cb46-444" aria-hidden="true" tabindex="-1"></a>#&#39; vectors from the prior distribution and graphing the corresponding</span>
-<span id="cb46-445"><a href="#cb46-445" aria-hidden="true" tabindex="-1"></a>#&#39; curves of expected data, and seeing if these could plausibly cover</span>
-<span id="cb46-446"><a href="#cb46-446" aria-hidden="true" tabindex="-1"></a>#&#39; the possible cases that might arise in the particular problem being</span>
-<span id="cb46-447"><a href="#cb46-447" aria-hidden="true" tabindex="-1"></a>#&#39; studied.</span>
-<span id="cb46-448"><a href="#cb46-448" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-449"><a href="#cb46-449" aria-hidden="true" tabindex="-1"></a>#&#39; No matter how it&#39;s done, inference has to come from somewhere, and</span>
-<span id="cb46-450"><a href="#cb46-450" aria-hidden="true" tabindex="-1"></a>#&#39; if the data are weak, you need to put in prior information if your</span>
-<span id="cb46-451"><a href="#cb46-451" aria-hidden="true" tabindex="-1"></a>#&#39; goal is to make some statement about possible parameter values, and</span>
-<span id="cb46-452"><a href="#cb46-452" aria-hidden="true" tabindex="-1"></a>#&#39; from there to make probabilistic predictions and decisions.</span>
-<span id="cb46-453"><a href="#cb46-453" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb46-454"><a href="#cb46-454" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="dt">&lt;</span><span class="kw">br</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
-<span id="cb46-455"><a href="#cb46-455" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-456"><a href="#cb46-456" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
-<span id="cb46-457"><a href="#cb46-457" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb46-458"><a href="#cb46-458" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under BSD-3.</span>
-<span id="cb46-459"><a href="#cb46-459" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>#&#39; image: ../social-cards/declining_exponentials.png</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Declining exponentials&quot;</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman&quot;</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-08-15</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>#&#39; Section 12.4 *Using modeling ideas to address computing problems*.</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>#&#39; * Declining exponential:  A nonlinear model that comes up in many</span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>#&#39;   science and engineering applications, also illustrating the use of</span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a>#&#39;   bounds in parameter estimation.</span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>#&#39; * Sum of declining exponentials:  An important class of nonlinear</span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>#&#39;   models that can be surprisingly difficult to estimate from data.</span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>#&#39;   This example illustrates how Stan can fail, and also the way in</span>
+<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>#&#39;   which default prior information can add stability to an otherwise</span>
+<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a>#&#39;   intractable problem.</span>
+<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
+<span id="cb46-33"><a href="#cb46-33" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
+<span id="cb46-34"><a href="#cb46-34" aria-hidden="true" tabindex="-1"></a>  cache = FALSE,</span>
+<span id="cb46-35"><a href="#cb46-35" aria-hidden="true" tabindex="-1"></a>  message = FALSE,</span>
+<span id="cb46-36"><a href="#cb46-36" aria-hidden="true" tabindex="-1"></a>  error = FALSE,</span>
+<span id="cb46-37"><a href="#cb46-37" aria-hidden="true" tabindex="-1"></a>  warning = FALSE,</span>
+<span id="cb46-38"><a href="#cb46-38" aria-hidden="true" tabindex="-1"></a>  comment = NA,</span>
+<span id="cb46-39"><a href="#cb46-39" aria-hidden="true" tabindex="-1"></a>  out.width = &#39;95%&#39;</span>
+<span id="cb46-40"><a href="#cb46-40" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb46-41"><a href="#cb46-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-42"><a href="#cb46-42" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages and set options**</span>
+<span id="cb46-43"><a href="#cb46-43" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
+<span id="cb46-44"><a href="#cb46-44" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
+<span id="cb46-45"><a href="#cb46-45" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
+<span id="cb46-46"><a href="#cb46-46" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
+<span id="cb46-47"><a href="#cb46-47" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
+<span id="cb46-48"><a href="#cb46-48" aria-hidden="true" tabindex="-1"></a>options(digits = 2)</span>
+<span id="cb46-49"><a href="#cb46-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## options(htmltools.dir.version = FALSE)</span></span>
+<span id="cb46-50"><a href="#cb46-50" aria-hidden="true" tabindex="-1"></a>set.seed(1123)</span>
+<span id="cb46-51"><a href="#cb46-51" aria-hidden="true" tabindex="-1"></a><span class="fu"># utility functions</span></span>
+<span id="cb46-52"><a href="#cb46-52" aria-hidden="true" tabindex="-1"></a>fround &lt;- function(x, digits) {</span>
+<span id="cb46-53"><a href="#cb46-53" aria-hidden="true" tabindex="-1"></a>  format(round(x, digits), nsmall = digits)</span>
+<span id="cb46-54"><a href="#cb46-54" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-55"><a href="#cb46-55" aria-hidden="true" tabindex="-1"></a>print_stan_file &lt;- function(file) {</span>
+<span id="cb46-56"><a href="#cb46-56" aria-hidden="true" tabindex="-1"></a>  code &lt;- readLines(file)</span>
+<span id="cb46-57"><a href="#cb46-57" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;</span>
+<span id="cb46-58"><a href="#cb46-58" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
+<span id="cb46-59"><a href="#cb46-59" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
+<span id="cb46-60"><a href="#cb46-60" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
+<span id="cb46-61"><a href="#cb46-61" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
+<span id="cb46-62"><a href="#cb46-62" aria-hidden="true" tabindex="-1"></a>  } else {</span>
+<span id="cb46-63"><a href="#cb46-63" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
+<span id="cb46-64"><a href="#cb46-64" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb46-65"><a href="#cb46-65" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-66"><a href="#cb46-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-67"><a href="#cb46-67" aria-hidden="true" tabindex="-1"></a>#&#39; # Declining exponential</span>
+<span id="cb46-68"><a href="#cb46-68" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-69"><a href="#cb46-69" aria-hidden="true" tabindex="-1"></a>#&#39; Let&#39;s fit the following simple model: $y = ae^{-bx} + \mathrm{error}$,</span>
+<span id="cb46-70"><a href="#cb46-70" aria-hidden="true" tabindex="-1"></a>#&#39; given data $(x,y)_i$:</span>
+<span id="cb46-71"><a href="#cb46-71" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb46-72"><a href="#cb46-72" aria-hidden="true" tabindex="-1"></a>#&#39; y_i = ae^{-bx_i} + \epsilon_i, \text{ for } i=1,\dots,N,</span>
+<span id="cb46-73"><a href="#cb46-73" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb46-74"><a href="#cb46-74" aria-hidden="true" tabindex="-1"></a>#&#39; We shall assume the errors are independent and normally</span>
+<span id="cb46-75"><a href="#cb46-75" aria-hidden="true" tabindex="-1"></a>#&#39; distributed: $\epsilon_i \sim \operatorname{normal}(0,\sigma)$.</span>
+<span id="cb46-76"><a href="#cb46-76" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-77"><a href="#cb46-77" aria-hidden="true" tabindex="-1"></a>#&#39; Here is the model in Stan:</span>
+<span id="cb46-78"><a href="#cb46-78" aria-hidden="true" tabindex="-1"></a>#| output: asis</span>
+<span id="cb46-79"><a href="#cb46-79" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;declining_exponentials&quot;,  &quot;exponential.stan&quot;))</span>
+<span id="cb46-80"><a href="#cb46-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-81"><a href="#cb46-81" aria-hidden="true" tabindex="-1"></a>#&#39; We have given the parameters $a$, and $b$, and $\sigma$ normal</span>
+<span id="cb46-82"><a href="#cb46-82" aria-hidden="true" tabindex="-1"></a>#&#39; prior distributions centered at 0 with standard deviation 10.  In</span>
+<span id="cb46-83"><a href="#cb46-83" aria-hidden="true" tabindex="-1"></a>#&#39; addition, the parameter $\sigma$ is constrained to be positive.</span>
+<span id="cb46-84"><a href="#cb46-84" aria-hidden="true" tabindex="-1"></a>#&#39; The purpose of the prior distributions is to keep the computations</span>
+<span id="cb46-85"><a href="#cb46-85" aria-hidden="true" tabindex="-1"></a>#&#39; at a reasonable value.  If we were working on a problem in which we</span>
+<span id="cb46-86"><a href="#cb46-86" aria-hidden="true" tabindex="-1"></a>#&#39; thought that $a$, $b$, or $\sigma$ could be much greater than 10,</span>
+<span id="cb46-87"><a href="#cb46-87" aria-hidden="true" tabindex="-1"></a>#&#39; we would want to use a weaker prior distribution.</span>
+<span id="cb46-88"><a href="#cb46-88" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-89"><a href="#cb46-89" aria-hidden="true" tabindex="-1"></a>#&#39; Another point about the above Stan program: the model for $y$ is</span>
+<span id="cb46-90"><a href="#cb46-90" aria-hidden="true" tabindex="-1"></a>#&#39; vectorized and could instead have been written more explicitly as a</span>
+<span id="cb46-91"><a href="#cb46-91" aria-hidden="true" tabindex="-1"></a>#&#39; loop:</span>
+<span id="cb46-92"><a href="#cb46-92" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
+<span id="cb46-93"><a href="#cb46-93" aria-hidden="true" tabindex="-1"></a>#&#39; for (i in 1:N) {</span>
+<span id="cb46-94"><a href="#cb46-94" aria-hidden="true" tabindex="-1"></a>#&#39;   y<span class="co">[</span><span class="ot">i</span><span class="co">]</span> ~ normal(a*exp(-b*x<span class="co">[</span><span class="ot">i</span><span class="co">]</span>), sigma);</span>
+<span id="cb46-95"><a href="#cb46-95" aria-hidden="true" tabindex="-1"></a>#&#39; }</span>
+<span id="cb46-96"><a href="#cb46-96" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
+<span id="cb46-97"><a href="#cb46-97" aria-hidden="true" tabindex="-1"></a>#&#39; We prefer the vectorized version as it is more compact and it also</span>
+<span id="cb46-98"><a href="#cb46-98" aria-hidden="true" tabindex="-1"></a>#&#39; runs faster in Stan, for reasons discussed elsewhere in this book.</span>
+<span id="cb46-99"><a href="#cb46-99" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-100"><a href="#cb46-100" aria-hidden="true" tabindex="-1"></a>#&#39; ## Simulated data</span>
+<span id="cb46-101"><a href="#cb46-101" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-102"><a href="#cb46-102" aria-hidden="true" tabindex="-1"></a>#&#39; To demonstrate our exponential model, we fit it to fake data.</span>
+<span id="cb46-103"><a href="#cb46-103" aria-hidden="true" tabindex="-1"></a>#&#39; We&#39;ll simulate $N=100$ data points with predictors $x$ uniformly</span>
+<span id="cb46-104"><a href="#cb46-104" aria-hidden="true" tabindex="-1"></a>#&#39; distributed between 0 and 10, from the above model with $a=0.2$,</span>
+<span id="cb46-105"><a href="#cb46-105" aria-hidden="true" tabindex="-1"></a>#&#39; $b=0.3$, $\sigma=0.5$.</span>
+<span id="cb46-106"><a href="#cb46-106" aria-hidden="true" tabindex="-1"></a>a &lt;- 5</span>
+<span id="cb46-107"><a href="#cb46-107" aria-hidden="true" tabindex="-1"></a>b &lt;- 0.3</span>
+<span id="cb46-108"><a href="#cb46-108" aria-hidden="true" tabindex="-1"></a>sigma &lt;- 0.5</span>
+<span id="cb46-109"><a href="#cb46-109" aria-hidden="true" tabindex="-1"></a>N &lt;- 100</span>
+<span id="cb46-110"><a href="#cb46-110" aria-hidden="true" tabindex="-1"></a>x &lt;- runif(N, 0, 10)</span>
+<span id="cb46-111"><a href="#cb46-111" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, a * exp(-b * x), sigma)</span>
+<span id="cb46-112"><a href="#cb46-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-113"><a href="#cb46-113" aria-hidden="true" tabindex="-1"></a>#&#39; Here is a graph of the true curve and the simulated data:</span>
+<span id="cb46-114"><a href="#cb46-114" aria-hidden="true" tabindex="-1"></a>#| label: fig-true-and-simulated</span>
+<span id="cb46-115"><a href="#cb46-115" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb46-116"><a href="#cb46-116" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb46-117"><a href="#cb46-117" aria-hidden="true" tabindex="-1"></a>curve(a * exp(-b * x), from = 0, to = 10, ylim = range(x, y), </span>
+<span id="cb46-118"><a href="#cb46-118" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, bty = &quot;l&quot;, </span>
+<span id="cb46-119"><a href="#cb46-119" aria-hidden="true" tabindex="-1"></a>      main = &quot;Data and true model&quot;, cex.main = 1)</span>
+<span id="cb46-120"><a href="#cb46-120" aria-hidden="true" tabindex="-1"></a>points(x, y, pch = 20, cex = 0.2)</span>
+<span id="cb46-121"><a href="#cb46-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-122"><a href="#cb46-122" aria-hidden="true" tabindex="-1"></a>#&#39; And then we fit the model:</span>
+<span id="cb46-123"><a href="#cb46-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-124"><a href="#cb46-124" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-125"><a href="#cb46-125" aria-hidden="true" tabindex="-1"></a>#| label: fit_1</span>
+<span id="cb46-126"><a href="#cb46-126" aria-hidden="true" tabindex="-1"></a>data_1 &lt;- list(N = N, x = x, y = y)</span>
+<span id="cb46-127"><a href="#cb46-127" aria-hidden="true" tabindex="-1"></a>mod_1 &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;exponential.stan&quot;))</span>
+<span id="cb46-128"><a href="#cb46-128" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- mod_1$sample(data = data_1)</span>
+<span id="cb46-129"><a href="#cb46-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-130"><a href="#cb46-130" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-131"><a href="#cb46-131" aria-hidden="true" tabindex="-1"></a>print(fit_1)</span>
+<span id="cb46-132"><a href="#cb46-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-133"><a href="#cb46-133" aria-hidden="true" tabindex="-1"></a>#&#39; Recall that the true parameter values were $a=5.0$, $b=0.3$,</span>
+<span id="cb46-134"><a href="#cb46-134" aria-hidden="true" tabindex="-1"></a>#&#39; $\sigma=0.5$. Here the model is simple enough and the data are</span>
+<span id="cb46-135"><a href="#cb46-135" aria-hidden="true" tabindex="-1"></a>#&#39; clean enough that we can estimate all three of these parameters</span>
+<span id="cb46-136"><a href="#cb46-136" aria-hidden="true" tabindex="-1"></a>#&#39; with reasonable precision from the data, as can be seen from the</span>
+<span id="cb46-137"><a href="#cb46-137" aria-hidden="true" tabindex="-1"></a>#&#39; 95% intervals above.</span>
+<span id="cb46-138"><a href="#cb46-138" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-139"><a href="#cb46-139" aria-hidden="true" tabindex="-1"></a>#&#39; Alternatively, we might want to say ahead of time that we are</span>
+<span id="cb46-140"><a href="#cb46-140" aria-hidden="true" tabindex="-1"></a>#&#39; fitting a declining exponential curve that starts positive and</span>
+<span id="cb46-141"><a href="#cb46-141" aria-hidden="true" tabindex="-1"></a>#&#39; descends to zero. We would thus want to constrain the parameters</span>
+<span id="cb46-142"><a href="#cb46-142" aria-hidden="true" tabindex="-1"></a>#&#39; $a$ and $b$ to be positive, which we can do in the parameters</span>
+<span id="cb46-143"><a href="#cb46-143" aria-hidden="true" tabindex="-1"></a>#&#39; block:</span>
+<span id="cb46-144"><a href="#cb46-144" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
+<span id="cb46-145"><a href="#cb46-145" aria-hidden="true" tabindex="-1"></a>#&#39;   real&lt;lower=0&gt; a;</span>
+<span id="cb46-146"><a href="#cb46-146" aria-hidden="true" tabindex="-1"></a>#&#39;   real&lt;lower=0&gt; b;</span>
+<span id="cb46-147"><a href="#cb46-147" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
+<span id="cb46-148"><a href="#cb46-148" aria-hidden="true" tabindex="-1"></a>#&#39; Otherwise we leave the model unchanged.  In this case the results</span>
+<span id="cb46-149"><a href="#cb46-149" aria-hidden="true" tabindex="-1"></a>#&#39; turn out to be very similar:</span>
+<span id="cb46-150"><a href="#cb46-150" aria-hidden="true" tabindex="-1"></a>#| label: fit_1b</span>
+<span id="cb46-151"><a href="#cb46-151" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-152"><a href="#cb46-152" aria-hidden="true" tabindex="-1"></a>mod_1b &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;,&quot;exponential_positive.stan&quot;))</span>
+<span id="cb46-153"><a href="#cb46-153" aria-hidden="true" tabindex="-1"></a>fit_1b &lt;- mod_1b$sample(data = data_1)</span>
+<span id="cb46-154"><a href="#cb46-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-155"><a href="#cb46-155" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-156"><a href="#cb46-156" aria-hidden="true" tabindex="-1"></a>print(fit_1b)</span>
+<span id="cb46-157"><a href="#cb46-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-158"><a href="#cb46-158" aria-hidden="true" tabindex="-1"></a>#&#39; ## Small simulated data</span>
+<span id="cb46-159"><a href="#cb46-159" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-160"><a href="#cb46-160" aria-hidden="true" tabindex="-1"></a>#&#39; With weaker data, though, the constraints could make a difference.</span>
+<span id="cb46-161"><a href="#cb46-161" aria-hidden="true" tabindex="-1"></a>#&#39; We could experiment on this by doing the same simulation but with</span>
+<span id="cb46-162"><a href="#cb46-162" aria-hidden="true" tabindex="-1"></a>#&#39; just $N=10$ data points:</span>
+<span id="cb46-163"><a href="#cb46-163" aria-hidden="true" tabindex="-1"></a>N &lt;- 10</span>
+<span id="cb46-164"><a href="#cb46-164" aria-hidden="true" tabindex="-1"></a>x &lt;- runif(N, 0, 10)</span>
+<span id="cb46-165"><a href="#cb46-165" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, a * exp(-b * x), sigma)</span>
+<span id="cb46-166"><a href="#cb46-166" aria-hidden="true" tabindex="-1"></a>#| label: fig-10-data-points</span>
+<span id="cb46-167"><a href="#cb46-167" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb46-168"><a href="#cb46-168" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb46-169"><a href="#cb46-169" aria-hidden="true" tabindex="-1"></a>curve(a * exp(-b * x), from = 0, to = 10, ylim = range(x, y),</span>
+<span id="cb46-170"><a href="#cb46-170" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, bty = &quot;l&quot;, </span>
+<span id="cb46-171"><a href="#cb46-171" aria-hidden="true" tabindex="-1"></a>      main = &quot;Just 10 data points&quot;, cex.main = 1)</span>
+<span id="cb46-172"><a href="#cb46-172" aria-hidden="true" tabindex="-1"></a>points(x, y, pch = 20, cex = 0.2)</span>
+<span id="cb46-173"><a href="#cb46-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-174"><a href="#cb46-174" aria-hidden="true" tabindex="-1"></a>#&#39; First we fit the unconstrained model:</span>
+<span id="cb46-175"><a href="#cb46-175" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-176"><a href="#cb46-176" aria-hidden="true" tabindex="-1"></a>#| label: fit_2</span>
+<span id="cb46-177"><a href="#cb46-177" aria-hidden="true" tabindex="-1"></a>data_2 &lt;- list(N = N, x = x, y = y)</span>
+<span id="cb46-178"><a href="#cb46-178" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- mod_1$sample(data = data_2)</span>
+<span id="cb46-179"><a href="#cb46-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-180"><a href="#cb46-180" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-181"><a href="#cb46-181" aria-hidden="true" tabindex="-1"></a>print(fit_2)</span>
+<span id="cb46-182"><a href="#cb46-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-183"><a href="#cb46-183" aria-hidden="true" tabindex="-1"></a>#&#39; Then we fit the constrained model:</span>
+<span id="cb46-184"><a href="#cb46-184" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-185"><a href="#cb46-185" aria-hidden="true" tabindex="-1"></a>#| label: fit_2b</span>
+<span id="cb46-186"><a href="#cb46-186" aria-hidden="true" tabindex="-1"></a>fit_2b &lt;- mod_1b$sample(data = data_2)</span>
+<span id="cb46-187"><a href="#cb46-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-188"><a href="#cb46-188" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-189"><a href="#cb46-189" aria-hidden="true" tabindex="-1"></a>print(fit_2b)</span>
+<span id="cb46-190"><a href="#cb46-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-191"><a href="#cb46-191" aria-hidden="true" tabindex="-1"></a>#&#39; Different things can happen with different sets of simulated data,</span>
+<span id="cb46-192"><a href="#cb46-192" aria-hidden="true" tabindex="-1"></a>#&#39; but the inference with the positivity constraints will typically be</span>
+<span id="cb46-193"><a href="#cb46-193" aria-hidden="true" tabindex="-1"></a>#&#39; much more stable.  Of course, we would only want to constrain the</span>
+<span id="cb46-194"><a href="#cb46-194" aria-hidden="true" tabindex="-1"></a>#&#39; model in this way if we knew that the positivity restriction is</span>
+<span id="cb46-195"><a href="#cb46-195" aria-hidden="true" tabindex="-1"></a>#&#39; appropriate.</span>
+<span id="cb46-196"><a href="#cb46-196" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-197"><a href="#cb46-197" aria-hidden="true" tabindex="-1"></a>#&#39; ## Positive simulated data</span>
+<span id="cb46-198"><a href="#cb46-198" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-199"><a href="#cb46-199" aria-hidden="true" tabindex="-1"></a>#&#39; Now suppose that the data are also restricted to be positive.  Then</span>
+<span id="cb46-200"><a href="#cb46-200" aria-hidden="true" tabindex="-1"></a>#&#39; we need a different error distribution, as the above model with</span>
+<span id="cb46-201"><a href="#cb46-201" aria-hidden="true" tabindex="-1"></a>#&#39; additive normal errors can yield negative data.</span>
+<span id="cb46-202"><a href="#cb46-202" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-203"><a href="#cb46-203" aria-hidden="true" tabindex="-1"></a>#&#39; Let&#39;s try a multiplicative error, with a lognormal distribution:</span>
+<span id="cb46-204"><a href="#cb46-204" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb46-205"><a href="#cb46-205" aria-hidden="true" tabindex="-1"></a>#&#39; y_i = ae^{-bx_i} * \epsilon_i, \text{ for } i=1,\dots,N<span class="sc">\\</span></span>
+<span id="cb46-206"><a href="#cb46-206" aria-hidden="true" tabindex="-1"></a>#&#39; \log\epsilon_i \sim \operatorname{normal}(0,\log\sigma), \text{ for } i=1,\dots,N</span>
+<span id="cb46-207"><a href="#cb46-207" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb46-208"><a href="#cb46-208" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-209"><a href="#cb46-209" aria-hidden="true" tabindex="-1"></a>#&#39; Here is the model in Stan:</span>
+<span id="cb46-210"><a href="#cb46-210" aria-hidden="true" tabindex="-1"></a>#| output: asis</span>
+<span id="cb46-211"><a href="#cb46-211" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;declining_exponentials&quot;, &quot;exponential_positive_lognormal.stan&quot;))</span>
+<span id="cb46-212"><a href="#cb46-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-213"><a href="#cb46-213" aria-hidden="true" tabindex="-1"></a>#&#39; As before, we can simulate fake data from this model:</span>
+<span id="cb46-214"><a href="#cb46-214" aria-hidden="true" tabindex="-1"></a>a &lt;- 5</span>
+<span id="cb46-215"><a href="#cb46-215" aria-hidden="true" tabindex="-1"></a>b &lt;- 0.3</span>
+<span id="cb46-216"><a href="#cb46-216" aria-hidden="true" tabindex="-1"></a>sigma &lt;- 0.5</span>
+<span id="cb46-217"><a href="#cb46-217" aria-hidden="true" tabindex="-1"></a>N &lt;- 100</span>
+<span id="cb46-218"><a href="#cb46-218" aria-hidden="true" tabindex="-1"></a>x &lt;- runif(N, 0, 10)</span>
+<span id="cb46-219"><a href="#cb46-219" aria-hidden="true" tabindex="-1"></a>epsilon &lt;- exp(rnorm(N, 0, sigma))</span>
+<span id="cb46-220"><a href="#cb46-220" aria-hidden="true" tabindex="-1"></a>y &lt;- a * exp(-b * x) * epsilon</span>
+<span id="cb46-221"><a href="#cb46-221" aria-hidden="true" tabindex="-1"></a>#| label: fig-positive-true-and-simulated</span>
+<span id="cb46-222"><a href="#cb46-222" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb46-223"><a href="#cb46-223" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb46-224"><a href="#cb46-224" aria-hidden="true" tabindex="-1"></a>curve(a * exp(-b * x), from = 0, to = 10, ylim = range(x, y), </span>
+<span id="cb46-225"><a href="#cb46-225" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, bty = &quot;l&quot;, </span>
+<span id="cb46-226"><a href="#cb46-226" aria-hidden="true" tabindex="-1"></a>      main = &quot;Data and true model&quot;, cex.main = 1)</span>
+<span id="cb46-227"><a href="#cb46-227" aria-hidden="true" tabindex="-1"></a>points(x, y, pch = 20, cex = 0.2)</span>
+<span id="cb46-228"><a href="#cb46-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-229"><a href="#cb46-229" aria-hidden="true" tabindex="-1"></a>#&#39; We can then fit the model to the simulated data and check that the</span>
+<span id="cb46-230"><a href="#cb46-230" aria-hidden="true" tabindex="-1"></a>#&#39; parameters are approximately recovered:</span>
+<span id="cb46-231"><a href="#cb46-231" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-232"><a href="#cb46-232" aria-hidden="true" tabindex="-1"></a>#| label: fit_3</span>
+<span id="cb46-233"><a href="#cb46-233" aria-hidden="true" tabindex="-1"></a>data_3 &lt;- list(N = N, x = x, y = y)</span>
+<span id="cb46-234"><a href="#cb46-234" aria-hidden="true" tabindex="-1"></a>mod_3 &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;exponential_positive_lognormal.stan&quot;))</span>
+<span id="cb46-235"><a href="#cb46-235" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- mod_3$sample(data = data_3)</span>
+<span id="cb46-236"><a href="#cb46-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-237"><a href="#cb46-237" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-238"><a href="#cb46-238" aria-hidden="true" tabindex="-1"></a>print(fit_3)</span>
+<span id="cb46-239"><a href="#cb46-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-240"><a href="#cb46-240" aria-hidden="true" tabindex="-1"></a>#&#39; # Sum of declining exponentials</span>
+<span id="cb46-241"><a href="#cb46-241" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-242"><a href="#cb46-242" aria-hidden="true" tabindex="-1"></a>#&#39; From the numerical analysis literature, here is an example of an</span>
+<span id="cb46-243"><a href="#cb46-243" aria-hidden="true" tabindex="-1"></a>#&#39; inference problem that appears simple but can be surprisingly</span>
+<span id="cb46-244"><a href="#cb46-244" aria-hidden="true" tabindex="-1"></a>#&#39; difficult.  The challenge is to estimate the parameters of a sum of</span>
+<span id="cb46-245"><a href="#cb46-245" aria-hidden="true" tabindex="-1"></a>#&#39; declining exponentials: $y = a_1e^{-b_1x} + a_2e^{-b_2x}$.  This is</span>
+<span id="cb46-246"><a href="#cb46-246" aria-hidden="true" tabindex="-1"></a>#&#39; also called an inverse problem, and it can be challenging to</span>
+<span id="cb46-247"><a href="#cb46-247" aria-hidden="true" tabindex="-1"></a>#&#39; decompose these two declining functions.</span>
+<span id="cb46-248"><a href="#cb46-248" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-249"><a href="#cb46-249" aria-hidden="true" tabindex="-1"></a>#&#39; This expression, and others like it, arise in many examples,</span>
+<span id="cb46-250"><a href="#cb46-250" aria-hidden="true" tabindex="-1"></a>#&#39; including in pharmacology, where $x$ represents time and $y$ could</span>
+<span id="cb46-251"><a href="#cb46-251" aria-hidden="true" tabindex="-1"></a>#&#39; be the concentration of a drug in the blood of someone who was</span>
+<span id="cb46-252"><a href="#cb46-252" aria-hidden="true" tabindex="-1"></a>#&#39; given a specified dose at time 0.  In a simple _two-compartment</span>
+<span id="cb46-253"><a href="#cb46-253" aria-hidden="true" tabindex="-1"></a>#&#39; model_, the total concentration will look like a sum of declining</span>
+<span id="cb46-254"><a href="#cb46-254" aria-hidden="true" tabindex="-1"></a>#&#39; exponentials.</span>
+<span id="cb46-255"><a href="#cb46-255" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-256"><a href="#cb46-256" aria-hidden="true" tabindex="-1"></a>#&#39; To set this up as a statistics problem, we add some noise to the</span>
+<span id="cb46-257"><a href="#cb46-257" aria-hidden="true" tabindex="-1"></a>#&#39; system.  We want the data to always be positive so our noise will be</span>
+<span id="cb46-258"><a href="#cb46-258" aria-hidden="true" tabindex="-1"></a>#&#39; multiplicative:</span>
+<span id="cb46-259"><a href="#cb46-259" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb46-260"><a href="#cb46-260" aria-hidden="true" tabindex="-1"></a>#&#39; y_i = (a_1e^{-b_1x_i} + a_2e^{-b_2x_i}) * \epsilon_i, \text{ for } i=1,\dots,N,</span>
+<span id="cb46-261"><a href="#cb46-261" aria-hidden="true" tabindex="-1"></a>#&#39; $$</span>
+<span id="cb46-262"><a href="#cb46-262" aria-hidden="true" tabindex="-1"></a>#&#39; with lognormally-distributed errors $\epsilon$.</span>
+<span id="cb46-263"><a href="#cb46-263" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-264"><a href="#cb46-264" aria-hidden="true" tabindex="-1"></a>#&#39; Here is the model in Stan:</span>
+<span id="cb46-265"><a href="#cb46-265" aria-hidden="true" tabindex="-1"></a>#| output: asis</span>
+<span id="cb46-266"><a href="#cb46-266" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;declining_exponentials&quot;, &quot;sum_of_exponentials.stan&quot;))</span>
+<span id="cb46-267"><a href="#cb46-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-268"><a href="#cb46-268" aria-hidden="true" tabindex="-1"></a>#&#39; The coefficients $a$ and the residual standard deviation $\sigma$</span>
+<span id="cb46-269"><a href="#cb46-269" aria-hidden="true" tabindex="-1"></a>#&#39; are constrained to be positive.  The parameters $b$ are also</span>
+<span id="cb46-270"><a href="#cb46-270" aria-hidden="true" tabindex="-1"></a>#&#39; positive---these are supposed to be declining, not increasing,</span>
+<span id="cb46-271"><a href="#cb46-271" aria-hidden="true" tabindex="-1"></a>#&#39; exponentials---and are also constrained to be ordered, so that</span>
+<span id="cb46-272"><a href="#cb46-272" aria-hidden="true" tabindex="-1"></a>#&#39; $b_1&lt;b_2$.  We need this to keep the model _identified_: Without</span>
+<span id="cb46-273"><a href="#cb46-273" aria-hidden="true" tabindex="-1"></a>#&#39; some sort of restriction, there would be no way from the data to</span>
+<span id="cb46-274"><a href="#cb46-274" aria-hidden="true" tabindex="-1"></a>#&#39; tell which component is labeled 1 and which is 2.  So we</span>
+<span id="cb46-275"><a href="#cb46-275" aria-hidden="true" tabindex="-1"></a>#&#39; arbitrarily label the component with lower value of $b$---that is,</span>
+<span id="cb46-276"><a href="#cb46-276" aria-hidden="true" tabindex="-1"></a>#&#39; the one that declines more slowly---as the first one, and the</span>
+<span id="cb46-277"><a href="#cb46-277" aria-hidden="true" tabindex="-1"></a>#&#39; component with higher value of $b$ to be the second.  We added the</span>
+<span id="cb46-278"><a href="#cb46-278" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`positive_ordered`</span> type to Stan because this sort of identification</span>
+<span id="cb46-279"><a href="#cb46-279" aria-hidden="true" tabindex="-1"></a>#&#39; problem comes up fairly often in applications.</span>
+<span id="cb46-280"><a href="#cb46-280" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-281"><a href="#cb46-281" aria-hidden="true" tabindex="-1"></a>#&#39; We&#39;ll try out our Stan model by simulating fake data from a model</span>
+<span id="cb46-282"><a href="#cb46-282" aria-hidden="true" tabindex="-1"></a>#&#39; where the two curves should be cleanly distinguished, setting</span>
+<span id="cb46-283"><a href="#cb46-283" aria-hidden="true" tabindex="-1"></a>#&#39; $b_1=0.1$ and $b_2=2.0$, a factor of 20 apart in scale.  We&#39;ll</span>
+<span id="cb46-284"><a href="#cb46-284" aria-hidden="true" tabindex="-1"></a>#&#39; simulate 1000 data points where the predictors $x$ are uniformly</span>
+<span id="cb46-285"><a href="#cb46-285" aria-hidden="true" tabindex="-1"></a>#&#39; spaced from 0 to 10, and, somewhat arbitrarily, set $a_1=1.0$,</span>
+<span id="cb46-286"><a href="#cb46-286" aria-hidden="true" tabindex="-1"></a>#&#39; $a_2=0.8$, and $\sigma=0.2$.  We can then simulate from the</span>
+<span id="cb46-287"><a href="#cb46-287" aria-hidden="true" tabindex="-1"></a>#&#39; lognormal distribution to generate the data $y$.</span>
+<span id="cb46-288"><a href="#cb46-288" aria-hidden="true" tabindex="-1"></a>a &lt;- c(1, 0.8)</span>
+<span id="cb46-289"><a href="#cb46-289" aria-hidden="true" tabindex="-1"></a>b &lt;- c(0.1, 2)</span>
+<span id="cb46-290"><a href="#cb46-290" aria-hidden="true" tabindex="-1"></a>N &lt;- 1000</span>
+<span id="cb46-291"><a href="#cb46-291" aria-hidden="true" tabindex="-1"></a>x &lt;- seq(0, 10, length = N)</span>
+<span id="cb46-292"><a href="#cb46-292" aria-hidden="true" tabindex="-1"></a>sigma &lt;- 0.2</span>
+<span id="cb46-293"><a href="#cb46-293" aria-hidden="true" tabindex="-1"></a>epsilon &lt;- exp(rnorm(N, 0, sigma))</span>
+<span id="cb46-294"><a href="#cb46-294" aria-hidden="true" tabindex="-1"></a>y &lt;- (a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x)) * epsilon</span>
+<span id="cb46-295"><a href="#cb46-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-296"><a href="#cb46-296" aria-hidden="true" tabindex="-1"></a>#&#39; Here is a graph of the true curve and the simulated data:</span>
+<span id="cb46-297"><a href="#cb46-297" aria-hidden="true" tabindex="-1"></a>#| label: fig-sumexp-true-and-simulated</span>
+<span id="cb46-298"><a href="#cb46-298" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb46-299"><a href="#cb46-299" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb46-300"><a href="#cb46-300" aria-hidden="true" tabindex="-1"></a>data_graph &lt;- function(a, b, sigma, x, y) {</span>
+<span id="cb46-301"><a href="#cb46-301" aria-hidden="true" tabindex="-1"></a>  curve(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x), </span>
+<span id="cb46-302"><a href="#cb46-302" aria-hidden="true" tabindex="-1"></a>        from = min(x), to = max(x), </span>
+<span id="cb46-303"><a href="#cb46-303" aria-hidden="true" tabindex="-1"></a>        ylim = c(0, 1.05 * max(y)),  xlim = c(0, max(x)), </span>
+<span id="cb46-304"><a href="#cb46-304" aria-hidden="true" tabindex="-1"></a>        xlab = &quot;x&quot;, ylab = &quot;y&quot;, xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, </span>
+<span id="cb46-305"><a href="#cb46-305" aria-hidden="true" tabindex="-1"></a>        main = &quot;Data and true model&quot;, cex.main = 1)</span>
+<span id="cb46-306"><a href="#cb46-306" aria-hidden="true" tabindex="-1"></a>  points(x, y, pch = 20, cex = 0.2)</span>
+<span id="cb46-307"><a href="#cb46-307" aria-hidden="true" tabindex="-1"></a>  text(max(x), 0.5 * max(y), </span>
+<span id="cb46-308"><a href="#cb46-308" aria-hidden="true" tabindex="-1"></a>       paste(&quot;y = &quot;, fround(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>, 1), &quot;*exp(&quot;, fround(-b[1], 1), &quot;*x) + &quot;,  </span>
+<span id="cb46-309"><a href="#cb46-309" aria-hidden="true" tabindex="-1"></a>             fround(a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>, 1), &quot;*exp(&quot;, fround(-b[2], 1), &quot;*x)&quot;, sep = &quot;&quot;), adj = 1)</span>
+<span id="cb46-310"><a href="#cb46-310" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb46-311"><a href="#cb46-311" aria-hidden="true" tabindex="-1"></a>data_graph(a, b, sigma, x, y)</span>
+<span id="cb46-312"><a href="#cb46-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-313"><a href="#cb46-313" aria-hidden="true" tabindex="-1"></a>#&#39; And then we fit the model:</span>
+<span id="cb46-314"><a href="#cb46-314" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-315"><a href="#cb46-315" aria-hidden="true" tabindex="-1"></a>#| label: fit_4</span>
+<span id="cb46-316"><a href="#cb46-316" aria-hidden="true" tabindex="-1"></a>data_4 &lt;- list(N = N, x = x, y = y)</span>
+<span id="cb46-317"><a href="#cb46-317" aria-hidden="true" tabindex="-1"></a>mod_4 &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;sum_of_exponentials.stan&quot;))</span>
+<span id="cb46-318"><a href="#cb46-318" aria-hidden="true" tabindex="-1"></a>fit_4 &lt;- mod_4$sample(data = data_4)</span>
+<span id="cb46-319"><a href="#cb46-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-320"><a href="#cb46-320" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-321"><a href="#cb46-321" aria-hidden="true" tabindex="-1"></a>print(fit_4)</span>
+<span id="cb46-322"><a href="#cb46-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-323"><a href="#cb46-323" aria-hidden="true" tabindex="-1"></a>#&#39; The parameters are recovered well, with the only difficulty being</span>
+<span id="cb46-324"><a href="#cb46-324" aria-hidden="true" tabindex="-1"></a>#&#39; $b_2$, where the estimate is 1.89 but the true value is 2.0---but</span>
+<span id="cb46-325"><a href="#cb46-325" aria-hidden="true" tabindex="-1"></a>#&#39; that is well within the posterior uncertainty.  Stan worked just</span>
+<span id="cb46-326"><a href="#cb46-326" aria-hidden="true" tabindex="-1"></a>#&#39; fine on this nonlinear model.</span>
+<span id="cb46-327"><a href="#cb46-327" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-328"><a href="#cb46-328" aria-hidden="true" tabindex="-1"></a>#&#39; But now let&#39;s make the problem just slightly more difficult.</span>
+<span id="cb46-329"><a href="#cb46-329" aria-hidden="true" tabindex="-1"></a>#&#39; Instead of setting the two parameters $b$ to 0.1 and 2.0, we&#39;ll</span>
+<span id="cb46-330"><a href="#cb46-330" aria-hidden="true" tabindex="-1"></a>#&#39; make them 0.1 and 0.2, so now only a factor of 2 separates the</span>
+<span id="cb46-331"><a href="#cb46-331" aria-hidden="true" tabindex="-1"></a>#&#39; scales of the two declining exponentials.</span>
+<span id="cb46-332"><a href="#cb46-332" aria-hidden="true" tabindex="-1"></a>b &lt;- c(0.1, 0.2)</span>
+<span id="cb46-333"><a href="#cb46-333" aria-hidden="true" tabindex="-1"></a>y_2 &lt;- (a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x)) * epsilon</span>
+<span id="cb46-334"><a href="#cb46-334" aria-hidden="true" tabindex="-1"></a>data_5 &lt;- list(N = N, x = x, y = y_2)</span>
+<span id="cb46-335"><a href="#cb46-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-336"><a href="#cb46-336" aria-hidden="true" tabindex="-1"></a>#&#39; This should still be easy to fit in Stan, right?  Wrong:</span>
+<span id="cb46-337"><a href="#cb46-337" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-338"><a href="#cb46-338" aria-hidden="true" tabindex="-1"></a>#| label: fit_5</span>
+<span id="cb46-339"><a href="#cb46-339" aria-hidden="true" tabindex="-1"></a>fit_5 &lt;- mod_4$sample(data = data_5)</span>
+<span id="cb46-340"><a href="#cb46-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-341"><a href="#cb46-341" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-342"><a href="#cb46-342" aria-hidden="true" tabindex="-1"></a>print(fit_5)</span>
+<span id="cb46-343"><a href="#cb46-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-344"><a href="#cb46-344" aria-hidden="true" tabindex="-1"></a>#&#39; What happened??  It turns out that these two declining exponentials</span>
+<span id="cb46-345"><a href="#cb46-345" aria-hidden="true" tabindex="-1"></a>#&#39; are _very_ hard to detect.  Look: here&#39;s a graph of the</span>
+<span id="cb46-346"><a href="#cb46-346" aria-hidden="true" tabindex="-1"></a>#&#39; two-component model for the expected data,</span>
+<span id="cb46-347"><a href="#cb46-347" aria-hidden="true" tabindex="-1"></a>#&#39; $y=1.0e^{-0.1x}+0.8e^{-0.2x}$:</span>
+<span id="cb46-348"><a href="#cb46-348" aria-hidden="true" tabindex="-1"></a>#| label: fig-sumexp-true-model</span>
+<span id="cb46-349"><a href="#cb46-349" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb46-350"><a href="#cb46-350" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb46-351"><a href="#cb46-351" aria-hidden="true" tabindex="-1"></a>curve(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x), </span>
+<span id="cb46-352"><a href="#cb46-352" aria-hidden="true" tabindex="-1"></a>      from = 0, to = 10, ylim = c(0, 1.9), xlim = c(0, 10), </span>
+<span id="cb46-353"><a href="#cb46-353" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, </span>
+<span id="cb46-354"><a href="#cb46-354" aria-hidden="true" tabindex="-1"></a>      main = &quot;True model&quot;, cex.main = 1)</span>
+<span id="cb46-355"><a href="#cb46-355" aria-hidden="true" tabindex="-1"></a>text(5.6, 0.7, &quot;y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)&quot;, adj = 1)</span>
+<span id="cb46-356"><a href="#cb46-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-357"><a href="#cb46-357" aria-hidden="true" tabindex="-1"></a>#&#39; And now we&#39;ll overlay a graph of a particular _one-component_ model,</span>
+<span id="cb46-358"><a href="#cb46-358" aria-hidden="true" tabindex="-1"></a>#&#39; $y=1.8e^{-0.135x}$:</span>
+<span id="cb46-359"><a href="#cb46-359" aria-hidden="true" tabindex="-1"></a>#| label: fig-sumexp-true-and-one-component</span>
+<span id="cb46-360"><a href="#cb46-360" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb46-361"><a href="#cb46-361" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb46-362"><a href="#cb46-362" aria-hidden="true" tabindex="-1"></a>curve(a<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">1</span><span class="co">]</span> * x) + a<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * exp(-b<span class="co">[</span><span class="ot">2</span><span class="co">]</span> * x), from = 0, to = 10, </span>
+<span id="cb46-363"><a href="#cb46-363" aria-hidden="true" tabindex="-1"></a>      ylim = c(0, 1.9), xlim = c(0, 10), </span>
+<span id="cb46-364"><a href="#cb46-364" aria-hidden="true" tabindex="-1"></a>      xlab = &quot;x&quot;, ylab = &quot;y&quot;, xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, </span>
+<span id="cb46-365"><a href="#cb46-365" aria-hidden="true" tabindex="-1"></a>      main = &quot;True model and scarily-close one-component approximation&quot;, cex.main = 1)</span>
+<span id="cb46-366"><a href="#cb46-366" aria-hidden="true" tabindex="-1"></a>curve(1.8 * exp(-0.135 * x), from = 0, to = 10, add = TRUE)</span>
+<span id="cb46-367"><a href="#cb46-367" aria-hidden="true" tabindex="-1"></a>text(5.6, 0.7, &quot;y = 1.0*exp(-0.1x) + 0.8*exp(-0.2x)&quot;, adj = 1)</span>
+<span id="cb46-368"><a href="#cb46-368" aria-hidden="true" tabindex="-1"></a>text(6.1, 1.3, &quot;y = 1.8*exp(-0.135x)&quot;, adj = 1)</span>
+<span id="cb46-369"><a href="#cb46-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-370"><a href="#cb46-370" aria-hidden="true" tabindex="-1"></a>#&#39; The two lines are strikingly close, and it would be essentially</span>
+<span id="cb46-371"><a href="#cb46-371" aria-hidden="true" tabindex="-1"></a>#&#39; impossible to tell them apart based on noisy data, even 1000</span>
+<span id="cb46-372"><a href="#cb46-372" aria-hidden="true" tabindex="-1"></a>#&#39; measurements. So Stan had trouble recovering the true parameters</span>
+<span id="cb46-373"><a href="#cb46-373" aria-hidden="true" tabindex="-1"></a>#&#39; from the data.</span>
+<span id="cb46-374"><a href="#cb46-374" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-375"><a href="#cb46-375" aria-hidden="true" tabindex="-1"></a>#&#39; Still, if the parameters are difficult to fit, this should just</span>
+<span id="cb46-376"><a href="#cb46-376" aria-hidden="true" tabindex="-1"></a>#&#39; result in a high posterior uncertainty.  Why did the Stan fit</span>
+<span id="cb46-377"><a href="#cb46-377" aria-hidden="true" tabindex="-1"></a>#&#39; explode?  The problem in this case is that, since only one term in</span>
+<span id="cb46-378"><a href="#cb46-378" aria-hidden="true" tabindex="-1"></a>#&#39; the model was required to fit these data, the second term was</span>
+<span id="cb46-379"><a href="#cb46-379" aria-hidden="true" tabindex="-1"></a>#&#39; completely free---and the parameter $\beta_2$ was unbounded: there</span>
+<span id="cb46-380"><a href="#cb46-380" aria-hidden="true" tabindex="-1"></a>#&#39; was nothing stopping it from being estimated as arbitrarily large.</span>
+<span id="cb46-381"><a href="#cb46-381" aria-hidden="true" tabindex="-1"></a>#&#39; This sort of unbounded posterior distribution is called _improper_</span>
+<span id="cb46-382"><a href="#cb46-382" aria-hidden="true" tabindex="-1"></a>#&#39; (see Bayesian Data Analysis for a more formal definition), and</span>
+<span id="cb46-383"><a href="#cb46-383" aria-hidden="true" tabindex="-1"></a>#&#39; there is no way of drawing simulations from such a distribution,</span>
+<span id="cb46-384"><a href="#cb46-384" aria-hidden="true" tabindex="-1"></a>#&#39; hence Stan does not converge. The simulations drift off to</span>
+<span id="cb46-385"><a href="#cb46-385" aria-hidden="true" tabindex="-1"></a>#&#39; infinity, as there is nothing in the prior or likelihood that is</span>
+<span id="cb46-386"><a href="#cb46-386" aria-hidden="true" tabindex="-1"></a>#&#39; keeping them from doing so.</span>
+<span id="cb46-387"><a href="#cb46-387" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-388"><a href="#cb46-388" aria-hidden="true" tabindex="-1"></a>#&#39; To fix the problem, we can add some prior information.  Here we</span>
+<span id="cb46-389"><a href="#cb46-389" aria-hidden="true" tabindex="-1"></a>#&#39; shall use our default, which is independent $\operatorname{normal}(0,1)$</span>
+<span id="cb46-390"><a href="#cb46-390" aria-hidden="true" tabindex="-1"></a>#&#39; prior densities on all the parameters; thus, we add these lines to</span>
+<span id="cb46-391"><a href="#cb46-391" aria-hidden="true" tabindex="-1"></a>#&#39; the model block in the Stan program:</span>
+<span id="cb46-392"><a href="#cb46-392" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
+<span id="cb46-393"><a href="#cb46-393" aria-hidden="true" tabindex="-1"></a>#&#39;   a ~ normal(0, 1);</span>
+<span id="cb46-394"><a href="#cb46-394" aria-hidden="true" tabindex="-1"></a>#&#39;   b ~ normal(0, 1);</span>
+<span id="cb46-395"><a href="#cb46-395" aria-hidden="true" tabindex="-1"></a>#&#39;   sigma ~ normal(0, 1);</span>
+<span id="cb46-396"><a href="#cb46-396" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
+<span id="cb46-397"><a href="#cb46-397" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-398"><a href="#cb46-398" aria-hidden="true" tabindex="-1"></a>#&#39; For this particular example, all we really need is a prior on $b$</span>
+<span id="cb46-399"><a href="#cb46-399" aria-hidden="true" tabindex="-1"></a>#&#39; (really, just $b_2$ because of the ordering), but to demonstrate</span>
+<span id="cb46-400"><a href="#cb46-400" aria-hidden="true" tabindex="-1"></a>#&#39; the point we shall assign default priors to everything.  The priors</span>
+<span id="cb46-401"><a href="#cb46-401" aria-hidden="true" tabindex="-1"></a>#&#39; are in addition to the rest of the model; that is, they go on top</span>
+<span id="cb46-402"><a href="#cb46-402" aria-hidden="true" tabindex="-1"></a>#&#39; of the positivity and ordering constraints.  So, for example, the</span>
+<span id="cb46-403"><a href="#cb46-403" aria-hidden="true" tabindex="-1"></a>#&#39; prior for $\sigma$ is the positive half of a normal, which is</span>
+<span id="cb46-404"><a href="#cb46-404" aria-hidden="true" tabindex="-1"></a>#&#39; sometimes written as $\operatorname{normal}^+(0,1)$.</span>
+<span id="cb46-405"><a href="#cb46-405" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-406"><a href="#cb46-406" aria-hidden="true" tabindex="-1"></a>#&#39; We now can fit this new model to our data, and the results are much</span>
+<span id="cb46-407"><a href="#cb46-407" aria-hidden="true" tabindex="-1"></a>#&#39; more stable:</span>
+<span id="cb46-408"><a href="#cb46-408" aria-hidden="true" tabindex="-1"></a>#| label: fit_5_with_priors</span>
+<span id="cb46-409"><a href="#cb46-409" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb46-410"><a href="#cb46-410" aria-hidden="true" tabindex="-1"></a>mod_5_with_priors &lt;- cmdstan_model(root(&quot;declining_exponentials&quot;, &quot;sum_of_exponentials_with_priors.stan&quot;))</span>
+<span id="cb46-411"><a href="#cb46-411" aria-hidden="true" tabindex="-1"></a>fit_5_with_priors &lt;- mod_5_with_priors$sample(data = data_5)</span>
+<span id="cb46-412"><a href="#cb46-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-413"><a href="#cb46-413" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb46-414"><a href="#cb46-414" aria-hidden="true" tabindex="-1"></a>print(fit_5_with_priors)</span>
+<span id="cb46-415"><a href="#cb46-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-416"><a href="#cb46-416" aria-hidden="true" tabindex="-1"></a>#&#39; The fit is far from perfect---compare to the true parameter values,</span>
+<span id="cb46-417"><a href="#cb46-417" aria-hidden="true" tabindex="-1"></a>#&#39; $a_1=1.0$, $a_2=0.8$, $b_1=0.1$, $b_2=0.2$---but we have to expect</span>
+<span id="cb46-418"><a href="#cb46-418" aria-hidden="true" tabindex="-1"></a>#&#39; that.  As explained above, the data at hand do not identify the</span>
+<span id="cb46-419"><a href="#cb46-419" aria-hidden="true" tabindex="-1"></a>#&#39; parameters, so all we can hope for in a posterior distribution is</span>
+<span id="cb46-420"><a href="#cb46-420" aria-hidden="true" tabindex="-1"></a>#&#39; some summary of uncertainty.</span>
+<span id="cb46-421"><a href="#cb46-421" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-422"><a href="#cb46-422" aria-hidden="true" tabindex="-1"></a>#&#39; The question then arises, what about those prior distributions?  We</span>
+<span id="cb46-423"><a href="#cb46-423" aria-hidden="true" tabindex="-1"></a>#&#39; can think about them in a couple different ways.</span>
+<span id="cb46-424"><a href="#cb46-424" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-425"><a href="#cb46-425" aria-hidden="true" tabindex="-1"></a>#&#39; From one direction, we can think of scaling.  We are using priors</span>
+<span id="cb46-426"><a href="#cb46-426" aria-hidden="true" tabindex="-1"></a>#&#39; centered at 0 with a scale of 1; this can be reasonable if the</span>
+<span id="cb46-427"><a href="#cb46-427" aria-hidden="true" tabindex="-1"></a>#&#39; parameters are on &quot;unit scale,&quot; meaning that we expect them to be</span>
+<span id="cb46-428"><a href="#cb46-428" aria-hidden="true" tabindex="-1"></a>#&#39; of order of magnitude around 1.  Not all statistical models are on</span>
+<span id="cb46-429"><a href="#cb46-429" aria-hidden="true" tabindex="-1"></a>#&#39; unit scale.  For example, in the above model, if the data $y_i$ are</span>
+<span id="cb46-430"><a href="#cb46-430" aria-hidden="true" tabindex="-1"></a>#&#39; on unit scale, but the data values $x_i$ take on values in the</span>
+<span id="cb46-431"><a href="#cb46-431" aria-hidden="true" tabindex="-1"></a>#&#39; millions, then we&#39;d probably expect the parameters $b_1$ and $b_2$</span>
+<span id="cb46-432"><a href="#cb46-432" aria-hidden="true" tabindex="-1"></a>#&#39; to be roughly on the scale of $10^{-6}$.  In such a case, we&#39;d want</span>
+<span id="cb46-433"><a href="#cb46-433" aria-hidden="true" tabindex="-1"></a>#&#39; to rescale $x$ so that the coefficients $b$ are more interpretable.</span>
+<span id="cb46-434"><a href="#cb46-434" aria-hidden="true" tabindex="-1"></a>#&#39; Similarly, if the values of $y$ ranged in the millions, then the</span>
+<span id="cb46-435"><a href="#cb46-435" aria-hidden="true" tabindex="-1"></a>#&#39; coefficients $a$ would have to be of order $10^6$, and, again, we</span>
+<span id="cb46-436"><a href="#cb46-436" aria-hidden="true" tabindex="-1"></a>#&#39; would want to rescale the data or the model so that $a$ would be on</span>
+<span id="cb46-437"><a href="#cb46-437" aria-hidden="true" tabindex="-1"></a>#&#39; unit scale.  By using unit scale priors, we are implicitly assuming</span>
+<span id="cb46-438"><a href="#cb46-438" aria-hidden="true" tabindex="-1"></a>#&#39; the model has been scaled.</span>
+<span id="cb46-439"><a href="#cb46-439" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-440"><a href="#cb46-440" aria-hidden="true" tabindex="-1"></a>#&#39; From the other direction, instead of adapting the model to the</span>
+<span id="cb46-441"><a href="#cb46-441" aria-hidden="true" tabindex="-1"></a>#&#39; prior distribution, we could adapt the prior to the model.  That</span>
+<span id="cb46-442"><a href="#cb46-442" aria-hidden="true" tabindex="-1"></a>#&#39; would imply an understanding of a reasonable range of values for</span>
+<span id="cb46-443"><a href="#cb46-443" aria-hidden="true" tabindex="-1"></a>#&#39; the parameters, based on the context of the problem.  In any</span>
+<span id="cb46-444"><a href="#cb46-444" aria-hidden="true" tabindex="-1"></a>#&#39; particular example this could be done by simulating parameter</span>
+<span id="cb46-445"><a href="#cb46-445" aria-hidden="true" tabindex="-1"></a>#&#39; vectors from the prior distribution and graphing the corresponding</span>
+<span id="cb46-446"><a href="#cb46-446" aria-hidden="true" tabindex="-1"></a>#&#39; curves of expected data, and seeing if these could plausibly cover</span>
+<span id="cb46-447"><a href="#cb46-447" aria-hidden="true" tabindex="-1"></a>#&#39; the possible cases that might arise in the particular problem being</span>
+<span id="cb46-448"><a href="#cb46-448" aria-hidden="true" tabindex="-1"></a>#&#39; studied.</span>
+<span id="cb46-449"><a href="#cb46-449" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-450"><a href="#cb46-450" aria-hidden="true" tabindex="-1"></a>#&#39; No matter how it&#39;s done, inference has to come from somewhere, and</span>
+<span id="cb46-451"><a href="#cb46-451" aria-hidden="true" tabindex="-1"></a>#&#39; if the data are weak, you need to put in prior information if your</span>
+<span id="cb46-452"><a href="#cb46-452" aria-hidden="true" tabindex="-1"></a>#&#39; goal is to make some statement about possible parameter values, and</span>
+<span id="cb46-453"><a href="#cb46-453" aria-hidden="true" tabindex="-1"></a>#&#39; from there to make probabilistic predictions and decisions.</span>
+<span id="cb46-454"><a href="#cb46-454" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb46-455"><a href="#cb46-455" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="dt">&lt;</span><span class="kw">br</span><span class="ot"> </span><span class="dt">/&gt;</span></span>
+<span id="cb46-456"><a href="#cb46-456" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-457"><a href="#cb46-457" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
+<span id="cb46-458"><a href="#cb46-458" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb46-459"><a href="#cb46-459" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under BSD-3.</span>
+<span id="cb46-460"><a href="#cb46-460" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

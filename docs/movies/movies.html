@@ -3895,6 +3895,12 @@ box-shadow: none !important;
 padding: 0 !important;
 }
 </style>
+<meta property="og:title" content="Coding a series of models: Simulated data of movie ratings – Bayesian Workflow book">
+<meta property="og:description" content="Website for the Bayesian Workflow book by Gelman, Vehtari, McElreath, et al. — case studies, code, and exercises in R and Stan.">
+<meta property="og:image" content="https://avehtari.github.io/Bayesian-Workflow/social-cards/movies.png">
+<meta property="og:site_name" content="Bayesian Workflow book">
+<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
 </head>
 
 <body class="nav-sidebar docked nav-fixed quarto-light">
@@ -4169,7 +4175,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-15</p>
     </div>
   </div>
     
@@ -4950,7 +4956,7 @@ Figure 10
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/avehtari\.github\.io\/Bayesian-Workflow\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -5278,459 +5284,460 @@ Figure 10
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Coding a series of models: Simulated data of movie ratings&quot;</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman and Aki Vehtari&quot;</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-08-15</span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
-<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
-<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
-<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 16 *Coding a series of models: Simulated data of movie</span>
-<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>#&#39; ratings*.</span>
-<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
-<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>#&#39; Consider the following scenario.  You are considering which of two</span>
-<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>#&#39; movies to go see.  Both have average online ratings of 4 out of 5</span>
-<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>#&#39; stars, but one is based on 2 ratings and the other is based on 100.</span>
-<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>#&#39; Which movie should you choose?</span>
-<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
-<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
-<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>  cache = FALSE,</span>
-<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>  message = FALSE,</span>
-<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>  error = FALSE,</span>
-<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>  warning = FALSE,</span>
-<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>  comment = NA,</span>
-<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>  out.width = &#39;95%&#39;</span>
-<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages and set options**</span>
-<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
-<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
-<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
-<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
-<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
-<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
-<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>library(ggplot2)</span>
-<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a>theme_set(bayesplot::theme_default(base_family = &quot;sans&quot;))</span>
-<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>library(ggdist)</span>
-<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>library(patchwork)</span>
-<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a>library(dplyr)</span>
-<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>set.seed(1234)</span>
-<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a>print_stan_code &lt;- function(code) {</span>
-<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;</span>
-<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
-<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
-<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
-<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
-<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>  } else {</span>
-<span id="cb38-58"><a href="#cb38-58" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
-<span id="cb38-59"><a href="#cb38-59" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb38-60"><a href="#cb38-60" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-61"><a href="#cb38-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>#&#39; image: ../social-cards/movies.png</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Coding a series of models: Simulated data of movie ratings&quot;</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman and Aki Vehtari&quot;</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-08-15</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
+<span id="cb38-14"><a href="#cb38-14" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
+<span id="cb38-15"><a href="#cb38-15" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
+<span id="cb38-16"><a href="#cb38-16" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb38-17"><a href="#cb38-17" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
+<span id="cb38-18"><a href="#cb38-18" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 16 *Coding a series of models: Simulated data of movie</span>
+<span id="cb38-19"><a href="#cb38-19" aria-hidden="true" tabindex="-1"></a>#&#39; ratings*.</span>
+<span id="cb38-20"><a href="#cb38-20" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb38-21"><a href="#cb38-21" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
+<span id="cb38-22"><a href="#cb38-22" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb38-23"><a href="#cb38-23" aria-hidden="true" tabindex="-1"></a>#&#39; Consider the following scenario.  You are considering which of two</span>
+<span id="cb38-24"><a href="#cb38-24" aria-hidden="true" tabindex="-1"></a>#&#39; movies to go see.  Both have average online ratings of 4 out of 5</span>
+<span id="cb38-25"><a href="#cb38-25" aria-hidden="true" tabindex="-1"></a>#&#39; stars, but one is based on 2 ratings and the other is based on 100.</span>
+<span id="cb38-26"><a href="#cb38-26" aria-hidden="true" tabindex="-1"></a>#&#39; Which movie should you choose?</span>
+<span id="cb38-27"><a href="#cb38-27" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb38-28"><a href="#cb38-28" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
+<span id="cb38-29"><a href="#cb38-29" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
+<span id="cb38-30"><a href="#cb38-30" aria-hidden="true" tabindex="-1"></a>  cache = FALSE,</span>
+<span id="cb38-31"><a href="#cb38-31" aria-hidden="true" tabindex="-1"></a>  message = FALSE,</span>
+<span id="cb38-32"><a href="#cb38-32" aria-hidden="true" tabindex="-1"></a>  error = FALSE,</span>
+<span id="cb38-33"><a href="#cb38-33" aria-hidden="true" tabindex="-1"></a>  warning = FALSE,</span>
+<span id="cb38-34"><a href="#cb38-34" aria-hidden="true" tabindex="-1"></a>  comment = NA,</span>
+<span id="cb38-35"><a href="#cb38-35" aria-hidden="true" tabindex="-1"></a>  out.width = &#39;95%&#39;</span>
+<span id="cb38-36"><a href="#cb38-36" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-37"><a href="#cb38-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-38"><a href="#cb38-38" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages and set options**</span>
+<span id="cb38-39"><a href="#cb38-39" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
+<span id="cb38-40"><a href="#cb38-40" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
+<span id="cb38-41"><a href="#cb38-41" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
+<span id="cb38-42"><a href="#cb38-42" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
+<span id="cb38-43"><a href="#cb38-43" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
+<span id="cb38-44"><a href="#cb38-44" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
+<span id="cb38-45"><a href="#cb38-45" aria-hidden="true" tabindex="-1"></a>library(ggplot2)</span>
+<span id="cb38-46"><a href="#cb38-46" aria-hidden="true" tabindex="-1"></a>theme_set(bayesplot::theme_default(base_family = &quot;sans&quot;))</span>
+<span id="cb38-47"><a href="#cb38-47" aria-hidden="true" tabindex="-1"></a>library(ggdist)</span>
+<span id="cb38-48"><a href="#cb38-48" aria-hidden="true" tabindex="-1"></a>library(patchwork)</span>
+<span id="cb38-49"><a href="#cb38-49" aria-hidden="true" tabindex="-1"></a>library(dplyr)</span>
+<span id="cb38-50"><a href="#cb38-50" aria-hidden="true" tabindex="-1"></a>set.seed(1234)</span>
+<span id="cb38-51"><a href="#cb38-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-52"><a href="#cb38-52" aria-hidden="true" tabindex="-1"></a>print_stan_code &lt;- function(code) {</span>
+<span id="cb38-53"><a href="#cb38-53" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;</span>
+<span id="cb38-54"><a href="#cb38-54" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
+<span id="cb38-55"><a href="#cb38-55" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
+<span id="cb38-56"><a href="#cb38-56" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
+<span id="cb38-57"><a href="#cb38-57" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
+<span id="cb38-58"><a href="#cb38-58" aria-hidden="true" tabindex="-1"></a>  } else {</span>
+<span id="cb38-59"><a href="#cb38-59" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
+<span id="cb38-60"><a href="#cb38-60" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb38-61"><a href="#cb38-61" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb38-62"><a href="#cb38-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-63"><a href="#cb38-63" aria-hidden="true" tabindex="-1"></a>#&#39; # Model for two movies</span>
-<span id="cb38-64"><a href="#cb38-64" aria-hidden="true" tabindex="-1"></a>y_1 &lt;- c(3, 5)</span>
-<span id="cb38-65"><a href="#cb38-65" aria-hidden="true" tabindex="-1"></a>y_2 &lt;- rep(c(2, 3, 4, 5), c(10, 20, 30, 40))</span>
-<span id="cb38-66"><a href="#cb38-66" aria-hidden="true" tabindex="-1"></a>y &lt;- c(y_1, y_2)</span>
-<span id="cb38-67"><a href="#cb38-67" aria-hidden="true" tabindex="-1"></a>N &lt;- length(y)</span>
-<span id="cb38-68"><a href="#cb38-68" aria-hidden="true" tabindex="-1"></a>movie &lt;- rep(c(1, 2), c(length(y_1), length(y_2)))</span>
-<span id="cb38-69"><a href="#cb38-69" aria-hidden="true" tabindex="-1"></a>movie_data &lt;- list(y = y, N = N, movie = movie)</span>
-<span id="cb38-70"><a href="#cb38-70" aria-hidden="true" tabindex="-1"></a>mod_1 &lt;- cmdstan_model(root(&quot;movies&quot;, &quot;ratings_1.stan&quot;))</span>
-<span id="cb38-71"><a href="#cb38-71" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model code</span>
-<span id="cb38-72"><a href="#cb38-72" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb38-73"><a href="#cb38-73" aria-hidden="true" tabindex="-1"></a>print_stan_code(mod_1$code())</span>
-<span id="cb38-74"><a href="#cb38-74" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
-<span id="cb38-75"><a href="#cb38-75" aria-hidden="true" tabindex="-1"></a>#| label: fit_1</span>
-<span id="cb38-76"><a href="#cb38-76" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb38-77"><a href="#cb38-77" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- mod_1$sample(data = movie_data, refresh = 0)</span>
-<span id="cb38-78"><a href="#cb38-78" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
-<span id="cb38-79"><a href="#cb38-79" aria-hidden="true" tabindex="-1"></a>print(fit_1)</span>
-<span id="cb38-80"><a href="#cb38-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-81"><a href="#cb38-81" aria-hidden="true" tabindex="-1"></a>#&#39; # Extending the model to J movies</span>
-<span id="cb38-82"><a href="#cb38-82" aria-hidden="true" tabindex="-1"></a>J &lt;- 40</span>
-<span id="cb38-83"><a href="#cb38-83" aria-hidden="true" tabindex="-1"></a>N_ratings &lt;- sample(0:100, J, replace = TRUE)</span>
-<span id="cb38-84"><a href="#cb38-84" aria-hidden="true" tabindex="-1"></a>N &lt;- sum(N_ratings)</span>
-<span id="cb38-85"><a href="#cb38-85" aria-hidden="true" tabindex="-1"></a>movie &lt;- rep(1:J, N_ratings)</span>
-<span id="cb38-86"><a href="#cb38-86" aria-hidden="true" tabindex="-1"></a>theta &lt;- rnorm(J, 3.0, 0.5)</span>
-<span id="cb38-87"><a href="#cb38-87" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, theta<span class="co">[</span><span class="ot">movie</span><span class="co">]</span>, 2.0)</span>
-<span id="cb38-88"><a href="#cb38-88" aria-hidden="true" tabindex="-1"></a>movie_data &lt;- list(y = y, N = N, J = J, movie = movie)</span>
-<span id="cb38-89"><a href="#cb38-89" aria-hidden="true" tabindex="-1"></a>mod_2 &lt;- cmdstan_model(root(&quot;movies&quot;, &quot;ratings_2.stan&quot;))</span>
-<span id="cb38-90"><a href="#cb38-90" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model code</span>
-<span id="cb38-91"><a href="#cb38-91" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb38-92"><a href="#cb38-92" aria-hidden="true" tabindex="-1"></a>print_stan_code(mod_2$code())</span>
-<span id="cb38-93"><a href="#cb38-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-94"><a href="#cb38-94" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
-<span id="cb38-95"><a href="#cb38-95" aria-hidden="true" tabindex="-1"></a>#| label: fit_2</span>
-<span id="cb38-96"><a href="#cb38-96" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb38-97"><a href="#cb38-97" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- mod_2$sample(data = movie_data, refresh = 0)</span>
-<span id="cb38-98"><a href="#cb38-98" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
-<span id="cb38-99"><a href="#cb38-99" aria-hidden="true" tabindex="-1"></a>print(fit_2)</span>
-<span id="cb38-100"><a href="#cb38-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-101"><a href="#cb38-101" aria-hidden="true" tabindex="-1"></a>theta_post &lt;- fit_2$draws(&quot;theta&quot;, format = &quot;matrix&quot;)</span>
-<span id="cb38-102"><a href="#cb38-102" aria-hidden="true" tabindex="-1"></a>theta_post_quants &lt;- t(apply(theta_post, 2, function(x) </span>
-<span id="cb38-103"><a href="#cb38-103" aria-hidden="true" tabindex="-1"></a>  quantile(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975))</span>
-<span id="cb38-104"><a href="#cb38-104" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb38-105"><a href="#cb38-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-106"><a href="#cb38-106" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_1</span>
-<span id="cb38-107"><a href="#cb38-107" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-108"><a href="#cb38-108" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5</span>
-<span id="cb38-109"><a href="#cb38-109" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, 0.5, 0), tck = -0.02)</span>
-<span id="cb38-110"><a href="#cb38-110" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
-<span id="cb38-111"><a href="#cb38-111" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(theta_post_quants, theta)</span>
-<span id="cb38-112"><a href="#cb38-112" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, xlab = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
-<span id="cb38-113"><a href="#cb38-113" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-114"><a href="#cb38-114" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
-<span id="cb38-115"><a href="#cb38-115" aria-hidden="true" tabindex="-1"></a>points(theta_post_quants<span class="co">[</span><span class="ot"> , &quot;50%&quot;</span><span class="co">]</span>, theta, pch = 20)</span>
-<span id="cb38-116"><a href="#cb38-116" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
-<span id="cb38-117"><a href="#cb38-117" aria-hidden="true" tabindex="-1"></a>  lines(c(theta_post_quants<span class="co">[</span><span class="ot">j, &quot;25%&quot;</span><span class="co">]</span>, theta_post_quants<span class="co">[</span><span class="ot">j, &quot;75%&quot;</span><span class="co">]</span>),</span>
-<span id="cb38-118"><a href="#cb38-118" aria-hidden="true" tabindex="-1"></a>        rep(theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 2)</span>
-<span id="cb38-119"><a href="#cb38-119" aria-hidden="true" tabindex="-1"></a>  lines(c(theta_post_quants<span class="co">[</span><span class="ot">j, &quot;2.5%&quot;</span><span class="co">]</span>, theta_post_quants<span class="co">[</span><span class="ot">j, &quot;97.5%&quot;</span><span class="co">]</span>),</span>
-<span id="cb38-120"><a href="#cb38-120" aria-hidden="true" tabindex="-1"></a>        rep(theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5)</span>
-<span id="cb38-121"><a href="#cb38-121" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-122"><a href="#cb38-122" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Comparing parameters &quot;, theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, </span>
-<span id="cb38-123"><a href="#cb38-123" aria-hidden="true" tabindex="-1"></a>                       &quot; to their posterior inferences&quot;)), side = 3)</span>
-<span id="cb38-124"><a href="#cb38-124" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-125"><a href="#cb38-125" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
-<span id="cb38-126"><a href="#cb38-126" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_1</span>
-<span id="cb38-127"><a href="#cb38-127" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4.5</span>
-<span id="cb38-128"><a href="#cb38-128" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4.5</span>
-<span id="cb38-129"><a href="#cb38-129" aria-hidden="true" tabindex="-1"></a>#| out-width: 70%</span>
-<span id="cb38-130"><a href="#cb38-130" aria-hidden="true" tabindex="-1"></a>draws &lt;- as_draws_rvars(fit_2$draws(&quot;theta&quot;))</span>
-<span id="cb38-131"><a href="#cb38-131" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(summarize_draws(</span>
-<span id="cb38-132"><a href="#cb38-132" aria-hidden="true" tabindex="-1"></a>  draws, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
-<span id="cb38-133"><a href="#cb38-133" aria-hidden="true" tabindex="-1"></a>ggplot(data = NULL) +</span>
-<span id="cb38-134"><a href="#cb38-134" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rng, ylim = rng) +</span>
-<span id="cb38-135"><a href="#cb38-135" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
-<span id="cb38-136"><a href="#cb38-136" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = theta, xdist = draws$theta),</span>
-<span id="cb38-137"><a href="#cb38-137" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
-<span id="cb38-138"><a href="#cb38-138" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
-<span id="cb38-139"><a href="#cb38-139" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
-<span id="cb38-140"><a href="#cb38-140" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
-<span id="cb38-141"><a href="#cb38-141" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
-<span id="cb38-142"><a href="#cb38-142" aria-hidden="true" tabindex="-1"></a>       subtitle = expression(paste(&quot;Comparing parameters &quot;, theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, </span>
-<span id="cb38-143"><a href="#cb38-143" aria-hidden="true" tabindex="-1"></a>                                &quot; to their posterior inferences&quot;)))</span>
-<span id="cb38-144"><a href="#cb38-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-145"><a href="#cb38-145" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_2</span>
-<span id="cb38-146"><a href="#cb38-146" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-147"><a href="#cb38-147" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb38-148"><a href="#cb38-148" aria-hidden="true" tabindex="-1"></a>interval_width &lt;- theta_post_quants<span class="co">[</span><span class="ot">,&quot;75%&quot;</span><span class="co">]</span> - theta_post_quants<span class="co">[</span><span class="ot">,&quot;25%&quot;</span><span class="co">]</span></span>
-<span id="cb38-149"><a href="#cb38-149" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)</span>
-<span id="cb38-150"><a href="#cb38-150" aria-hidden="true" tabindex="-1"></a>plot(c(0, 1.02 * max(N_ratings)), c(0, 1.02 * max(interval_width)), </span>
-<span id="cb38-151"><a href="#cb38-151" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Number of ratings&quot;, ylab = &quot;Width of 50% posterior interval&quot;, </span>
-<span id="cb38-152"><a href="#cb38-152" aria-hidden="true" tabindex="-1"></a>     yaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-153"><a href="#cb38-153" aria-hidden="true" tabindex="-1"></a>points(N_ratings, interval_width, pch = 20)</span>
-<span id="cb38-154"><a href="#cb38-154" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Where you have more data, you have less uncertainty&quot;, side = 3)</span>
-<span id="cb38-155"><a href="#cb38-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-156"><a href="#cb38-156" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
-<span id="cb38-157"><a href="#cb38-157" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_2</span>
-<span id="cb38-158"><a href="#cb38-158" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-159"><a href="#cb38-159" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb38-160"><a href="#cb38-160" aria-hidden="true" tabindex="-1"></a>bind_cols(tibble(N = N_ratings),</span>
-<span id="cb38-161"><a href="#cb38-161" aria-hidden="true" tabindex="-1"></a>          summarize_draws(draws, ~quantile(.x, probs = c(0.025, 0.975)))) |&gt;</span>
-<span id="cb38-162"><a href="#cb38-162" aria-hidden="true" tabindex="-1"></a>  mutate(interval_width = <span class="in">`97.5%`</span> - <span class="in">`2.5%`</span>) |&gt;</span>
-<span id="cb38-163"><a href="#cb38-163" aria-hidden="true" tabindex="-1"></a>  ggplot(aes(x = N, y = interval_width)) +</span>
-<span id="cb38-164"><a href="#cb38-164" aria-hidden="true" tabindex="-1"></a>  geom_point() +</span>
-<span id="cb38-165"><a href="#cb38-165" aria-hidden="true" tabindex="-1"></a>  ylim(c(0, NA)) +</span>
-<span id="cb38-166"><a href="#cb38-166" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Number of ratings&quot;,</span>
-<span id="cb38-167"><a href="#cb38-167" aria-hidden="true" tabindex="-1"></a>       y = &quot;Width of 50% posterior interval&quot;,</span>
-<span id="cb38-168"><a href="#cb38-168" aria-hidden="true" tabindex="-1"></a>       title = &quot;Where you have more data, you have less uncertainty&quot;)</span>
-<span id="cb38-169"><a href="#cb38-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-170"><a href="#cb38-170" aria-hidden="true" tabindex="-1"></a>#&#39; # Item-response model with parameters for raters and for movies</span>
-<span id="cb38-171"><a href="#cb38-171" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb38-172"><a href="#cb38-172" aria-hidden="true" tabindex="-1"></a>#&#39; ## Balanced data</span>
-<span id="cb38-173"><a href="#cb38-173" aria-hidden="true" tabindex="-1"></a>J &lt;- 40</span>
-<span id="cb38-174"><a href="#cb38-174" aria-hidden="true" tabindex="-1"></a>K &lt;- 100</span>
-<span id="cb38-175"><a href="#cb38-175" aria-hidden="true" tabindex="-1"></a>N &lt;- J * K</span>
-<span id="cb38-176"><a href="#cb38-176" aria-hidden="true" tabindex="-1"></a>movie &lt;- rep(1:J, rep(K, J))</span>
-<span id="cb38-177"><a href="#cb38-177" aria-hidden="true" tabindex="-1"></a>rater &lt;- rep(1:K, J)</span>
-<span id="cb38-178"><a href="#cb38-178" aria-hidden="true" tabindex="-1"></a>mu &lt;- 3</span>
-<span id="cb38-179"><a href="#cb38-179" aria-hidden="true" tabindex="-1"></a>sigma_a &lt;- 0.5</span>
-<span id="cb38-180"><a href="#cb38-180" aria-hidden="true" tabindex="-1"></a>sigma_b &lt;- 0.5</span>
-<span id="cb38-181"><a href="#cb38-181" aria-hidden="true" tabindex="-1"></a>sigma_y &lt;- 2</span>
-<span id="cb38-182"><a href="#cb38-182" aria-hidden="true" tabindex="-1"></a>alpha &lt;- rnorm(J, 0, 1)</span>
-<span id="cb38-183"><a href="#cb38-183" aria-hidden="true" tabindex="-1"></a>beta &lt;- rnorm(K, 0, 1)</span>
-<span id="cb38-184"><a href="#cb38-184" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, mu + sigma_a * alpha<span class="co">[</span><span class="ot">movie</span><span class="co">]</span> - sigma_b * beta<span class="co">[</span><span class="ot">rater</span><span class="co">]</span>, sigma_y)</span>
-<span id="cb38-185"><a href="#cb38-185" aria-hidden="true" tabindex="-1"></a>data_3 &lt;- list(N = N, J = J, K = K, movie = movie, rater = rater, y = y)</span>
-<span id="cb38-186"><a href="#cb38-186" aria-hidden="true" tabindex="-1"></a>mod_3 &lt;- cmdstan_model(root(&quot;movies&quot;, &quot;ratings_3.stan&quot;))</span>
-<span id="cb38-187"><a href="#cb38-187" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model code</span>
-<span id="cb38-188"><a href="#cb38-188" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb38-189"><a href="#cb38-189" aria-hidden="true" tabindex="-1"></a>print_stan_code(mod_3$code())</span>
-<span id="cb38-190"><a href="#cb38-190" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
-<span id="cb38-191"><a href="#cb38-191" aria-hidden="true" tabindex="-1"></a>#| label: fit_3</span>
-<span id="cb38-192"><a href="#cb38-192" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb38-193"><a href="#cb38-193" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- mod_3$sample(data = data_3, refresh = 0)</span>
-<span id="cb38-194"><a href="#cb38-194" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
-<span id="cb38-195"><a href="#cb38-195" aria-hidden="true" tabindex="-1"></a>print(fit_3, variables = c(&quot;mu&quot;, &quot;sigma_a&quot;, &quot;sigma_b&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb38-196"><a href="#cb38-196" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-197"><a href="#cb38-197" aria-hidden="true" tabindex="-1"></a>alpha_post &lt;- fit_3$draws(&quot;alpha&quot;, format = &quot;matrix&quot;)</span>
-<span id="cb38-198"><a href="#cb38-198" aria-hidden="true" tabindex="-1"></a>beta_post &lt;- fit_3$draws(&quot;beta&quot;, format = &quot;matrix&quot;)</span>
-<span id="cb38-199"><a href="#cb38-199" aria-hidden="true" tabindex="-1"></a>quants &lt;- c(0.025, 0.25, 0.5, 0.75, 0.975)</span>
-<span id="cb38-200"><a href="#cb38-200" aria-hidden="true" tabindex="-1"></a>alpha_post_quants &lt;- t(apply(alpha_post, 2, function(x) quantile(x, probs = quants)))</span>
-<span id="cb38-201"><a href="#cb38-201" aria-hidden="true" tabindex="-1"></a>beta_post_quants &lt;- t(apply(beta_post, 2, function(x) quantile(x, probs = quants)))</span>
-<span id="cb38-202"><a href="#cb38-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-203"><a href="#cb38-203" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_3</span>
-<span id="cb38-204"><a href="#cb38-204" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-205"><a href="#cb38-205" aria-hidden="true" tabindex="-1"></a>#| fig-width: 9</span>
-<span id="cb38-206"><a href="#cb38-206" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(1, 2))</span>
-<span id="cb38-207"><a href="#cb38-207" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -0.02)</span>
-<span id="cb38-208"><a href="#cb38-208" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
-<span id="cb38-209"><a href="#cb38-209" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(alpha_post_quants, alpha)</span>
-<span id="cb38-210"><a href="#cb38-210" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
-<span id="cb38-211"><a href="#cb38-211" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
-<span id="cb38-212"><a href="#cb38-212" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, </span>
-<span id="cb38-213"><a href="#cb38-213" aria-hidden="true" tabindex="-1"></a>     bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-214"><a href="#cb38-214" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
-<span id="cb38-215"><a href="#cb38-215" aria-hidden="true" tabindex="-1"></a>points(alpha_post_quants<span class="co">[</span><span class="ot">, &quot;50%&quot;</span><span class="co">]</span>, alpha, pch = 20)</span>
-<span id="cb38-216"><a href="#cb38-216" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
-<span id="cb38-217"><a href="#cb38-217" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;25%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;75%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-218"><a href="#cb38-218" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 2)</span>
-<span id="cb38-219"><a href="#cb38-219" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;2.5%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-220"><a href="#cb38-220" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5)</span>
-<span id="cb38-221"><a href="#cb38-221" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-222"><a href="#cb38-222" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
-<span id="cb38-223"><a href="#cb38-223" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(beta_post_quants, beta)</span>
-<span id="cb38-224"><a href="#cb38-224" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
-<span id="cb38-225"><a href="#cb38-225" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
-<span id="cb38-226"><a href="#cb38-226" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, </span>
-<span id="cb38-227"><a href="#cb38-227" aria-hidden="true" tabindex="-1"></a>     bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-228"><a href="#cb38-228" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
-<span id="cb38-229"><a href="#cb38-229" aria-hidden="true" tabindex="-1"></a>points(beta_post_quants<span class="co">[</span><span class="ot">, &quot;50%&quot;</span><span class="co">]</span>, beta, pch = 20)</span>
-<span id="cb38-230"><a href="#cb38-230" aria-hidden="true" tabindex="-1"></a>for (k in 1:K){</span>
-<span id="cb38-231"><a href="#cb38-231" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;25%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;75%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-232"><a href="#cb38-232" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 2)</span>
-<span id="cb38-233"><a href="#cb38-233" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;2.5%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-234"><a href="#cb38-234" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 0.5)</span>
-<span id="cb38-235"><a href="#cb38-235" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-236"><a href="#cb38-236" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
-<span id="cb38-237"><a href="#cb38-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-238"><a href="#cb38-238" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
-<span id="cb38-239"><a href="#cb38-239" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_3</span>
-<span id="cb38-240"><a href="#cb38-240" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-241"><a href="#cb38-241" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb38-242"><a href="#cb38-242" aria-hidden="true" tabindex="-1"></a>drawsa &lt;- as_draws_rvars(fit_3$draws(c(&quot;alpha&quot;)))</span>
-<span id="cb38-243"><a href="#cb38-243" aria-hidden="true" tabindex="-1"></a>rnga &lt;- range(summarize_draws(</span>
-<span id="cb38-244"><a href="#cb38-244" aria-hidden="true" tabindex="-1"></a>  drawsa, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
-<span id="cb38-245"><a href="#cb38-245" aria-hidden="true" tabindex="-1"></a>p3a &lt;- ggplot(data = NULL) +</span>
-<span id="cb38-246"><a href="#cb38-246" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rnga, ylim = rnga) +</span>
-<span id="cb38-247"><a href="#cb38-247" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
-<span id="cb38-248"><a href="#cb38-248" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = alpha, xdist = drawsa$alpha),</span>
-<span id="cb38-249"><a href="#cb38-249" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
-<span id="cb38-250"><a href="#cb38-250" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
-<span id="cb38-251"><a href="#cb38-251" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
-<span id="cb38-252"><a href="#cb38-252" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
-<span id="cb38-253"><a href="#cb38-253" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
-<span id="cb38-254"><a href="#cb38-254" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)))</span>
-<span id="cb38-255"><a href="#cb38-255" aria-hidden="true" tabindex="-1"></a>drawsb &lt;- as_draws_rvars(fit_3$draws(c(&quot;beta&quot;)))</span>
-<span id="cb38-256"><a href="#cb38-256" aria-hidden="true" tabindex="-1"></a>rngb &lt;- range(summarize_draws(</span>
-<span id="cb38-257"><a href="#cb38-257" aria-hidden="true" tabindex="-1"></a>  drawsb, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
-<span id="cb38-258"><a href="#cb38-258" aria-hidden="true" tabindex="-1"></a>p3b &lt;- ggplot(data = NULL) +</span>
-<span id="cb38-259"><a href="#cb38-259" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rngb, ylim = rngb) +</span>
-<span id="cb38-260"><a href="#cb38-260" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
-<span id="cb38-261"><a href="#cb38-261" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = beta, xdist = drawsb$beta),</span>
-<span id="cb38-262"><a href="#cb38-262" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
-<span id="cb38-263"><a href="#cb38-263" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
-<span id="cb38-264"><a href="#cb38-264" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
-<span id="cb38-265"><a href="#cb38-265" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
-<span id="cb38-266"><a href="#cb38-266" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
-<span id="cb38-267"><a href="#cb38-267" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)))</span>
-<span id="cb38-268"><a href="#cb38-268" aria-hidden="true" tabindex="-1"></a>p3a + p3b</span>
-<span id="cb38-269"><a href="#cb38-269" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-270"><a href="#cb38-270" aria-hidden="true" tabindex="-1"></a>#&#39; ## Unbalanced data</span>
-<span id="cb38-271"><a href="#cb38-271" aria-hidden="true" tabindex="-1"></a>genre &lt;- rep(c(&quot;romantic&quot;, &quot;crime&quot;), c(round(J / 2), J - round(J / 2)))</span>
-<span id="cb38-272"><a href="#cb38-272" aria-hidden="true" tabindex="-1"></a>prob_of_rated &lt;- ifelse(beta<span class="co">[</span><span class="ot">rater</span><span class="co">]</span> &gt; 0,</span>
-<span id="cb38-273"><a href="#cb38-273" aria-hidden="true" tabindex="-1"></a>                        ifelse(genre<span class="co">[</span><span class="ot">movie</span><span class="co">]</span> == &quot;romantic&quot;, 0.2, 0.7),</span>
-<span id="cb38-274"><a href="#cb38-274" aria-hidden="true" tabindex="-1"></a>                        ifelse(genre<span class="co">[</span><span class="ot">movie</span><span class="co">]</span> == &quot;romantic&quot;, 0.7, 0.2))</span>
-<span id="cb38-275"><a href="#cb38-275" aria-hidden="true" tabindex="-1"></a>rated &lt;- rbinom(N, 1, prob_of_rated)  == 1 # TRUE if movie was rated, FALSE if not</span>
-<span id="cb38-276"><a href="#cb38-276" aria-hidden="true" tabindex="-1"></a>data_3a &lt;- list(N = sum(rated), J = J, K = K, </span>
-<span id="cb38-277"><a href="#cb38-277" aria-hidden="true" tabindex="-1"></a>                movie = movie<span class="co">[</span><span class="ot">rated</span><span class="co">]</span>, rater = rater<span class="co">[</span><span class="ot">rated</span><span class="co">]</span>, </span>
-<span id="cb38-278"><a href="#cb38-278" aria-hidden="true" tabindex="-1"></a>                y = y<span class="co">[</span><span class="ot">rated</span><span class="co">]</span>)</span>
-<span id="cb38-279"><a href="#cb38-279" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
-<span id="cb38-280"><a href="#cb38-280" aria-hidden="true" tabindex="-1"></a>#| label: fit_3a</span>
-<span id="cb38-281"><a href="#cb38-281" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb38-282"><a href="#cb38-282" aria-hidden="true" tabindex="-1"></a>fit_3a &lt;- mod_3$sample(data = data_3a, refresh = 0)</span>
-<span id="cb38-283"><a href="#cb38-283" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
-<span id="cb38-284"><a href="#cb38-284" aria-hidden="true" tabindex="-1"></a>print(fit_3a, variables = c(&quot;mu&quot;, &quot;sigma_a&quot;, &quot;sigma_b&quot;, &quot;sigma_y&quot;))</span>
-<span id="cb38-285"><a href="#cb38-285" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-286"><a href="#cb38-286" aria-hidden="true" tabindex="-1"></a>alpha_post &lt;- fit_3a$draws(&quot;alpha&quot;, format = &quot;matrix&quot;)</span>
-<span id="cb38-287"><a href="#cb38-287" aria-hidden="true" tabindex="-1"></a>beta_post &lt;- fit_3a$draws(&quot;beta&quot;, format = &quot;matrix&quot;)</span>
-<span id="cb38-288"><a href="#cb38-288" aria-hidden="true" tabindex="-1"></a>quants &lt;- c(0.025, 0.25, 0.5, 0.75, 0.975)</span>
-<span id="cb38-289"><a href="#cb38-289" aria-hidden="true" tabindex="-1"></a>alpha_post_quants &lt;- t(apply(alpha_post, 2, function(x) quantile(x, probs = quants)))</span>
-<span id="cb38-290"><a href="#cb38-290" aria-hidden="true" tabindex="-1"></a>beta_post_quants &lt;- t(apply(beta_post, 2, function(x) quantile(x, probs = quants)))</span>
-<span id="cb38-291"><a href="#cb38-291" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-292"><a href="#cb38-292" aria-hidden="true" tabindex="-1"></a>add_legend &lt;- function(text, pch, range) {</span>
-<span id="cb38-293"><a href="#cb38-293" aria-hidden="true" tabindex="-1"></a>  legend(0.6 * min(range) + 0.4 * max(range), </span>
-<span id="cb38-294"><a href="#cb38-294" aria-hidden="true" tabindex="-1"></a>         min(range) + 0.12 * (max(range) - min(range)), </span>
-<span id="cb38-295"><a href="#cb38-295" aria-hidden="true" tabindex="-1"></a>         text<span class="co">[</span><span class="ot">1</span><span class="co">]</span>, pch = pch<span class="co">[</span><span class="ot">1</span><span class="co">]</span>, cex = 0.8, bty = &quot;n&quot;)</span>
-<span id="cb38-296"><a href="#cb38-296" aria-hidden="true" tabindex="-1"></a>  legend(0.6 * min(range) + 0.4 * max(range), </span>
-<span id="cb38-297"><a href="#cb38-297" aria-hidden="true" tabindex="-1"></a>         min(range) + 0.06 * (max(range) - min(range)), </span>
-<span id="cb38-298"><a href="#cb38-298" aria-hidden="true" tabindex="-1"></a>         text<span class="co">[</span><span class="ot">2</span><span class="co">]</span>, pch = pch<span class="co">[</span><span class="ot">2</span><span class="co">]</span>, cex = 0.8, bty = &quot;n&quot;)</span>
-<span id="cb38-299"><a href="#cb38-299" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-300"><a href="#cb38-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-301"><a href="#cb38-301" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_4</span>
-<span id="cb38-302"><a href="#cb38-302" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-303"><a href="#cb38-303" aria-hidden="true" tabindex="-1"></a>#| fig-width: 9</span>
-<span id="cb38-304"><a href="#cb38-304" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(1, 2), oma = c(0, 0, 1, 0))</span>
-<span id="cb38-305"><a href="#cb38-305" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)</span>
-<span id="cb38-306"><a href="#cb38-306" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
-<span id="cb38-307"><a href="#cb38-307" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(alpha_post_quants, alpha)</span>
-<span id="cb38-308"><a href="#cb38-308" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
-<span id="cb38-309"><a href="#cb38-309" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
-<span id="cb38-310"><a href="#cb38-310" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-311"><a href="#cb38-311" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
-<span id="cb38-312"><a href="#cb38-312" aria-hidden="true" tabindex="-1"></a>points(alpha_post_quants<span class="co">[</span><span class="ot">genre==&quot;romantic&quot;, &quot;50%&quot;</span><span class="co">]</span>, alpha<span class="co">[</span><span class="ot">genre==&quot;romantic&quot;</span><span class="co">]</span>,</span>
-<span id="cb38-313"><a href="#cb38-313" aria-hidden="true" tabindex="-1"></a>       pch = 1, cex = 0.9)</span>
-<span id="cb38-314"><a href="#cb38-314" aria-hidden="true" tabindex="-1"></a>points(alpha_post_quants<span class="co">[</span><span class="ot">genre == &quot;crime&quot;, &quot;50%&quot;</span><span class="co">]</span>, alpha<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, </span>
-<span id="cb38-315"><a href="#cb38-315" aria-hidden="true" tabindex="-1"></a>       pch = 20)</span>
-<span id="cb38-316"><a href="#cb38-316" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
-<span id="cb38-317"><a href="#cb38-317" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;25%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;75%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-318"><a href="#cb38-318" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 2)</span>
-<span id="cb38-319"><a href="#cb38-319" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;2.5%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-320"><a href="#cb38-320" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5)</span>
-<span id="cb38-321"><a href="#cb38-321" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-322"><a href="#cb38-322" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;), pch = c(1, 20), range = rng)</span>
-<span id="cb38-323"><a href="#cb38-323" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
-<span id="cb38-324"><a href="#cb38-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-325"><a href="#cb38-325" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(beta_post_quants, beta)</span>
-<span id="cb38-326"><a href="#cb38-326" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
-<span id="cb38-327"><a href="#cb38-327" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
-<span id="cb38-328"><a href="#cb38-328" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, </span>
-<span id="cb38-329"><a href="#cb38-329" aria-hidden="true" tabindex="-1"></a>     bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-330"><a href="#cb38-330" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
-<span id="cb38-331"><a href="#cb38-331" aria-hidden="true" tabindex="-1"></a>points(beta_post_quants<span class="co">[</span><span class="ot">beta &lt; 0, &quot;50%&quot;</span><span class="co">]</span>, beta<span class="co">[</span><span class="ot">beta &lt; 0</span><span class="co">]</span>, pch = 1, cex = 0.9)</span>
-<span id="cb38-332"><a href="#cb38-332" aria-hidden="true" tabindex="-1"></a>points(beta_post_quants<span class="co">[</span><span class="ot">beta &gt; 0, &quot;50%&quot;</span><span class="co">]</span>, beta<span class="co">[</span><span class="ot">beta &gt; 0</span><span class="co">]</span>, pch = 20)</span>
-<span id="cb38-333"><a href="#cb38-333" aria-hidden="true" tabindex="-1"></a>for (k in 1:K){</span>
-<span id="cb38-334"><a href="#cb38-334" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;25%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;75%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-335"><a href="#cb38-335" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 2)</span>
-<span id="cb38-336"><a href="#cb38-336" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;2.5%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
-<span id="cb38-337"><a href="#cb38-337" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 0.5)</span>
-<span id="cb38-338"><a href="#cb38-338" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-339"><a href="#cb38-339" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Nice raters&quot;, &quot;Difficult raters&quot;), pch = c(1, 20), range = rng)</span>
-<span id="cb38-340"><a href="#cb38-340" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
-<span id="cb38-341"><a href="#cb38-341" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Checking fits for model when difficult reviewers were more likely to rate certain genres&quot;,</span>
-<span id="cb38-342"><a href="#cb38-342" aria-hidden="true" tabindex="-1"></a>      side = 3, outer = TRUE)</span>
-<span id="cb38-343"><a href="#cb38-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-63"><a href="#cb38-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-64"><a href="#cb38-64" aria-hidden="true" tabindex="-1"></a>#&#39; # Model for two movies</span>
+<span id="cb38-65"><a href="#cb38-65" aria-hidden="true" tabindex="-1"></a>y_1 &lt;- c(3, 5)</span>
+<span id="cb38-66"><a href="#cb38-66" aria-hidden="true" tabindex="-1"></a>y_2 &lt;- rep(c(2, 3, 4, 5), c(10, 20, 30, 40))</span>
+<span id="cb38-67"><a href="#cb38-67" aria-hidden="true" tabindex="-1"></a>y &lt;- c(y_1, y_2)</span>
+<span id="cb38-68"><a href="#cb38-68" aria-hidden="true" tabindex="-1"></a>N &lt;- length(y)</span>
+<span id="cb38-69"><a href="#cb38-69" aria-hidden="true" tabindex="-1"></a>movie &lt;- rep(c(1, 2), c(length(y_1), length(y_2)))</span>
+<span id="cb38-70"><a href="#cb38-70" aria-hidden="true" tabindex="-1"></a>movie_data &lt;- list(y = y, N = N, movie = movie)</span>
+<span id="cb38-71"><a href="#cb38-71" aria-hidden="true" tabindex="-1"></a>mod_1 &lt;- cmdstan_model(root(&quot;movies&quot;, &quot;ratings_1.stan&quot;))</span>
+<span id="cb38-72"><a href="#cb38-72" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model code</span>
+<span id="cb38-73"><a href="#cb38-73" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb38-74"><a href="#cb38-74" aria-hidden="true" tabindex="-1"></a>print_stan_code(mod_1$code())</span>
+<span id="cb38-75"><a href="#cb38-75" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
+<span id="cb38-76"><a href="#cb38-76" aria-hidden="true" tabindex="-1"></a>#| label: fit_1</span>
+<span id="cb38-77"><a href="#cb38-77" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb38-78"><a href="#cb38-78" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- mod_1$sample(data = movie_data, refresh = 0)</span>
+<span id="cb38-79"><a href="#cb38-79" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
+<span id="cb38-80"><a href="#cb38-80" aria-hidden="true" tabindex="-1"></a>print(fit_1)</span>
+<span id="cb38-81"><a href="#cb38-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-82"><a href="#cb38-82" aria-hidden="true" tabindex="-1"></a>#&#39; # Extending the model to J movies</span>
+<span id="cb38-83"><a href="#cb38-83" aria-hidden="true" tabindex="-1"></a>J &lt;- 40</span>
+<span id="cb38-84"><a href="#cb38-84" aria-hidden="true" tabindex="-1"></a>N_ratings &lt;- sample(0:100, J, replace = TRUE)</span>
+<span id="cb38-85"><a href="#cb38-85" aria-hidden="true" tabindex="-1"></a>N &lt;- sum(N_ratings)</span>
+<span id="cb38-86"><a href="#cb38-86" aria-hidden="true" tabindex="-1"></a>movie &lt;- rep(1:J, N_ratings)</span>
+<span id="cb38-87"><a href="#cb38-87" aria-hidden="true" tabindex="-1"></a>theta &lt;- rnorm(J, 3.0, 0.5)</span>
+<span id="cb38-88"><a href="#cb38-88" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, theta<span class="co">[</span><span class="ot">movie</span><span class="co">]</span>, 2.0)</span>
+<span id="cb38-89"><a href="#cb38-89" aria-hidden="true" tabindex="-1"></a>movie_data &lt;- list(y = y, N = N, J = J, movie = movie)</span>
+<span id="cb38-90"><a href="#cb38-90" aria-hidden="true" tabindex="-1"></a>mod_2 &lt;- cmdstan_model(root(&quot;movies&quot;, &quot;ratings_2.stan&quot;))</span>
+<span id="cb38-91"><a href="#cb38-91" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model code</span>
+<span id="cb38-92"><a href="#cb38-92" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb38-93"><a href="#cb38-93" aria-hidden="true" tabindex="-1"></a>print_stan_code(mod_2$code())</span>
+<span id="cb38-94"><a href="#cb38-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-95"><a href="#cb38-95" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
+<span id="cb38-96"><a href="#cb38-96" aria-hidden="true" tabindex="-1"></a>#| label: fit_2</span>
+<span id="cb38-97"><a href="#cb38-97" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb38-98"><a href="#cb38-98" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- mod_2$sample(data = movie_data, refresh = 0)</span>
+<span id="cb38-99"><a href="#cb38-99" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
+<span id="cb38-100"><a href="#cb38-100" aria-hidden="true" tabindex="-1"></a>print(fit_2)</span>
+<span id="cb38-101"><a href="#cb38-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-102"><a href="#cb38-102" aria-hidden="true" tabindex="-1"></a>theta_post &lt;- fit_2$draws(&quot;theta&quot;, format = &quot;matrix&quot;)</span>
+<span id="cb38-103"><a href="#cb38-103" aria-hidden="true" tabindex="-1"></a>theta_post_quants &lt;- t(apply(theta_post, 2, function(x) </span>
+<span id="cb38-104"><a href="#cb38-104" aria-hidden="true" tabindex="-1"></a>  quantile(x, probs = c(0.025, 0.25, 0.5, 0.75, 0.975))</span>
+<span id="cb38-105"><a href="#cb38-105" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb38-106"><a href="#cb38-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-107"><a href="#cb38-107" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_1</span>
+<span id="cb38-108"><a href="#cb38-108" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-109"><a href="#cb38-109" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5</span>
+<span id="cb38-110"><a href="#cb38-110" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, 0.5, 0), tck = -0.02)</span>
+<span id="cb38-111"><a href="#cb38-111" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
+<span id="cb38-112"><a href="#cb38-112" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(theta_post_quants, theta)</span>
+<span id="cb38-113"><a href="#cb38-113" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, xlab = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
+<span id="cb38-114"><a href="#cb38-114" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-115"><a href="#cb38-115" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
+<span id="cb38-116"><a href="#cb38-116" aria-hidden="true" tabindex="-1"></a>points(theta_post_quants<span class="co">[</span><span class="ot"> , &quot;50%&quot;</span><span class="co">]</span>, theta, pch = 20)</span>
+<span id="cb38-117"><a href="#cb38-117" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
+<span id="cb38-118"><a href="#cb38-118" aria-hidden="true" tabindex="-1"></a>  lines(c(theta_post_quants<span class="co">[</span><span class="ot">j, &quot;25%&quot;</span><span class="co">]</span>, theta_post_quants<span class="co">[</span><span class="ot">j, &quot;75%&quot;</span><span class="co">]</span>),</span>
+<span id="cb38-119"><a href="#cb38-119" aria-hidden="true" tabindex="-1"></a>        rep(theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 2)</span>
+<span id="cb38-120"><a href="#cb38-120" aria-hidden="true" tabindex="-1"></a>  lines(c(theta_post_quants<span class="co">[</span><span class="ot">j, &quot;2.5%&quot;</span><span class="co">]</span>, theta_post_quants<span class="co">[</span><span class="ot">j, &quot;97.5%&quot;</span><span class="co">]</span>),</span>
+<span id="cb38-121"><a href="#cb38-121" aria-hidden="true" tabindex="-1"></a>        rep(theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5)</span>
+<span id="cb38-122"><a href="#cb38-122" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-123"><a href="#cb38-123" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Comparing parameters &quot;, theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, </span>
+<span id="cb38-124"><a href="#cb38-124" aria-hidden="true" tabindex="-1"></a>                       &quot; to their posterior inferences&quot;)), side = 3)</span>
+<span id="cb38-125"><a href="#cb38-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-126"><a href="#cb38-126" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
+<span id="cb38-127"><a href="#cb38-127" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_1</span>
+<span id="cb38-128"><a href="#cb38-128" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4.5</span>
+<span id="cb38-129"><a href="#cb38-129" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4.5</span>
+<span id="cb38-130"><a href="#cb38-130" aria-hidden="true" tabindex="-1"></a>#| out-width: 70%</span>
+<span id="cb38-131"><a href="#cb38-131" aria-hidden="true" tabindex="-1"></a>draws &lt;- as_draws_rvars(fit_2$draws(&quot;theta&quot;))</span>
+<span id="cb38-132"><a href="#cb38-132" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(summarize_draws(</span>
+<span id="cb38-133"><a href="#cb38-133" aria-hidden="true" tabindex="-1"></a>  draws, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
+<span id="cb38-134"><a href="#cb38-134" aria-hidden="true" tabindex="-1"></a>ggplot(data = NULL) +</span>
+<span id="cb38-135"><a href="#cb38-135" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rng, ylim = rng) +</span>
+<span id="cb38-136"><a href="#cb38-136" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
+<span id="cb38-137"><a href="#cb38-137" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = theta, xdist = draws$theta),</span>
+<span id="cb38-138"><a href="#cb38-138" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
+<span id="cb38-139"><a href="#cb38-139" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
+<span id="cb38-140"><a href="#cb38-140" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
+<span id="cb38-141"><a href="#cb38-141" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
+<span id="cb38-142"><a href="#cb38-142" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
+<span id="cb38-143"><a href="#cb38-143" aria-hidden="true" tabindex="-1"></a>       subtitle = expression(paste(&quot;Comparing parameters &quot;, theta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, </span>
+<span id="cb38-144"><a href="#cb38-144" aria-hidden="true" tabindex="-1"></a>                                &quot; to their posterior inferences&quot;)))</span>
+<span id="cb38-145"><a href="#cb38-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-146"><a href="#cb38-146" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_2</span>
+<span id="cb38-147"><a href="#cb38-147" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-148"><a href="#cb38-148" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb38-149"><a href="#cb38-149" aria-hidden="true" tabindex="-1"></a>interval_width &lt;- theta_post_quants<span class="co">[</span><span class="ot">,&quot;75%&quot;</span><span class="co">]</span> - theta_post_quants<span class="co">[</span><span class="ot">,&quot;25%&quot;</span><span class="co">]</span></span>
+<span id="cb38-150"><a href="#cb38-150" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)</span>
+<span id="cb38-151"><a href="#cb38-151" aria-hidden="true" tabindex="-1"></a>plot(c(0, 1.02 * max(N_ratings)), c(0, 1.02 * max(interval_width)), </span>
+<span id="cb38-152"><a href="#cb38-152" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Number of ratings&quot;, ylab = &quot;Width of 50% posterior interval&quot;, </span>
+<span id="cb38-153"><a href="#cb38-153" aria-hidden="true" tabindex="-1"></a>     yaxs = &quot;i&quot;, yaxs = &quot;i&quot;, bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-154"><a href="#cb38-154" aria-hidden="true" tabindex="-1"></a>points(N_ratings, interval_width, pch = 20)</span>
+<span id="cb38-155"><a href="#cb38-155" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Where you have more data, you have less uncertainty&quot;, side = 3)</span>
+<span id="cb38-156"><a href="#cb38-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-157"><a href="#cb38-157" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
+<span id="cb38-158"><a href="#cb38-158" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_2</span>
+<span id="cb38-159"><a href="#cb38-159" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-160"><a href="#cb38-160" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb38-161"><a href="#cb38-161" aria-hidden="true" tabindex="-1"></a>bind_cols(tibble(N = N_ratings),</span>
+<span id="cb38-162"><a href="#cb38-162" aria-hidden="true" tabindex="-1"></a>          summarize_draws(draws, ~quantile(.x, probs = c(0.025, 0.975)))) |&gt;</span>
+<span id="cb38-163"><a href="#cb38-163" aria-hidden="true" tabindex="-1"></a>  mutate(interval_width = <span class="in">`97.5%`</span> - <span class="in">`2.5%`</span>) |&gt;</span>
+<span id="cb38-164"><a href="#cb38-164" aria-hidden="true" tabindex="-1"></a>  ggplot(aes(x = N, y = interval_width)) +</span>
+<span id="cb38-165"><a href="#cb38-165" aria-hidden="true" tabindex="-1"></a>  geom_point() +</span>
+<span id="cb38-166"><a href="#cb38-166" aria-hidden="true" tabindex="-1"></a>  ylim(c(0, NA)) +</span>
+<span id="cb38-167"><a href="#cb38-167" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Number of ratings&quot;,</span>
+<span id="cb38-168"><a href="#cb38-168" aria-hidden="true" tabindex="-1"></a>       y = &quot;Width of 50% posterior interval&quot;,</span>
+<span id="cb38-169"><a href="#cb38-169" aria-hidden="true" tabindex="-1"></a>       title = &quot;Where you have more data, you have less uncertainty&quot;)</span>
+<span id="cb38-170"><a href="#cb38-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-171"><a href="#cb38-171" aria-hidden="true" tabindex="-1"></a>#&#39; # Item-response model with parameters for raters and for movies</span>
+<span id="cb38-172"><a href="#cb38-172" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb38-173"><a href="#cb38-173" aria-hidden="true" tabindex="-1"></a>#&#39; ## Balanced data</span>
+<span id="cb38-174"><a href="#cb38-174" aria-hidden="true" tabindex="-1"></a>J &lt;- 40</span>
+<span id="cb38-175"><a href="#cb38-175" aria-hidden="true" tabindex="-1"></a>K &lt;- 100</span>
+<span id="cb38-176"><a href="#cb38-176" aria-hidden="true" tabindex="-1"></a>N &lt;- J * K</span>
+<span id="cb38-177"><a href="#cb38-177" aria-hidden="true" tabindex="-1"></a>movie &lt;- rep(1:J, rep(K, J))</span>
+<span id="cb38-178"><a href="#cb38-178" aria-hidden="true" tabindex="-1"></a>rater &lt;- rep(1:K, J)</span>
+<span id="cb38-179"><a href="#cb38-179" aria-hidden="true" tabindex="-1"></a>mu &lt;- 3</span>
+<span id="cb38-180"><a href="#cb38-180" aria-hidden="true" tabindex="-1"></a>sigma_a &lt;- 0.5</span>
+<span id="cb38-181"><a href="#cb38-181" aria-hidden="true" tabindex="-1"></a>sigma_b &lt;- 0.5</span>
+<span id="cb38-182"><a href="#cb38-182" aria-hidden="true" tabindex="-1"></a>sigma_y &lt;- 2</span>
+<span id="cb38-183"><a href="#cb38-183" aria-hidden="true" tabindex="-1"></a>alpha &lt;- rnorm(J, 0, 1)</span>
+<span id="cb38-184"><a href="#cb38-184" aria-hidden="true" tabindex="-1"></a>beta &lt;- rnorm(K, 0, 1)</span>
+<span id="cb38-185"><a href="#cb38-185" aria-hidden="true" tabindex="-1"></a>y &lt;- rnorm(N, mu + sigma_a * alpha<span class="co">[</span><span class="ot">movie</span><span class="co">]</span> - sigma_b * beta<span class="co">[</span><span class="ot">rater</span><span class="co">]</span>, sigma_y)</span>
+<span id="cb38-186"><a href="#cb38-186" aria-hidden="true" tabindex="-1"></a>data_3 &lt;- list(N = N, J = J, K = K, movie = movie, rater = rater, y = y)</span>
+<span id="cb38-187"><a href="#cb38-187" aria-hidden="true" tabindex="-1"></a>mod_3 &lt;- cmdstan_model(root(&quot;movies&quot;, &quot;ratings_3.stan&quot;))</span>
+<span id="cb38-188"><a href="#cb38-188" aria-hidden="true" tabindex="-1"></a>#&#39; Stan model code</span>
+<span id="cb38-189"><a href="#cb38-189" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb38-190"><a href="#cb38-190" aria-hidden="true" tabindex="-1"></a>print_stan_code(mod_3$code())</span>
+<span id="cb38-191"><a href="#cb38-191" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
+<span id="cb38-192"><a href="#cb38-192" aria-hidden="true" tabindex="-1"></a>#| label: fit_3</span>
+<span id="cb38-193"><a href="#cb38-193" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb38-194"><a href="#cb38-194" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- mod_3$sample(data = data_3, refresh = 0)</span>
+<span id="cb38-195"><a href="#cb38-195" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
+<span id="cb38-196"><a href="#cb38-196" aria-hidden="true" tabindex="-1"></a>print(fit_3, variables = c(&quot;mu&quot;, &quot;sigma_a&quot;, &quot;sigma_b&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb38-197"><a href="#cb38-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-198"><a href="#cb38-198" aria-hidden="true" tabindex="-1"></a>alpha_post &lt;- fit_3$draws(&quot;alpha&quot;, format = &quot;matrix&quot;)</span>
+<span id="cb38-199"><a href="#cb38-199" aria-hidden="true" tabindex="-1"></a>beta_post &lt;- fit_3$draws(&quot;beta&quot;, format = &quot;matrix&quot;)</span>
+<span id="cb38-200"><a href="#cb38-200" aria-hidden="true" tabindex="-1"></a>quants &lt;- c(0.025, 0.25, 0.5, 0.75, 0.975)</span>
+<span id="cb38-201"><a href="#cb38-201" aria-hidden="true" tabindex="-1"></a>alpha_post_quants &lt;- t(apply(alpha_post, 2, function(x) quantile(x, probs = quants)))</span>
+<span id="cb38-202"><a href="#cb38-202" aria-hidden="true" tabindex="-1"></a>beta_post_quants &lt;- t(apply(beta_post, 2, function(x) quantile(x, probs = quants)))</span>
+<span id="cb38-203"><a href="#cb38-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-204"><a href="#cb38-204" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_3</span>
+<span id="cb38-205"><a href="#cb38-205" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-206"><a href="#cb38-206" aria-hidden="true" tabindex="-1"></a>#| fig-width: 9</span>
+<span id="cb38-207"><a href="#cb38-207" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(1, 2))</span>
+<span id="cb38-208"><a href="#cb38-208" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -0.02)</span>
+<span id="cb38-209"><a href="#cb38-209" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
+<span id="cb38-210"><a href="#cb38-210" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(alpha_post_quants, alpha)</span>
+<span id="cb38-211"><a href="#cb38-211" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
+<span id="cb38-212"><a href="#cb38-212" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
+<span id="cb38-213"><a href="#cb38-213" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, </span>
+<span id="cb38-214"><a href="#cb38-214" aria-hidden="true" tabindex="-1"></a>     bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-215"><a href="#cb38-215" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
+<span id="cb38-216"><a href="#cb38-216" aria-hidden="true" tabindex="-1"></a>points(alpha_post_quants<span class="co">[</span><span class="ot">, &quot;50%&quot;</span><span class="co">]</span>, alpha, pch = 20)</span>
+<span id="cb38-217"><a href="#cb38-217" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
+<span id="cb38-218"><a href="#cb38-218" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;25%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;75%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-219"><a href="#cb38-219" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 2)</span>
+<span id="cb38-220"><a href="#cb38-220" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;2.5%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-221"><a href="#cb38-221" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5)</span>
+<span id="cb38-222"><a href="#cb38-222" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-223"><a href="#cb38-223" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
+<span id="cb38-224"><a href="#cb38-224" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(beta_post_quants, beta)</span>
+<span id="cb38-225"><a href="#cb38-225" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
+<span id="cb38-226"><a href="#cb38-226" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
+<span id="cb38-227"><a href="#cb38-227" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, </span>
+<span id="cb38-228"><a href="#cb38-228" aria-hidden="true" tabindex="-1"></a>     bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-229"><a href="#cb38-229" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
+<span id="cb38-230"><a href="#cb38-230" aria-hidden="true" tabindex="-1"></a>points(beta_post_quants<span class="co">[</span><span class="ot">, &quot;50%&quot;</span><span class="co">]</span>, beta, pch = 20)</span>
+<span id="cb38-231"><a href="#cb38-231" aria-hidden="true" tabindex="-1"></a>for (k in 1:K){</span>
+<span id="cb38-232"><a href="#cb38-232" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;25%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;75%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-233"><a href="#cb38-233" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 2)</span>
+<span id="cb38-234"><a href="#cb38-234" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;2.5%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-235"><a href="#cb38-235" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 0.5)</span>
+<span id="cb38-236"><a href="#cb38-236" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-237"><a href="#cb38-237" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
+<span id="cb38-238"><a href="#cb38-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-239"><a href="#cb38-239" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
+<span id="cb38-240"><a href="#cb38-240" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_3</span>
+<span id="cb38-241"><a href="#cb38-241" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-242"><a href="#cb38-242" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb38-243"><a href="#cb38-243" aria-hidden="true" tabindex="-1"></a>drawsa &lt;- as_draws_rvars(fit_3$draws(c(&quot;alpha&quot;)))</span>
+<span id="cb38-244"><a href="#cb38-244" aria-hidden="true" tabindex="-1"></a>rnga &lt;- range(summarize_draws(</span>
+<span id="cb38-245"><a href="#cb38-245" aria-hidden="true" tabindex="-1"></a>  drawsa, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
+<span id="cb38-246"><a href="#cb38-246" aria-hidden="true" tabindex="-1"></a>p3a &lt;- ggplot(data = NULL) +</span>
+<span id="cb38-247"><a href="#cb38-247" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rnga, ylim = rnga) +</span>
+<span id="cb38-248"><a href="#cb38-248" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
+<span id="cb38-249"><a href="#cb38-249" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = alpha, xdist = drawsa$alpha),</span>
+<span id="cb38-250"><a href="#cb38-250" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
+<span id="cb38-251"><a href="#cb38-251" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
+<span id="cb38-252"><a href="#cb38-252" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
+<span id="cb38-253"><a href="#cb38-253" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
+<span id="cb38-254"><a href="#cb38-254" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
+<span id="cb38-255"><a href="#cb38-255" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)))</span>
+<span id="cb38-256"><a href="#cb38-256" aria-hidden="true" tabindex="-1"></a>drawsb &lt;- as_draws_rvars(fit_3$draws(c(&quot;beta&quot;)))</span>
+<span id="cb38-257"><a href="#cb38-257" aria-hidden="true" tabindex="-1"></a>rngb &lt;- range(summarize_draws(</span>
+<span id="cb38-258"><a href="#cb38-258" aria-hidden="true" tabindex="-1"></a>  drawsb, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
+<span id="cb38-259"><a href="#cb38-259" aria-hidden="true" tabindex="-1"></a>p3b &lt;- ggplot(data = NULL) +</span>
+<span id="cb38-260"><a href="#cb38-260" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rngb, ylim = rngb) +</span>
+<span id="cb38-261"><a href="#cb38-261" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
+<span id="cb38-262"><a href="#cb38-262" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = beta, xdist = drawsb$beta),</span>
+<span id="cb38-263"><a href="#cb38-263" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
+<span id="cb38-264"><a href="#cb38-264" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
+<span id="cb38-265"><a href="#cb38-265" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
+<span id="cb38-266"><a href="#cb38-266" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
+<span id="cb38-267"><a href="#cb38-267" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
+<span id="cb38-268"><a href="#cb38-268" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)))</span>
+<span id="cb38-269"><a href="#cb38-269" aria-hidden="true" tabindex="-1"></a>p3a + p3b</span>
+<span id="cb38-270"><a href="#cb38-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-271"><a href="#cb38-271" aria-hidden="true" tabindex="-1"></a>#&#39; ## Unbalanced data</span>
+<span id="cb38-272"><a href="#cb38-272" aria-hidden="true" tabindex="-1"></a>genre &lt;- rep(c(&quot;romantic&quot;, &quot;crime&quot;), c(round(J / 2), J - round(J / 2)))</span>
+<span id="cb38-273"><a href="#cb38-273" aria-hidden="true" tabindex="-1"></a>prob_of_rated &lt;- ifelse(beta<span class="co">[</span><span class="ot">rater</span><span class="co">]</span> &gt; 0,</span>
+<span id="cb38-274"><a href="#cb38-274" aria-hidden="true" tabindex="-1"></a>                        ifelse(genre<span class="co">[</span><span class="ot">movie</span><span class="co">]</span> == &quot;romantic&quot;, 0.2, 0.7),</span>
+<span id="cb38-275"><a href="#cb38-275" aria-hidden="true" tabindex="-1"></a>                        ifelse(genre<span class="co">[</span><span class="ot">movie</span><span class="co">]</span> == &quot;romantic&quot;, 0.7, 0.2))</span>
+<span id="cb38-276"><a href="#cb38-276" aria-hidden="true" tabindex="-1"></a>rated &lt;- rbinom(N, 1, prob_of_rated)  == 1 # TRUE if movie was rated, FALSE if not</span>
+<span id="cb38-277"><a href="#cb38-277" aria-hidden="true" tabindex="-1"></a>data_3a &lt;- list(N = sum(rated), J = J, K = K, </span>
+<span id="cb38-278"><a href="#cb38-278" aria-hidden="true" tabindex="-1"></a>                movie = movie<span class="co">[</span><span class="ot">rated</span><span class="co">]</span>, rater = rater<span class="co">[</span><span class="ot">rated</span><span class="co">]</span>, </span>
+<span id="cb38-279"><a href="#cb38-279" aria-hidden="true" tabindex="-1"></a>                y = y<span class="co">[</span><span class="ot">rated</span><span class="co">]</span>)</span>
+<span id="cb38-280"><a href="#cb38-280" aria-hidden="true" tabindex="-1"></a>#&#39; Sample</span>
+<span id="cb38-281"><a href="#cb38-281" aria-hidden="true" tabindex="-1"></a>#| label: fit_3a</span>
+<span id="cb38-282"><a href="#cb38-282" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb38-283"><a href="#cb38-283" aria-hidden="true" tabindex="-1"></a>fit_3a &lt;- mod_3$sample(data = data_3a, refresh = 0)</span>
+<span id="cb38-284"><a href="#cb38-284" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary</span>
+<span id="cb38-285"><a href="#cb38-285" aria-hidden="true" tabindex="-1"></a>print(fit_3a, variables = c(&quot;mu&quot;, &quot;sigma_a&quot;, &quot;sigma_b&quot;, &quot;sigma_y&quot;))</span>
+<span id="cb38-286"><a href="#cb38-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-287"><a href="#cb38-287" aria-hidden="true" tabindex="-1"></a>alpha_post &lt;- fit_3a$draws(&quot;alpha&quot;, format = &quot;matrix&quot;)</span>
+<span id="cb38-288"><a href="#cb38-288" aria-hidden="true" tabindex="-1"></a>beta_post &lt;- fit_3a$draws(&quot;beta&quot;, format = &quot;matrix&quot;)</span>
+<span id="cb38-289"><a href="#cb38-289" aria-hidden="true" tabindex="-1"></a>quants &lt;- c(0.025, 0.25, 0.5, 0.75, 0.975)</span>
+<span id="cb38-290"><a href="#cb38-290" aria-hidden="true" tabindex="-1"></a>alpha_post_quants &lt;- t(apply(alpha_post, 2, function(x) quantile(x, probs = quants)))</span>
+<span id="cb38-291"><a href="#cb38-291" aria-hidden="true" tabindex="-1"></a>beta_post_quants &lt;- t(apply(beta_post, 2, function(x) quantile(x, probs = quants)))</span>
+<span id="cb38-292"><a href="#cb38-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-293"><a href="#cb38-293" aria-hidden="true" tabindex="-1"></a>add_legend &lt;- function(text, pch, range) {</span>
+<span id="cb38-294"><a href="#cb38-294" aria-hidden="true" tabindex="-1"></a>  legend(0.6 * min(range) + 0.4 * max(range), </span>
+<span id="cb38-295"><a href="#cb38-295" aria-hidden="true" tabindex="-1"></a>         min(range) + 0.12 * (max(range) - min(range)), </span>
+<span id="cb38-296"><a href="#cb38-296" aria-hidden="true" tabindex="-1"></a>         text<span class="co">[</span><span class="ot">1</span><span class="co">]</span>, pch = pch<span class="co">[</span><span class="ot">1</span><span class="co">]</span>, cex = 0.8, bty = &quot;n&quot;)</span>
+<span id="cb38-297"><a href="#cb38-297" aria-hidden="true" tabindex="-1"></a>  legend(0.6 * min(range) + 0.4 * max(range), </span>
+<span id="cb38-298"><a href="#cb38-298" aria-hidden="true" tabindex="-1"></a>         min(range) + 0.06 * (max(range) - min(range)), </span>
+<span id="cb38-299"><a href="#cb38-299" aria-hidden="true" tabindex="-1"></a>         text<span class="co">[</span><span class="ot">2</span><span class="co">]</span>, pch = pch<span class="co">[</span><span class="ot">2</span><span class="co">]</span>, cex = 0.8, bty = &quot;n&quot;)</span>
+<span id="cb38-300"><a href="#cb38-300" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-301"><a href="#cb38-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-302"><a href="#cb38-302" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_4</span>
+<span id="cb38-303"><a href="#cb38-303" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-304"><a href="#cb38-304" aria-hidden="true" tabindex="-1"></a>#| fig-width: 9</span>
+<span id="cb38-305"><a href="#cb38-305" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(1, 2), oma = c(0, 0, 1, 0))</span>
+<span id="cb38-306"><a href="#cb38-306" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -.02)</span>
+<span id="cb38-307"><a href="#cb38-307" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
+<span id="cb38-308"><a href="#cb38-308" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(alpha_post_quants, alpha)</span>
+<span id="cb38-309"><a href="#cb38-309" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
+<span id="cb38-310"><a href="#cb38-310" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
+<span id="cb38-311"><a href="#cb38-311" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-312"><a href="#cb38-312" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
+<span id="cb38-313"><a href="#cb38-313" aria-hidden="true" tabindex="-1"></a>points(alpha_post_quants<span class="co">[</span><span class="ot">genre==&quot;romantic&quot;, &quot;50%&quot;</span><span class="co">]</span>, alpha<span class="co">[</span><span class="ot">genre==&quot;romantic&quot;</span><span class="co">]</span>,</span>
+<span id="cb38-314"><a href="#cb38-314" aria-hidden="true" tabindex="-1"></a>       pch = 1, cex = 0.9)</span>
+<span id="cb38-315"><a href="#cb38-315" aria-hidden="true" tabindex="-1"></a>points(alpha_post_quants<span class="co">[</span><span class="ot">genre == &quot;crime&quot;, &quot;50%&quot;</span><span class="co">]</span>, alpha<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, </span>
+<span id="cb38-316"><a href="#cb38-316" aria-hidden="true" tabindex="-1"></a>       pch = 20)</span>
+<span id="cb38-317"><a href="#cb38-317" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
+<span id="cb38-318"><a href="#cb38-318" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;25%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;75%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-319"><a href="#cb38-319" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 2)</span>
+<span id="cb38-320"><a href="#cb38-320" aria-hidden="true" tabindex="-1"></a>  lines(c(alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;2.5%&quot;</span><span class="co">]</span>, alpha_post_quants<span class="co">[</span><span class="ot">j, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-321"><a href="#cb38-321" aria-hidden="true" tabindex="-1"></a>        rep(alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5)</span>
+<span id="cb38-322"><a href="#cb38-322" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-323"><a href="#cb38-323" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;), pch = c(1, 20), range = rng)</span>
+<span id="cb38-324"><a href="#cb38-324" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
+<span id="cb38-325"><a href="#cb38-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-326"><a href="#cb38-326" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(beta_post_quants, beta)</span>
+<span id="cb38-327"><a href="#cb38-327" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
+<span id="cb38-328"><a href="#cb38-328" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median, 50%, and 95% interval&quot;, </span>
+<span id="cb38-329"><a href="#cb38-329" aria-hidden="true" tabindex="-1"></a>     ylab = &quot;True parameter value&quot;, </span>
+<span id="cb38-330"><a href="#cb38-330" aria-hidden="true" tabindex="-1"></a>     bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-331"><a href="#cb38-331" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
+<span id="cb38-332"><a href="#cb38-332" aria-hidden="true" tabindex="-1"></a>points(beta_post_quants<span class="co">[</span><span class="ot">beta &lt; 0, &quot;50%&quot;</span><span class="co">]</span>, beta<span class="co">[</span><span class="ot">beta &lt; 0</span><span class="co">]</span>, pch = 1, cex = 0.9)</span>
+<span id="cb38-333"><a href="#cb38-333" aria-hidden="true" tabindex="-1"></a>points(beta_post_quants<span class="co">[</span><span class="ot">beta &gt; 0, &quot;50%&quot;</span><span class="co">]</span>, beta<span class="co">[</span><span class="ot">beta &gt; 0</span><span class="co">]</span>, pch = 20)</span>
+<span id="cb38-334"><a href="#cb38-334" aria-hidden="true" tabindex="-1"></a>for (k in 1:K){</span>
+<span id="cb38-335"><a href="#cb38-335" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;25%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;75%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-336"><a href="#cb38-336" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 2)</span>
+<span id="cb38-337"><a href="#cb38-337" aria-hidden="true" tabindex="-1"></a>  lines(c(beta_post_quants<span class="co">[</span><span class="ot">k, &quot;2.5%&quot;</span><span class="co">]</span>, beta_post_quants<span class="co">[</span><span class="ot">k, &quot;97.5%&quot;</span><span class="co">]</span>), </span>
+<span id="cb38-338"><a href="#cb38-338" aria-hidden="true" tabindex="-1"></a>        rep(beta<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, 2), lwd = 0.5)</span>
+<span id="cb38-339"><a href="#cb38-339" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-340"><a href="#cb38-340" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Nice raters&quot;, &quot;Difficult raters&quot;), pch = c(1, 20), range = rng)</span>
+<span id="cb38-341"><a href="#cb38-341" aria-hidden="true" tabindex="-1"></a>mtext(expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;)), side = 3)</span>
+<span id="cb38-342"><a href="#cb38-342" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Checking fits for model when difficult reviewers were more likely to rate certain genres&quot;,</span>
+<span id="cb38-343"><a href="#cb38-343" aria-hidden="true" tabindex="-1"></a>      side = 3, outer = TRUE)</span>
 <span id="cb38-344"><a href="#cb38-344" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-345"><a href="#cb38-345" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
-<span id="cb38-346"><a href="#cb38-346" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_4</span>
-<span id="cb38-347"><a href="#cb38-347" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-348"><a href="#cb38-348" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb38-349"><a href="#cb38-349" aria-hidden="true" tabindex="-1"></a>drawsa &lt;- as_draws_rvars(fit_3a$draws(c(&quot;alpha&quot;)))</span>
-<span id="cb38-350"><a href="#cb38-350" aria-hidden="true" tabindex="-1"></a>rnga &lt;- range(summarize_draws(</span>
-<span id="cb38-351"><a href="#cb38-351" aria-hidden="true" tabindex="-1"></a>  drawsa, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
-<span id="cb38-352"><a href="#cb38-352" aria-hidden="true" tabindex="-1"></a>p4a &lt;- ggplot(data = NULL) +</span>
-<span id="cb38-353"><a href="#cb38-353" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rnga, ylim = rnga) +</span>
-<span id="cb38-354"><a href="#cb38-354" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
-<span id="cb38-355"><a href="#cb38-355" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = alpha, xdist = drawsa$alpha, shape = genre),</span>
-<span id="cb38-356"><a href="#cb38-356" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
-<span id="cb38-357"><a href="#cb38-357" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
-<span id="cb38-358"><a href="#cb38-358" aria-hidden="true" tabindex="-1"></a>                     point_size = 2,</span>
-<span id="cb38-359"><a href="#cb38-359" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
-<span id="cb38-360"><a href="#cb38-360" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;)) +</span>
-<span id="cb38-361"><a href="#cb38-361" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
-<span id="cb38-362"><a href="#cb38-362" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
-<span id="cb38-363"><a href="#cb38-363" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;))) +</span>
-<span id="cb38-364"><a href="#cb38-364" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
-<span id="cb38-365"><a href="#cb38-365" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
-<span id="cb38-366"><a href="#cb38-366" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
-<span id="cb38-367"><a href="#cb38-367" aria-hidden="true" tabindex="-1"></a>drawsb &lt;- as_draws_rvars(fit_3a$draws(c(&quot;beta&quot;)))</span>
-<span id="cb38-368"><a href="#cb38-368" aria-hidden="true" tabindex="-1"></a>rngb &lt;- range(summarize_draws(</span>
-<span id="cb38-369"><a href="#cb38-369" aria-hidden="true" tabindex="-1"></a>  drawsb, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
-<span id="cb38-370"><a href="#cb38-370" aria-hidden="true" tabindex="-1"></a>p4b &lt;- ggplot(data = NULL) +</span>
-<span id="cb38-371"><a href="#cb38-371" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rngb, ylim = rngb) +</span>
-<span id="cb38-372"><a href="#cb38-372" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
-<span id="cb38-373"><a href="#cb38-373" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = beta, xdist = drawsb$beta, shape = factor(beta&gt;0)),</span>
-<span id="cb38-374"><a href="#cb38-374" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
-<span id="cb38-375"><a href="#cb38-375" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
-<span id="cb38-376"><a href="#cb38-376" aria-hidden="true" tabindex="-1"></a>                     point_size = 2,</span>
-<span id="cb38-377"><a href="#cb38-377" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
-<span id="cb38-378"><a href="#cb38-378" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Nice raters&quot;, &quot;Difficult raters&quot;)) +</span>
-<span id="cb38-379"><a href="#cb38-379" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
-<span id="cb38-380"><a href="#cb38-380" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
-<span id="cb38-381"><a href="#cb38-381" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;))) +</span>
-<span id="cb38-382"><a href="#cb38-382" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
-<span id="cb38-383"><a href="#cb38-383" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
-<span id="cb38-384"><a href="#cb38-384" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
-<span id="cb38-385"><a href="#cb38-385" aria-hidden="true" tabindex="-1"></a>p4a + p4b</span>
-<span id="cb38-386"><a href="#cb38-386" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-387"><a href="#cb38-387" aria-hidden="true" tabindex="-1"></a>#&#39; # Comparison to naive data averaging</span>
-<span id="cb38-388"><a href="#cb38-388" aria-hidden="true" tabindex="-1"></a>ybar &lt;- rep(NA, J)</span>
-<span id="cb38-389"><a href="#cb38-389" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
-<span id="cb38-390"><a href="#cb38-390" aria-hidden="true" tabindex="-1"></a>  ybar<span class="co">[</span><span class="ot">j</span><span class="co">]</span> &lt;- mean(y<span class="co">[</span><span class="ot">movie == j &amp; rated</span><span class="co">]</span>)</span>
-<span id="cb38-391"><a href="#cb38-391" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb38-392"><a href="#cb38-392" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-393"><a href="#cb38-393" aria-hidden="true" tabindex="-1"></a>a_true &lt;- mu + sigma_a * alpha</span>
-<span id="cb38-394"><a href="#cb38-394" aria-hidden="true" tabindex="-1"></a>a_post_median &lt;- fit_3a$summary(variables =  &quot;a&quot;)$median</span>
-<span id="cb38-395"><a href="#cb38-395" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-396"><a href="#cb38-396" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_5</span>
-<span id="cb38-397"><a href="#cb38-397" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-398"><a href="#cb38-398" aria-hidden="true" tabindex="-1"></a>#| fig-width: 9</span>
-<span id="cb38-399"><a href="#cb38-399" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(1, 2))</span>
-<span id="cb38-400"><a href="#cb38-400" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -0.02)</span>
-<span id="cb38-401"><a href="#cb38-401" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
-<span id="cb38-402"><a href="#cb38-402" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(a_post_median, ybar, a_true)</span>
-<span id="cb38-403"><a href="#cb38-403" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
-<span id="cb38-404"><a href="#cb38-404" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Raw average rating for movie j&quot;, </span>
-<span id="cb38-405"><a href="#cb38-405" aria-hidden="true" tabindex="-1"></a>     ylab = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)), bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-406"><a href="#cb38-406" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
-<span id="cb38-407"><a href="#cb38-407" aria-hidden="true" tabindex="-1"></a>points(ybar<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, pch = 1, cex = 0.9)</span>
-<span id="cb38-408"><a href="#cb38-408" aria-hidden="true" tabindex="-1"></a>points(ybar<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, pch = 20)</span>
-<span id="cb38-409"><a href="#cb38-409" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Problems with raw averaging&quot;, side = 3)</span>
-<span id="cb38-410"><a href="#cb38-410" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;), pch = c(1, 20), range = rng)</span>
-<span id="cb38-411"><a href="#cb38-411" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
-<span id="cb38-412"><a href="#cb38-412" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median estimate for movie j&quot;, </span>
-<span id="cb38-413"><a href="#cb38-413" aria-hidden="true" tabindex="-1"></a>     ylab = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)), bty = &quot;l&quot;, type = &quot;n&quot;)</span>
-<span id="cb38-414"><a href="#cb38-414" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
-<span id="cb38-415"><a href="#cb38-415" aria-hidden="true" tabindex="-1"></a>points(a_post_median<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, pch = 1, cex = 0.9)</span>
-<span id="cb38-416"><a href="#cb38-416" aria-hidden="true" tabindex="-1"></a>points(a_post_median<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, pch = 20)</span>
-<span id="cb38-417"><a href="#cb38-417" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Model-based estimates do better&quot;, side = 3)</span>
-<span id="cb38-418"><a href="#cb38-418" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;), pch = c(1, 20), range = rng)</span>
-<span id="cb38-419"><a href="#cb38-419" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Problems with raw averages when difficult reviewers were more likely to rate certain genres&quot;,</span>
-<span id="cb38-420"><a href="#cb38-420" aria-hidden="true" tabindex="-1"></a>      side = 3, outer = TRUE)</span>
-<span id="cb38-421"><a href="#cb38-421" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-422"><a href="#cb38-422" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
-<span id="cb38-423"><a href="#cb38-423" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_5</span>
-<span id="cb38-424"><a href="#cb38-424" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb38-425"><a href="#cb38-425" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
-<span id="cb38-426"><a href="#cb38-426" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(a_post_median, ybar, a_true)</span>
-<span id="cb38-427"><a href="#cb38-427" aria-hidden="true" tabindex="-1"></a>p5a &lt;- ggplot(data = NULL, aes(x = ybar, y = a_true, shape = genre)) +</span>
-<span id="cb38-428"><a href="#cb38-428" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rng, ylim = rng) +</span>
-<span id="cb38-429"><a href="#cb38-429" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
-<span id="cb38-430"><a href="#cb38-430" aria-hidden="true" tabindex="-1"></a>  geom_point(size = 2) +</span>
-<span id="cb38-431"><a href="#cb38-431" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;)) +</span>
-<span id="cb38-432"><a href="#cb38-432" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Raw average rating for movie j&quot;,</span>
-<span id="cb38-433"><a href="#cb38-433" aria-hidden="true" tabindex="-1"></a>       y = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)),</span>
-<span id="cb38-434"><a href="#cb38-434" aria-hidden="true" tabindex="-1"></a>       title = &quot;Problems with raw averaging&quot;) +</span>
-<span id="cb38-435"><a href="#cb38-435" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
-<span id="cb38-436"><a href="#cb38-436" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
-<span id="cb38-437"><a href="#cb38-437" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
-<span id="cb38-438"><a href="#cb38-438" aria-hidden="true" tabindex="-1"></a>p5b &lt;- ggplot(data = NULL, aes(x = a_post_median, y = a_true, shape = genre)) +</span>
-<span id="cb38-439"><a href="#cb38-439" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rng, ylim = rng) +</span>
-<span id="cb38-440"><a href="#cb38-440" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
-<span id="cb38-441"><a href="#cb38-441" aria-hidden="true" tabindex="-1"></a>  geom_point(size = 2) +</span>
-<span id="cb38-442"><a href="#cb38-442" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;)) +</span>
-<span id="cb38-443"><a href="#cb38-443" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median estimate for movie j&quot;,</span>
-<span id="cb38-444"><a href="#cb38-444" aria-hidden="true" tabindex="-1"></a>       y = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)),</span>
-<span id="cb38-445"><a href="#cb38-445" aria-hidden="true" tabindex="-1"></a>       title = &quot;Model-based estimates do better&quot;) +</span>
-<span id="cb38-446"><a href="#cb38-446" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
-<span id="cb38-447"><a href="#cb38-447" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
-<span id="cb38-448"><a href="#cb38-448" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
-<span id="cb38-449"><a href="#cb38-449" aria-hidden="true" tabindex="-1"></a>p5a + p5b</span>
-<span id="cb38-450"><a href="#cb38-450" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb38-451"><a href="#cb38-451" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
-<span id="cb38-452"><a href="#cb38-452" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb38-453"><a href="#cb38-453" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under BSD-3.</span>
-<span id="cb38-454"><a href="#cb38-454" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
+<span id="cb38-345"><a href="#cb38-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-346"><a href="#cb38-346" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
+<span id="cb38-347"><a href="#cb38-347" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_4</span>
+<span id="cb38-348"><a href="#cb38-348" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-349"><a href="#cb38-349" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb38-350"><a href="#cb38-350" aria-hidden="true" tabindex="-1"></a>drawsa &lt;- as_draws_rvars(fit_3a$draws(c(&quot;alpha&quot;)))</span>
+<span id="cb38-351"><a href="#cb38-351" aria-hidden="true" tabindex="-1"></a>rnga &lt;- range(summarize_draws(</span>
+<span id="cb38-352"><a href="#cb38-352" aria-hidden="true" tabindex="-1"></a>  drawsa, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
+<span id="cb38-353"><a href="#cb38-353" aria-hidden="true" tabindex="-1"></a>p4a &lt;- ggplot(data = NULL) +</span>
+<span id="cb38-354"><a href="#cb38-354" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rnga, ylim = rnga) +</span>
+<span id="cb38-355"><a href="#cb38-355" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
+<span id="cb38-356"><a href="#cb38-356" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = alpha, xdist = drawsa$alpha, shape = genre),</span>
+<span id="cb38-357"><a href="#cb38-357" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
+<span id="cb38-358"><a href="#cb38-358" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
+<span id="cb38-359"><a href="#cb38-359" aria-hidden="true" tabindex="-1"></a>                     point_size = 2,</span>
+<span id="cb38-360"><a href="#cb38-360" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
+<span id="cb38-361"><a href="#cb38-361" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;)) +</span>
+<span id="cb38-362"><a href="#cb38-362" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
+<span id="cb38-363"><a href="#cb38-363" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
+<span id="cb38-364"><a href="#cb38-364" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, alpha<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;))) +</span>
+<span id="cb38-365"><a href="#cb38-365" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
+<span id="cb38-366"><a href="#cb38-366" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
+<span id="cb38-367"><a href="#cb38-367" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
+<span id="cb38-368"><a href="#cb38-368" aria-hidden="true" tabindex="-1"></a>drawsb &lt;- as_draws_rvars(fit_3a$draws(c(&quot;beta&quot;)))</span>
+<span id="cb38-369"><a href="#cb38-369" aria-hidden="true" tabindex="-1"></a>rngb &lt;- range(summarize_draws(</span>
+<span id="cb38-370"><a href="#cb38-370" aria-hidden="true" tabindex="-1"></a>  drawsb, ~quantile(.x, probs = c(0.025, 0.975)))<span class="co">[</span><span class="ot">,c(&quot;2.5%&quot;,&quot;97.5%&quot;)</span><span class="co">]</span>)</span>
+<span id="cb38-371"><a href="#cb38-371" aria-hidden="true" tabindex="-1"></a>p4b &lt;- ggplot(data = NULL) +</span>
+<span id="cb38-372"><a href="#cb38-372" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rngb, ylim = rngb) +</span>
+<span id="cb38-373"><a href="#cb38-373" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
+<span id="cb38-374"><a href="#cb38-374" aria-hidden="true" tabindex="-1"></a>  stat_pointinterval(aes(y = beta, xdist = drawsb$beta, shape = factor(beta&gt;0)),</span>
+<span id="cb38-375"><a href="#cb38-375" aria-hidden="true" tabindex="-1"></a>                     .width = c(0.5, 0.95),</span>
+<span id="cb38-376"><a href="#cb38-376" aria-hidden="true" tabindex="-1"></a>                     interval_size_range = c(0.4, 0.8),</span>
+<span id="cb38-377"><a href="#cb38-377" aria-hidden="true" tabindex="-1"></a>                     point_size = 2,</span>
+<span id="cb38-378"><a href="#cb38-378" aria-hidden="true" tabindex="-1"></a>                     alpha = 0.5) +</span>
+<span id="cb38-379"><a href="#cb38-379" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Nice raters&quot;, &quot;Difficult raters&quot;)) +</span>
+<span id="cb38-380"><a href="#cb38-380" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median, 50%, and 95% interval&quot;,</span>
+<span id="cb38-381"><a href="#cb38-381" aria-hidden="true" tabindex="-1"></a>       y = &quot;True parameter value&quot;,</span>
+<span id="cb38-382"><a href="#cb38-382" aria-hidden="true" tabindex="-1"></a>       title = expression(paste(&quot;Checking the &quot;, beta<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, &quot;&#39;s&quot;))) +</span>
+<span id="cb38-383"><a href="#cb38-383" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
+<span id="cb38-384"><a href="#cb38-384" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
+<span id="cb38-385"><a href="#cb38-385" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
+<span id="cb38-386"><a href="#cb38-386" aria-hidden="true" tabindex="-1"></a>p4a + p4b</span>
+<span id="cb38-387"><a href="#cb38-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-388"><a href="#cb38-388" aria-hidden="true" tabindex="-1"></a>#&#39; # Comparison to naive data averaging</span>
+<span id="cb38-389"><a href="#cb38-389" aria-hidden="true" tabindex="-1"></a>ybar &lt;- rep(NA, J)</span>
+<span id="cb38-390"><a href="#cb38-390" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
+<span id="cb38-391"><a href="#cb38-391" aria-hidden="true" tabindex="-1"></a>  ybar<span class="co">[</span><span class="ot">j</span><span class="co">]</span> &lt;- mean(y<span class="co">[</span><span class="ot">movie == j &amp; rated</span><span class="co">]</span>)</span>
+<span id="cb38-392"><a href="#cb38-392" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb38-393"><a href="#cb38-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-394"><a href="#cb38-394" aria-hidden="true" tabindex="-1"></a>a_true &lt;- mu + sigma_a * alpha</span>
+<span id="cb38-395"><a href="#cb38-395" aria-hidden="true" tabindex="-1"></a>a_post_median &lt;- fit_3a$summary(variables =  &quot;a&quot;)$median</span>
+<span id="cb38-396"><a href="#cb38-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-397"><a href="#cb38-397" aria-hidden="true" tabindex="-1"></a>#| label: fig-movies_5</span>
+<span id="cb38-398"><a href="#cb38-398" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-399"><a href="#cb38-399" aria-hidden="true" tabindex="-1"></a>#| fig-width: 9</span>
+<span id="cb38-400"><a href="#cb38-400" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(1, 2))</span>
+<span id="cb38-401"><a href="#cb38-401" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 1), mgp = c(1.7, .5, 0), tck = -0.02)</span>
+<span id="cb38-402"><a href="#cb38-402" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;)</span>
+<span id="cb38-403"><a href="#cb38-403" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(a_post_median, ybar, a_true)</span>
+<span id="cb38-404"><a href="#cb38-404" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
+<span id="cb38-405"><a href="#cb38-405" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Raw average rating for movie j&quot;, </span>
+<span id="cb38-406"><a href="#cb38-406" aria-hidden="true" tabindex="-1"></a>     ylab = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)), bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-407"><a href="#cb38-407" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
+<span id="cb38-408"><a href="#cb38-408" aria-hidden="true" tabindex="-1"></a>points(ybar<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, pch = 1, cex = 0.9)</span>
+<span id="cb38-409"><a href="#cb38-409" aria-hidden="true" tabindex="-1"></a>points(ybar<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, pch = 20)</span>
+<span id="cb38-410"><a href="#cb38-410" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Problems with raw averaging&quot;, side = 3)</span>
+<span id="cb38-411"><a href="#cb38-411" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;), pch = c(1, 20), range = rng)</span>
+<span id="cb38-412"><a href="#cb38-412" aria-hidden="true" tabindex="-1"></a>plot(rng, rng, </span>
+<span id="cb38-413"><a href="#cb38-413" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior median estimate for movie j&quot;, </span>
+<span id="cb38-414"><a href="#cb38-414" aria-hidden="true" tabindex="-1"></a>     ylab = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)), bty = &quot;l&quot;, type = &quot;n&quot;)</span>
+<span id="cb38-415"><a href="#cb38-415" aria-hidden="true" tabindex="-1"></a>abline(0, 1, col = &quot;gray&quot;)</span>
+<span id="cb38-416"><a href="#cb38-416" aria-hidden="true" tabindex="-1"></a>points(a_post_median<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;romantic&quot;</span><span class="co">]</span>, pch = 1, cex = 0.9)</span>
+<span id="cb38-417"><a href="#cb38-417" aria-hidden="true" tabindex="-1"></a>points(a_post_median<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, a_true<span class="co">[</span><span class="ot">genre == &quot;crime&quot;</span><span class="co">]</span>, pch = 20)</span>
+<span id="cb38-418"><a href="#cb38-418" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Model-based estimates do better&quot;, side = 3)</span>
+<span id="cb38-419"><a href="#cb38-419" aria-hidden="true" tabindex="-1"></a>add_legend(c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;), pch = c(1, 20), range = rng)</span>
+<span id="cb38-420"><a href="#cb38-420" aria-hidden="true" tabindex="-1"></a>mtext(&quot;Problems with raw averages when difficult reviewers were more likely to rate certain genres&quot;,</span>
+<span id="cb38-421"><a href="#cb38-421" aria-hidden="true" tabindex="-1"></a>      side = 3, outer = TRUE)</span>
+<span id="cb38-422"><a href="#cb38-422" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-423"><a href="#cb38-423" aria-hidden="true" tabindex="-1"></a>#&#39; ggplot version</span>
+<span id="cb38-424"><a href="#cb38-424" aria-hidden="true" tabindex="-1"></a>#| label: fig-gg-movies_5</span>
+<span id="cb38-425"><a href="#cb38-425" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb38-426"><a href="#cb38-426" aria-hidden="true" tabindex="-1"></a>#| fig-width: 8</span>
+<span id="cb38-427"><a href="#cb38-427" aria-hidden="true" tabindex="-1"></a>rng &lt;- range(a_post_median, ybar, a_true)</span>
+<span id="cb38-428"><a href="#cb38-428" aria-hidden="true" tabindex="-1"></a>p5a &lt;- ggplot(data = NULL, aes(x = ybar, y = a_true, shape = genre)) +</span>
+<span id="cb38-429"><a href="#cb38-429" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rng, ylim = rng) +</span>
+<span id="cb38-430"><a href="#cb38-430" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
+<span id="cb38-431"><a href="#cb38-431" aria-hidden="true" tabindex="-1"></a>  geom_point(size = 2) +</span>
+<span id="cb38-432"><a href="#cb38-432" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;)) +</span>
+<span id="cb38-433"><a href="#cb38-433" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Raw average rating for movie j&quot;,</span>
+<span id="cb38-434"><a href="#cb38-434" aria-hidden="true" tabindex="-1"></a>       y = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)),</span>
+<span id="cb38-435"><a href="#cb38-435" aria-hidden="true" tabindex="-1"></a>       title = &quot;Problems with raw averaging&quot;) +</span>
+<span id="cb38-436"><a href="#cb38-436" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
+<span id="cb38-437"><a href="#cb38-437" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
+<span id="cb38-438"><a href="#cb38-438" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
+<span id="cb38-439"><a href="#cb38-439" aria-hidden="true" tabindex="-1"></a>p5b &lt;- ggplot(data = NULL, aes(x = a_post_median, y = a_true, shape = genre)) +</span>
+<span id="cb38-440"><a href="#cb38-440" aria-hidden="true" tabindex="-1"></a>  coord_fixed(xlim = rng, ylim = rng) +</span>
+<span id="cb38-441"><a href="#cb38-441" aria-hidden="true" tabindex="-1"></a>  geom_abline(color = &quot;gray&quot;) +</span>
+<span id="cb38-442"><a href="#cb38-442" aria-hidden="true" tabindex="-1"></a>  geom_point(size = 2) +</span>
+<span id="cb38-443"><a href="#cb38-443" aria-hidden="true" tabindex="-1"></a>  scale_shape_manual(values = c(1, 19), labels = c(&quot;Romantic comedies&quot;, &quot;Crime movies&quot;)) +</span>
+<span id="cb38-444"><a href="#cb38-444" aria-hidden="true" tabindex="-1"></a>  labs(x = &quot;Posterior median estimate for movie j&quot;,</span>
+<span id="cb38-445"><a href="#cb38-445" aria-hidden="true" tabindex="-1"></a>       y = expression(paste(&quot;True &quot;,  a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>)),</span>
+<span id="cb38-446"><a href="#cb38-446" aria-hidden="true" tabindex="-1"></a>       title = &quot;Model-based estimates do better&quot;) +</span>
+<span id="cb38-447"><a href="#cb38-447" aria-hidden="true" tabindex="-1"></a>  guides(shape = guide_legend(position = &quot;inside&quot;)) +</span>
+<span id="cb38-448"><a href="#cb38-448" aria-hidden="true" tabindex="-1"></a>  theme(legend.justification.inside = c(0.5, 0),</span>
+<span id="cb38-449"><a href="#cb38-449" aria-hidden="true" tabindex="-1"></a>        legend.title = element_blank())</span>
+<span id="cb38-450"><a href="#cb38-450" aria-hidden="true" tabindex="-1"></a>p5a + p5b</span>
+<span id="cb38-451"><a href="#cb38-451" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-452"><a href="#cb38-452" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
+<span id="cb38-453"><a href="#cb38-453" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb38-454"><a href="#cb38-454" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under BSD-3.</span>
+<span id="cb38-455"><a href="#cb38-455" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

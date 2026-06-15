@@ -3915,6 +3915,12 @@ box-shadow: none !important;
 padding: 0 !important;
 }
 </style>
+<meta property="og:title" content="Posterior predictive checking: Stochastic learning in dogs – Bayesian Workflow book">
+<meta property="og:description" content="Website for the Bayesian Workflow book by Gelman, Vehtari, McElreath, et al. — case studies, code, and exercises in R and Stan.">
+<meta property="og:image" content="https://avehtari.github.io/Bayesian-Workflow/social-cards/dogs_stan.png">
+<meta property="og:site_name" content="Bayesian Workflow book">
+<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
 </head>
 
 <body class="nav-sidebar docked nav-fixed quarto-light">
@@ -4185,7 +4191,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-15</p>
     </div>
   </div>
     
@@ -4827,7 +4833,7 @@ Bush, R. R., and F. Mosteller. 1955. <em>Stochastic Models for Learning</em>. Wi
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/avehtari\.github\.io\/Bayesian-Workflow\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -5155,327 +5161,328 @@ Bush, R. R., and F. Mosteller. 1955. <em>Stochastic Models for Learning</em>. Wi
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Posterior predictive checking: Stochastic learning in dogs&quot;</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman&quot;</span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-07-16</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
-<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
-<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
-<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
-<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
-<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
-<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
-<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
-<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the <span class="in">`CmdStanR`</span> code for the Bayesian Workflow book</span>
-<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 21 *Posterior predictive checking: Stochastic learning in dogs*.</span>
-<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
-<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>#&#39; We analyse stochastic learning in dogs data by</span>
-<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>#&#39; @Bush+Mosteller:1955.</span>
-<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
-<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
-<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
-<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>  cache=FALSE,</span>
-<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>  message=FALSE,</span>
-<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>  error=FALSE,</span>
-<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>  warning=TRUE,</span>
-<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>  comment=NA,</span>
-<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>  out.width=&#39;95%&#39;</span>
-<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages**</span>
-<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
-<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
-<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
-<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
-<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a><span class="fu"># CmdStanR output directory makes Quarto cache to work</span></span>
-<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a>dir.create(root(&quot;dogs&quot;, &quot;stan_output&quot;), showWarnings = FALSE)</span>
-<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a>options(cmdstanr_output_dir = root(&quot;dogs&quot;, &quot;stan_output&quot;))</span>
-<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
-<span id="cb48-43"><a href="#cb48-43" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
-<span id="cb48-44"><a href="#cb48-44" aria-hidden="true" tabindex="-1"></a>library(MASS)</span>
-<span id="cb48-45"><a href="#cb48-45" aria-hidden="true" tabindex="-1"></a>library(arm)</span>
-<span id="cb48-46"><a href="#cb48-46" aria-hidden="true" tabindex="-1"></a>set.seed(123)</span>
-<span id="cb48-47"><a href="#cb48-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-48"><a href="#cb48-48" aria-hidden="true" tabindex="-1"></a>#&#39; # Data</span>
-<span id="cb48-49"><a href="#cb48-49" aria-hidden="true" tabindex="-1"></a>dogs &lt;- read.table(root(&quot;dogs&quot;, &quot;data&quot;, &quot;dogs.dat&quot;), skip = 2)</span>
-<span id="cb48-50"><a href="#cb48-50" aria-hidden="true" tabindex="-1"></a>shock &lt;- ifelse(as.matrix(dogs<span class="co">[</span><span class="ot">, 2:26</span><span class="co">]</span>) == &quot;S&quot;, 1, 0)</span>
-<span id="cb48-51"><a href="#cb48-51" aria-hidden="true" tabindex="-1"></a>dogs_data &lt;- list(y = shock, J = nrow(shock), T = ncol(shock))</span>
-<span id="cb48-52"><a href="#cb48-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-53"><a href="#cb48-53" aria-hidden="true" tabindex="-1"></a>#&#39; # Models</span>
-<span id="cb48-54"><a href="#cb48-54" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-55"><a href="#cb48-55" aria-hidden="true" tabindex="-1"></a>dogs_0 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_0.stan&quot;))</span>
-<span id="cb48-56"><a href="#cb48-56" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-57"><a href="#cb48-57" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-58"><a href="#cb48-58" aria-hidden="true" tabindex="-1"></a>fit_0 &lt;- dogs_0$sample(data = dogs_data, refresh = 0)</span>
-<span id="cb48-59"><a href="#cb48-59" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-60"><a href="#cb48-60" aria-hidden="true" tabindex="-1"></a>print(fit_0)</span>
-<span id="cb48-61"><a href="#cb48-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-62"><a href="#cb48-62" aria-hidden="true" tabindex="-1"></a>dogs_1 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_1.stan&quot;))</span>
-<span id="cb48-63"><a href="#cb48-63" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-64"><a href="#cb48-64" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-65"><a href="#cb48-65" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- dogs_1$sample(data = dogs_data, refresh = 0)</span>
-<span id="cb48-66"><a href="#cb48-66" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-67"><a href="#cb48-67" aria-hidden="true" tabindex="-1"></a>print(fit_1)</span>
-<span id="cb48-68"><a href="#cb48-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-69"><a href="#cb48-69" aria-hidden="true" tabindex="-1"></a>dogs_2 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_2.stan&quot;))</span>
-<span id="cb48-70"><a href="#cb48-70" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-71"><a href="#cb48-71" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-72"><a href="#cb48-72" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- dogs_2$sample(data = dogs_data, refresh = 0)</span>
-<span id="cb48-73"><a href="#cb48-73" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-74"><a href="#cb48-74" aria-hidden="true" tabindex="-1"></a>print(fit_2)</span>
-<span id="cb48-75"><a href="#cb48-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-76"><a href="#cb48-76" aria-hidden="true" tabindex="-1"></a>dogs_3 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_3.stan&quot;))</span>
-<span id="cb48-77"><a href="#cb48-77" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-78"><a href="#cb48-78" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-79"><a href="#cb48-79" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- dogs_3$sample(data = dogs_data, refresh = 0)</span>
-<span id="cb48-80"><a href="#cb48-80" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-81"><a href="#cb48-81" aria-hidden="true" tabindex="-1"></a>print(fit_3, variables = c(&quot;mu_logit_a&quot;, &quot;sigma_logit_a&quot;))</span>
-<span id="cb48-82"><a href="#cb48-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-83"><a href="#cb48-83" aria-hidden="true" tabindex="-1"></a>dogs_4 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_4.stan&quot;))</span>
-<span id="cb48-84"><a href="#cb48-84" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-85"><a href="#cb48-85" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-86"><a href="#cb48-86" aria-hidden="true" tabindex="-1"></a>fit_4 &lt;- dogs_4$sample(data = dogs_data, refresh = 0)</span>
-<span id="cb48-87"><a href="#cb48-87" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-88"><a href="#cb48-88" aria-hidden="true" tabindex="-1"></a>print(fit_4, variables = c(&quot;mu_logit_ab&quot;, &quot;Sigma_logit_ab&quot;))</span>
-<span id="cb48-89"><a href="#cb48-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-90"><a href="#cb48-90" aria-hidden="true" tabindex="-1"></a>dogs_5 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_5.stan&quot;))</span>
-<span id="cb48-91"><a href="#cb48-91" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-92"><a href="#cb48-92" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-93"><a href="#cb48-93" aria-hidden="true" tabindex="-1"></a>fit_5 &lt;- dogs_5$sample(data = dogs_data, refresh = 0)</span>
-<span id="cb48-94"><a href="#cb48-94" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-95"><a href="#cb48-95" aria-hidden="true" tabindex="-1"></a>print(fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
-<span id="cb48-96"><a href="#cb48-96" aria-hidden="true" tabindex="-1"></a>                           &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;))</span>
-<span id="cb48-97"><a href="#cb48-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-98"><a href="#cb48-98" aria-hidden="true" tabindex="-1"></a>#&#39; # Plots</span>
-<span id="cb48-99"><a href="#cb48-99" aria-hidden="true" tabindex="-1"></a>empty_plot &lt;- function(a = &quot;&quot;) {</span>
-<span id="cb48-100"><a href="#cb48-100" aria-hidden="true" tabindex="-1"></a>  plot(0, 0, bty = &quot;n&quot;, xaxt = &quot;n&quot;, yaxt = &quot;n&quot;, type = &quot;n&quot;)</span>
-<span id="cb48-101"><a href="#cb48-101" aria-hidden="true" tabindex="-1"></a>  text(0, 0, a, cex = .8)</span>
-<span id="cb48-102"><a href="#cb48-102" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-103"><a href="#cb48-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-104"><a href="#cb48-104" aria-hidden="true" tabindex="-1"></a>plot_dogs &lt;- function(y, ...) {</span>
-<span id="cb48-105"><a href="#cb48-105" aria-hidden="true" tabindex="-1"></a>  J &lt;- nrow(y)</span>
-<span id="cb48-106"><a href="#cb48-106" aria-hidden="true" tabindex="-1"></a>  T &lt;- ncol(y)</span>
-<span id="cb48-107"><a href="#cb48-107" aria-hidden="true" tabindex="-1"></a>  max_y_times &lt;- rep(NA, J)</span>
-<span id="cb48-108"><a href="#cb48-108" aria-hidden="true" tabindex="-1"></a>  for (j in 1:J) {</span>
-<span id="cb48-109"><a href="#cb48-109" aria-hidden="true" tabindex="-1"></a>    max_y_times<span class="co">[</span><span class="ot">j</span><span class="co">]</span> &lt;- max((1:T)<span class="co">[</span><span class="ot">y[j, ] == 1</span><span class="co">]</span>)</span>
-<span id="cb48-110"><a href="#cb48-110" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb48-111"><a href="#cb48-111" aria-hidden="true" tabindex="-1"></a>  y_ordered &lt;- y<span class="co">[</span><span class="ot">rev(order(max_y_times)), </span><span class="co">]</span></span>
-<span id="cb48-112"><a href="#cb48-112" aria-hidden="true" tabindex="-1"></a>  image(t(y_ordered), bty = &quot;n&quot;, xaxt = &quot;n&quot;, yaxt = &quot;n&quot;, ...)</span>
-<span id="cb48-113"><a href="#cb48-113" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-114"><a href="#cb48-114" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-115"><a href="#cb48-115" aria-hidden="true" tabindex="-1"></a>plot_ppc &lt;- function(fit, label){</span>
-<span id="cb48-116"><a href="#cb48-116" aria-hidden="true" tabindex="-1"></a>  post &lt;- as_draws_rvars(fit$draws())</span>
-<span id="cb48-117"><a href="#cb48-117" aria-hidden="true" tabindex="-1"></a>  empty_plot(label)</span>
-<span id="cb48-118"><a href="#cb48-118" aria-hidden="true" tabindex="-1"></a>  for (k in 1:3) {</span>
-<span id="cb48-119"><a href="#cb48-119" aria-hidden="true" tabindex="-1"></a>    for (i in sample(1000, 2)) {</span>
-<span id="cb48-120"><a href="#cb48-120" aria-hidden="true" tabindex="-1"></a>      rep &lt;- sum(subset_draws(post, iter = i, chain = k)$y_rep)</span>
-<span id="cb48-121"><a href="#cb48-121" aria-hidden="true" tabindex="-1"></a>      plot_dogs(rep)</span>
-<span id="cb48-122"><a href="#cb48-122" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb48-123"><a href="#cb48-123" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb48-124"><a href="#cb48-124" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-125"><a href="#cb48-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>#&#39; image: ../social-cards/dogs_stan.png</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Posterior predictive checking: Stochastic learning in dogs&quot;</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman&quot;</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-07-16</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the <span class="in">`CmdStanR`</span> code for the Bayesian Workflow book</span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 21 *Posterior predictive checking: Stochastic learning in dogs*.</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>#&#39; We analyse stochastic learning in dogs data by</span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>#&#39; @Bush+Mosteller:1955.</span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>#&#39; </span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>  cache=FALSE,</span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>  message=FALSE,</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>  error=FALSE,</span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>  warning=TRUE,</span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>  comment=NA,</span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>  out.width=&#39;95%&#39;</span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages**</span>
+<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
+<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
+<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
+<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
+<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a><span class="fu"># CmdStanR output directory makes Quarto cache to work</span></span>
+<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a>dir.create(root(&quot;dogs&quot;, &quot;stan_output&quot;), showWarnings = FALSE)</span>
+<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a>options(cmdstanr_output_dir = root(&quot;dogs&quot;, &quot;stan_output&quot;))</span>
+<span id="cb48-43"><a href="#cb48-43" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
+<span id="cb48-44"><a href="#cb48-44" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
+<span id="cb48-45"><a href="#cb48-45" aria-hidden="true" tabindex="-1"></a>library(MASS)</span>
+<span id="cb48-46"><a href="#cb48-46" aria-hidden="true" tabindex="-1"></a>library(arm)</span>
+<span id="cb48-47"><a href="#cb48-47" aria-hidden="true" tabindex="-1"></a>set.seed(123)</span>
+<span id="cb48-48"><a href="#cb48-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-49"><a href="#cb48-49" aria-hidden="true" tabindex="-1"></a>#&#39; # Data</span>
+<span id="cb48-50"><a href="#cb48-50" aria-hidden="true" tabindex="-1"></a>dogs &lt;- read.table(root(&quot;dogs&quot;, &quot;data&quot;, &quot;dogs.dat&quot;), skip = 2)</span>
+<span id="cb48-51"><a href="#cb48-51" aria-hidden="true" tabindex="-1"></a>shock &lt;- ifelse(as.matrix(dogs<span class="co">[</span><span class="ot">, 2:26</span><span class="co">]</span>) == &quot;S&quot;, 1, 0)</span>
+<span id="cb48-52"><a href="#cb48-52" aria-hidden="true" tabindex="-1"></a>dogs_data &lt;- list(y = shock, J = nrow(shock), T = ncol(shock))</span>
+<span id="cb48-53"><a href="#cb48-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-54"><a href="#cb48-54" aria-hidden="true" tabindex="-1"></a>#&#39; # Models</span>
+<span id="cb48-55"><a href="#cb48-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-56"><a href="#cb48-56" aria-hidden="true" tabindex="-1"></a>dogs_0 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_0.stan&quot;))</span>
+<span id="cb48-57"><a href="#cb48-57" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-58"><a href="#cb48-58" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-59"><a href="#cb48-59" aria-hidden="true" tabindex="-1"></a>fit_0 &lt;- dogs_0$sample(data = dogs_data, refresh = 0)</span>
+<span id="cb48-60"><a href="#cb48-60" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-61"><a href="#cb48-61" aria-hidden="true" tabindex="-1"></a>print(fit_0)</span>
+<span id="cb48-62"><a href="#cb48-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-63"><a href="#cb48-63" aria-hidden="true" tabindex="-1"></a>dogs_1 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_1.stan&quot;))</span>
+<span id="cb48-64"><a href="#cb48-64" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-65"><a href="#cb48-65" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-66"><a href="#cb48-66" aria-hidden="true" tabindex="-1"></a>fit_1 &lt;- dogs_1$sample(data = dogs_data, refresh = 0)</span>
+<span id="cb48-67"><a href="#cb48-67" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-68"><a href="#cb48-68" aria-hidden="true" tabindex="-1"></a>print(fit_1)</span>
+<span id="cb48-69"><a href="#cb48-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-70"><a href="#cb48-70" aria-hidden="true" tabindex="-1"></a>dogs_2 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_2.stan&quot;))</span>
+<span id="cb48-71"><a href="#cb48-71" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-72"><a href="#cb48-72" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-73"><a href="#cb48-73" aria-hidden="true" tabindex="-1"></a>fit_2 &lt;- dogs_2$sample(data = dogs_data, refresh = 0)</span>
+<span id="cb48-74"><a href="#cb48-74" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-75"><a href="#cb48-75" aria-hidden="true" tabindex="-1"></a>print(fit_2)</span>
+<span id="cb48-76"><a href="#cb48-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-77"><a href="#cb48-77" aria-hidden="true" tabindex="-1"></a>dogs_3 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_3.stan&quot;))</span>
+<span id="cb48-78"><a href="#cb48-78" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-79"><a href="#cb48-79" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-80"><a href="#cb48-80" aria-hidden="true" tabindex="-1"></a>fit_3 &lt;- dogs_3$sample(data = dogs_data, refresh = 0)</span>
+<span id="cb48-81"><a href="#cb48-81" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-82"><a href="#cb48-82" aria-hidden="true" tabindex="-1"></a>print(fit_3, variables = c(&quot;mu_logit_a&quot;, &quot;sigma_logit_a&quot;))</span>
+<span id="cb48-83"><a href="#cb48-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-84"><a href="#cb48-84" aria-hidden="true" tabindex="-1"></a>dogs_4 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_4.stan&quot;))</span>
+<span id="cb48-85"><a href="#cb48-85" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-86"><a href="#cb48-86" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-87"><a href="#cb48-87" aria-hidden="true" tabindex="-1"></a>fit_4 &lt;- dogs_4$sample(data = dogs_data, refresh = 0)</span>
+<span id="cb48-88"><a href="#cb48-88" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-89"><a href="#cb48-89" aria-hidden="true" tabindex="-1"></a>print(fit_4, variables = c(&quot;mu_logit_ab&quot;, &quot;Sigma_logit_ab&quot;))</span>
+<span id="cb48-90"><a href="#cb48-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-91"><a href="#cb48-91" aria-hidden="true" tabindex="-1"></a>dogs_5 &lt;- cmdstan_model(root(&quot;dogs&quot;, &quot;dogs_5.stan&quot;))</span>
+<span id="cb48-92"><a href="#cb48-92" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-93"><a href="#cb48-93" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-94"><a href="#cb48-94" aria-hidden="true" tabindex="-1"></a>fit_5 &lt;- dogs_5$sample(data = dogs_data, refresh = 0)</span>
+<span id="cb48-95"><a href="#cb48-95" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-96"><a href="#cb48-96" aria-hidden="true" tabindex="-1"></a>print(fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
+<span id="cb48-97"><a href="#cb48-97" aria-hidden="true" tabindex="-1"></a>                           &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;))</span>
+<span id="cb48-98"><a href="#cb48-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-99"><a href="#cb48-99" aria-hidden="true" tabindex="-1"></a>#&#39; # Plots</span>
+<span id="cb48-100"><a href="#cb48-100" aria-hidden="true" tabindex="-1"></a>empty_plot &lt;- function(a = &quot;&quot;) {</span>
+<span id="cb48-101"><a href="#cb48-101" aria-hidden="true" tabindex="-1"></a>  plot(0, 0, bty = &quot;n&quot;, xaxt = &quot;n&quot;, yaxt = &quot;n&quot;, type = &quot;n&quot;)</span>
+<span id="cb48-102"><a href="#cb48-102" aria-hidden="true" tabindex="-1"></a>  text(0, 0, a, cex = .8)</span>
+<span id="cb48-103"><a href="#cb48-103" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-104"><a href="#cb48-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-105"><a href="#cb48-105" aria-hidden="true" tabindex="-1"></a>plot_dogs &lt;- function(y, ...) {</span>
+<span id="cb48-106"><a href="#cb48-106" aria-hidden="true" tabindex="-1"></a>  J &lt;- nrow(y)</span>
+<span id="cb48-107"><a href="#cb48-107" aria-hidden="true" tabindex="-1"></a>  T &lt;- ncol(y)</span>
+<span id="cb48-108"><a href="#cb48-108" aria-hidden="true" tabindex="-1"></a>  max_y_times &lt;- rep(NA, J)</span>
+<span id="cb48-109"><a href="#cb48-109" aria-hidden="true" tabindex="-1"></a>  for (j in 1:J) {</span>
+<span id="cb48-110"><a href="#cb48-110" aria-hidden="true" tabindex="-1"></a>    max_y_times<span class="co">[</span><span class="ot">j</span><span class="co">]</span> &lt;- max((1:T)<span class="co">[</span><span class="ot">y[j, ] == 1</span><span class="co">]</span>)</span>
+<span id="cb48-111"><a href="#cb48-111" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb48-112"><a href="#cb48-112" aria-hidden="true" tabindex="-1"></a>  y_ordered &lt;- y<span class="co">[</span><span class="ot">rev(order(max_y_times)), </span><span class="co">]</span></span>
+<span id="cb48-113"><a href="#cb48-113" aria-hidden="true" tabindex="-1"></a>  image(t(y_ordered), bty = &quot;n&quot;, xaxt = &quot;n&quot;, yaxt = &quot;n&quot;, ...)</span>
+<span id="cb48-114"><a href="#cb48-114" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-115"><a href="#cb48-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-116"><a href="#cb48-116" aria-hidden="true" tabindex="-1"></a>plot_ppc &lt;- function(fit, label){</span>
+<span id="cb48-117"><a href="#cb48-117" aria-hidden="true" tabindex="-1"></a>  post &lt;- as_draws_rvars(fit$draws())</span>
+<span id="cb48-118"><a href="#cb48-118" aria-hidden="true" tabindex="-1"></a>  empty_plot(label)</span>
+<span id="cb48-119"><a href="#cb48-119" aria-hidden="true" tabindex="-1"></a>  for (k in 1:3) {</span>
+<span id="cb48-120"><a href="#cb48-120" aria-hidden="true" tabindex="-1"></a>    for (i in sample(1000, 2)) {</span>
+<span id="cb48-121"><a href="#cb48-121" aria-hidden="true" tabindex="-1"></a>      rep &lt;- sum(subset_draws(post, iter = i, chain = k)$y_rep)</span>
+<span id="cb48-122"><a href="#cb48-122" aria-hidden="true" tabindex="-1"></a>      plot_dogs(rep)</span>
+<span id="cb48-123"><a href="#cb48-123" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb48-124"><a href="#cb48-124" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb48-125"><a href="#cb48-125" aria-hidden="true" tabindex="-1"></a>}</span>
 <span id="cb48-126"><a href="#cb48-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-127"><a href="#cb48-127" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_ppc</span>
-<span id="cb48-128"><a href="#cb48-128" aria-hidden="true" tabindex="-1"></a>#| fig-height: 5.5</span>
-<span id="cb48-129"><a href="#cb48-129" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
-<span id="cb48-130"><a href="#cb48-130" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(7, 7), mar = c(.5, .5, .5, .5))</span>
-<span id="cb48-131"><a href="#cb48-131" aria-hidden="true" tabindex="-1"></a>empty_plot(&quot;Real dogs&quot;)</span>
-<span id="cb48-132"><a href="#cb48-132" aria-hidden="true" tabindex="-1"></a>plot_dogs(shock)</span>
-<span id="cb48-133"><a href="#cb48-133" aria-hidden="true" tabindex="-1"></a>for (k in 1:5){</span>
-<span id="cb48-134"><a href="#cb48-134" aria-hidden="true" tabindex="-1"></a>  empty_plot()</span>
-<span id="cb48-135"><a href="#cb48-135" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-136"><a href="#cb48-136" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_0, &quot;PPsims from M0:\nlogit model&quot;)</span>
-<span id="cb48-137"><a href="#cb48-137" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_1, &quot;PPsims from M1:\n1-parameter\nlog model&quot;)</span>
-<span id="cb48-138"><a href="#cb48-138" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_2, &quot;PPsims from M2:\n2-parameter\nlog model&quot;)</span>
-<span id="cb48-139"><a href="#cb48-139" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_3, &quot;PPsims from M3:\nhier 1-par\nlog model&quot;)</span>
-<span id="cb48-140"><a href="#cb48-140" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_4, &quot;PPsims from M4:\nhier 2-par\nlog model&quot;)</span>
-<span id="cb48-141"><a href="#cb48-141" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_5, &quot;PPsims from M5:\nhier 2-par\nlog model\nwith prior&quot;)</span>
-<span id="cb48-142"><a href="#cb48-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-143"><a href="#cb48-143" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_inference</span>
-<span id="cb48-144"><a href="#cb48-144" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3</span>
-<span id="cb48-145"><a href="#cb48-145" aria-hidden="true" tabindex="-1"></a>#| fig-width: 7.5</span>
-<span id="cb48-146"><a href="#cb48-146" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(fit_5$draws())</span>
-<span id="cb48-147"><a href="#cb48-147" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(2, 5), pty = &quot;s&quot;, </span>
-<span id="cb48-148"><a href="#cb48-148" aria-hidden="true" tabindex="-1"></a>    mar = c(2.5, 2.5, 0.5, 0.5), mgp = c(1.5, 0.2, 0), </span>
-<span id="cb48-149"><a href="#cb48-149" aria-hidden="true" tabindex="-1"></a>    tck = -0.02, oma = c(0, 0, 1, 0))</span>
-<span id="cb48-150"><a href="#cb48-150" aria-hidden="true" tabindex="-1"></a>for (k in 1:2){</span>
-<span id="cb48-151"><a href="#cb48-151" aria-hidden="true" tabindex="-1"></a>  index &lt;- sample(1000, 5)</span>
-<span id="cb48-152"><a href="#cb48-152" aria-hidden="true" tabindex="-1"></a>  for (i in 1:5) {</span>
-<span id="cb48-153"><a href="#cb48-153" aria-hidden="true" tabindex="-1"></a>    a_sim &lt;- sum(subset_draws(post, iter = index<span class="co">[</span><span class="ot">i</span><span class="co">]</span>, chain = k)$a)</span>
-<span id="cb48-154"><a href="#cb48-154" aria-hidden="true" tabindex="-1"></a>    b_sim &lt;- sum(subset_draws(post, iter = index<span class="co">[</span><span class="ot">i</span><span class="co">]</span>, chain = k)$b)</span>
-<span id="cb48-155"><a href="#cb48-155" aria-hidden="true" tabindex="-1"></a>    plot(c(0.55, 1), c(0.55, 1), </span>
-<span id="cb48-156"><a href="#cb48-156" aria-hidden="true" tabindex="-1"></a>         xlab= if (k <span class="al">== 2) &quot;a&quot; else &quot;&quot;, ylab = if (i ==</span> 1) &quot;b&quot; else &quot;&quot;,</span>
-<span id="cb48-157"><a href="#cb48-157" aria-hidden="true" tabindex="-1"></a>         xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, xaxt = &quot;n&quot;, yaxt = &quot;n&quot;, type = &quot;n&quot;)</span>
-<span id="cb48-158"><a href="#cb48-158" aria-hidden="true" tabindex="-1"></a>    if (k==2) axis(1, c(0.6, 0.8, 1), c(&quot;0.6&quot;, &quot;0.8&quot;, &quot;1&quot;)) else axis(1, c(0.6, 0.8, 1), c(&quot;&quot;, &quot;&quot;, &quot;&quot;)) </span>
-<span id="cb48-159"><a href="#cb48-159" aria-hidden="true" tabindex="-1"></a>    if (i==1) axis(2, c(0.6, 0.8, 1), c(&quot;0.6&quot;, &quot;0.8&quot;, &quot;1&quot;)) else axis(1, c(0.6, 0.8, 1), c(&quot;&quot;, &quot;&quot;, &quot;&quot;)) </span>
-<span id="cb48-160"><a href="#cb48-160" aria-hidden="true" tabindex="-1"></a>    abline(0, 1, lwd = .5, col = &quot;gray&quot;)</span>
-<span id="cb48-161"><a href="#cb48-161" aria-hidden="true" tabindex="-1"></a>    points(a_sim, b_sim, pch = 20, cex = .6)</span>
-<span id="cb48-162"><a href="#cb48-162" aria-hidden="true" tabindex="-1"></a>    mtext(&quot;10 posterior simulations of the parameters of the 30 dogs&quot;, </span>
-<span id="cb48-163"><a href="#cb48-163" aria-hidden="true" tabindex="-1"></a>          3, 0, cex = 0.8, outer = TRUE)</span>
-<span id="cb48-164"><a href="#cb48-164" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb48-165"><a href="#cb48-165" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-166"><a href="#cb48-166" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-167"><a href="#cb48-167" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_point_estimate</span>
-<span id="cb48-168"><a href="#cb48-168" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb48-169"><a href="#cb48-169" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
-<span id="cb48-170"><a href="#cb48-170" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(fit_5$draws())</span>
-<span id="cb48-171"><a href="#cb48-171" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, .5, 0), tck = -.01)</span>
-<span id="cb48-172"><a href="#cb48-172" aria-hidden="true" tabindex="-1"></a>plot(median(post$a), median(post$b), </span>
-<span id="cb48-173"><a href="#cb48-173" aria-hidden="true" tabindex="-1"></a>     xlim = c(0.55, 1), ylim = c(0.55, 1), xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, </span>
-<span id="cb48-174"><a href="#cb48-174" aria-hidden="true" tabindex="-1"></a>     xlab = expression(hat(a)), ylab = expression(hat(b)), pch = 20, cex = 0.6, </span>
-<span id="cb48-175"><a href="#cb48-175" aria-hidden="true" tabindex="-1"></a>     main = &quot;Posterior medians from fitted model&quot;, cex.main = 0.9)</span>
-<span id="cb48-176"><a href="#cb48-176" aria-hidden="true" tabindex="-1"></a>  abline(0,1,lwd=.5, col=&quot;gray&quot;)</span>
-<span id="cb48-177"><a href="#cb48-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-178"><a href="#cb48-178" aria-hidden="true" tabindex="-1"></a>new_dogs_mu_logit_ab &lt;- c(2.4, 1.3)</span>
-<span id="cb48-179"><a href="#cb48-179" aria-hidden="true" tabindex="-1"></a>new_dogs_sigma_ab &lt;- c(0.32, 0.40)</span>
-<span id="cb48-180"><a href="#cb48-180" aria-hidden="true" tabindex="-1"></a>new_dogs_rho_ab &lt;- 0</span>
-<span id="cb48-181"><a href="#cb48-181" aria-hidden="true" tabindex="-1"></a>new_dogs_Sigma_ab &lt;- </span>
-<span id="cb48-182"><a href="#cb48-182" aria-hidden="true" tabindex="-1"></a>  diag(new_dogs_sigma_ab) %*% </span>
-<span id="cb48-183"><a href="#cb48-183" aria-hidden="true" tabindex="-1"></a>  rbind(c(1, new_dogs_rho_ab), c(new_dogs_rho_ab, 1)) %*% </span>
-<span id="cb48-184"><a href="#cb48-184" aria-hidden="true" tabindex="-1"></a>  diag(new_dogs_sigma_ab)</span>
-<span id="cb48-185"><a href="#cb48-185" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-186"><a href="#cb48-186" aria-hidden="true" tabindex="-1"></a>J &lt;- 30</span>
-<span id="cb48-187"><a href="#cb48-187" aria-hidden="true" tabindex="-1"></a>new_dogs_ab &lt;- invlogit(mvrnorm(J, new_dogs_mu_logit_ab, new_dogs_Sigma_ab))</span>
-<span id="cb48-188"><a href="#cb48-188" aria-hidden="true" tabindex="-1"></a>a &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 1</span><span class="co">]</span></span>
-<span id="cb48-189"><a href="#cb48-189" aria-hidden="true" tabindex="-1"></a>b &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 2</span><span class="co">]</span></span>
-<span id="cb48-190"><a href="#cb48-190" aria-hidden="true" tabindex="-1"></a>T &lt;- 25</span>
-<span id="cb48-191"><a href="#cb48-191" aria-hidden="true" tabindex="-1"></a>new_dogs &lt;- array(NA, c(J, T))</span>
-<span id="cb48-192"><a href="#cb48-192" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
-<span id="cb48-193"><a href="#cb48-193" aria-hidden="true" tabindex="-1"></a>  prev_shock &lt;- 0</span>
-<span id="cb48-194"><a href="#cb48-194" aria-hidden="true" tabindex="-1"></a>  prev_avoid &lt;-  0</span>
-<span id="cb48-195"><a href="#cb48-195" aria-hidden="true" tabindex="-1"></a>  new_dogs<span class="co">[</span><span class="ot">j, 1</span><span class="co">]</span> &lt;- 1</span>
-<span id="cb48-196"><a href="#cb48-196" aria-hidden="true" tabindex="-1"></a>  for (t in 2:T) {</span>
-<span id="cb48-197"><a href="#cb48-197" aria-hidden="true" tabindex="-1"></a>    prev_shock = prev_shock + new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
-<span id="cb48-198"><a href="#cb48-198" aria-hidden="true" tabindex="-1"></a>    prev_avoid = prev_avoid + 1 - new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
-<span id="cb48-199"><a href="#cb48-199" aria-hidden="true" tabindex="-1"></a>    p = a<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_shock * b<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_avoid</span>
-<span id="cb48-200"><a href="#cb48-200" aria-hidden="true" tabindex="-1"></a>    new_dogs<span class="co">[</span><span class="ot">j, t</span><span class="co">]</span> &lt;- rbinom(1, 1, p)</span>
-<span id="cb48-201"><a href="#cb48-201" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb48-202"><a href="#cb48-202" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-203"><a href="#cb48-203" aria-hidden="true" tabindex="-1"></a>new_dogs_data &lt;- list(y = new_dogs, J = J, T = T)</span>
-<span id="cb48-204"><a href="#cb48-204" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-205"><a href="#cb48-205" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-206"><a href="#cb48-206" aria-hidden="true" tabindex="-1"></a>new_fit_5 &lt;- dogs_5$sample(data = new_dogs_data, refresh = 0)</span>
-<span id="cb48-207"><a href="#cb48-207" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-208"><a href="#cb48-208" aria-hidden="true" tabindex="-1"></a>print(new_fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
-<span id="cb48-209"><a href="#cb48-209" aria-hidden="true" tabindex="-1"></a>                               &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;))</span>
-<span id="cb48-210"><a href="#cb48-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-211"><a href="#cb48-211" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_parameters</span>
-<span id="cb48-212"><a href="#cb48-212" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb48-213"><a href="#cb48-213" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
-<span id="cb48-214"><a href="#cb48-214" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)</span>
-<span id="cb48-215"><a href="#cb48-215" aria-hidden="true" tabindex="-1"></a>plot(a, b, xlim = c(0.55, 1), ylim = c(0.55, 1), </span>
-<span id="cb48-216"><a href="#cb48-216" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, yaxs = &quot;i&quot;,  xlab = &quot;a&quot;, ylab = &quot;b&quot;, pch = 20, cex = 0.6, </span>
-<span id="cb48-217"><a href="#cb48-217" aria-hidden="true" tabindex="-1"></a>     main = &quot;Simulated parameters&quot;, cex.main = 0.9)</span>
-<span id="cb48-218"><a href="#cb48-218" aria-hidden="true" tabindex="-1"></a>abline(0, 1, lwd = 0.5, col = &quot;gray&quot;)</span>
-<span id="cb48-219"><a href="#cb48-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-127"><a href="#cb48-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-128"><a href="#cb48-128" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_ppc</span>
+<span id="cb48-129"><a href="#cb48-129" aria-hidden="true" tabindex="-1"></a>#| fig-height: 5.5</span>
+<span id="cb48-130"><a href="#cb48-130" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
+<span id="cb48-131"><a href="#cb48-131" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(7, 7), mar = c(.5, .5, .5, .5))</span>
+<span id="cb48-132"><a href="#cb48-132" aria-hidden="true" tabindex="-1"></a>empty_plot(&quot;Real dogs&quot;)</span>
+<span id="cb48-133"><a href="#cb48-133" aria-hidden="true" tabindex="-1"></a>plot_dogs(shock)</span>
+<span id="cb48-134"><a href="#cb48-134" aria-hidden="true" tabindex="-1"></a>for (k in 1:5){</span>
+<span id="cb48-135"><a href="#cb48-135" aria-hidden="true" tabindex="-1"></a>  empty_plot()</span>
+<span id="cb48-136"><a href="#cb48-136" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-137"><a href="#cb48-137" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_0, &quot;PPsims from M0:\nlogit model&quot;)</span>
+<span id="cb48-138"><a href="#cb48-138" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_1, &quot;PPsims from M1:\n1-parameter\nlog model&quot;)</span>
+<span id="cb48-139"><a href="#cb48-139" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_2, &quot;PPsims from M2:\n2-parameter\nlog model&quot;)</span>
+<span id="cb48-140"><a href="#cb48-140" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_3, &quot;PPsims from M3:\nhier 1-par\nlog model&quot;)</span>
+<span id="cb48-141"><a href="#cb48-141" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_4, &quot;PPsims from M4:\nhier 2-par\nlog model&quot;)</span>
+<span id="cb48-142"><a href="#cb48-142" aria-hidden="true" tabindex="-1"></a>plot_ppc(fit_5, &quot;PPsims from M5:\nhier 2-par\nlog model\nwith prior&quot;)</span>
+<span id="cb48-143"><a href="#cb48-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-144"><a href="#cb48-144" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_inference</span>
+<span id="cb48-145"><a href="#cb48-145" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3</span>
+<span id="cb48-146"><a href="#cb48-146" aria-hidden="true" tabindex="-1"></a>#| fig-width: 7.5</span>
+<span id="cb48-147"><a href="#cb48-147" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(fit_5$draws())</span>
+<span id="cb48-148"><a href="#cb48-148" aria-hidden="true" tabindex="-1"></a>par(mfrow = c(2, 5), pty = &quot;s&quot;, </span>
+<span id="cb48-149"><a href="#cb48-149" aria-hidden="true" tabindex="-1"></a>    mar = c(2.5, 2.5, 0.5, 0.5), mgp = c(1.5, 0.2, 0), </span>
+<span id="cb48-150"><a href="#cb48-150" aria-hidden="true" tabindex="-1"></a>    tck = -0.02, oma = c(0, 0, 1, 0))</span>
+<span id="cb48-151"><a href="#cb48-151" aria-hidden="true" tabindex="-1"></a>for (k in 1:2){</span>
+<span id="cb48-152"><a href="#cb48-152" aria-hidden="true" tabindex="-1"></a>  index &lt;- sample(1000, 5)</span>
+<span id="cb48-153"><a href="#cb48-153" aria-hidden="true" tabindex="-1"></a>  for (i in 1:5) {</span>
+<span id="cb48-154"><a href="#cb48-154" aria-hidden="true" tabindex="-1"></a>    a_sim &lt;- sum(subset_draws(post, iter = index<span class="co">[</span><span class="ot">i</span><span class="co">]</span>, chain = k)$a)</span>
+<span id="cb48-155"><a href="#cb48-155" aria-hidden="true" tabindex="-1"></a>    b_sim &lt;- sum(subset_draws(post, iter = index<span class="co">[</span><span class="ot">i</span><span class="co">]</span>, chain = k)$b)</span>
+<span id="cb48-156"><a href="#cb48-156" aria-hidden="true" tabindex="-1"></a>    plot(c(0.55, 1), c(0.55, 1), </span>
+<span id="cb48-157"><a href="#cb48-157" aria-hidden="true" tabindex="-1"></a>         xlab= if (k <span class="al">== 2) &quot;a&quot; else &quot;&quot;, ylab = if (i ==</span> 1) &quot;b&quot; else &quot;&quot;,</span>
+<span id="cb48-158"><a href="#cb48-158" aria-hidden="true" tabindex="-1"></a>         xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, xaxt = &quot;n&quot;, yaxt = &quot;n&quot;, type = &quot;n&quot;)</span>
+<span id="cb48-159"><a href="#cb48-159" aria-hidden="true" tabindex="-1"></a>    if (k==2) axis(1, c(0.6, 0.8, 1), c(&quot;0.6&quot;, &quot;0.8&quot;, &quot;1&quot;)) else axis(1, c(0.6, 0.8, 1), c(&quot;&quot;, &quot;&quot;, &quot;&quot;)) </span>
+<span id="cb48-160"><a href="#cb48-160" aria-hidden="true" tabindex="-1"></a>    if (i==1) axis(2, c(0.6, 0.8, 1), c(&quot;0.6&quot;, &quot;0.8&quot;, &quot;1&quot;)) else axis(1, c(0.6, 0.8, 1), c(&quot;&quot;, &quot;&quot;, &quot;&quot;)) </span>
+<span id="cb48-161"><a href="#cb48-161" aria-hidden="true" tabindex="-1"></a>    abline(0, 1, lwd = .5, col = &quot;gray&quot;)</span>
+<span id="cb48-162"><a href="#cb48-162" aria-hidden="true" tabindex="-1"></a>    points(a_sim, b_sim, pch = 20, cex = .6)</span>
+<span id="cb48-163"><a href="#cb48-163" aria-hidden="true" tabindex="-1"></a>    mtext(&quot;10 posterior simulations of the parameters of the 30 dogs&quot;, </span>
+<span id="cb48-164"><a href="#cb48-164" aria-hidden="true" tabindex="-1"></a>          3, 0, cex = 0.8, outer = TRUE)</span>
+<span id="cb48-165"><a href="#cb48-165" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb48-166"><a href="#cb48-166" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-167"><a href="#cb48-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-168"><a href="#cb48-168" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_point_estimate</span>
+<span id="cb48-169"><a href="#cb48-169" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb48-170"><a href="#cb48-170" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
+<span id="cb48-171"><a href="#cb48-171" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(fit_5$draws())</span>
+<span id="cb48-172"><a href="#cb48-172" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, .5, 0), tck = -.01)</span>
+<span id="cb48-173"><a href="#cb48-173" aria-hidden="true" tabindex="-1"></a>plot(median(post$a), median(post$b), </span>
+<span id="cb48-174"><a href="#cb48-174" aria-hidden="true" tabindex="-1"></a>     xlim = c(0.55, 1), ylim = c(0.55, 1), xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, </span>
+<span id="cb48-175"><a href="#cb48-175" aria-hidden="true" tabindex="-1"></a>     xlab = expression(hat(a)), ylab = expression(hat(b)), pch = 20, cex = 0.6, </span>
+<span id="cb48-176"><a href="#cb48-176" aria-hidden="true" tabindex="-1"></a>     main = &quot;Posterior medians from fitted model&quot;, cex.main = 0.9)</span>
+<span id="cb48-177"><a href="#cb48-177" aria-hidden="true" tabindex="-1"></a>  abline(0,1,lwd=.5, col=&quot;gray&quot;)</span>
+<span id="cb48-178"><a href="#cb48-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-179"><a href="#cb48-179" aria-hidden="true" tabindex="-1"></a>new_dogs_mu_logit_ab &lt;- c(2.4, 1.3)</span>
+<span id="cb48-180"><a href="#cb48-180" aria-hidden="true" tabindex="-1"></a>new_dogs_sigma_ab &lt;- c(0.32, 0.40)</span>
+<span id="cb48-181"><a href="#cb48-181" aria-hidden="true" tabindex="-1"></a>new_dogs_rho_ab &lt;- 0</span>
+<span id="cb48-182"><a href="#cb48-182" aria-hidden="true" tabindex="-1"></a>new_dogs_Sigma_ab &lt;- </span>
+<span id="cb48-183"><a href="#cb48-183" aria-hidden="true" tabindex="-1"></a>  diag(new_dogs_sigma_ab) %*% </span>
+<span id="cb48-184"><a href="#cb48-184" aria-hidden="true" tabindex="-1"></a>  rbind(c(1, new_dogs_rho_ab), c(new_dogs_rho_ab, 1)) %*% </span>
+<span id="cb48-185"><a href="#cb48-185" aria-hidden="true" tabindex="-1"></a>  diag(new_dogs_sigma_ab)</span>
+<span id="cb48-186"><a href="#cb48-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-187"><a href="#cb48-187" aria-hidden="true" tabindex="-1"></a>J &lt;- 30</span>
+<span id="cb48-188"><a href="#cb48-188" aria-hidden="true" tabindex="-1"></a>new_dogs_ab &lt;- invlogit(mvrnorm(J, new_dogs_mu_logit_ab, new_dogs_Sigma_ab))</span>
+<span id="cb48-189"><a href="#cb48-189" aria-hidden="true" tabindex="-1"></a>a &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 1</span><span class="co">]</span></span>
+<span id="cb48-190"><a href="#cb48-190" aria-hidden="true" tabindex="-1"></a>b &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 2</span><span class="co">]</span></span>
+<span id="cb48-191"><a href="#cb48-191" aria-hidden="true" tabindex="-1"></a>T &lt;- 25</span>
+<span id="cb48-192"><a href="#cb48-192" aria-hidden="true" tabindex="-1"></a>new_dogs &lt;- array(NA, c(J, T))</span>
+<span id="cb48-193"><a href="#cb48-193" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
+<span id="cb48-194"><a href="#cb48-194" aria-hidden="true" tabindex="-1"></a>  prev_shock &lt;- 0</span>
+<span id="cb48-195"><a href="#cb48-195" aria-hidden="true" tabindex="-1"></a>  prev_avoid &lt;-  0</span>
+<span id="cb48-196"><a href="#cb48-196" aria-hidden="true" tabindex="-1"></a>  new_dogs<span class="co">[</span><span class="ot">j, 1</span><span class="co">]</span> &lt;- 1</span>
+<span id="cb48-197"><a href="#cb48-197" aria-hidden="true" tabindex="-1"></a>  for (t in 2:T) {</span>
+<span id="cb48-198"><a href="#cb48-198" aria-hidden="true" tabindex="-1"></a>    prev_shock = prev_shock + new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
+<span id="cb48-199"><a href="#cb48-199" aria-hidden="true" tabindex="-1"></a>    prev_avoid = prev_avoid + 1 - new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
+<span id="cb48-200"><a href="#cb48-200" aria-hidden="true" tabindex="-1"></a>    p = a<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_shock * b<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_avoid</span>
+<span id="cb48-201"><a href="#cb48-201" aria-hidden="true" tabindex="-1"></a>    new_dogs<span class="co">[</span><span class="ot">j, t</span><span class="co">]</span> &lt;- rbinom(1, 1, p)</span>
+<span id="cb48-202"><a href="#cb48-202" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb48-203"><a href="#cb48-203" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-204"><a href="#cb48-204" aria-hidden="true" tabindex="-1"></a>new_dogs_data &lt;- list(y = new_dogs, J = J, T = T)</span>
+<span id="cb48-205"><a href="#cb48-205" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-206"><a href="#cb48-206" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-207"><a href="#cb48-207" aria-hidden="true" tabindex="-1"></a>new_fit_5 &lt;- dogs_5$sample(data = new_dogs_data, refresh = 0)</span>
+<span id="cb48-208"><a href="#cb48-208" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-209"><a href="#cb48-209" aria-hidden="true" tabindex="-1"></a>print(new_fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
+<span id="cb48-210"><a href="#cb48-210" aria-hidden="true" tabindex="-1"></a>                               &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;))</span>
+<span id="cb48-211"><a href="#cb48-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-212"><a href="#cb48-212" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_parameters</span>
+<span id="cb48-213"><a href="#cb48-213" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb48-214"><a href="#cb48-214" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
+<span id="cb48-215"><a href="#cb48-215" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)</span>
+<span id="cb48-216"><a href="#cb48-216" aria-hidden="true" tabindex="-1"></a>plot(a, b, xlim = c(0.55, 1), ylim = c(0.55, 1), </span>
+<span id="cb48-217"><a href="#cb48-217" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, yaxs = &quot;i&quot;,  xlab = &quot;a&quot;, ylab = &quot;b&quot;, pch = 20, cex = 0.6, </span>
+<span id="cb48-218"><a href="#cb48-218" aria-hidden="true" tabindex="-1"></a>     main = &quot;Simulated parameters&quot;, cex.main = 0.9)</span>
+<span id="cb48-219"><a href="#cb48-219" aria-hidden="true" tabindex="-1"></a>abline(0, 1, lwd = 0.5, col = &quot;gray&quot;)</span>
 <span id="cb48-220"><a href="#cb48-220" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-221"><a href="#cb48-221" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_data</span>
-<span id="cb48-222"><a href="#cb48-222" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb48-223"><a href="#cb48-223" aria-hidden="true" tabindex="-1"></a>#| fig-width: 3</span>
-<span id="cb48-224"><a href="#cb48-224" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;m&quot;, mar = c(1, 2, 2, 1))</span>
-<span id="cb48-225"><a href="#cb48-225" aria-hidden="true" tabindex="-1"></a>plot_dogs(new_dogs, main = &quot;Simulated data&quot;, cex.main = 0.9)</span>
-<span id="cb48-226"><a href="#cb48-226" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-227"><a href="#cb48-227" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_calibration</span>
-<span id="cb48-228"><a href="#cb48-228" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb48-229"><a href="#cb48-229" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
-<span id="cb48-230"><a href="#cb48-230" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(new_fit_5$draws())</span>
-<span id="cb48-231"><a href="#cb48-231" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)</span>
-<span id="cb48-232"><a href="#cb48-232" aria-hidden="true" tabindex="-1"></a>plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1),</span>
-<span id="cb48-233"><a href="#cb48-233" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior inference&quot;, ylab = &quot;True parameter value&quot;, </span>
-<span id="cb48-234"><a href="#cb48-234" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, pch = 20, cex = 0.6, </span>
-<span id="cb48-235"><a href="#cb48-235" aria-hidden="true" tabindex="-1"></a>     main = &quot;Calibration check of posterior intervals&quot;, cex.main = 0.9)</span>
-<span id="cb48-236"><a href="#cb48-236" aria-hidden="true" tabindex="-1"></a>abline(0, 1, lwd = 0.5, col = &quot;gray&quot;)</span>
-<span id="cb48-237"><a href="#cb48-237" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
-<span id="cb48-238"><a href="#cb48-238" aria-hidden="true" tabindex="-1"></a>  points(median(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;blue&quot;)</span>
-<span id="cb48-239"><a href="#cb48-239" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;blue&quot;)</span>
-<span id="cb48-240"><a href="#cb48-240" aria-hidden="true" tabindex="-1"></a>  points(median(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;red&quot;)</span>
-<span id="cb48-241"><a href="#cb48-241" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;red&quot;)</span>
-<span id="cb48-242"><a href="#cb48-242" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-243"><a href="#cb48-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-244"><a href="#cb48-244" aria-hidden="true" tabindex="-1"></a>J &lt;- 300</span>
-<span id="cb48-245"><a href="#cb48-245" aria-hidden="true" tabindex="-1"></a>new_dogs_ab &lt;- invlogit(mvrnorm(J, new_dogs_mu_logit_ab, new_dogs_Sigma_ab))</span>
-<span id="cb48-246"><a href="#cb48-246" aria-hidden="true" tabindex="-1"></a>a &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 1</span><span class="co">]</span></span>
-<span id="cb48-247"><a href="#cb48-247" aria-hidden="true" tabindex="-1"></a>b &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 2</span><span class="co">]</span></span>
-<span id="cb48-248"><a href="#cb48-248" aria-hidden="true" tabindex="-1"></a>T &lt;- 25</span>
-<span id="cb48-249"><a href="#cb48-249" aria-hidden="true" tabindex="-1"></a>new_dogs &lt;- array(NA, c(J, T))</span>
-<span id="cb48-250"><a href="#cb48-250" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
-<span id="cb48-251"><a href="#cb48-251" aria-hidden="true" tabindex="-1"></a>  prev_shock &lt;- 0</span>
-<span id="cb48-252"><a href="#cb48-252" aria-hidden="true" tabindex="-1"></a>  prev_avoid &lt;-  0</span>
-<span id="cb48-253"><a href="#cb48-253" aria-hidden="true" tabindex="-1"></a>  new_dogs<span class="co">[</span><span class="ot">j, 1</span><span class="co">]</span> &lt;- 1</span>
-<span id="cb48-254"><a href="#cb48-254" aria-hidden="true" tabindex="-1"></a>  for (t in 2:T) {</span>
-<span id="cb48-255"><a href="#cb48-255" aria-hidden="true" tabindex="-1"></a>    prev_shock = prev_shock + new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
-<span id="cb48-256"><a href="#cb48-256" aria-hidden="true" tabindex="-1"></a>    prev_avoid = prev_avoid + 1 - new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
-<span id="cb48-257"><a href="#cb48-257" aria-hidden="true" tabindex="-1"></a>    p = a<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_shock * b<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_avoid</span>
-<span id="cb48-258"><a href="#cb48-258" aria-hidden="true" tabindex="-1"></a>    new_dogs<span class="co">[</span><span class="ot">j, t</span><span class="co">]</span> &lt;- rbinom(1, 1, p)</span>
-<span id="cb48-259"><a href="#cb48-259" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb48-260"><a href="#cb48-260" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-261"><a href="#cb48-261" aria-hidden="true" tabindex="-1"></a>new_dogs_data &lt;- list(y = new_dogs, J = J, T = T)</span>
-<span id="cb48-262"><a href="#cb48-262" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-263"><a href="#cb48-263" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-264"><a href="#cb48-264" aria-hidden="true" tabindex="-1"></a>new_fit_5 &lt;- dogs_5$sample(data = new_dogs_data, refresh = 0)</span>
-<span id="cb48-265"><a href="#cb48-265" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-266"><a href="#cb48-266" aria-hidden="true" tabindex="-1"></a>print(new_fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
-<span id="cb48-267"><a href="#cb48-267" aria-hidden="true" tabindex="-1"></a>                               &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;))</span>
-<span id="cb48-268"><a href="#cb48-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-221"><a href="#cb48-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-222"><a href="#cb48-222" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_data</span>
+<span id="cb48-223"><a href="#cb48-223" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb48-224"><a href="#cb48-224" aria-hidden="true" tabindex="-1"></a>#| fig-width: 3</span>
+<span id="cb48-225"><a href="#cb48-225" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;m&quot;, mar = c(1, 2, 2, 1))</span>
+<span id="cb48-226"><a href="#cb48-226" aria-hidden="true" tabindex="-1"></a>plot_dogs(new_dogs, main = &quot;Simulated data&quot;, cex.main = 0.9)</span>
+<span id="cb48-227"><a href="#cb48-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-228"><a href="#cb48-228" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_calibration</span>
+<span id="cb48-229"><a href="#cb48-229" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb48-230"><a href="#cb48-230" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
+<span id="cb48-231"><a href="#cb48-231" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(new_fit_5$draws())</span>
+<span id="cb48-232"><a href="#cb48-232" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)</span>
+<span id="cb48-233"><a href="#cb48-233" aria-hidden="true" tabindex="-1"></a>plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1),</span>
+<span id="cb48-234"><a href="#cb48-234" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior inference&quot;, ylab = &quot;True parameter value&quot;, </span>
+<span id="cb48-235"><a href="#cb48-235" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, pch = 20, cex = 0.6, </span>
+<span id="cb48-236"><a href="#cb48-236" aria-hidden="true" tabindex="-1"></a>     main = &quot;Calibration check of posterior intervals&quot;, cex.main = 0.9)</span>
+<span id="cb48-237"><a href="#cb48-237" aria-hidden="true" tabindex="-1"></a>abline(0, 1, lwd = 0.5, col = &quot;gray&quot;)</span>
+<span id="cb48-238"><a href="#cb48-238" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
+<span id="cb48-239"><a href="#cb48-239" aria-hidden="true" tabindex="-1"></a>  points(median(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;blue&quot;)</span>
+<span id="cb48-240"><a href="#cb48-240" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;blue&quot;)</span>
+<span id="cb48-241"><a href="#cb48-241" aria-hidden="true" tabindex="-1"></a>  points(median(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;red&quot;)</span>
+<span id="cb48-242"><a href="#cb48-242" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;red&quot;)</span>
+<span id="cb48-243"><a href="#cb48-243" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-244"><a href="#cb48-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-245"><a href="#cb48-245" aria-hidden="true" tabindex="-1"></a>J &lt;- 300</span>
+<span id="cb48-246"><a href="#cb48-246" aria-hidden="true" tabindex="-1"></a>new_dogs_ab &lt;- invlogit(mvrnorm(J, new_dogs_mu_logit_ab, new_dogs_Sigma_ab))</span>
+<span id="cb48-247"><a href="#cb48-247" aria-hidden="true" tabindex="-1"></a>a &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 1</span><span class="co">]</span></span>
+<span id="cb48-248"><a href="#cb48-248" aria-hidden="true" tabindex="-1"></a>b &lt;- new_dogs_ab<span class="co">[</span><span class="ot">, 2</span><span class="co">]</span></span>
+<span id="cb48-249"><a href="#cb48-249" aria-hidden="true" tabindex="-1"></a>T &lt;- 25</span>
+<span id="cb48-250"><a href="#cb48-250" aria-hidden="true" tabindex="-1"></a>new_dogs &lt;- array(NA, c(J, T))</span>
+<span id="cb48-251"><a href="#cb48-251" aria-hidden="true" tabindex="-1"></a>for (j in 1:J) {</span>
+<span id="cb48-252"><a href="#cb48-252" aria-hidden="true" tabindex="-1"></a>  prev_shock &lt;- 0</span>
+<span id="cb48-253"><a href="#cb48-253" aria-hidden="true" tabindex="-1"></a>  prev_avoid &lt;-  0</span>
+<span id="cb48-254"><a href="#cb48-254" aria-hidden="true" tabindex="-1"></a>  new_dogs<span class="co">[</span><span class="ot">j, 1</span><span class="co">]</span> &lt;- 1</span>
+<span id="cb48-255"><a href="#cb48-255" aria-hidden="true" tabindex="-1"></a>  for (t in 2:T) {</span>
+<span id="cb48-256"><a href="#cb48-256" aria-hidden="true" tabindex="-1"></a>    prev_shock = prev_shock + new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
+<span id="cb48-257"><a href="#cb48-257" aria-hidden="true" tabindex="-1"></a>    prev_avoid = prev_avoid + 1 - new_dogs<span class="co">[</span><span class="ot">j, t - 1</span><span class="co">]</span></span>
+<span id="cb48-258"><a href="#cb48-258" aria-hidden="true" tabindex="-1"></a>    p = a<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_shock * b<span class="co">[</span><span class="ot">j</span><span class="co">]</span> ^ prev_avoid</span>
+<span id="cb48-259"><a href="#cb48-259" aria-hidden="true" tabindex="-1"></a>    new_dogs<span class="co">[</span><span class="ot">j, t</span><span class="co">]</span> &lt;- rbinom(1, 1, p)</span>
+<span id="cb48-260"><a href="#cb48-260" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb48-261"><a href="#cb48-261" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-262"><a href="#cb48-262" aria-hidden="true" tabindex="-1"></a>new_dogs_data &lt;- list(y = new_dogs, J = J, T = T)</span>
+<span id="cb48-263"><a href="#cb48-263" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-264"><a href="#cb48-264" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-265"><a href="#cb48-265" aria-hidden="true" tabindex="-1"></a>new_fit_5 &lt;- dogs_5$sample(data = new_dogs_data, refresh = 0)</span>
+<span id="cb48-266"><a href="#cb48-266" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-267"><a href="#cb48-267" aria-hidden="true" tabindex="-1"></a>print(new_fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
+<span id="cb48-268"><a href="#cb48-268" aria-hidden="true" tabindex="-1"></a>                               &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;))</span>
 <span id="cb48-269"><a href="#cb48-269" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-270"><a href="#cb48-270" aria-hidden="true" tabindex="-1"></a>T &lt;- 50</span>
-<span id="cb48-271"><a href="#cb48-271" aria-hidden="true" tabindex="-1"></a>new_dogs &lt;- array(NA, c(J, T))</span>
-<span id="cb48-272"><a href="#cb48-272" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
-<span id="cb48-273"><a href="#cb48-273" aria-hidden="true" tabindex="-1"></a>  prev_shock &lt;- 0</span>
-<span id="cb48-274"><a href="#cb48-274" aria-hidden="true" tabindex="-1"></a>  prev_avoid &lt;-  0</span>
-<span id="cb48-275"><a href="#cb48-275" aria-hidden="true" tabindex="-1"></a>  new_dogs<span class="co">[</span><span class="ot">j,1</span><span class="co">]</span> &lt;- 1</span>
-<span id="cb48-276"><a href="#cb48-276" aria-hidden="true" tabindex="-1"></a>  for (t in 2:T){</span>
-<span id="cb48-277"><a href="#cb48-277" aria-hidden="true" tabindex="-1"></a>    prev_shock = prev_shock + new_dogs<span class="co">[</span><span class="ot">j,t-1</span><span class="co">]</span></span>
-<span id="cb48-278"><a href="#cb48-278" aria-hidden="true" tabindex="-1"></a>    prev_avoid = prev_avoid + 1 - new_dogs<span class="co">[</span><span class="ot">j,t-1</span><span class="co">]</span></span>
-<span id="cb48-279"><a href="#cb48-279" aria-hidden="true" tabindex="-1"></a>    p = a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>^prev_shock * b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>^prev_avoid</span>
-<span id="cb48-280"><a href="#cb48-280" aria-hidden="true" tabindex="-1"></a>    new_dogs<span class="co">[</span><span class="ot">j,t</span><span class="co">]</span> &lt;- rbinom(1, 1, p)</span>
-<span id="cb48-281"><a href="#cb48-281" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb48-282"><a href="#cb48-282" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-283"><a href="#cb48-283" aria-hidden="true" tabindex="-1"></a>new_dogs_data &lt;- list(y = new_dogs, J = J, T = T)</span>
-<span id="cb48-284"><a href="#cb48-284" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb48-285"><a href="#cb48-285" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
-<span id="cb48-286"><a href="#cb48-286" aria-hidden="true" tabindex="-1"></a>new_fit_5 &lt;- dogs_5$sample(data = new_dogs_data, refresh = 0)</span>
-<span id="cb48-287"><a href="#cb48-287" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-288"><a href="#cb48-288" aria-hidden="true" tabindex="-1"></a>print(new_fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
-<span id="cb48-289"><a href="#cb48-289" aria-hidden="true" tabindex="-1"></a>                               &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;))</span>
-<span id="cb48-290"><a href="#cb48-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-291"><a href="#cb48-291" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_data_50</span>
-<span id="cb48-292"><a href="#cb48-292" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb48-293"><a href="#cb48-293" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
-<span id="cb48-294"><a href="#cb48-294" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;m&quot;, mar = c(1, 2, 2, 1))</span>
-<span id="cb48-295"><a href="#cb48-295" aria-hidden="true" tabindex="-1"></a>plot_dogs(new_dogs, main = &quot;Simulated data:  50 trials&quot;, cex.main = 0.9)</span>
-<span id="cb48-296"><a href="#cb48-296" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-297"><a href="#cb48-297" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_calibration_50</span>
-<span id="cb48-298"><a href="#cb48-298" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
-<span id="cb48-299"><a href="#cb48-299" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
-<span id="cb48-300"><a href="#cb48-300" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(new_fit_5$draws())</span>
-<span id="cb48-301"><a href="#cb48-301" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)</span>
-<span id="cb48-302"><a href="#cb48-302" aria-hidden="true" tabindex="-1"></a>plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1), </span>
-<span id="cb48-303"><a href="#cb48-303" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior inference&quot;, ylab = &quot;True parameter value&quot;, </span>
-<span id="cb48-304"><a href="#cb48-304" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, pch = 20, cex = 0.6, </span>
-<span id="cb48-305"><a href="#cb48-305" aria-hidden="true" tabindex="-1"></a>     main = &quot;Calibration check based on 50 trials&quot;, cex.main = 0.9)</span>
-<span id="cb48-306"><a href="#cb48-306" aria-hidden="true" tabindex="-1"></a>abline(0, 1, lwd = 0.5, col = &quot;gray&quot;)</span>
-<span id="cb48-307"><a href="#cb48-307" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
-<span id="cb48-308"><a href="#cb48-308" aria-hidden="true" tabindex="-1"></a>  points(median(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;blue&quot;)</span>
-<span id="cb48-309"><a href="#cb48-309" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;blue&quot;)</span>
-<span id="cb48-310"><a href="#cb48-310" aria-hidden="true" tabindex="-1"></a>  points(median(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;red&quot;)</span>
-<span id="cb48-311"><a href="#cb48-311" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;red&quot;)</span>
-<span id="cb48-312"><a href="#cb48-312" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-313"><a href="#cb48-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-314"><a href="#cb48-314" aria-hidden="true" tabindex="-1"></a>#&#39; # References {.unnumbered}</span>
-<span id="cb48-315"><a href="#cb48-315" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-316"><a href="#cb48-316" aria-hidden="true" tabindex="-1"></a>#&#39; ::: {#refs}</span>
-<span id="cb48-317"><a href="#cb48-317" aria-hidden="true" tabindex="-1"></a>#&#39; :::</span>
-<span id="cb48-318"><a href="#cb48-318" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-319"><a href="#cb48-319" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
-<span id="cb48-320"><a href="#cb48-320" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb48-321"><a href="#cb48-321" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2023--2025, Andrew Gelman, licensed under BSD-3.</span>
-<span id="cb48-322"><a href="#cb48-322" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2023--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
+<span id="cb48-270"><a href="#cb48-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-271"><a href="#cb48-271" aria-hidden="true" tabindex="-1"></a>T &lt;- 50</span>
+<span id="cb48-272"><a href="#cb48-272" aria-hidden="true" tabindex="-1"></a>new_dogs &lt;- array(NA, c(J, T))</span>
+<span id="cb48-273"><a href="#cb48-273" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
+<span id="cb48-274"><a href="#cb48-274" aria-hidden="true" tabindex="-1"></a>  prev_shock &lt;- 0</span>
+<span id="cb48-275"><a href="#cb48-275" aria-hidden="true" tabindex="-1"></a>  prev_avoid &lt;-  0</span>
+<span id="cb48-276"><a href="#cb48-276" aria-hidden="true" tabindex="-1"></a>  new_dogs<span class="co">[</span><span class="ot">j,1</span><span class="co">]</span> &lt;- 1</span>
+<span id="cb48-277"><a href="#cb48-277" aria-hidden="true" tabindex="-1"></a>  for (t in 2:T){</span>
+<span id="cb48-278"><a href="#cb48-278" aria-hidden="true" tabindex="-1"></a>    prev_shock = prev_shock + new_dogs<span class="co">[</span><span class="ot">j,t-1</span><span class="co">]</span></span>
+<span id="cb48-279"><a href="#cb48-279" aria-hidden="true" tabindex="-1"></a>    prev_avoid = prev_avoid + 1 - new_dogs<span class="co">[</span><span class="ot">j,t-1</span><span class="co">]</span></span>
+<span id="cb48-280"><a href="#cb48-280" aria-hidden="true" tabindex="-1"></a>    p = a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>^prev_shock * b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>^prev_avoid</span>
+<span id="cb48-281"><a href="#cb48-281" aria-hidden="true" tabindex="-1"></a>    new_dogs<span class="co">[</span><span class="ot">j,t</span><span class="co">]</span> &lt;- rbinom(1, 1, p)</span>
+<span id="cb48-282"><a href="#cb48-282" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb48-283"><a href="#cb48-283" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-284"><a href="#cb48-284" aria-hidden="true" tabindex="-1"></a>new_dogs_data &lt;- list(y = new_dogs, J = J, T = T)</span>
+<span id="cb48-285"><a href="#cb48-285" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb48-286"><a href="#cb48-286" aria-hidden="true" tabindex="-1"></a>#| cache: true</span>
+<span id="cb48-287"><a href="#cb48-287" aria-hidden="true" tabindex="-1"></a>new_fit_5 &lt;- dogs_5$sample(data = new_dogs_data, refresh = 0)</span>
+<span id="cb48-288"><a href="#cb48-288" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-289"><a href="#cb48-289" aria-hidden="true" tabindex="-1"></a>print(new_fit_5, variables = c(&quot;mu_logit_ab&quot;, &quot;sigma_logit_ab&quot;, &quot;Omega_logit_ab<span class="co">[</span><span class="ot">1,2</span><span class="co">]</span>&quot;,</span>
+<span id="cb48-290"><a href="#cb48-290" aria-hidden="true" tabindex="-1"></a>                               &quot;a<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;a<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">1</span><span class="co">]</span>&quot;, &quot;b<span class="co">[</span><span class="ot">2</span><span class="co">]</span>&quot;))</span>
+<span id="cb48-291"><a href="#cb48-291" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-292"><a href="#cb48-292" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_data_50</span>
+<span id="cb48-293"><a href="#cb48-293" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb48-294"><a href="#cb48-294" aria-hidden="true" tabindex="-1"></a>#| fig-width: 6</span>
+<span id="cb48-295"><a href="#cb48-295" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;m&quot;, mar = c(1, 2, 2, 1))</span>
+<span id="cb48-296"><a href="#cb48-296" aria-hidden="true" tabindex="-1"></a>plot_dogs(new_dogs, main = &quot;Simulated data:  50 trials&quot;, cex.main = 0.9)</span>
+<span id="cb48-297"><a href="#cb48-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-298"><a href="#cb48-298" aria-hidden="true" tabindex="-1"></a>#| label: fig-dogs_calibration_50</span>
+<span id="cb48-299"><a href="#cb48-299" aria-hidden="true" tabindex="-1"></a>#| fig-height: 4</span>
+<span id="cb48-300"><a href="#cb48-300" aria-hidden="true" tabindex="-1"></a>#| fig-width: 4</span>
+<span id="cb48-301"><a href="#cb48-301" aria-hidden="true" tabindex="-1"></a>post &lt;- as_draws_rvars(new_fit_5$draws())</span>
+<span id="cb48-302"><a href="#cb48-302" aria-hidden="true" tabindex="-1"></a>par(pty = &quot;s&quot;, mar = c(3, 3.5, 2, 1), mgp = c(2, 0.5, 0), tck = -0.01)</span>
+<span id="cb48-303"><a href="#cb48-303" aria-hidden="true" tabindex="-1"></a>plot(0, 0, xlim = c(0.55, 1), ylim = c(0.55, 1), </span>
+<span id="cb48-304"><a href="#cb48-304" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Posterior inference&quot;, ylab = &quot;True parameter value&quot;, </span>
+<span id="cb48-305"><a href="#cb48-305" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, yaxs = &quot;i&quot;, pch = 20, cex = 0.6, </span>
+<span id="cb48-306"><a href="#cb48-306" aria-hidden="true" tabindex="-1"></a>     main = &quot;Calibration check based on 50 trials&quot;, cex.main = 0.9)</span>
+<span id="cb48-307"><a href="#cb48-307" aria-hidden="true" tabindex="-1"></a>abline(0, 1, lwd = 0.5, col = &quot;gray&quot;)</span>
+<span id="cb48-308"><a href="#cb48-308" aria-hidden="true" tabindex="-1"></a>for (j in 1:J){</span>
+<span id="cb48-309"><a href="#cb48-309" aria-hidden="true" tabindex="-1"></a>  points(median(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;blue&quot;)</span>
+<span id="cb48-310"><a href="#cb48-310" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(a<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;blue&quot;)</span>
+<span id="cb48-311"><a href="#cb48-311" aria-hidden="true" tabindex="-1"></a>  points(median(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>), b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, pch = 20, cex = 0.6, col = &quot;red&quot;)</span>
+<span id="cb48-312"><a href="#cb48-312" aria-hidden="true" tabindex="-1"></a>  lines(quantile(post$b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, c(0.25, 0.75)), rep(b<span class="co">[</span><span class="ot">j</span><span class="co">]</span>, 2), lwd = 0.5, col = &quot;red&quot;)</span>
+<span id="cb48-313"><a href="#cb48-313" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb48-314"><a href="#cb48-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-315"><a href="#cb48-315" aria-hidden="true" tabindex="-1"></a>#&#39; # References {.unnumbered}</span>
+<span id="cb48-316"><a href="#cb48-316" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-317"><a href="#cb48-317" aria-hidden="true" tabindex="-1"></a>#&#39; ::: {#refs}</span>
+<span id="cb48-318"><a href="#cb48-318" aria-hidden="true" tabindex="-1"></a>#&#39; :::</span>
+<span id="cb48-319"><a href="#cb48-319" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-320"><a href="#cb48-320" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
+<span id="cb48-321"><a href="#cb48-321" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb48-322"><a href="#cb48-322" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2023--2025, Andrew Gelman, licensed under BSD-3.</span>
+<span id="cb48-323"><a href="#cb48-323" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2023--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

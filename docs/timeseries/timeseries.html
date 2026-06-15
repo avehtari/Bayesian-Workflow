@@ -3975,6 +3975,12 @@ box-shadow: none !important;
 padding: 0 !important;
 }
 </style>
+<meta property="og:title" content="Using a fitted model for decision analysis: Mixture model for time series competition – Bayesian Workflow book">
+<meta property="og:description" content="Website for the Bayesian Workflow book by Gelman, Vehtari, McElreath, et al. — case studies, code, and exercises in R and Stan.">
+<meta property="og:image" content="https://avehtari.github.io/Bayesian-Workflow/social-cards/timeseries.png">
+<meta property="og:site_name" content="Bayesian Workflow book">
+<meta property="og:image:height" content="630">
+<meta property="og:image:width" content="1200">
 </head>
 
 <body class="nav-sidebar docked nav-fixed quarto-light">
@@ -4244,7 +4250,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-04-07</p>
+      <p class="date-modified">2026-06-15</p>
     </div>
   </div>
     
@@ -4674,7 +4680,7 @@ Figure 3
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/avehtari\.github\.io\/Bayesian-Workflow\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
@@ -5002,333 +5008,334 @@ Figure 3
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Using a fitted model for decision analysis: Mixture model for time series competition&quot;</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman&quot;</span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-08-18</span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
-<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
-<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 20 *Using a fitted model for decision analysis: Mixture</span>
-<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>#&#39; model for time series competition*.</span>
-<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
-<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>#&#39; A few years ago someone sent us an email about a &quot;Global Climate</span>
-<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>#&#39; Challenge&quot; that he had seen online, and which was introduced as</span>
-<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>#&#39; follows:</span>
-<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; It has often been claimed that alarm about global warming is</span>
-<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>#&#39;   supported by observational evidence. I have argued that there is no</span>
-<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>#&#39;   observational evidence for global-warming alarm: rather, all claims</span>
-<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>#&#39;   of such evidence rely on invalid statistical analyses.</span>
-<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; Some people, though, have asserted that the statistical analyses are</span>
-<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>#&#39;   valid. Those people assert, in particular, that they can determine,</span>
-<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>#&#39;   via statistical analysis, whether global temperatures have been</span>
-<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>#&#39;   increasing more than would be reasonably expected by random natural</span>
-<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>#&#39;   variation. Those people do not present any counter to my argument,</span>
-<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>#&#39;   but they make their assertions anyway.</span>
-<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; In response to that, I am sponsoring a contest: the prize is</span>
-<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>#&#39;   $100,000. In essence, the prize will be awarded to anyone who can</span>
-<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>#&#39;   demonstrate, via statistical analysis, that the increase in global</span>
-<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>#&#39;   temperatures is probably not due to random natural variation.</span>
-<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>#&#39; How to win the money?</span>
-<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; The file <span class="in">`Series1000.txt`</span> contains 1000 time series. Each</span>
-<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>#&#39;   series has length 135: the same as that of the most commonly studied</span>
-<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>#&#39;   series of global temperatures (which span 1880–2014). The 1000</span>
-<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>#&#39;   series were generated as follows. First, 1000 random series were</span>
-<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>#&#39;   obtained (via a trendless statistical model fit for global</span>
-<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>#&#39;   temperatures). Then, some randomly-selected series had a trend added</span>
-<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a>#&#39;   to them. Some trends were positive; the others were negative. Each</span>
-<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>#&#39;   individual trend was 1°C/century (in magnitude)—which is greater</span>
-<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a>#&#39;   than the trend claimed for global temperatures.</span>
-<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; A prize of $100,000 (one hundred thousand U.S. dollars) will be</span>
-<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a>#&#39;   awarded to the first person who submits an entry that correctly</span>
-<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a>#&#39;   identifies at least 900 series: which series were generated by a</span>
-<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a>#&#39;   trendless process and which were generated by a trending process.</span>
-<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a>#&#39; But also this:</span>
-<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; Each entry must be accompanied by a payment of $10.</span>
-<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-64"><a href="#cb29-64" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
-<span id="cb29-65"><a href="#cb29-65" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
-<span id="cb29-66"><a href="#cb29-66" aria-hidden="true" tabindex="-1"></a>  cache = FALSE,</span>
-<span id="cb29-67"><a href="#cb29-67" aria-hidden="true" tabindex="-1"></a>  message = FALSE,</span>
-<span id="cb29-68"><a href="#cb29-68" aria-hidden="true" tabindex="-1"></a>  error = FALSE,</span>
-<span id="cb29-69"><a href="#cb29-69" aria-hidden="true" tabindex="-1"></a>  warning = FALSE,</span>
-<span id="cb29-70"><a href="#cb29-70" aria-hidden="true" tabindex="-1"></a>  comment = NA,</span>
-<span id="cb29-71"><a href="#cb29-71" aria-hidden="true" tabindex="-1"></a>  out.width = &#39;95%&#39;</span>
-<span id="cb29-72"><a href="#cb29-72" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb29-73"><a href="#cb29-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-74"><a href="#cb29-74" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-75"><a href="#cb29-75" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages**</span>
-<span id="cb29-76"><a href="#cb29-76" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
-<span id="cb29-77"><a href="#cb29-77" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
-<span id="cb29-78"><a href="#cb29-78" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
-<span id="cb29-79"><a href="#cb29-79" aria-hidden="true" tabindex="-1"></a>library(scales)</span>
-<span id="cb29-80"><a href="#cb29-80" aria-hidden="true" tabindex="-1"></a>options(digits = 2)</span>
-<span id="cb29-81"><a href="#cb29-81" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
-<span id="cb29-82"><a href="#cb29-82" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
-<span id="cb29-83"><a href="#cb29-83" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
-<span id="cb29-84"><a href="#cb29-84" aria-hidden="true" tabindex="-1"></a>set.seed(1123)</span>
-<span id="cb29-85"><a href="#cb29-85" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-86"><a href="#cb29-86" aria-hidden="true" tabindex="-1"></a>print_stan_file &lt;- function(file) {</span>
-<span id="cb29-87"><a href="#cb29-87" aria-hidden="true" tabindex="-1"></a>  code &lt;- readLines(file)</span>
-<span id="cb29-88"><a href="#cb29-88" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;</span>
-<span id="cb29-89"><a href="#cb29-89" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
-<span id="cb29-90"><a href="#cb29-90" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
-<span id="cb29-91"><a href="#cb29-91" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
-<span id="cb29-92"><a href="#cb29-92" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
-<span id="cb29-93"><a href="#cb29-93" aria-hidden="true" tabindex="-1"></a>  } else {</span>
-<span id="cb29-94"><a href="#cb29-94" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
-<span id="cb29-95"><a href="#cb29-95" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb29-96"><a href="#cb29-96" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-97"><a href="#cb29-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-98"><a href="#cb29-98" aria-hidden="true" tabindex="-1"></a>#&#39; # Data</span>
-<span id="cb29-99"><a href="#cb29-99" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-100"><a href="#cb29-100" aria-hidden="true" tabindex="-1"></a>#&#39; OK, now it&#39;s time to get to work.  We start by downloading and</span>
-<span id="cb29-101"><a href="#cb29-101" aria-hidden="true" tabindex="-1"></a>#&#39; graphing the data.</span>
-<span id="cb29-102"><a href="#cb29-102" aria-hidden="true" tabindex="-1"></a>series &lt;- matrix(</span>
-<span id="cb29-103"><a href="#cb29-103" aria-hidden="true" tabindex="-1"></a>  scan(root(&quot;timeseries&quot;, &quot;data&quot;, &quot;Series1000.txt&quot;)),</span>
-<span id="cb29-104"><a href="#cb29-104" aria-hidden="true" tabindex="-1"></a>  nrow = 1000,</span>
-<span id="cb29-105"><a href="#cb29-105" aria-hidden="true" tabindex="-1"></a>  ncol = 135,</span>
-<span id="cb29-106"><a href="#cb29-106" aria-hidden="true" tabindex="-1"></a>  byrow = TRUE</span>
-<span id="cb29-107"><a href="#cb29-107" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb29-108"><a href="#cb29-108" aria-hidden="true" tabindex="-1"></a>T &lt;- 135</span>
-<span id="cb29-109"><a href="#cb29-109" aria-hidden="true" tabindex="-1"></a>N &lt;- 1000</span>
-<span id="cb29-110"><a href="#cb29-110" aria-hidden="true" tabindex="-1"></a>#| label: fig-series_1</span>
-<span id="cb29-111"><a href="#cb29-111" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3.4</span>
-<span id="cb29-112"><a href="#cb29-112" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
-<span id="cb29-113"><a href="#cb29-113" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 0), tck = -0.01, mgp = c(1.5, 0.5, 0))</span>
-<span id="cb29-114"><a href="#cb29-114" aria-hidden="true" tabindex="-1"></a>plot(c(1, T), range(series),</span>
-<span id="cb29-115"><a href="#cb29-115" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, bty = &quot;l&quot;, type = &quot;n&quot;,</span>
-<span id="cb29-116"><a href="#cb29-116" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Time&quot;, ylab = &quot;y&quot;)</span>
-<span id="cb29-117"><a href="#cb29-117" aria-hidden="true" tabindex="-1"></a>for (n in 1:N) {</span>
-<span id="cb29-118"><a href="#cb29-118" aria-hidden="true" tabindex="-1"></a>  lines(1:T, series<span class="co">[</span><span class="ot">n, </span><span class="co">]</span>, lwd = .5, col = alpha(&quot;black&quot;, 0.2))</span>
-<span id="cb29-119"><a href="#cb29-119" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-120"><a href="#cb29-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-121"><a href="#cb29-121" aria-hidden="true" tabindex="-1"></a>#&#39; # Separate linear regression</span>
-<span id="cb29-122"><a href="#cb29-122" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-123"><a href="#cb29-123" aria-hidden="true" tabindex="-1"></a>#&#39; Aha! The lines are fanning out from a common starting point. We&#39;ll fit</span>
-<span id="cb29-124"><a href="#cb29-124" aria-hidden="true" tabindex="-1"></a>#&#39; a regression to each line and then summarize each line by its average</span>
-<span id="cb29-125"><a href="#cb29-125" aria-hidden="true" tabindex="-1"></a>#&#39; slope.  This is not necessarily the most efficient way to estimate</span>
-<span id="cb29-126"><a href="#cb29-126" aria-hidden="true" tabindex="-1"></a>#&#39; a slope from correlated data, but we will not be concerned about</span>
-<span id="cb29-127"><a href="#cb29-127" aria-hidden="true" tabindex="-1"></a>#&#39; that, as our purpose here is to demonstrate decision analysis in</span>
-<span id="cb29-128"><a href="#cb29-128" aria-hidden="true" tabindex="-1"></a>#&#39; the context of a fitted model, rather than to fit the model in an</span>
-<span id="cb29-129"><a href="#cb29-129" aria-hidden="true" tabindex="-1"></a>#&#39; optimal way.</span>
-<span id="cb29-130"><a href="#cb29-130" aria-hidden="true" tabindex="-1"></a>slope &lt;- rep(NA, N)</span>
-<span id="cb29-131"><a href="#cb29-131" aria-hidden="true" tabindex="-1"></a>se &lt;- rep(NA, N)</span>
-<span id="cb29-132"><a href="#cb29-132" aria-hidden="true" tabindex="-1"></a>for (n in 1:N) {</span>
-<span id="cb29-133"><a href="#cb29-133" aria-hidden="true" tabindex="-1"></a>  data &lt;- series<span class="co">[</span><span class="ot">n, </span><span class="co">]</span></span>
-<span id="cb29-134"><a href="#cb29-134" aria-hidden="true" tabindex="-1"></a>  time &lt;- 1:T</span>
-<span id="cb29-135"><a href="#cb29-135" aria-hidden="true" tabindex="-1"></a>  fit &lt;- lm(data ~ time)</span>
-<span id="cb29-136"><a href="#cb29-136" aria-hidden="true" tabindex="-1"></a>  coefs &lt;- summary(fit)$coefficients</span>
-<span id="cb29-137"><a href="#cb29-137" aria-hidden="true" tabindex="-1"></a>  slope<span class="co">[</span><span class="ot">n</span><span class="co">]</span> &lt;- 100 * coefs<span class="co">[</span><span class="ot">2, &quot;Estimate&quot;</span><span class="co">]</span></span>
-<span id="cb29-138"><a href="#cb29-138" aria-hidden="true" tabindex="-1"></a>  se<span class="co">[</span><span class="ot">n</span><span class="co">]</span> &lt;- 100 * coefs<span class="co">[</span><span class="ot">2, &quot;Std. Error&quot;</span><span class="co">]</span></span>
-<span id="cb29-139"><a href="#cb29-139" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb29-140"><a href="#cb29-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-141"><a href="#cb29-141" aria-hidden="true" tabindex="-1"></a>#&#39; We multiplied the slopes (and standard errors) by 100 to put them on a</span>
-<span id="cb29-142"><a href="#cb29-142" aria-hidden="true" tabindex="-1"></a>#&#39; per-century scale to match the above instructions.</span>
-<span id="cb29-143"><a href="#cb29-143" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-144"><a href="#cb29-144" aria-hidden="true" tabindex="-1"></a>#&#39; Next we plot the estimated slopes and their standard errors:</span>
-<span id="cb29-145"><a href="#cb29-145" aria-hidden="true" tabindex="-1"></a>#| label: fig-series_2</span>
-<span id="cb29-146"><a href="#cb29-146" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3.6</span>
-<span id="cb29-147"><a href="#cb29-147" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
-<span id="cb29-148"><a href="#cb29-148" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 0), tck = -.01, mgp = c(1.5, .5, 0))</span>
-<span id="cb29-149"><a href="#cb29-149" aria-hidden="true" tabindex="-1"></a>plot(slope, se,</span>
-<span id="cb29-150"><a href="#cb29-150" aria-hidden="true" tabindex="-1"></a>     ylim = c(0, 1.05 * max(se)), yaxs = &quot;i&quot;, bty = &quot;l&quot;,</span>
-<span id="cb29-151"><a href="#cb29-151" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Estimated slope&quot;, ylab = &quot;SE&quot;, pch = 20, cex = .5)</span>
-<span id="cb29-152"><a href="#cb29-152" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-153"><a href="#cb29-153" aria-hidden="true" tabindex="-1"></a>#&#39; OK, not much information in the se&#39;s. How about a histogram of the</span>
-<span id="cb29-154"><a href="#cb29-154" aria-hidden="true" tabindex="-1"></a>#&#39; estimated slopes?</span>
-<span id="cb29-155"><a href="#cb29-155" aria-hidden="true" tabindex="-1"></a>#| label: fig-series_3</span>
-<span id="cb29-156"><a href="#cb29-156" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3.6</span>
-<span id="cb29-157"><a href="#cb29-157" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
-<span id="cb29-158"><a href="#cb29-158" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 0), tck = -.01, mgp = c(1.5, .5, 0))</span>
-<span id="cb29-159"><a href="#cb29-159" aria-hidden="true" tabindex="-1"></a>hist(</span>
-<span id="cb29-160"><a href="#cb29-160" aria-hidden="true" tabindex="-1"></a>  slope,</span>
-<span id="cb29-161"><a href="#cb29-161" aria-hidden="true" tabindex="-1"></a>  xlab = &quot;Estimated slope&quot;,</span>
-<span id="cb29-162"><a href="#cb29-162" aria-hidden="true" tabindex="-1"></a>  breaks = seq(floor(10 * min(slope)), ceiling(10 * max(slope))) / 10,</span>
-<span id="cb29-163"><a href="#cb29-163" aria-hidden="true" tabindex="-1"></a>  main = &quot;&quot;</span>
-<span id="cb29-164"><a href="#cb29-164" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb29-165"><a href="#cb29-165" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-166"><a href="#cb29-166" aria-hidden="true" tabindex="-1"></a>#&#39; Based on the problem description, I&#39;d expect to see distributions</span>
-<span id="cb29-167"><a href="#cb29-167" aria-hidden="true" tabindex="-1"></a>#&#39; centered at 0, -1, and 1. It looks like this might be the case.</span>
-<span id="cb29-168"><a href="#cb29-168" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-169"><a href="#cb29-169" aria-hidden="true" tabindex="-1"></a>#&#39; # Stan mixture model</span>
-<span id="cb29-170"><a href="#cb29-170" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-171"><a href="#cb29-171" aria-hidden="true" tabindex="-1"></a>#&#39; So let&#39;s fit a mixture model. That&#39;s easy.  Here&#39;s the Stan model:</span>
-<span id="cb29-172"><a href="#cb29-172" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
-<span id="cb29-173"><a href="#cb29-173" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;timeseries&quot;, &quot;mixture.stan&quot;))</span>
-<span id="cb29-174"><a href="#cb29-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-175"><a href="#cb29-175" aria-hidden="true" tabindex="-1"></a>#&#39; We sample from the posterior:</span>
-<span id="cb29-176"><a href="#cb29-176" aria-hidden="true" tabindex="-1"></a>y &lt;- slope</span>
-<span id="cb29-177"><a href="#cb29-177" aria-hidden="true" tabindex="-1"></a>K &lt;- 3</span>
-<span id="cb29-178"><a href="#cb29-178" aria-hidden="true" tabindex="-1"></a>mu &lt;- c(0, -1, 1)</span>
-<span id="cb29-179"><a href="#cb29-179" aria-hidden="true" tabindex="-1"></a>data &lt;- list(y = y, K = K, N = N, mu = mu)</span>
-<span id="cb29-180"><a href="#cb29-180" aria-hidden="true" tabindex="-1"></a>mod &lt;- cmdstan_model(root(&quot;timeseries&quot;, &quot;mixture.stan&quot;))</span>
-<span id="cb29-181"><a href="#cb29-181" aria-hidden="true" tabindex="-1"></a>#| label: fit_mix</span>
-<span id="cb29-182"><a href="#cb29-182" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb29-183"><a href="#cb29-183" aria-hidden="true" tabindex="-1"></a>fit_mix &lt;- mod$sample(data = data, refresh = 0)</span>
-<span id="cb29-184"><a href="#cb29-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-185"><a href="#cb29-185" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
-<span id="cb29-186"><a href="#cb29-186" aria-hidden="true" tabindex="-1"></a>print(fit_mix)</span>
-<span id="cb29-187"><a href="#cb29-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-188"><a href="#cb29-188" aria-hidden="true" tabindex="-1"></a>#&#39; Convergence is fine: $\widehat{R}$ is close to 1 for everything.  The</span>
-<span id="cb29-189"><a href="#cb29-189" aria-hidden="true" tabindex="-1"></a>#&#39; estimated weights of the three mixture components are approximately</span>
-<span id="cb29-190"><a href="#cb29-190" aria-hidden="true" tabindex="-1"></a>#&#39; 0.5, 0.25, 0.25. Given that the problem was made up, I&#39;m guessing the</span>
-<span id="cb29-191"><a href="#cb29-191" aria-hidden="true" tabindex="-1"></a>#&#39; weights of the underlying data-generation process are exactly 1/2,</span>
-<span id="cb29-192"><a href="#cb29-192" aria-hidden="true" tabindex="-1"></a>#&#39; 1/4, and 1/4. The standard deviation of the slopes within each</span>
-<span id="cb29-193"><a href="#cb29-193" aria-hidden="true" tabindex="-1"></a>#&#39; component is 0.4, or close to it. We could also try fitting a model</span>
-<span id="cb29-194"><a href="#cb29-194" aria-hidden="true" tabindex="-1"></a>#&#39; where the standard deviations of the three components differ, but we</span>
-<span id="cb29-195"><a href="#cb29-195" aria-hidden="true" tabindex="-1"></a>#&#39; won&#39;t, partly because the description given with the simulated data</span>
-<span id="cb29-196"><a href="#cb29-196" aria-hidden="true" tabindex="-1"></a>#&#39; described the change as adding a trend, and partly because the above</span>
-<span id="cb29-197"><a href="#cb29-197" aria-hidden="true" tabindex="-1"></a>#&#39; histogram doesn&#39;t seem to show any varying of the widths of the</span>
-<span id="cb29-198"><a href="#cb29-198" aria-hidden="true" tabindex="-1"></a>#&#39; mixture components.</span>
-<span id="cb29-199"><a href="#cb29-199" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-200"><a href="#cb29-200" aria-hidden="true" tabindex="-1"></a>#&#39; OK, now we&#39;re getting somewhere. To make predictions, we need to know,</span>
-<span id="cb29-201"><a href="#cb29-201" aria-hidden="true" tabindex="-1"></a>#&#39; for each series, the probability of it being in each of the three</span>
-<span id="cb29-202"><a href="#cb29-202" aria-hidden="true" tabindex="-1"></a>#&#39; components. We&#39;ll compute these probabilities by adding a generated</span>
-<span id="cb29-203"><a href="#cb29-203" aria-hidden="true" tabindex="-1"></a>#&#39; quantities block to the Stan program:</span>
-<span id="cb29-204"><a href="#cb29-204" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-205"><a href="#cb29-205" aria-hidden="true" tabindex="-1"></a>#&#39; ```stan</span>
-<span id="cb29-206"><a href="#cb29-206" aria-hidden="true" tabindex="-1"></a>#&#39; generated quantities {</span>
-<span id="cb29-207"><a href="#cb29-207" aria-hidden="true" tabindex="-1"></a>#&#39;   matrix<span class="co">[</span><span class="ot">N, K</span><span class="co">]</span> p;</span>
-<span id="cb29-208"><a href="#cb29-208" aria-hidden="true" tabindex="-1"></a>#&#39;   for (n in 1:N) {</span>
-<span id="cb29-209"><a href="#cb29-209" aria-hidden="true" tabindex="-1"></a>#&#39;     vector<span class="co">[</span><span class="ot">K</span><span class="co">]</span> p_raw;</span>
-<span id="cb29-210"><a href="#cb29-210" aria-hidden="true" tabindex="-1"></a>#&#39;     for (k in 1:K) {</span>
-<span id="cb29-211"><a href="#cb29-211" aria-hidden="true" tabindex="-1"></a>#&#39;       p_raw<span class="co">[</span><span class="ot">k</span><span class="co">]</span> = theta<span class="co">[</span><span class="ot">k</span><span class="co">]</span> * exp(normal_lpdf(y<span class="co">[</span><span class="ot">n</span><span class="co">]</span> | mu<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, sigma));</span>
-<span id="cb29-212"><a href="#cb29-212" aria-hidden="true" tabindex="-1"></a>#&#39;     }</span>
-<span id="cb29-213"><a href="#cb29-213" aria-hidden="true" tabindex="-1"></a>#&#39;     for (k in 1:K) {</span>
-<span id="cb29-214"><a href="#cb29-214" aria-hidden="true" tabindex="-1"></a>#&#39;       p<span class="co">[</span><span class="ot">n,k</span><span class="co">]</span> = p_raw<span class="co">[</span><span class="ot">k</span><span class="co">]</span> / sum(p_raw);</span>
-<span id="cb29-215"><a href="#cb29-215" aria-hidden="true" tabindex="-1"></a>#&#39;     }</span>
-<span id="cb29-216"><a href="#cb29-216" aria-hidden="true" tabindex="-1"></a>#&#39;   }</span>
-<span id="cb29-217"><a href="#cb29-217" aria-hidden="true" tabindex="-1"></a>#&#39; }</span>
-<span id="cb29-218"><a href="#cb29-218" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
-<span id="cb29-219"><a href="#cb29-219" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-220"><a href="#cb29-220" aria-hidden="true" tabindex="-1"></a>#&#39; We then re-fit the model, extract the $p$&#39;s, and average them over the</span>
-<span id="cb29-221"><a href="#cb29-221" aria-hidden="true" tabindex="-1"></a>#&#39; posterior simulations. This is made simpler using the posterior R package&#39;s</span>
-<span id="cb29-222"><a href="#cb29-222" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`draws_rvars`</span> format.</span>
-<span id="cb29-223"><a href="#cb29-223" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-224"><a href="#cb29-224" aria-hidden="true" tabindex="-1"></a>#| label: fit_mix_2</span>
-<span id="cb29-225"><a href="#cb29-225" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
-<span id="cb29-226"><a href="#cb29-226" aria-hidden="true" tabindex="-1"></a>mod &lt;- cmdstan_model(root(&quot;timeseries&quot;, &quot;mixture_2.stan&quot;))</span>
-<span id="cb29-227"><a href="#cb29-227" aria-hidden="true" tabindex="-1"></a>fit_mix &lt;- mod$sample(data = data, refresh = 0)</span>
-<span id="cb29-228"><a href="#cb29-228" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-229"><a href="#cb29-229" aria-hidden="true" tabindex="-1"></a>prob_sims &lt;- as_draws_rvars(fit_mix$draws())</span>
-<span id="cb29-230"><a href="#cb29-230" aria-hidden="true" tabindex="-1"></a>prob &lt;- mean(prob_sims$p)</span>
-<span id="cb29-231"><a href="#cb29-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-232"><a href="#cb29-232" aria-hidden="true" tabindex="-1"></a>#&#39; We now have a $1000\times 3$ matrix of probabilities. Let&#39;s take a</span>
-<span id="cb29-233"><a href="#cb29-233" aria-hidden="true" tabindex="-1"></a>#&#39; look at the first ten rows</span>
-<span id="cb29-234"><a href="#cb29-234" aria-hidden="true" tabindex="-1"></a>round(prob<span class="co">[</span><span class="ot">1:10,</span><span class="co">]</span>, 2)</span>
-<span id="cb29-235"><a href="#cb29-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-236"><a href="#cb29-236" aria-hidden="true" tabindex="-1"></a>#&#39; So, the first series is probably drawn from the sloping-upward model;</span>
-<span id="cb29-237"><a href="#cb29-237" aria-hidden="true" tabindex="-1"></a>#&#39; the second might be from the null model or it might be from the</span>
-<span id="cb29-238"><a href="#cb29-238" aria-hidden="true" tabindex="-1"></a>#&#39; sloping-downward model; the third, fourth, fifth, sixth, seventh, and</span>
-<span id="cb29-239"><a href="#cb29-239" aria-hidden="true" tabindex="-1"></a>#&#39; eighth are probably from the null model; the ninth is probably from</span>
-<span id="cb29-240"><a href="#cb29-240" aria-hidden="true" tabindex="-1"></a>#&#39; the sloping-upward model; and so forth.</span>
-<span id="cb29-241"><a href="#cb29-241" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-242"><a href="#cb29-242" aria-hidden="true" tabindex="-1"></a>#&#39; We&#39;ll now program this: for each of the 1000 series in the dataset,</span>
-<span id="cb29-243"><a href="#cb29-243" aria-hidden="true" tabindex="-1"></a>#&#39; we&#39;ll pick which of the three mixture components has the highest</span>
-<span id="cb29-244"><a href="#cb29-244" aria-hidden="true" tabindex="-1"></a>#&#39; probability. We&#39;ll save the probability and also which component is</span>
-<span id="cb29-245"><a href="#cb29-245" aria-hidden="true" tabindex="-1"></a>#&#39; being picked.</span>
-<span id="cb29-246"><a href="#cb29-246" aria-hidden="true" tabindex="-1"></a>max_prob &lt;- apply(prob, 1, max)</span>
-<span id="cb29-247"><a href="#cb29-247" aria-hidden="true" tabindex="-1"></a>choice &lt;- apply(prob, 1, which.max)</span>
-<span id="cb29-248"><a href="#cb29-248" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-249"><a href="#cb29-249" aria-hidden="true" tabindex="-1"></a>#&#39; And now we can sum this over the 1000 series. We&#39;ll compute the number</span>
-<span id="cb29-250"><a href="#cb29-250" aria-hidden="true" tabindex="-1"></a>#&#39; of series assigned to each of the three choices:</span>
-<span id="cb29-251"><a href="#cb29-251" aria-hidden="true" tabindex="-1"></a>print(table(choice))</span>
-<span id="cb29-252"><a href="#cb29-252" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-253"><a href="#cb29-253" aria-hidden="true" tabindex="-1"></a>#&#39; The guesses are not quite in proportion 0.5, 0.25, 0.25. There seem to</span>
-<span id="cb29-254"><a href="#cb29-254" aria-hidden="true" tabindex="-1"></a>#&#39; be too many guesses of zero slope and not enough of positive and</span>
-<span id="cb29-255"><a href="#cb29-255" aria-hidden="true" tabindex="-1"></a>#&#39; negative slopes. But that makes sense given the decision problem: we</span>
-<span id="cb29-256"><a href="#cb29-256" aria-hidden="true" tabindex="-1"></a>#&#39; want to maximize the number of correct guesses so we end up</span>
-<span id="cb29-257"><a href="#cb29-257" aria-hidden="true" tabindex="-1"></a>#&#39; disproportionately guessing the most common category. That&#39;s fine;</span>
-<span id="cb29-258"><a href="#cb29-258" aria-hidden="true" tabindex="-1"></a>#&#39; it&#39;s how it will be.</span>
-<span id="cb29-259"><a href="#cb29-259" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-260"><a href="#cb29-260" aria-hidden="true" tabindex="-1"></a>#&#39; And we can compute the expected number of correct guesses (based on</span>
-<span id="cb29-261"><a href="#cb29-261" aria-hidden="true" tabindex="-1"></a>#&#39; the posterior distribution we have here), and the standard deviation</span>
-<span id="cb29-262"><a href="#cb29-262" aria-hidden="true" tabindex="-1"></a>#&#39; of the number of correct guesses (based on the reasonable</span>
-<span id="cb29-263"><a href="#cb29-263" aria-hidden="true" tabindex="-1"></a>#&#39; approximation of independence of the 1000 series conditional on the</span>
-<span id="cb29-264"><a href="#cb29-264" aria-hidden="true" tabindex="-1"></a>#&#39; model). And then we&#39;ll print all these numbers:</span>
-<span id="cb29-265"><a href="#cb29-265" aria-hidden="true" tabindex="-1"></a>expected_correct &lt;- sum(max_prob)</span>
-<span id="cb29-266"><a href="#cb29-266" aria-hidden="true" tabindex="-1"></a>sd_correct &lt;- sqrt(sum(max_prob * (1 - max_prob)))</span>
-<span id="cb29-267"><a href="#cb29-267" aria-hidden="true" tabindex="-1"></a>round(c(expected_correct, sd_correct), 1)</span>
-<span id="cb29-268"><a href="#cb29-268" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-269"><a href="#cb29-269" aria-hidden="true" tabindex="-1"></a>#&#39; Interesting.  The expected number of correct guesses is</span>
-<span id="cb29-270"><a href="#cb29-270" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`r round(expected_correct)`</span>. Not quite the 900 that&#39;s needed to win! The standard</span>
-<span id="cb29-271"><a href="#cb29-271" aria-hidden="true" tabindex="-1"></a>#&#39; error of the number of correct guesses is <span class="in">`r round(sd_correct, 1)`</span>, so 900 is</span>
-<span id="cb29-272"><a href="#cb29-272" aria-hidden="true" tabindex="-1"></a>#&#39; over 5 standard errors away from our expected number correct. That&#39;s bad news!</span>
-<span id="cb29-273"><a href="#cb29-273" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-274"><a href="#cb29-274" aria-hidden="true" tabindex="-1"></a>#&#39; How bad is it?  We can compute the normal cumulative density function</span>
-<span id="cb29-275"><a href="#cb29-275" aria-hidden="true" tabindex="-1"></a>#&#39; to get the probability of at least 900 successes; that&#39;s</span>
-<span id="cb29-276"><a href="#cb29-276" aria-hidden="true" tabindex="-1"></a>pnorm(expected_correct, 900, sd_correct)</span>
-<span id="cb29-277"><a href="#cb29-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-278"><a href="#cb29-278" aria-hidden="true" tabindex="-1"></a>#&#39; That&#39;s a small number; here&#39;s its reciprocal:</span>
-<span id="cb29-279"><a href="#cb29-279" aria-hidden="true" tabindex="-1"></a>recip &lt;- 1 / pnorm(expected_correct, 900, sd_correct)</span>
-<span id="cb29-280"><a href="#cb29-280" aria-hidden="true" tabindex="-1"></a>recip</span>
-<span id="cb29-281"><a href="#cb29-281" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-282"><a href="#cb29-282" aria-hidden="true" tabindex="-1"></a>#&#39; That&#39;s almost a 1-in-200,000 chance of winning the big prize!</span>
-<span id="cb29-283"><a href="#cb29-283" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-284"><a href="#cb29-284" aria-hidden="true" tabindex="-1"></a>#&#39; But we only have to get _at least_ 900. So we can do the continuity</span>
-<span id="cb29-285"><a href="#cb29-285" aria-hidden="true" tabindex="-1"></a>#&#39; correction and evaluate the probability of at least 899.5 successes,</span>
-<span id="cb29-286"><a href="#cb29-286" aria-hidden="true" tabindex="-1"></a>#&#39; which, when inverted, yields:</span>
-<span id="cb29-287"><a href="#cb29-287" aria-hidden="true" tabindex="-1"></a>1 / pnorm(expected_correct, 899.5, sd_correct)</span>
-<span id="cb29-288"><a href="#cb29-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-289"><a href="#cb29-289" aria-hidden="true" tabindex="-1"></a>#&#39; Nope, still no good. For the bet to be worth it, even in the crudest</span>
-<span id="cb29-290"><a href="#cb29-290" aria-hidden="true" tabindex="-1"></a>#&#39; sense of expected monetary value, the probability of winning would</span>
-<span id="cb29-291"><a href="#cb29-291" aria-hidden="true" tabindex="-1"></a>#&#39; have to be at least 1 in 10,000. (Recall that the prize is \$100,000</span>
-<span id="cb29-292"><a href="#cb29-292" aria-hidden="true" tabindex="-1"></a>#&#39; but the cost of entry is \$10.) And that&#39;s all conditional on the</span>
-<span id="cb29-293"><a href="#cb29-293" aria-hidden="true" tabindex="-1"></a>#&#39; designer of the study doing everything exactly as he said, and not</span>
-<span id="cb29-294"><a href="#cb29-294" aria-hidden="true" tabindex="-1"></a>#&#39; playing with multiple seeds for the random number generator,</span>
-<span id="cb29-295"><a href="#cb29-295" aria-hidden="true" tabindex="-1"></a>#&#39; etc. After all, he could well have first chosen a seed and generated</span>
-<span id="cb29-296"><a href="#cb29-296" aria-hidden="true" tabindex="-1"></a>#&#39; the series, then performed something like the above analysis and</span>
-<span id="cb29-297"><a href="#cb29-297" aria-hidden="true" tabindex="-1"></a>#&#39; checked that the most natural estimate gave only 850 correct or so,</span>
-<span id="cb29-298"><a href="#cb29-298" aria-hidden="true" tabindex="-1"></a>#&#39; and in the very unlikely event that the natural estimate gave 900 or</span>
-<span id="cb29-299"><a href="#cb29-299" aria-hidden="true" tabindex="-1"></a>#&#39; close to it, just re-running with a new seed. We have no reason to</span>
-<span id="cb29-300"><a href="#cb29-300" aria-hidden="true" tabindex="-1"></a>#&#39; think that the creator of this challenge did anything like that; our</span>
-<span id="cb29-301"><a href="#cb29-301" aria-hidden="true" tabindex="-1"></a>#&#39; point here is only that, even if he did his simulation in a completely</span>
-<span id="cb29-302"><a href="#cb29-302" aria-hidden="true" tabindex="-1"></a>#&#39; clean way, our odds of winning are about 1 in 200,000---about 1/20th</span>
-<span id="cb29-303"><a href="#cb29-303" aria-hidden="true" tabindex="-1"></a>#&#39; what we&#39;d need for this to be a fair game.</span>
-<span id="cb29-304"><a href="#cb29-304" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-305"><a href="#cb29-305" aria-hidden="true" tabindex="-1"></a>#&#39; There is one more thing, though: the data are highly autocorrelated,</span>
-<span id="cb29-306"><a href="#cb29-306" aria-hidden="true" tabindex="-1"></a>#&#39; so least-squares regression may not be the most efficient way to</span>
-<span id="cb29-307"><a href="#cb29-307" aria-hidden="true" tabindex="-1"></a>#&#39; estimate these slopes. If we can estimate the slopes more precisely,</span>
-<span id="cb29-308"><a href="#cb29-308" aria-hidden="true" tabindex="-1"></a>#&#39; we can get more discrimination in our predictions.  Maybe there is a</span>
-<span id="cb29-309"><a href="#cb29-309" aria-hidden="true" tabindex="-1"></a>#&#39; way to win the game by extracting more information from each series,</span>
-<span id="cb29-310"><a href="#cb29-310" aria-hidden="true" tabindex="-1"></a>#&#39; but it won&#39;t be easy.</span>
-<span id="cb29-311"><a href="#cb29-311" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-312"><a href="#cb29-312" aria-hidden="true" tabindex="-1"></a>#&#39; You could say that the above all demonstrates the designer&#39;s point,</span>
-<span id="cb29-313"><a href="#cb29-313" aria-hidden="true" tabindex="-1"></a>#&#39; that you can&#39;t identify a trend in a time series of this length. But we</span>
-<span id="cb29-314"><a href="#cb29-314" aria-hidden="true" tabindex="-1"></a>#&#39; don&#39;t think it would make sense to draw that conclusion from this</span>
-<span id="cb29-315"><a href="#cb29-315" aria-hidden="true" tabindex="-1"></a>#&#39; exercise. After all, you can just tweak the parameters in the problem</span>
-<span id="cb29-316"><a href="#cb29-316" aria-hidden="true" tabindex="-1"></a>#&#39; a bit---or simply set the goal to 800 correct instead of 900---and the</span>
-<span id="cb29-317"><a href="#cb29-317" aria-hidden="true" tabindex="-1"></a>#&#39; game becomes easy to win. Or, had the game been winnable as initially</span>
-<span id="cb29-318"><a href="#cb29-318" aria-hidden="true" tabindex="-1"></a>#&#39; set up, you could just up the threshold to 950, and again it would</span>
-<span id="cb29-319"><a href="#cb29-319" aria-hidden="true" tabindex="-1"></a>#&#39; become essentially impossible to win. Conversely, if the designer of</span>
-<span id="cb29-320"><a href="#cb29-320" aria-hidden="true" tabindex="-1"></a>#&#39; the challenge had messed up his calculations and set the threshold to</span>
-<span id="cb29-321"><a href="#cb29-321" aria-hidden="true" tabindex="-1"></a>#&#39; 800, and someone had sent in a winning entry, it wouldn&#39;t disprove his</span>
-<span id="cb29-322"><a href="#cb29-322" aria-hidden="true" tabindex="-1"></a>#&#39; claims about climate science, it would just mean he hadn&#39;t been</span>
-<span id="cb29-323"><a href="#cb29-323" aria-hidden="true" tabindex="-1"></a>#&#39; careful enough in setting up his bet.</span>
-<span id="cb29-324"><a href="#cb29-324" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-325"><a href="#cb29-325" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
-<span id="cb29-326"><a href="#cb29-326" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
-<span id="cb29-327"><a href="#cb29-327" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under BSD-3.</span>
-<span id="cb29-328"><a href="#cb29-328" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>#&#39; image: ../social-cards/timeseries.png</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>#&#39; title: &quot;Using a fitted model for decision analysis: Mixture model for time series competition&quot;</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>#&#39; author: &quot;Andrew Gelman&quot;</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>#&#39; date: 2022-08-18</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>#&#39; date-modified: today</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>#&#39; date-format: iso</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>#&#39; format:</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>#&#39;   html:</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>#&#39;     number-sections: true</span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>#&#39;     code-copy: true</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>#&#39;     code-download: true</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>#&#39;     code-tools: true</span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a>#&#39; bibliography: ../casestudies.bib</span>
+<span id="cb29-15"><a href="#cb29-15" aria-hidden="true" tabindex="-1"></a>#&#39; ---</span>
+<span id="cb29-16"><a href="#cb29-16" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-17"><a href="#cb29-17" aria-hidden="true" tabindex="-1"></a>#&#39; This notebook includes the code for the Bayesian Workflow book</span>
+<span id="cb29-18"><a href="#cb29-18" aria-hidden="true" tabindex="-1"></a>#&#39; Chapter 20 *Using a fitted model for decision analysis: Mixture</span>
+<span id="cb29-19"><a href="#cb29-19" aria-hidden="true" tabindex="-1"></a>#&#39; model for time series competition*.</span>
+<span id="cb29-20"><a href="#cb29-20" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-21"><a href="#cb29-21" aria-hidden="true" tabindex="-1"></a>#&#39; # Introduction</span>
+<span id="cb29-22"><a href="#cb29-22" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-23"><a href="#cb29-23" aria-hidden="true" tabindex="-1"></a>#&#39; A few years ago someone sent us an email about a &quot;Global Climate</span>
+<span id="cb29-24"><a href="#cb29-24" aria-hidden="true" tabindex="-1"></a>#&#39; Challenge&quot; that he had seen online, and which was introduced as</span>
+<span id="cb29-25"><a href="#cb29-25" aria-hidden="true" tabindex="-1"></a>#&#39; follows:</span>
+<span id="cb29-26"><a href="#cb29-26" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-27"><a href="#cb29-27" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; It has often been claimed that alarm about global warming is</span>
+<span id="cb29-28"><a href="#cb29-28" aria-hidden="true" tabindex="-1"></a>#&#39;   supported by observational evidence. I have argued that there is no</span>
+<span id="cb29-29"><a href="#cb29-29" aria-hidden="true" tabindex="-1"></a>#&#39;   observational evidence for global-warming alarm: rather, all claims</span>
+<span id="cb29-30"><a href="#cb29-30" aria-hidden="true" tabindex="-1"></a>#&#39;   of such evidence rely on invalid statistical analyses.</span>
+<span id="cb29-31"><a href="#cb29-31" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-32"><a href="#cb29-32" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; Some people, though, have asserted that the statistical analyses are</span>
+<span id="cb29-33"><a href="#cb29-33" aria-hidden="true" tabindex="-1"></a>#&#39;   valid. Those people assert, in particular, that they can determine,</span>
+<span id="cb29-34"><a href="#cb29-34" aria-hidden="true" tabindex="-1"></a>#&#39;   via statistical analysis, whether global temperatures have been</span>
+<span id="cb29-35"><a href="#cb29-35" aria-hidden="true" tabindex="-1"></a>#&#39;   increasing more than would be reasonably expected by random natural</span>
+<span id="cb29-36"><a href="#cb29-36" aria-hidden="true" tabindex="-1"></a>#&#39;   variation. Those people do not present any counter to my argument,</span>
+<span id="cb29-37"><a href="#cb29-37" aria-hidden="true" tabindex="-1"></a>#&#39;   but they make their assertions anyway.</span>
+<span id="cb29-38"><a href="#cb29-38" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-39"><a href="#cb29-39" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; In response to that, I am sponsoring a contest: the prize is</span>
+<span id="cb29-40"><a href="#cb29-40" aria-hidden="true" tabindex="-1"></a>#&#39;   $100,000. In essence, the prize will be awarded to anyone who can</span>
+<span id="cb29-41"><a href="#cb29-41" aria-hidden="true" tabindex="-1"></a>#&#39;   demonstrate, via statistical analysis, that the increase in global</span>
+<span id="cb29-42"><a href="#cb29-42" aria-hidden="true" tabindex="-1"></a>#&#39;   temperatures is probably not due to random natural variation.</span>
+<span id="cb29-43"><a href="#cb29-43" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-44"><a href="#cb29-44" aria-hidden="true" tabindex="-1"></a>#&#39; How to win the money?</span>
+<span id="cb29-45"><a href="#cb29-45" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-46"><a href="#cb29-46" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; The file <span class="in">`Series1000.txt`</span> contains 1000 time series. Each</span>
+<span id="cb29-47"><a href="#cb29-47" aria-hidden="true" tabindex="-1"></a>#&#39;   series has length 135: the same as that of the most commonly studied</span>
+<span id="cb29-48"><a href="#cb29-48" aria-hidden="true" tabindex="-1"></a>#&#39;   series of global temperatures (which span 1880–2014). The 1000</span>
+<span id="cb29-49"><a href="#cb29-49" aria-hidden="true" tabindex="-1"></a>#&#39;   series were generated as follows. First, 1000 random series were</span>
+<span id="cb29-50"><a href="#cb29-50" aria-hidden="true" tabindex="-1"></a>#&#39;   obtained (via a trendless statistical model fit for global</span>
+<span id="cb29-51"><a href="#cb29-51" aria-hidden="true" tabindex="-1"></a>#&#39;   temperatures). Then, some randomly-selected series had a trend added</span>
+<span id="cb29-52"><a href="#cb29-52" aria-hidden="true" tabindex="-1"></a>#&#39;   to them. Some trends were positive; the others were negative. Each</span>
+<span id="cb29-53"><a href="#cb29-53" aria-hidden="true" tabindex="-1"></a>#&#39;   individual trend was 1°C/century (in magnitude)—which is greater</span>
+<span id="cb29-54"><a href="#cb29-54" aria-hidden="true" tabindex="-1"></a>#&#39;   than the trend claimed for global temperatures.</span>
+<span id="cb29-55"><a href="#cb29-55" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-56"><a href="#cb29-56" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; A prize of $100,000 (one hundred thousand U.S. dollars) will be</span>
+<span id="cb29-57"><a href="#cb29-57" aria-hidden="true" tabindex="-1"></a>#&#39;   awarded to the first person who submits an entry that correctly</span>
+<span id="cb29-58"><a href="#cb29-58" aria-hidden="true" tabindex="-1"></a>#&#39;   identifies at least 900 series: which series were generated by a</span>
+<span id="cb29-59"><a href="#cb29-59" aria-hidden="true" tabindex="-1"></a>#&#39;   trendless process and which were generated by a trending process.</span>
+<span id="cb29-60"><a href="#cb29-60" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-61"><a href="#cb29-61" aria-hidden="true" tabindex="-1"></a>#&#39; But also this:</span>
+<span id="cb29-62"><a href="#cb29-62" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-63"><a href="#cb29-63" aria-hidden="true" tabindex="-1"></a>#&#39; &gt; Each entry must be accompanied by a payment of $10.</span>
+<span id="cb29-64"><a href="#cb29-64" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-65"><a href="#cb29-65" aria-hidden="true" tabindex="-1"></a>#+ setup, include=FALSE</span>
+<span id="cb29-66"><a href="#cb29-66" aria-hidden="true" tabindex="-1"></a>knitr::opts_chunk$set(</span>
+<span id="cb29-67"><a href="#cb29-67" aria-hidden="true" tabindex="-1"></a>  cache = FALSE,</span>
+<span id="cb29-68"><a href="#cb29-68" aria-hidden="true" tabindex="-1"></a>  message = FALSE,</span>
+<span id="cb29-69"><a href="#cb29-69" aria-hidden="true" tabindex="-1"></a>  error = FALSE,</span>
+<span id="cb29-70"><a href="#cb29-70" aria-hidden="true" tabindex="-1"></a>  warning = FALSE,</span>
+<span id="cb29-71"><a href="#cb29-71" aria-hidden="true" tabindex="-1"></a>  comment = NA,</span>
+<span id="cb29-72"><a href="#cb29-72" aria-hidden="true" tabindex="-1"></a>  out.width = &#39;95%&#39;</span>
+<span id="cb29-73"><a href="#cb29-73" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-74"><a href="#cb29-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-75"><a href="#cb29-75" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-76"><a href="#cb29-76" aria-hidden="true" tabindex="-1"></a>#&#39; **Load packages**</span>
+<span id="cb29-77"><a href="#cb29-77" aria-hidden="true" tabindex="-1"></a>#| cache: FALSE</span>
+<span id="cb29-78"><a href="#cb29-78" aria-hidden="true" tabindex="-1"></a>library(rprojroot)</span>
+<span id="cb29-79"><a href="#cb29-79" aria-hidden="true" tabindex="-1"></a>root &lt;- has_file(&quot;.Bayesian-Workflow-root&quot;)$make_fix_file()</span>
+<span id="cb29-80"><a href="#cb29-80" aria-hidden="true" tabindex="-1"></a>library(scales)</span>
+<span id="cb29-81"><a href="#cb29-81" aria-hidden="true" tabindex="-1"></a>options(digits = 2)</span>
+<span id="cb29-82"><a href="#cb29-82" aria-hidden="true" tabindex="-1"></a>library(cmdstanr)</span>
+<span id="cb29-83"><a href="#cb29-83" aria-hidden="true" tabindex="-1"></a>library(posterior)</span>
+<span id="cb29-84"><a href="#cb29-84" aria-hidden="true" tabindex="-1"></a>options(mc.cores = 4)</span>
+<span id="cb29-85"><a href="#cb29-85" aria-hidden="true" tabindex="-1"></a>set.seed(1123)</span>
+<span id="cb29-86"><a href="#cb29-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-87"><a href="#cb29-87" aria-hidden="true" tabindex="-1"></a>print_stan_file &lt;- function(file) {</span>
+<span id="cb29-88"><a href="#cb29-88" aria-hidden="true" tabindex="-1"></a>  code &lt;- readLines(file)</span>
+<span id="cb29-89"><a href="#cb29-89" aria-hidden="true" tabindex="-1"></a>  if (isTRUE(getOption(&quot;knitr.in.progress&quot;)) &amp;</span>
+<span id="cb29-90"><a href="#cb29-90" aria-hidden="true" tabindex="-1"></a>        identical(knitr::opts_current$get(&quot;results&quot;), &quot;asis&quot;)) {</span>
+<span id="cb29-91"><a href="#cb29-91" aria-hidden="true" tabindex="-1"></a>    # In render: emit as-is so Pandoc/Quarto does syntax highlighting</span>
+<span id="cb29-92"><a href="#cb29-92" aria-hidden="true" tabindex="-1"></a>    block &lt;- paste0(&quot;```stan&quot;, &quot;\n&quot;, paste(code, collapse = &quot;\n&quot;), &quot;\n&quot;, &quot;```&quot;)</span>
+<span id="cb29-93"><a href="#cb29-93" aria-hidden="true" tabindex="-1"></a>    knitr::asis_output(block)</span>
+<span id="cb29-94"><a href="#cb29-94" aria-hidden="true" tabindex="-1"></a>  } else {</span>
+<span id="cb29-95"><a href="#cb29-95" aria-hidden="true" tabindex="-1"></a>    writeLines(code)</span>
+<span id="cb29-96"><a href="#cb29-96" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb29-97"><a href="#cb29-97" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-98"><a href="#cb29-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-99"><a href="#cb29-99" aria-hidden="true" tabindex="-1"></a>#&#39; # Data</span>
+<span id="cb29-100"><a href="#cb29-100" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-101"><a href="#cb29-101" aria-hidden="true" tabindex="-1"></a>#&#39; OK, now it&#39;s time to get to work.  We start by downloading and</span>
+<span id="cb29-102"><a href="#cb29-102" aria-hidden="true" tabindex="-1"></a>#&#39; graphing the data.</span>
+<span id="cb29-103"><a href="#cb29-103" aria-hidden="true" tabindex="-1"></a>series &lt;- matrix(</span>
+<span id="cb29-104"><a href="#cb29-104" aria-hidden="true" tabindex="-1"></a>  scan(root(&quot;timeseries&quot;, &quot;data&quot;, &quot;Series1000.txt&quot;)),</span>
+<span id="cb29-105"><a href="#cb29-105" aria-hidden="true" tabindex="-1"></a>  nrow = 1000,</span>
+<span id="cb29-106"><a href="#cb29-106" aria-hidden="true" tabindex="-1"></a>  ncol = 135,</span>
+<span id="cb29-107"><a href="#cb29-107" aria-hidden="true" tabindex="-1"></a>  byrow = TRUE</span>
+<span id="cb29-108"><a href="#cb29-108" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-109"><a href="#cb29-109" aria-hidden="true" tabindex="-1"></a>T &lt;- 135</span>
+<span id="cb29-110"><a href="#cb29-110" aria-hidden="true" tabindex="-1"></a>N &lt;- 1000</span>
+<span id="cb29-111"><a href="#cb29-111" aria-hidden="true" tabindex="-1"></a>#| label: fig-series_1</span>
+<span id="cb29-112"><a href="#cb29-112" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3.4</span>
+<span id="cb29-113"><a href="#cb29-113" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
+<span id="cb29-114"><a href="#cb29-114" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 0), tck = -0.01, mgp = c(1.5, 0.5, 0))</span>
+<span id="cb29-115"><a href="#cb29-115" aria-hidden="true" tabindex="-1"></a>plot(c(1, T), range(series),</span>
+<span id="cb29-116"><a href="#cb29-116" aria-hidden="true" tabindex="-1"></a>     xaxs = &quot;i&quot;, bty = &quot;l&quot;, type = &quot;n&quot;,</span>
+<span id="cb29-117"><a href="#cb29-117" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Time&quot;, ylab = &quot;y&quot;)</span>
+<span id="cb29-118"><a href="#cb29-118" aria-hidden="true" tabindex="-1"></a>for (n in 1:N) {</span>
+<span id="cb29-119"><a href="#cb29-119" aria-hidden="true" tabindex="-1"></a>  lines(1:T, series<span class="co">[</span><span class="ot">n, </span><span class="co">]</span>, lwd = .5, col = alpha(&quot;black&quot;, 0.2))</span>
+<span id="cb29-120"><a href="#cb29-120" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-121"><a href="#cb29-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-122"><a href="#cb29-122" aria-hidden="true" tabindex="-1"></a>#&#39; # Separate linear regression</span>
+<span id="cb29-123"><a href="#cb29-123" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-124"><a href="#cb29-124" aria-hidden="true" tabindex="-1"></a>#&#39; Aha! The lines are fanning out from a common starting point. We&#39;ll fit</span>
+<span id="cb29-125"><a href="#cb29-125" aria-hidden="true" tabindex="-1"></a>#&#39; a regression to each line and then summarize each line by its average</span>
+<span id="cb29-126"><a href="#cb29-126" aria-hidden="true" tabindex="-1"></a>#&#39; slope.  This is not necessarily the most efficient way to estimate</span>
+<span id="cb29-127"><a href="#cb29-127" aria-hidden="true" tabindex="-1"></a>#&#39; a slope from correlated data, but we will not be concerned about</span>
+<span id="cb29-128"><a href="#cb29-128" aria-hidden="true" tabindex="-1"></a>#&#39; that, as our purpose here is to demonstrate decision analysis in</span>
+<span id="cb29-129"><a href="#cb29-129" aria-hidden="true" tabindex="-1"></a>#&#39; the context of a fitted model, rather than to fit the model in an</span>
+<span id="cb29-130"><a href="#cb29-130" aria-hidden="true" tabindex="-1"></a>#&#39; optimal way.</span>
+<span id="cb29-131"><a href="#cb29-131" aria-hidden="true" tabindex="-1"></a>slope &lt;- rep(NA, N)</span>
+<span id="cb29-132"><a href="#cb29-132" aria-hidden="true" tabindex="-1"></a>se &lt;- rep(NA, N)</span>
+<span id="cb29-133"><a href="#cb29-133" aria-hidden="true" tabindex="-1"></a>for (n in 1:N) {</span>
+<span id="cb29-134"><a href="#cb29-134" aria-hidden="true" tabindex="-1"></a>  data &lt;- series<span class="co">[</span><span class="ot">n, </span><span class="co">]</span></span>
+<span id="cb29-135"><a href="#cb29-135" aria-hidden="true" tabindex="-1"></a>  time &lt;- 1:T</span>
+<span id="cb29-136"><a href="#cb29-136" aria-hidden="true" tabindex="-1"></a>  fit &lt;- lm(data ~ time)</span>
+<span id="cb29-137"><a href="#cb29-137" aria-hidden="true" tabindex="-1"></a>  coefs &lt;- summary(fit)$coefficients</span>
+<span id="cb29-138"><a href="#cb29-138" aria-hidden="true" tabindex="-1"></a>  slope<span class="co">[</span><span class="ot">n</span><span class="co">]</span> &lt;- 100 * coefs<span class="co">[</span><span class="ot">2, &quot;Estimate&quot;</span><span class="co">]</span></span>
+<span id="cb29-139"><a href="#cb29-139" aria-hidden="true" tabindex="-1"></a>  se<span class="co">[</span><span class="ot">n</span><span class="co">]</span> &lt;- 100 * coefs<span class="co">[</span><span class="ot">2, &quot;Std. Error&quot;</span><span class="co">]</span></span>
+<span id="cb29-140"><a href="#cb29-140" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb29-141"><a href="#cb29-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-142"><a href="#cb29-142" aria-hidden="true" tabindex="-1"></a>#&#39; We multiplied the slopes (and standard errors) by 100 to put them on a</span>
+<span id="cb29-143"><a href="#cb29-143" aria-hidden="true" tabindex="-1"></a>#&#39; per-century scale to match the above instructions.</span>
+<span id="cb29-144"><a href="#cb29-144" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-145"><a href="#cb29-145" aria-hidden="true" tabindex="-1"></a>#&#39; Next we plot the estimated slopes and their standard errors:</span>
+<span id="cb29-146"><a href="#cb29-146" aria-hidden="true" tabindex="-1"></a>#| label: fig-series_2</span>
+<span id="cb29-147"><a href="#cb29-147" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3.6</span>
+<span id="cb29-148"><a href="#cb29-148" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
+<span id="cb29-149"><a href="#cb29-149" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 0), tck = -.01, mgp = c(1.5, .5, 0))</span>
+<span id="cb29-150"><a href="#cb29-150" aria-hidden="true" tabindex="-1"></a>plot(slope, se,</span>
+<span id="cb29-151"><a href="#cb29-151" aria-hidden="true" tabindex="-1"></a>     ylim = c(0, 1.05 * max(se)), yaxs = &quot;i&quot;, bty = &quot;l&quot;,</span>
+<span id="cb29-152"><a href="#cb29-152" aria-hidden="true" tabindex="-1"></a>     xlab = &quot;Estimated slope&quot;, ylab = &quot;SE&quot;, pch = 20, cex = .5)</span>
+<span id="cb29-153"><a href="#cb29-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-154"><a href="#cb29-154" aria-hidden="true" tabindex="-1"></a>#&#39; OK, not much information in the se&#39;s. How about a histogram of the</span>
+<span id="cb29-155"><a href="#cb29-155" aria-hidden="true" tabindex="-1"></a>#&#39; estimated slopes?</span>
+<span id="cb29-156"><a href="#cb29-156" aria-hidden="true" tabindex="-1"></a>#| label: fig-series_3</span>
+<span id="cb29-157"><a href="#cb29-157" aria-hidden="true" tabindex="-1"></a>#| fig-height: 3.6</span>
+<span id="cb29-158"><a href="#cb29-158" aria-hidden="true" tabindex="-1"></a>#| fig-width: 5.5</span>
+<span id="cb29-159"><a href="#cb29-159" aria-hidden="true" tabindex="-1"></a>par(mar = c(3, 3, 2, 0), tck = -.01, mgp = c(1.5, .5, 0))</span>
+<span id="cb29-160"><a href="#cb29-160" aria-hidden="true" tabindex="-1"></a>hist(</span>
+<span id="cb29-161"><a href="#cb29-161" aria-hidden="true" tabindex="-1"></a>  slope,</span>
+<span id="cb29-162"><a href="#cb29-162" aria-hidden="true" tabindex="-1"></a>  xlab = &quot;Estimated slope&quot;,</span>
+<span id="cb29-163"><a href="#cb29-163" aria-hidden="true" tabindex="-1"></a>  breaks = seq(floor(10 * min(slope)), ceiling(10 * max(slope))) / 10,</span>
+<span id="cb29-164"><a href="#cb29-164" aria-hidden="true" tabindex="-1"></a>  main = &quot;&quot;</span>
+<span id="cb29-165"><a href="#cb29-165" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-166"><a href="#cb29-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-167"><a href="#cb29-167" aria-hidden="true" tabindex="-1"></a>#&#39; Based on the problem description, I&#39;d expect to see distributions</span>
+<span id="cb29-168"><a href="#cb29-168" aria-hidden="true" tabindex="-1"></a>#&#39; centered at 0, -1, and 1. It looks like this might be the case.</span>
+<span id="cb29-169"><a href="#cb29-169" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-170"><a href="#cb29-170" aria-hidden="true" tabindex="-1"></a>#&#39; # Stan mixture model</span>
+<span id="cb29-171"><a href="#cb29-171" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-172"><a href="#cb29-172" aria-hidden="true" tabindex="-1"></a>#&#39; So let&#39;s fit a mixture model. That&#39;s easy.  Here&#39;s the Stan model:</span>
+<span id="cb29-173"><a href="#cb29-173" aria-hidden="true" tabindex="-1"></a>#| results: asis</span>
+<span id="cb29-174"><a href="#cb29-174" aria-hidden="true" tabindex="-1"></a>print_stan_file(root(&quot;timeseries&quot;, &quot;mixture.stan&quot;))</span>
+<span id="cb29-175"><a href="#cb29-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-176"><a href="#cb29-176" aria-hidden="true" tabindex="-1"></a>#&#39; We sample from the posterior:</span>
+<span id="cb29-177"><a href="#cb29-177" aria-hidden="true" tabindex="-1"></a>y &lt;- slope</span>
+<span id="cb29-178"><a href="#cb29-178" aria-hidden="true" tabindex="-1"></a>K &lt;- 3</span>
+<span id="cb29-179"><a href="#cb29-179" aria-hidden="true" tabindex="-1"></a>mu &lt;- c(0, -1, 1)</span>
+<span id="cb29-180"><a href="#cb29-180" aria-hidden="true" tabindex="-1"></a>data &lt;- list(y = y, K = K, N = N, mu = mu)</span>
+<span id="cb29-181"><a href="#cb29-181" aria-hidden="true" tabindex="-1"></a>mod &lt;- cmdstan_model(root(&quot;timeseries&quot;, &quot;mixture.stan&quot;))</span>
+<span id="cb29-182"><a href="#cb29-182" aria-hidden="true" tabindex="-1"></a>#| label: fit_mix</span>
+<span id="cb29-183"><a href="#cb29-183" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb29-184"><a href="#cb29-184" aria-hidden="true" tabindex="-1"></a>fit_mix &lt;- mod$sample(data = data, refresh = 0)</span>
+<span id="cb29-185"><a href="#cb29-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-186"><a href="#cb29-186" aria-hidden="true" tabindex="-1"></a>#&#39; Posterior summary:</span>
+<span id="cb29-187"><a href="#cb29-187" aria-hidden="true" tabindex="-1"></a>print(fit_mix)</span>
+<span id="cb29-188"><a href="#cb29-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-189"><a href="#cb29-189" aria-hidden="true" tabindex="-1"></a>#&#39; Convergence is fine: $\widehat{R}$ is close to 1 for everything.  The</span>
+<span id="cb29-190"><a href="#cb29-190" aria-hidden="true" tabindex="-1"></a>#&#39; estimated weights of the three mixture components are approximately</span>
+<span id="cb29-191"><a href="#cb29-191" aria-hidden="true" tabindex="-1"></a>#&#39; 0.5, 0.25, 0.25. Given that the problem was made up, I&#39;m guessing the</span>
+<span id="cb29-192"><a href="#cb29-192" aria-hidden="true" tabindex="-1"></a>#&#39; weights of the underlying data-generation process are exactly 1/2,</span>
+<span id="cb29-193"><a href="#cb29-193" aria-hidden="true" tabindex="-1"></a>#&#39; 1/4, and 1/4. The standard deviation of the slopes within each</span>
+<span id="cb29-194"><a href="#cb29-194" aria-hidden="true" tabindex="-1"></a>#&#39; component is 0.4, or close to it. We could also try fitting a model</span>
+<span id="cb29-195"><a href="#cb29-195" aria-hidden="true" tabindex="-1"></a>#&#39; where the standard deviations of the three components differ, but we</span>
+<span id="cb29-196"><a href="#cb29-196" aria-hidden="true" tabindex="-1"></a>#&#39; won&#39;t, partly because the description given with the simulated data</span>
+<span id="cb29-197"><a href="#cb29-197" aria-hidden="true" tabindex="-1"></a>#&#39; described the change as adding a trend, and partly because the above</span>
+<span id="cb29-198"><a href="#cb29-198" aria-hidden="true" tabindex="-1"></a>#&#39; histogram doesn&#39;t seem to show any varying of the widths of the</span>
+<span id="cb29-199"><a href="#cb29-199" aria-hidden="true" tabindex="-1"></a>#&#39; mixture components.</span>
+<span id="cb29-200"><a href="#cb29-200" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-201"><a href="#cb29-201" aria-hidden="true" tabindex="-1"></a>#&#39; OK, now we&#39;re getting somewhere. To make predictions, we need to know,</span>
+<span id="cb29-202"><a href="#cb29-202" aria-hidden="true" tabindex="-1"></a>#&#39; for each series, the probability of it being in each of the three</span>
+<span id="cb29-203"><a href="#cb29-203" aria-hidden="true" tabindex="-1"></a>#&#39; components. We&#39;ll compute these probabilities by adding a generated</span>
+<span id="cb29-204"><a href="#cb29-204" aria-hidden="true" tabindex="-1"></a>#&#39; quantities block to the Stan program:</span>
+<span id="cb29-205"><a href="#cb29-205" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-206"><a href="#cb29-206" aria-hidden="true" tabindex="-1"></a>#&#39; ```stan</span>
+<span id="cb29-207"><a href="#cb29-207" aria-hidden="true" tabindex="-1"></a>#&#39; generated quantities {</span>
+<span id="cb29-208"><a href="#cb29-208" aria-hidden="true" tabindex="-1"></a>#&#39;   matrix<span class="co">[</span><span class="ot">N, K</span><span class="co">]</span> p;</span>
+<span id="cb29-209"><a href="#cb29-209" aria-hidden="true" tabindex="-1"></a>#&#39;   for (n in 1:N) {</span>
+<span id="cb29-210"><a href="#cb29-210" aria-hidden="true" tabindex="-1"></a>#&#39;     vector<span class="co">[</span><span class="ot">K</span><span class="co">]</span> p_raw;</span>
+<span id="cb29-211"><a href="#cb29-211" aria-hidden="true" tabindex="-1"></a>#&#39;     for (k in 1:K) {</span>
+<span id="cb29-212"><a href="#cb29-212" aria-hidden="true" tabindex="-1"></a>#&#39;       p_raw<span class="co">[</span><span class="ot">k</span><span class="co">]</span> = theta<span class="co">[</span><span class="ot">k</span><span class="co">]</span> * exp(normal_lpdf(y<span class="co">[</span><span class="ot">n</span><span class="co">]</span> | mu<span class="co">[</span><span class="ot">k</span><span class="co">]</span>, sigma));</span>
+<span id="cb29-213"><a href="#cb29-213" aria-hidden="true" tabindex="-1"></a>#&#39;     }</span>
+<span id="cb29-214"><a href="#cb29-214" aria-hidden="true" tabindex="-1"></a>#&#39;     for (k in 1:K) {</span>
+<span id="cb29-215"><a href="#cb29-215" aria-hidden="true" tabindex="-1"></a>#&#39;       p<span class="co">[</span><span class="ot">n,k</span><span class="co">]</span> = p_raw<span class="co">[</span><span class="ot">k</span><span class="co">]</span> / sum(p_raw);</span>
+<span id="cb29-216"><a href="#cb29-216" aria-hidden="true" tabindex="-1"></a>#&#39;     }</span>
+<span id="cb29-217"><a href="#cb29-217" aria-hidden="true" tabindex="-1"></a>#&#39;   }</span>
+<span id="cb29-218"><a href="#cb29-218" aria-hidden="true" tabindex="-1"></a>#&#39; }</span>
+<span id="cb29-219"><a href="#cb29-219" aria-hidden="true" tabindex="-1"></a>#&#39; ```</span>
+<span id="cb29-220"><a href="#cb29-220" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-221"><a href="#cb29-221" aria-hidden="true" tabindex="-1"></a>#&#39; We then re-fit the model, extract the $p$&#39;s, and average them over the</span>
+<span id="cb29-222"><a href="#cb29-222" aria-hidden="true" tabindex="-1"></a>#&#39; posterior simulations. This is made simpler using the posterior R package&#39;s</span>
+<span id="cb29-223"><a href="#cb29-223" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`draws_rvars`</span> format.</span>
+<span id="cb29-224"><a href="#cb29-224" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-225"><a href="#cb29-225" aria-hidden="true" tabindex="-1"></a>#| label: fit_mix_2</span>
+<span id="cb29-226"><a href="#cb29-226" aria-hidden="true" tabindex="-1"></a>#| results: hide</span>
+<span id="cb29-227"><a href="#cb29-227" aria-hidden="true" tabindex="-1"></a>mod &lt;- cmdstan_model(root(&quot;timeseries&quot;, &quot;mixture_2.stan&quot;))</span>
+<span id="cb29-228"><a href="#cb29-228" aria-hidden="true" tabindex="-1"></a>fit_mix &lt;- mod$sample(data = data, refresh = 0)</span>
+<span id="cb29-229"><a href="#cb29-229" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-230"><a href="#cb29-230" aria-hidden="true" tabindex="-1"></a>prob_sims &lt;- as_draws_rvars(fit_mix$draws())</span>
+<span id="cb29-231"><a href="#cb29-231" aria-hidden="true" tabindex="-1"></a>prob &lt;- mean(prob_sims$p)</span>
+<span id="cb29-232"><a href="#cb29-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-233"><a href="#cb29-233" aria-hidden="true" tabindex="-1"></a>#&#39; We now have a $1000\times 3$ matrix of probabilities. Let&#39;s take a</span>
+<span id="cb29-234"><a href="#cb29-234" aria-hidden="true" tabindex="-1"></a>#&#39; look at the first ten rows</span>
+<span id="cb29-235"><a href="#cb29-235" aria-hidden="true" tabindex="-1"></a>round(prob<span class="co">[</span><span class="ot">1:10,</span><span class="co">]</span>, 2)</span>
+<span id="cb29-236"><a href="#cb29-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-237"><a href="#cb29-237" aria-hidden="true" tabindex="-1"></a>#&#39; So, the first series is probably drawn from the sloping-upward model;</span>
+<span id="cb29-238"><a href="#cb29-238" aria-hidden="true" tabindex="-1"></a>#&#39; the second might be from the null model or it might be from the</span>
+<span id="cb29-239"><a href="#cb29-239" aria-hidden="true" tabindex="-1"></a>#&#39; sloping-downward model; the third, fourth, fifth, sixth, seventh, and</span>
+<span id="cb29-240"><a href="#cb29-240" aria-hidden="true" tabindex="-1"></a>#&#39; eighth are probably from the null model; the ninth is probably from</span>
+<span id="cb29-241"><a href="#cb29-241" aria-hidden="true" tabindex="-1"></a>#&#39; the sloping-upward model; and so forth.</span>
+<span id="cb29-242"><a href="#cb29-242" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-243"><a href="#cb29-243" aria-hidden="true" tabindex="-1"></a>#&#39; We&#39;ll now program this: for each of the 1000 series in the dataset,</span>
+<span id="cb29-244"><a href="#cb29-244" aria-hidden="true" tabindex="-1"></a>#&#39; we&#39;ll pick which of the three mixture components has the highest</span>
+<span id="cb29-245"><a href="#cb29-245" aria-hidden="true" tabindex="-1"></a>#&#39; probability. We&#39;ll save the probability and also which component is</span>
+<span id="cb29-246"><a href="#cb29-246" aria-hidden="true" tabindex="-1"></a>#&#39; being picked.</span>
+<span id="cb29-247"><a href="#cb29-247" aria-hidden="true" tabindex="-1"></a>max_prob &lt;- apply(prob, 1, max)</span>
+<span id="cb29-248"><a href="#cb29-248" aria-hidden="true" tabindex="-1"></a>choice &lt;- apply(prob, 1, which.max)</span>
+<span id="cb29-249"><a href="#cb29-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-250"><a href="#cb29-250" aria-hidden="true" tabindex="-1"></a>#&#39; And now we can sum this over the 1000 series. We&#39;ll compute the number</span>
+<span id="cb29-251"><a href="#cb29-251" aria-hidden="true" tabindex="-1"></a>#&#39; of series assigned to each of the three choices:</span>
+<span id="cb29-252"><a href="#cb29-252" aria-hidden="true" tabindex="-1"></a>print(table(choice))</span>
+<span id="cb29-253"><a href="#cb29-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-254"><a href="#cb29-254" aria-hidden="true" tabindex="-1"></a>#&#39; The guesses are not quite in proportion 0.5, 0.25, 0.25. There seem to</span>
+<span id="cb29-255"><a href="#cb29-255" aria-hidden="true" tabindex="-1"></a>#&#39; be too many guesses of zero slope and not enough of positive and</span>
+<span id="cb29-256"><a href="#cb29-256" aria-hidden="true" tabindex="-1"></a>#&#39; negative slopes. But that makes sense given the decision problem: we</span>
+<span id="cb29-257"><a href="#cb29-257" aria-hidden="true" tabindex="-1"></a>#&#39; want to maximize the number of correct guesses so we end up</span>
+<span id="cb29-258"><a href="#cb29-258" aria-hidden="true" tabindex="-1"></a>#&#39; disproportionately guessing the most common category. That&#39;s fine;</span>
+<span id="cb29-259"><a href="#cb29-259" aria-hidden="true" tabindex="-1"></a>#&#39; it&#39;s how it will be.</span>
+<span id="cb29-260"><a href="#cb29-260" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-261"><a href="#cb29-261" aria-hidden="true" tabindex="-1"></a>#&#39; And we can compute the expected number of correct guesses (based on</span>
+<span id="cb29-262"><a href="#cb29-262" aria-hidden="true" tabindex="-1"></a>#&#39; the posterior distribution we have here), and the standard deviation</span>
+<span id="cb29-263"><a href="#cb29-263" aria-hidden="true" tabindex="-1"></a>#&#39; of the number of correct guesses (based on the reasonable</span>
+<span id="cb29-264"><a href="#cb29-264" aria-hidden="true" tabindex="-1"></a>#&#39; approximation of independence of the 1000 series conditional on the</span>
+<span id="cb29-265"><a href="#cb29-265" aria-hidden="true" tabindex="-1"></a>#&#39; model). And then we&#39;ll print all these numbers:</span>
+<span id="cb29-266"><a href="#cb29-266" aria-hidden="true" tabindex="-1"></a>expected_correct &lt;- sum(max_prob)</span>
+<span id="cb29-267"><a href="#cb29-267" aria-hidden="true" tabindex="-1"></a>sd_correct &lt;- sqrt(sum(max_prob * (1 - max_prob)))</span>
+<span id="cb29-268"><a href="#cb29-268" aria-hidden="true" tabindex="-1"></a>round(c(expected_correct, sd_correct), 1)</span>
+<span id="cb29-269"><a href="#cb29-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-270"><a href="#cb29-270" aria-hidden="true" tabindex="-1"></a>#&#39; Interesting.  The expected number of correct guesses is</span>
+<span id="cb29-271"><a href="#cb29-271" aria-hidden="true" tabindex="-1"></a>#&#39; <span class="in">`r round(expected_correct)`</span>. Not quite the 900 that&#39;s needed to win! The standard</span>
+<span id="cb29-272"><a href="#cb29-272" aria-hidden="true" tabindex="-1"></a>#&#39; error of the number of correct guesses is <span class="in">`r round(sd_correct, 1)`</span>, so 900 is</span>
+<span id="cb29-273"><a href="#cb29-273" aria-hidden="true" tabindex="-1"></a>#&#39; over 5 standard errors away from our expected number correct. That&#39;s bad news!</span>
+<span id="cb29-274"><a href="#cb29-274" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-275"><a href="#cb29-275" aria-hidden="true" tabindex="-1"></a>#&#39; How bad is it?  We can compute the normal cumulative density function</span>
+<span id="cb29-276"><a href="#cb29-276" aria-hidden="true" tabindex="-1"></a>#&#39; to get the probability of at least 900 successes; that&#39;s</span>
+<span id="cb29-277"><a href="#cb29-277" aria-hidden="true" tabindex="-1"></a>pnorm(expected_correct, 900, sd_correct)</span>
+<span id="cb29-278"><a href="#cb29-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-279"><a href="#cb29-279" aria-hidden="true" tabindex="-1"></a>#&#39; That&#39;s a small number; here&#39;s its reciprocal:</span>
+<span id="cb29-280"><a href="#cb29-280" aria-hidden="true" tabindex="-1"></a>recip &lt;- 1 / pnorm(expected_correct, 900, sd_correct)</span>
+<span id="cb29-281"><a href="#cb29-281" aria-hidden="true" tabindex="-1"></a>recip</span>
+<span id="cb29-282"><a href="#cb29-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-283"><a href="#cb29-283" aria-hidden="true" tabindex="-1"></a>#&#39; That&#39;s almost a 1-in-200,000 chance of winning the big prize!</span>
+<span id="cb29-284"><a href="#cb29-284" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-285"><a href="#cb29-285" aria-hidden="true" tabindex="-1"></a>#&#39; But we only have to get _at least_ 900. So we can do the continuity</span>
+<span id="cb29-286"><a href="#cb29-286" aria-hidden="true" tabindex="-1"></a>#&#39; correction and evaluate the probability of at least 899.5 successes,</span>
+<span id="cb29-287"><a href="#cb29-287" aria-hidden="true" tabindex="-1"></a>#&#39; which, when inverted, yields:</span>
+<span id="cb29-288"><a href="#cb29-288" aria-hidden="true" tabindex="-1"></a>1 / pnorm(expected_correct, 899.5, sd_correct)</span>
+<span id="cb29-289"><a href="#cb29-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-290"><a href="#cb29-290" aria-hidden="true" tabindex="-1"></a>#&#39; Nope, still no good. For the bet to be worth it, even in the crudest</span>
+<span id="cb29-291"><a href="#cb29-291" aria-hidden="true" tabindex="-1"></a>#&#39; sense of expected monetary value, the probability of winning would</span>
+<span id="cb29-292"><a href="#cb29-292" aria-hidden="true" tabindex="-1"></a>#&#39; have to be at least 1 in 10,000. (Recall that the prize is \$100,000</span>
+<span id="cb29-293"><a href="#cb29-293" aria-hidden="true" tabindex="-1"></a>#&#39; but the cost of entry is \$10.) And that&#39;s all conditional on the</span>
+<span id="cb29-294"><a href="#cb29-294" aria-hidden="true" tabindex="-1"></a>#&#39; designer of the study doing everything exactly as he said, and not</span>
+<span id="cb29-295"><a href="#cb29-295" aria-hidden="true" tabindex="-1"></a>#&#39; playing with multiple seeds for the random number generator,</span>
+<span id="cb29-296"><a href="#cb29-296" aria-hidden="true" tabindex="-1"></a>#&#39; etc. After all, he could well have first chosen a seed and generated</span>
+<span id="cb29-297"><a href="#cb29-297" aria-hidden="true" tabindex="-1"></a>#&#39; the series, then performed something like the above analysis and</span>
+<span id="cb29-298"><a href="#cb29-298" aria-hidden="true" tabindex="-1"></a>#&#39; checked that the most natural estimate gave only 850 correct or so,</span>
+<span id="cb29-299"><a href="#cb29-299" aria-hidden="true" tabindex="-1"></a>#&#39; and in the very unlikely event that the natural estimate gave 900 or</span>
+<span id="cb29-300"><a href="#cb29-300" aria-hidden="true" tabindex="-1"></a>#&#39; close to it, just re-running with a new seed. We have no reason to</span>
+<span id="cb29-301"><a href="#cb29-301" aria-hidden="true" tabindex="-1"></a>#&#39; think that the creator of this challenge did anything like that; our</span>
+<span id="cb29-302"><a href="#cb29-302" aria-hidden="true" tabindex="-1"></a>#&#39; point here is only that, even if he did his simulation in a completely</span>
+<span id="cb29-303"><a href="#cb29-303" aria-hidden="true" tabindex="-1"></a>#&#39; clean way, our odds of winning are about 1 in 200,000---about 1/20th</span>
+<span id="cb29-304"><a href="#cb29-304" aria-hidden="true" tabindex="-1"></a>#&#39; what we&#39;d need for this to be a fair game.</span>
+<span id="cb29-305"><a href="#cb29-305" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-306"><a href="#cb29-306" aria-hidden="true" tabindex="-1"></a>#&#39; There is one more thing, though: the data are highly autocorrelated,</span>
+<span id="cb29-307"><a href="#cb29-307" aria-hidden="true" tabindex="-1"></a>#&#39; so least-squares regression may not be the most efficient way to</span>
+<span id="cb29-308"><a href="#cb29-308" aria-hidden="true" tabindex="-1"></a>#&#39; estimate these slopes. If we can estimate the slopes more precisely,</span>
+<span id="cb29-309"><a href="#cb29-309" aria-hidden="true" tabindex="-1"></a>#&#39; we can get more discrimination in our predictions.  Maybe there is a</span>
+<span id="cb29-310"><a href="#cb29-310" aria-hidden="true" tabindex="-1"></a>#&#39; way to win the game by extracting more information from each series,</span>
+<span id="cb29-311"><a href="#cb29-311" aria-hidden="true" tabindex="-1"></a>#&#39; but it won&#39;t be easy.</span>
+<span id="cb29-312"><a href="#cb29-312" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-313"><a href="#cb29-313" aria-hidden="true" tabindex="-1"></a>#&#39; You could say that the above all demonstrates the designer&#39;s point,</span>
+<span id="cb29-314"><a href="#cb29-314" aria-hidden="true" tabindex="-1"></a>#&#39; that you can&#39;t identify a trend in a time series of this length. But we</span>
+<span id="cb29-315"><a href="#cb29-315" aria-hidden="true" tabindex="-1"></a>#&#39; don&#39;t think it would make sense to draw that conclusion from this</span>
+<span id="cb29-316"><a href="#cb29-316" aria-hidden="true" tabindex="-1"></a>#&#39; exercise. After all, you can just tweak the parameters in the problem</span>
+<span id="cb29-317"><a href="#cb29-317" aria-hidden="true" tabindex="-1"></a>#&#39; a bit---or simply set the goal to 800 correct instead of 900---and the</span>
+<span id="cb29-318"><a href="#cb29-318" aria-hidden="true" tabindex="-1"></a>#&#39; game becomes easy to win. Or, had the game been winnable as initially</span>
+<span id="cb29-319"><a href="#cb29-319" aria-hidden="true" tabindex="-1"></a>#&#39; set up, you could just up the threshold to 950, and again it would</span>
+<span id="cb29-320"><a href="#cb29-320" aria-hidden="true" tabindex="-1"></a>#&#39; become essentially impossible to win. Conversely, if the designer of</span>
+<span id="cb29-321"><a href="#cb29-321" aria-hidden="true" tabindex="-1"></a>#&#39; the challenge had messed up his calculations and set the threshold to</span>
+<span id="cb29-322"><a href="#cb29-322" aria-hidden="true" tabindex="-1"></a>#&#39; 800, and someone had sent in a winning entry, it wouldn&#39;t disprove his</span>
+<span id="cb29-323"><a href="#cb29-323" aria-hidden="true" tabindex="-1"></a>#&#39; claims about climate science, it would just mean he hadn&#39;t been</span>
+<span id="cb29-324"><a href="#cb29-324" aria-hidden="true" tabindex="-1"></a>#&#39; careful enough in setting up his bet.</span>
+<span id="cb29-325"><a href="#cb29-325" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-326"><a href="#cb29-326" aria-hidden="true" tabindex="-1"></a>#&#39; # Licenses {.unnumbered}</span>
+<span id="cb29-327"><a href="#cb29-327" aria-hidden="true" tabindex="-1"></a>#&#39;</span>
+<span id="cb29-328"><a href="#cb29-328" aria-hidden="true" tabindex="-1"></a>#&#39; * Code <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under BSD-3.</span>
+<span id="cb29-329"><a href="#cb29-329" aria-hidden="true" tabindex="-1"></a>#&#39; * Text <span class="dv">&amp;copy;</span> 2022--2025, Andrew Gelman, licensed under CC-BY-NC 4.0.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

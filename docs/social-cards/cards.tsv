@@ -1,0 +1,27 @@
+# Per-case-study social card selections.
+# Columns: <dir[/page]>  <figure-number-or-name>
+# Figure number = N-th numbered figure in the rendered page (document order).
+# Rebuild all cards with: social-cards/build_all.sh
+bioassay	4
+multiple_choice	6
+loo_comparison	3
+digits	1
+problems	5
+declining_exponentials	4
+movies	2
+sleep_study	26
+nabiximols	13
+coronavirus	3
+timeseries	1
+dogs	6
+dogs/dogs_stan	1
+cat_adoptions	2
+variable_selection	3
+park_rule	7
+planetary_motion	3
+sbc	5
+world_cup	1
+roaches	6
+golf	8
+sharks	4
+birthdays	40
