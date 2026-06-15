@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/park_rule.png
 #' title: "Sampling problems with latent variables: No vehicles in the park"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2025-09-16

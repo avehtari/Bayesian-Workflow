@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/roaches.png
 #' title: "Leave-one-out cross validation model checking and comparison: Roaches"
 #' author: "Aki Vehtari"
 #' date: 2017-01-10

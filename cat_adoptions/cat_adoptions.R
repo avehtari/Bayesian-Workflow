@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/cat_adoptions.png
 #' title: "Incremental development and testing: Black cat adoptions"
 #' author: "Richard McElreath and Aki Vehtari"
 #' date: 2025-12-27

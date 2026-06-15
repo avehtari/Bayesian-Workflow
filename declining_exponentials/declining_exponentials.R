@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/declining_exponentials.png
 #' title: "Declining exponentials"
 #' author: "Andrew Gelman"
 #' date: 2022-08-15

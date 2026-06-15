@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/loo_comparison.png
 #' title: "Uncertainty in Bayesian LOO-CV Model Comparison"
 #' author: "Aki Vehtari"
 #' date: 2025-06-23

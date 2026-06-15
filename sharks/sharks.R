@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/sharks.png
 #' title: "Model building with latent variables: Markov models for animal movement"
 #' author: "Vianey Leos Barajas"
 #' date: 2025-12-14

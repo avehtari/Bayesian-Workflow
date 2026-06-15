@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/multiple_choice.png
 #' title: "Modeling performance on a multiple choice exam"
 #' author: "Andrew Gelman"
 #' date: 2022-08-22

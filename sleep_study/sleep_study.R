@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/sleep_study.png
 #' title: "Prior specification for regression models: Reanalysis of a sleep study"
 #' author: "Paul Bürkner and Aki Vehtari"
 #' date: 2025-10-22

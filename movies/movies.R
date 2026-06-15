@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/movies.png
 #' title: "Coding a series of models: Simulated data of movie ratings"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2022-08-15

@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/world_cup.png
 #' title: "Debugging a model: World Cup football"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2021-01-12

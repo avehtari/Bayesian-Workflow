@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/timeseries.png
 #' title: "Using a fitted model for decision analysis: Mixture model for time series competition"
 #' author: "Andrew Gelman"
 #' date: 2022-08-18

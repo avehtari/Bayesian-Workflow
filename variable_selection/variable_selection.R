@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/variable_selection.png
 #' title: "Models for regression coefficients and variable selection: Student grades"
 #' author: "Aki Vehtari"
 #' date: 2023-12-14

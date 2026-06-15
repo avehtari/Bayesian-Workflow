@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/digits.png
 #' title: "How many iterations to run and how many digits to report"
 #' author: "Aki Vehtari"
 #' date: 2020-12-05

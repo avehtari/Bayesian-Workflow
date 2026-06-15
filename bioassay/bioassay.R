@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/bioassay.png
 #' title: "Bioassay case study"
 #' author: "Andrew Gelman and Aki Vehtari"
 #' date: 2025-10-15

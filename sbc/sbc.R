@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/sbc.png
 #' title: "Simulation-based calibration checking in model development workflow"
 #' author: "Martin Modrák"
 #' date: 2022-12-16

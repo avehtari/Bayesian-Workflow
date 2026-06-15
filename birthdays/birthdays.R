@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/birthdays.png
 #' title: "Model building: Time-series decomposition for birthdays"
 #' author: "Aki Vehtari"
 #' date: 2020-12-28

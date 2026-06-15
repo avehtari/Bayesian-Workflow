@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/dogs.png
 #' title: "Posterior predictive checking: Stochastic learning in dogs"
 #' author: "Aki Vehtari and Andrew Gelman"
 #' date: 2024-04-20

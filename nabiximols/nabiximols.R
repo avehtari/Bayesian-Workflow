@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/nabiximols.png
 #' title: "Predictive model checking and comparison: Clinical trial"
 #' author: "Aki Vehtari"
 #' date: 2024-02-23

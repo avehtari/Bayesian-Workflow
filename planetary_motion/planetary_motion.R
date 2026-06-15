@@ -1,4 +1,5 @@
 #' ---
+#' image: ../social-cards/planetary_motion.png
 #' title: "Challenge of multimodality: Differential equation for planetary motion"
 #' author: Charles C. Margossian, Andrew Gelman and Aki Vehtari
 #' date: 2020-11-09
