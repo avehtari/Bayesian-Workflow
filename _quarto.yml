@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: docs
+  resources:
+    - social-card.png
 
 execute:
   freeze: auto
