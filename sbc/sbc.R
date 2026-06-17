@@ -312,7 +312,7 @@ print(results_fixed_ordered$backend_diagnostics, digits = 2)
 
 #' One of the fits has quite a lot of divergent transitions. Let's
 #' look at the pairs plot for the model:
-#| label: sbcworkflow-mixture-fixed-ordered-pairs
+#| label: fig-sbcworkflow-mixture-fixed-ordered-pairs
 #| fig-cap: Pairs plot of a problematic fit in mixture model with ordered components.
 problematic_fit_id <- 2
 problematic_fit <- results_fixed_ordered$fits[[problematic_fit_id]]
