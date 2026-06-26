@@ -46,6 +46,7 @@ library(patchwork)
 library(tidybayes)
 library(RColorBrewer)
 library(priorsense)
+# requires loo 2.10.0 or later
 library(loo)
 library(posterior)
 library(brms)
@@ -158,10 +159,9 @@ bfit_0h <- add_criterion(bfit_0h, criterion = "loo", save_psis = TRUE)
 #' is clearly better, we can skip model checking for the simpler
 #' model.
 loo_compare(bfit_0, bfit_0h) |>
-        as.data.frame() |>
-        tibble::rownames_to_column("model") |>
-        select(model, elpd_diff, se_diff) |>
-        tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' ## Visualize predictions
 #'
@@ -352,10 +352,9 @@ bfit_1 <- add_criterion(bfit_1, criterion = "loo")
 #' than either logistic regression model. Thus we don't examine it
 #' further and move to more elaborate log models.
 loo_compare(bfit_0, bfit_0h, bfit_1) |>
-        as.data.frame() |>
-        tibble::rownames_to_column("model") |>
-        select(model, elpd_diff, se_diff) |>
-        tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' # Model 2: 2-parameter log model
 #'
@@ -387,10 +386,9 @@ bfit_2 <- add_criterion(bfit_2, criterion = "loo")
 #' the comparison more fair by using hierarchical 2-parameter log
 #' model.
 loo_compare(bfit_0h, bfit_2) |>
-        as.data.frame() |>
-        tibble::rownames_to_column("model") |>
-        select(model, elpd_diff, se_diff) |>
-        tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' # Model 3: hierarchical 1-parameter log model
 #'
@@ -425,10 +423,9 @@ bfit_3 <- add_criterion(bfit_3, criterion = "loo")
 #' non-hierarchcial 2-parameter log model, and thus we don't examine
 #' this model further.
 loo_compare(bfit_0h, bfit_2, bfit_3) |>
-        as.data.frame() |>
-        tibble::rownames_to_column("model") |>
-        select(model, elpd_diff, se_diff) |>
-        tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' # Model 4: hierarchical 2-parameter log model
 #'
@@ -466,10 +463,9 @@ bfit_4 <- add_criterion(bfit_4, criterion = "loo", save_psis = TRUE)
 #' take into account the variation in the shock and avoidances by
 #' using them as covariates.
 loo_compare(bfit_0h, bfit_2, bfit_4) |>
-        as.data.frame() |>
-        tibble::rownames_to_column("model") |>
-        select(model, elpd_diff, se_diff) |>
-        tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' ## Visualize predictions
 #' 
@@ -614,10 +610,9 @@ for (t in 5:25) {
 #' There is no difference in predictive performance between the
 #' hierarchical logistic regression and hierarchical log model.
 loo_compare(list(bfit_0h=elpd(ll_0h),bfit_4=elpd(ll_4))) |>
-        as.data.frame() |>
-        tibble::rownames_to_column("model") |>
-        select(model, elpd_diff, se_diff) |>
-        tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' # Are the data informative on two parameters of 2-parameter log model?
 #'

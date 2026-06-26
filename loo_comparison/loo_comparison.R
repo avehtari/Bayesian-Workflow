@@ -45,6 +45,7 @@ knitr::opts_chunk$set(cache=FALSE, message=FALSE, error=FALSE, warning=TRUE, com
 library(tidyr)
 library(dplyr)
 library(tibble)
+# requires loo 2.10.0 or later
 library(loo)
 library(brms)
 options(brms.backend = "cmdstanr", mc.cores = 1)
@@ -119,33 +120,22 @@ loo3 <- loo(M_3)
 loo4 <- loo(M_4)
 
 #' We compare the models $\mathrm{M}_1, \mathrm{M}_2,\mathrm{M}_3,\mathrm{M}_4$.
-#'
-#' The current version of `loo_compare()` shows `elpd_diff` and `diff_se`
 (loo_comp <- loo_compare(loo1, loo2, loo3, loo4))
 
-#' We add the probability that a model has worse predictive
-#' performance than the model with the best predictive performance
-#' using the normal approximation.
+#' - `elpd_diff`: the magnitude of the estimated predictive performance difference,
+#' - `se_diff`: the uncertainty around that estimate,
+#' - `p_worse`: the implied probability that the model is truly worse
+#'    than the current best, assuming the normal approximation is well
+#'    calibrated.
+#' 
+#' As the data set contains only N=17 different primate species for
+#' all comparisons `diag_diff` shows `N<100` and we get a message
+#' advising to read more in `loo-glossary`. With less than 100 observations
+#' `p_worse` is not well calibrated and can't be trusted.
+#' 
+#' We can also use `tinytable` for prettier table formatting
 loo_comp |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff==0,NA,pnorm(0, elpd_diff, se_diff))) |>
-  tt() |>
-  format_tt(replace = "-")
-
-#' In the paper, we the comparison was reported using the $M_1$ as the
-#' baseline, and the probability that a model has better predictive
-#' performance than the baseline.
-loo_comp2 <- sapply(list(loo1, loo2, loo3, loo4), \(x) pointwise(x, "elpd_loo")) 
-colnames(loo_comp2) <- c("M_1", "M_2", "M_3", "M_4")
-loo_comp2 <- loo_comp2 |>
-  as_tibble() |>
-  mutate(across(M_1:M_4, ~ .x - M_1))
-tibble(model=colnames(loo_comp2),
-       elpd_diff = colSums(loo_comp2),
-       se_diff = apply(loo_comp2, 2, \(x) sd(x) * sqrt(length(x)))) |>
-  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, -elpd_diff, se_diff))) |> 
+  dplyr::select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
   tt() |>
   format_tt(replace = "-")
 
@@ -155,9 +145,7 @@ tibble(model=colnames(loo_comp2),
 #' specified and we are fine with respect to Scenario 2 (model
 #' misspecification) . Models $\mathrm{M}_2$ and $\mathrm{M}_3$ have
 #' very small $\elpdHat{\Md}{\yobs}$ compared to model
-#' $\mathrm{M}_1$. The direct use of the normal approximation gives
-#' probabilities 0.16 and 0.6 that these models have better predictive
-#' performance than model $\mathrm{M}_1$. As $\elpdHat{\Md}{\yobs}$ is
+#' $\mathrm{M}_1$. As $\elpdHat{\Md}{\yobs}$ is
 #' small (Scenario 1) and the number of observations is small
 #' (Scenario 3), we may assume $\seHat{\Md}{\yobs}$ to be
 #' underestimated and the error distribution to be more skewed than
@@ -259,10 +247,7 @@ M_3 <- brm(Reaction ~ Days + (Days | Subject),
 
 #' We compare the models $\mathrm{M}_1, \mathrm{M}_2,\mathrm{M}_3,\mathrm{M}_4$
 loo_compare(M_1, M_2, M_3) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
+  dplyr::select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
   tt() |>
   format_tt(j = 4, replace = "-") |> 
   format_tt(i = 3, j = 4, digits = 5)
@@ -339,10 +324,7 @@ pp_check(M_3t, type = "loo_intervals") +
 #' We first compare $\mathrm{M}_{3}$ and $\mathrm{M}_{3t}$ to see
 #' whether a Student's $t$ model is more appropriate.
 loo_compare(M_3, M_3t) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
+  dplyr::select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
   tt() |>
   format_tt(j = 4, replace = "-", digits = 3)
 
@@ -354,10 +336,7 @@ loo_compare(M_3, M_3t) |>
 #' compare the three Student's $t$ models:
 #' 
 loo_compare(M_1t, M_2t, M_3t) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
+  dplyr::select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
   tt() |>
   format_tt(j = 4, replace = "-")
 
@@ -461,10 +440,7 @@ M_3 <- brm(bf(y ~ sqrt_roach1 + treatment + senior + offset(log(exposure2)),
 
 #' 
 loo_compare(M_1, M_2, M_3) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
+  dplyr::select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
   tt() |>
   format_tt(j = 4, replace = "-", digits = 4)
 
@@ -497,13 +473,9 @@ M_4 <- brm(bf(y ~ s(sqrt_roach1) + treatment + senior + offset(log(exposure2)),
 
 #' 
 loo_compare(M_3, M_4) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  dplyr::select(model, elpd_diff, se_diff) |>
-  mutate(p = ifelse(elpd_diff == 0, NA, pnorm(0, elpd_diff, se_diff))) |> 
+  dplyr::select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
   tt() |>
   format_tt(j = 4, replace = "-")
-
 
 #' Model $\mathrm{M}_4$ (with spline) seems to be slightly better, but
 #' now the difference is so small (Scenario 1) that the normal

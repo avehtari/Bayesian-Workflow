@@ -65,6 +65,7 @@ library(tinytable)
 options(tinytable_format_num_fmt = "significant_cell",
         tinytable_format_digits = 2,
         tinytable_tt_digits = 2)
+# requires loo 2.10.0 or later
 library(loo)
 library(bayesplot)
 theme_set(bayesplot::theme_default(base_family = "sans"))
@@ -1806,10 +1807,9 @@ compose_6panel(pf, pf1, pf2, pf3b, pf2b)
 loo8 <- fit8$loo()
 loo8tnu <- fit8tnu$loo()
 loo_compare(list(`Model 8 normal` = loo8, `Model 8 Student's t` = loo8tnu)) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  select(model, elpd_diff, se_diff) |>
-  tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 #' As we could have expected based on the posterior of `nu_f4`
 #' Student's t prior on day of year effects is better. As low degrees
 #' of freedom indicate a thick tailed distribution for day of year
@@ -1934,10 +1934,9 @@ compose_6panel(pf, pf1, pf2, pf3b, pf2b)
 #' RHS prior is better.
 loo8rhs <- fit8rhs$loo()
 loo_compare(list(`Model 8 Student's t` = loo8tnu, `Model 8 RHS` = loo8rhs)) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  select(model, elpd_diff, se_diff) |>
-  tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' Compare the mean and sd of parameters from Pathfinder and MCMC. In this case,
 #' we are using the non-resampled Pathfinder draws.
@@ -1991,10 +1990,9 @@ loo4 <- fit4$loo()
 loo6 <- fit6$loo()
 loo7 <- fit7$loo()
 loo_compare(list(`Model 1` = loo1, `Model 2` = loo2, `Model 3` = loo3, `Model 4` = loo4, `Model 6` = loo6, `Model 7` = loo7, `Model 8 + RHS` = loo8rhs)) |>
-  as.data.frame() |>
-  rownames_to_column("model") |>
-  select(model, elpd_diff, se_diff) |>
-  tt()
+  select(model, elpd_diff, se_diff, p_worse, diag_diff, diag_elpd) |>
+  tt() |>
+  format_tt(j=4, replace = "-")
 
 #' ### Residual analysis
 #' 
