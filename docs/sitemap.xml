@@ -6,7 +6,7 @@
   </url>
   <url>
     <loc>https://avehtari.github.io/Bayesian-Workflow/casestudies.html</loc>
-    <lastmod>2026-04-03T19:01:53.660Z</lastmod>
+    <lastmod>2026-06-26T07:49:29.740Z</lastmod>
   </url>
   <url>
     <loc>https://avehtari.github.io/Bayesian-Workflow/exercises.html</loc>
@@ -18,7 +18,7 @@
   </url>
   <url>
     <loc>https://avehtari.github.io/Bayesian-Workflow/errata.html</loc>
-    <lastmod>2026-02-27T08:59:59.085Z</lastmod>
+    <lastmod>2026-06-26T07:22:26.691Z</lastmod>
   </url>
   <url>
     <loc>https://avehtari.github.io/Bayesian-Workflow/resources.html</loc>
@@ -103,5 +103,17 @@
   <url>
     <loc>https://avehtari.github.io/Bayesian-Workflow/world_cup/world_cup.html</loc>
     <lastmod>2026-06-15T14:21:21.887Z</lastmod>
+  </url>
+  <url>
+    <loc>https://avehtari.github.io/Bayesian-Workflow/birthdays/birthdays.html</loc>
+    <lastmod>2026-06-26T07:22:26.689Z</lastmod>
+  </url>
+  <url>
+    <loc>https://avehtari.github.io/Bayesian-Workflow/dogs/dogs.html</loc>
+    <lastmod>2026-06-26T07:22:26.690Z</lastmod>
+  </url>
+  <url>
+    <loc>https://avehtari.github.io/Bayesian-Workflow/loo_comparison/loo_comparison.html</loc>
+    <lastmod>2026-06-26T07:22:26.691Z</lastmod>
   </url>
 </urlset>
