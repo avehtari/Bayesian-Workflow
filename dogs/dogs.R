@@ -189,6 +189,7 @@ plot_pred9_0h
 #' [@Dimitriadis+etal:2021:reliabilitydiag] implemented in
 #' `reliabilitydiag`. Looks quite good.
 #| label: fig-calib-0h
+#| warning: false
 rd <- reliabilitydiag(EMOS = loo_epred(bfit_0h), y = dogs_df$shock)
 plot_calib_0h <- autoplot(rd) +
         labs(
@@ -268,6 +269,7 @@ ppc_pava_residual <-
 
 #' PAV-adjusted residual plot looks reasonable.
 #| label: fig-ppc_pava_residual-0h
+#| warning: false
 ppc_pava_residual(dogs_df$shock,
                   loo_epred(bfit_0h),
                   jitter(dogs_df$time,0.3)) +
@@ -515,6 +517,7 @@ dogs_df |>
 #' Examine how well the leave-one-out predictive probabilities from
 #' hierarchical 2-parameter log model are calibrated. Looks quite good.
 #| label: fig-calib-4
+#| warning: false
 rd <- reliabilitydiag(EMOS = loo_epred(bfit_4), y = dogs_df$shock)
 plot_calib_4 <- autoplot(rd) +
   labs(x = "Predicted (LOO)", 
@@ -527,6 +530,7 @@ plot_calib_4
 #' 
 #' PAV-adjusted residual plot looks reasonable.
 #| label: fig-ppc_pava_residual-4
+#| warning: false
 ppc_pava_residual(dogs_df$shock,
                   loo_epred(bfit_4),
                   jitter(dogs_df$time,0.3)) +
