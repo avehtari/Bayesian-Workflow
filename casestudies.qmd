@@ -33,39 +33,9 @@ bioassay_stan_file <- root("bioassay","bioassay0.stan")
 ```
 finds the `bioassay0.stan` file, no matter where you have placed or renamed the `Bayesian-Workflow` directory. When you switch to another example, there is no need to switch the working directory.
 
-::: {.content-visible when-profile="draft"}
+### Python case studies
 
-## Case studies
-
-*Links to case studies will be added later.*
-
-- Sec 3.5: Bioassay
-- Ch 4: Modeling performance on a multiple choice exam
-- Sec 9.4: Model selection using predictive performance
-- Sec 11.4-6: How many iterations to run and how many digits to report
-- Sec 12.3: Illustration of problematic posteriors
-- Sec 12.4: Declining exponentials
-- Ch 16: Coding a series of models: Simulated data of movie ratings
-- Ch 17: Prior specification for regression models: Reanalysis of a sleep study
-- Ch 18: Predictive model checking and comparison: Clinical trial
-- Ch 19: Building up to a hierarchical model: Coronavirus testing
-- Ch 20: Using a fitted model for decision analysis: Mixture model for time series competition
-- Ch 21: Posterior predictive checking: Stochastic learning in dogs -- brms version
-- Ch 21: Posterior predictive checking: Stochastic learning in dogs -- Stan version
-- Ch 22: Incremental development and testing: Black cat adoptions
-- Ch 23: Debugging a model: World Cup football
-- Ch 24: Leave-one-out cross validation model checking and comparison: Roaches
-- Ch 25: Model building and expansion: Golf putting
-- Ch 26: Model building with latent variables: Markov models for animal movement
-- Ch 27: Model building: Time-series decomposition for birthdays
-- Ch 28: Models for regression coefficients and variable selection: Student grades
-- Ch 29: Sampling problems with latent variables: No vehicles in the park
-- Ch 30: Challenge of multimodality: Differential equation for planetary motion
-- Ch 31: Simulation-based calibration checking in model development workflow
-
-:::
-
-::: {.content-visible unless-profile="draft"}
+There are also [Python versions of the case studies by Osvaldo Martin](https://arviz-devs.github.io/bayesian-workflow/)
 
 ## Case studies
 
@@ -93,13 +63,10 @@ finds the `bioassay0.stan` file, no matter where you have placed or renamed the 
 - [Ch 30: Challenge of multimodality: Differential equation for planetary motion](planetary_motion/planetary_motion.html)
 - [Ch 31: Simulation-based calibration checking in model development workflow](sbc/sbc.html)
 
-
-:::
-
 ## Software versions
 
 We list here all the software packages used in the case studies and the versions used
-when rendering the case study web pages 2026-01-08.
+when rendering the case study web pages 2026-06-26.
 
 ```{r, echo=FALSE}
 # Extract package names from R files
