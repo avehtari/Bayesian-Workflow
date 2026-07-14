@@ -12,3 +12,12 @@ Errata (excluding minor typos) for the book.
 
 If you notice an error that is not mentioned here, [submit an issue](https://github.com/avehtari/Bayesian-Workflow/issues) or send an email.
 
+## 1st printing
+
+- On p. 29, `fit0 <- cmdstan_model("bioassay0.stan", pedantic=TRUE)` should be `mod0 <- cmdstan_model("bioassay0.stan", pedantic=TRUE)` (thanks to J. J. Ramsey)
+- On p. 31, the compile of the model with priors is missing and should be added 
+before it is used: `mod1 <- cmdstan_model("bioassay1.stan", pedantic=TRUE)`. 
+The sampling line should then read `fit1 <- mod1$sample(data=bioassay_data, refresh=0)` and `print(fit_1)` should be `print(fit1)` (thanks to J. J. Ramsey)
+- p. 44, in the paragraph beginning "Next we assign an exponential(1/5) distribution to $\sigma_b$", each $\sigma_b$ should be $\sigma_a$ (thanks to Greg Fedewa)
+- p. 54, $\beta_{2}3$ should be $\beta_{23}$ (thanks to Greg Fedewa)
+
