@@ -3829,6 +3829,86 @@ vertical-align: -.125em;
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
 
+  
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      var head = document.getElementsByTagName("head")[0];
+      var link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.href = "https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.css";
+      head.appendChild(link);
+      
+      function renderMathElements() {
+        var mathElements = document.getElementsByClassName("math");
+        var macros = [];
+        for (var i = 0; i < mathElements.length; i++) {
+          var texText = mathElements[i].firstChild;
+          if (mathElements[i].tagName == "SPAN") {
+            if (window.katex) {
+              window.katex.render(texText.data, mathElements[i], {
+                displayMode: mathElements[i].classList.contains('display'),
+                throwOnError: false,
+                macros: macros,
+                fleqn: false
+              });
+            } else {
+              console.error("KaTeX has not been loaded correctly, as not found globally.");
+            }
+          }
+        }
+      }
+
+      var script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/katex@0.13.11/dist/katex.min.js";
+      script.onload = renderMathElements;
+      
+      // Check for RequireJS and AMD detection as it conflicts with KaTeX loading.
+      if (typeof require === 'function' && typeof define === 'function' && define.amd) {
+        // Disable require.js AMD detection temporarily, as it conflicts with KaTeX loading using CommonJS
+        var disableAmdScript = document.createElement("script");
+        disableAmdScript.textContent = 'window._amd_backup = window.define.amd; window.define.amd = false;';
+        head.appendChild(disableAmdScript);
+        
+        // overwrite onload to restore Require.js AMD detection
+        script.onload = function() {
+          // Restore Require.js AMD detection
+          window.define.amd = window._amd_backup;
+          delete window._amd_backup;
+          renderMathElements();
+        };
+      }
+
+      head.appendChild(script);
+    });
+  </script>
+  
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <style type="text/css">
 code.sourceCode.stan {
@@ -4092,8 +4172,14 @@ padding: 0 !important;
 </nav>
 <div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul class="collapse">
+  <li><a href="#st-printing" id="toc-st-printing" class="nav-link active" data-scroll-target="#st-printing">1st printing</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -4118,7 +4204,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-06-26</p>
+      <p class="date-modified">2026-07-14</p>
     </div>
   </div>
     
@@ -4131,8 +4217,17 @@ padding: 0 !important;
 
 <p>Errata (excluding minor typos) for the book.</p>
 <p>If you notice an error that is not mentioned here, <a href="https://github.com/avehtari/Bayesian-Workflow/issues">submit an issue</a> or send an email.</p>
+<section id="st-printing" class="level2">
+<h2 class="anchored" data-anchor-id="st-printing">1st printing</h2>
+<ul>
+<li>On p. 29, <code>fit0 &lt;- cmdstan_model(&quot;bioassay0.stan&quot;, pedantic=TRUE)</code> should be <code>mod0 &lt;- cmdstan_model(&quot;bioassay0.stan&quot;, pedantic=TRUE)</code> (thanks to J. J. Ramsey)</li>
+<li>On p. 31, the compile of the model with priors is missing and should be added before it is used: <code>mod1 &lt;- cmdstan_model(&quot;bioassay1.stan&quot;, pedantic=TRUE)</code>. The sampling line should then read <code>fit1 &lt;- mod1$sample(data=bioassay_data, refresh=0)</code> and <code>print(fit_1)</code> should be <code>print(fit1)</code> (thanks to J. J. Ramsey)</li>
+<li>p. 44, in the paragraph beginning “Next we assign an exponential(1/5) distribution to <span class="math inline">\sigma_b</span>”, each <span class="math inline">\sigma_b</span> should be <span class="math inline">\sigma_a</span> (thanks to Greg Fedewa)</li>
+<li>p. 54, <span class="math inline">\beta_{2}3</span> should be <span class="math inline">\beta_{23}</span> (thanks to Greg Fedewa)</li>
+</ul>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

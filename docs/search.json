@@ -2108,5 +2108,12 @@
       "Case studies",
       "Ch 29: Sampling problems with latent variables: No vehicles in the park"
     ]
+  },
+  {
+    "objectID": "errata.html#st-printing",
+    "href": "errata.html#st-printing",
+    "title": "Bayesian Workflow book: Errata",
+    "section": "1st printing",
+    "text": "1st printing\n\nOn p. 29, fit0 &lt;- cmdstan_model(\"bioassay0.stan\", pedantic=TRUE) should be mod0 &lt;- cmdstan_model(\"bioassay0.stan\", pedantic=TRUE) (thanks to J. J. Ramsey)\nOn p. 31, the compile of the model with priors is missing and should be added before it is used: mod1 &lt;- cmdstan_model(\"bioassay1.stan\", pedantic=TRUE). The sampling line should then read fit1 &lt;- mod1$sample(data=bioassay_data, refresh=0) and print(fit_1) should be print(fit1) (thanks to J. J. Ramsey)\np. 44, in the paragraph beginning “Next we assign an exponential(1/5) distribution to \\sigma_b”, each \\sigma_b should be \\sigma_a (thanks to Greg Fedewa)\np. 54, \\beta_{2}3 should be \\beta_{23} (thanks to Greg Fedewa)"
   }
 ]
