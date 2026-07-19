@@ -14,10 +14,84 @@ If you notice an error that is not mentioned here, [submit an issue](https://git
 
 ## 1st printing
 
-- On p. 29, `fit0 <- cmdstan_model("bioassay0.stan", pedantic=TRUE)` should be `mod0 <- cmdstan_model("bioassay0.stan", pedantic=TRUE)` (thanks to J. J. Ramsey)
-- On p. 31, the compile of the model with priors is missing and should be added 
+- p. 28, in the caption of the rats figure, "$\Pr(y_j=1)=\mathrm{logit}^{-1}(a + bx_j)$" $\rightarrow$ "$\Pr(\mathrm{death} | x)=\mathrm{logit}^{-1}(a + bx)$"
+- p. 29, `fit0 <- cmdstan_model("bioassay0.stan", pedantic=TRUE)` should be `mod0 <- cmdstan_model("bioassay0.stan", pedantic=TRUE)` (thanks to J. J. Ramsey)
+- p. 30, "$\mathrm{E}(y|x=0)$" $\rightarrow$ "the probability of death at $x=0$"
+- p. 31, "along with the curves, $\operatorname{logit}^{-1}(a + bx_j)$" $\rightarrow$ "along with the curves, $\operatorname{logit}^{-1}(a + bx)$"
+- p. 31, the compile of the model with priors is missing and should be added 
 before it is used: `mod1 <- cmdstan_model("bioassay1.stan", pedantic=TRUE)`. 
 The sampling line should then read `fit1 <- mod1$sample(data=bioassay_data, refresh=0)` and `print(fit_1)` should be `print(fit1)` (thanks to J. J. Ramsey)
+- p. 32, "Solving $\mathrm{logit}^{-1}(\alpha+\beta x) = 0.5$ yields $x_{\mathrm{LD50}}=-\alpha/\beta$" $\rightarrow$ "$\mathrm{logit}^{-1}(a+b x) = 0.5$ and $x_{\mathrm{LD50}}=-a/b$"
+- p. 38, in the caption, "$y=\mathrm{logit}^{-1}(-1.40 + 0.33x)$" $\rightarrow$ "$\Pr(y=1)=\mathrm{logit}^{-1}(-1.40 + 0.33x)$"
+- p. 38, "$\int\!\!\int p(a,b|y)\,da\,db=\infty$" $\rightarrow$ "$\int\!\!\int p(y|a,b)\,p(a,b)\,da\,db=\infty$"
+- p. 39, "$x_i=0$" $\rightarrow$ "$x_j=0$"
+- p. 44, "means and variances" $\rightarrow$ "means and standard deviations"
 - p. 44, in the paragraph beginning "Next we assign an exponential(1/5) distribution to $\sigma_b$", each $\sigma_b$ should be $\sigma_a$ (thanks to Greg Fedewa)
+- p. 47, "most of the slopes $b_j$" $\rightarrow$ "most of the slopes $b_k$"
+- p. 48, `corr_matrix[2] Omega_ab = Omega_ab = multiply_lower_tri_self_transpose(L_ab);` $\rightarrow$ `corr_matrix[2] Omega_ab = multiply_lower_tri_self_transpose(L_ab);`
+- p. 51, in the caption, "an ability parameter $a$ for each student $j$ and a difficulty parameter for each item $k$" $\rightarrow$ "an ability parameter $\alpha_j$ for each student $j$ and a difficulty parameter $\beta_k$ for each item $k$"
+- p. 51, "the estimated abilities, $\alpha_i$" $\rightarrow$ "the estimated abilities, $\alpha_j$"
+- p. 52, "approximately a constant $0.25 + 0.75\cdot 0.5 = 0.65$" $\rightarrow$ "approximately a constant $0.25 + 0.75\cdot 0.5 = 0.625$"
+- p. 52, "In this parameterization of the gamma distribution" $\rightarrow$ "In this parameterization of the exponential distribution"
+- p. 53, in the caption, "a discrimination parameter $d_k$" $\rightarrow$ "a discrimination parameter  $\gamma_k$"
 - p. 54, $\beta_{2}3$ should be $\beta_{23}$ (thanks to Greg Fedewa)
+- p. 77, "$p|y\sim\mathrm{beta}(y+1, n-y+1)$" $\rightarrow$ "$\theta|y\sim\mathrm{beta}(y+1, n-y+1)$"
+- p. 83, "$\tau=\sigma\sqrt{\nu_{\nu-2}}$" $\rightarrow$ "$\tau=\sigma\sqrt{\nu/(\nu-2)}$"
+- p. 87, "sample 10 balls without replacement" $\rightarrow$ "sample 10 balls with replacement"
+- p. 93, "a unit logistic prior distribution for $\theta$"  $\rightarrow$ "a unit logistic prior distribution for $\phi$"
+- p. 94, in the caption, "$\phi=\mathrm{logit}^{-1}(p)$" $\rightarrow$ "$\phi=\mathrm{logit}(p)$"
+- p. 97, in the caption, "a $\mathrm{Cauchy}(0,1)$ prior on the bias" $\rightarrow$ $a \mathrm{Cauchy}(0,0.1)$  prior on the bias"
+- p. 103, "posterior simulations $\theta^s$ ... from $p(y|x,\theta)$" $\rightarrow$ "posterior simulations $\theta^s$ ... from $p(\theta|x,y)$"
+- p. 106, "then draw $\tilde{y}_j \sim \mathrm{normal}(\theta_j,\tilde{\sigma}_j)$" $\rightarrow$ "then draw $\tilde{y}_j \sim \mathrm{normal}(\tilde{\theta}_j,\tilde{\sigma}_j)$"
+- p. 107, estimates of $\sigma$ are missing the squares on the residuals $\rightarrow$ $\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/n}$ and $\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/(n-k)}$
+- p. 107, "$\mathrm{mad\ sd}(z) = 1.483,\mathrm{median}(|z - \mathrm{median}(z)|)$" $\rightarrow$ ""$\mathrm{mad\ sd}(z) = 1.483\,\mathrm{median}(|z - \mathrm{median}(z)|)$"
+- p. 111, "$y^* = a + bx_i + e_i + \eta_i$" $\rightarrow$ "$y^*_i = a + bx_i + e_i + \eta_i$"
+- p. 113, "the 200 students" $\rightarrow$ "the 500 students"
+- p. 120, "for contextually relevant values of $x^{\rm hi}$, $x^{\rm lo}$, and $v$" $\rightarrow$ "for contextually relevant values of $u^{\rm hi}$, $u^{\rm lo}$"
+- p. 120, "the coefficient of $y$" $\rightarrow$ "the coefficient of $u$"
+- p. 124, 
+$$
+\hat{\theta} = \frac{N_j\sum_{j=1}^J\hat{\theta}j }{\sum_{j=1}^{J}N_j}
+$$
+$\rightarrow$
+$$
+ \hat{\theta} = \frac{\sum_{j=1}^J N_j\hat{\theta}_j }{\sum_{j=1}^{J}N_j}
+$$
+- p. 124,
+$$
+\hat{\theta}_A = \frac{\sum_{j\in A}N_j\hat{\theta}j }{\sum_{j \in A} N_j}
+$$
+$\rightarrow$
+$$
+\hat{\theta}_A = \frac{\sum_{j\in A}N_j\hat{\theta}j }{\sum_{j \in A} N_j}
+$$
+- p. 125, "$b^{th}$ sample" $\rightarrow$ "posterior draw $s$"
+- p. 130, "then $\tilde{y}^s|\tilde{u},\tilde{x},\tilde{z}=1,\theta^s$" $\rightarrow$ "then $\tilde{y}^s|\tilde{u}^s,\tilde{x},\tilde{z}=0,\theta^s$"
+- p. 130, "thus, $(\tilde{y}^\prime)^s|\tilde{u}^s,\tilde{z}=1$." $\rightarrow$ "thus, $(\tilde{y}^\prime)^s|\tilde{u}^s,\tilde{x},\tilde{z}=1,\theta^s$."
+- p. 130, "The model is $\hat{\theta}\sim\mathrm{normal}(\hat{\theta},s)$" $\rightarrow$ "The model is $\hat{\theta}\sim\mathrm{normal}(\theta,s)$"
+- p. 131, $\theta|y\sim\operatorname{normal}\left(\frac{\frac{1}{s^2}\hat\theta}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}, \frac{1}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}\right)$ $\rightarrow$ $\theta|y\sim\operatorname{normal}\left(\frac{\frac{1}{s^2}\hat\theta}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}, \sqrt{\frac{1}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}}\right)$
+- p. 133, $\theta/s = 0.42 \operatorname{normal}(0,1.5) + 0.58 \operatorname{normal}(0,3.5)$ $\rightarrow$ $\theta/s \sim 0.42 \operatorname{normal}(0,1.5) + 0.58 \operatorname{normal}(0,3.5)$
+- p. 135, "type S error (probability the estimate has the same sign as the true effect)" $\rightarrow$ "type S error (probability the estimate has a different sign than the true effect)"
+- p. 142,
+$$
+    y_1^\mathrm{rep}, \ldots, y_n^\mathrm{rep} \sim  p(y^\mathrm{rep} | y ) = \int \! \! p(y^\mathrm{rep} | \theta) d\theta.
+$$
+$\rightarrow$
+$$
+    y_1^{\mathrm{rep}}, \ldots, y_n^{\mathrm{rep}} \sim  p(y^{\mathrm{rep}} | y ) = \int \! \! p(y^{\mathrm{rep}} | \theta)\, p(\theta|y)\, d\theta.
+$$
+- p. 149, "$d\hat{\beta}/dy_i$ will be far from zero" $\rightarrow$ "$d\hat{b}/dy_i$ will be far from zero"
+- p. 161, "$\mathrm{SATE} = \sum_{i=1}^N (\mathrm{E}(y|X_i,z=1) - \mathrm{E}(y|X_i,z=0))$" $\rightarrow$ $\mathrm{SATE} = \frac{1}{N}\sum_{i=1}^N (\mathrm{E}(y|X_i,z=1) - \mathrm{E}(y|X_i,z=0))$
+- p. 161, "$\mathrm{PATE} = \sum_{i=1}^{N^{\rm new}} \mathrm{E}(y|X^{\rm new}_i,z=1) - \mathrm{E}(y|X^{\rm new}_i,z=0))$" $\rightarrow$ "$\mathrm{PATE} = \frac{1}{N^{\rm new}}\sum_{i=1}^{N^{\rm new}} (\mathrm{E}(y|X^{\rm new}_i,z=1) - \mathrm{E}(y|X^{\rm new}_i,z=0))$"
+- pp. 164--166, in the elpd-difference column headers "$\mathrm{M}_1, \mathrm{M}_k" $\rightarrow$ $\mathrm{M}_k, \mathrm{M}_1$
+- p. 194, "In the 10-dimensional normal example" $\rightarrow$ "In the 100-dimensional normal example"
+- p. 201, "the numerator of this expression, $\frac{1}{2}\mathrm{E}((\theta^s - \theta^{s-t})^2)$" $\rightarrow$ ""the numerator of this expression, "$\mathrm{E}((\theta^s - \theta^{s-t})^2)$"
+- p. 201, "$z_i= \frac{r_i - 3/8}{MN-1/4}$" $\rightarrow$ "$z_i= \Phi^{-1}\left(\frac{r_i - 3/8}{MN+1/4}\right)$, where $\Phi^{-1}$ is the inverse of the normal cumulative distribution function"
+- p. 203, "with 99\% probability" $\rightarrow$ "with 99.7\% probability"
+- p. 217, "a 6\% chance" $\rightarrow$ "a 12.5\% chance"
+- p. 221, "$j=1,\dots,J$" $\rightarrow$ "$k=1,\dots,K$"
+- p. 230, "$\beta$ is a slope parameter" $\rightarrow$ "$b$ is a slope parameter", "$\alpha$ parameters" $\rightarrow$ "$a$ parameters", and "$\eta = \alpha/\beta$" $\rightarrow$ "$\eta = -a/b$"
+- p. 237, "the posterior standard deviation of $\beta_1$ has the computational estimate of 0.680" should be 1.447 (0.680 is the posterior standard deviation of $\beta_2$)
+- p. 241, in the variational inference objective, $q^* = \mathrm{argmin}_{q \in \mathcal{Q}}\, D(p||q)$ should be $D(q||p)$, matching the reverse KL divergence discussed in the text (also in three later occurrences of $D(p||q)$)
+- p. 244, "$p(\theta|y_1,y_2)=p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_1|\phi)p(y_2|\phi,\xi_2)$" $\rightarrow$ "$p(\theta|y_1,y_2)\propto p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_2|\phi)p(y_2|\phi,\xi_2)$"
 
