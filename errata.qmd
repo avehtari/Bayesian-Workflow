@@ -147,6 +147,7 @@ $$
 - p. 387, in the final `loo_compare` call and its output, "Negative binomial full model" / "Negative binomial without treatment" $\rightarrow$ "ZINB full model" / "ZINB without treatment"
 - p. 390, in the caption, "$y = \mathrm{logit}^{-1}(a + bx_j)$" $\rightarrow$ "$y = \mathrm{logit}^{-1}(a + bx)$"
 - p. 396, `vector[J] p = p_angle .* p_distance * (1 - epsilon);` $\rightarrow$ `vector[J] p = p_angle .* p_distance .* (1 - epsilon);`
+- p. 412, in the forecast-pseudo-residual definition, "$z_t = \Phi^{-1}(\Pr(X_t \leq x_t | X_{1:(t-1)=X_{1:(t-1)}}))$" $\rightarrow$ "$z_t = \Phi^{-1}(\Pr(X_t \leq x_t | X_{1:(t-1)} = x_{1:(t-1)}))$".
 - p. 419, "the estimated year, day-of-year, and day-of-year effects" $\rightarrow$ "the estimated year, day-of-week, and day-of-year effects"
 - p. 420, "The factors $(1 + \alpha_t)$, $(1 + \beta_t)$, and $(1 + \gamma_t)$" $\rightarrow$ "The factors $(1 + \alpha t)$, $(1 + \beta t)$, and $(1 + \gamma t)$"
 - p. 430, "that is, $g_3(0)\beta$---along with $g_3(t)/g_3(0)$" $\rightarrow$ "that is, $\exp(g_3(0))\beta$---along with $\exp(g_3(t)-g_3(0))$"
