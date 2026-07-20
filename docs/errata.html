@@ -20,6 +20,41 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+}
+pre.numberSource { margin-left: 3em; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -4204,7 +4239,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-07-19</p>
+      <p class="date-modified">2026-07-20</p>
     </div>
   </div>
     
@@ -4220,75 +4255,140 @@ padding: 0 !important;
 <section id="st-printing" class="level2">
 <h2 class="anchored" data-anchor-id="st-printing">1st printing</h2>
 <ul>
-<li>p. 28, in the caption of the rats figure, “<span class="math inline">\Pr(y_j=1)=\mathrm{logit}^{-1}(a + bx_j)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\Pr(\mathrm{death} | x)=\mathrm{logit}^{-1}(a + bx)</span>”</li>
-<li>p. 29, <code>fit0 &lt;- cmdstan_model(&quot;bioassay0.stan&quot;, pedantic=TRUE)</code> should be <code>mod0 &lt;- cmdstan_model(&quot;bioassay0.stan&quot;, pedantic=TRUE)</code> (thanks to J. J. Ramsey)</li>
-<li>p. 30, “<span class="math inline">\mathrm{E}(y|x=0)</span>” <span class="math inline">\rightarrow</span> “the probability of death at <span class="math inline">x=0</span>”</li>
-<li>p. 31, “along with the curves, <span class="math inline">\operatorname{logit}^{-1}(a + bx_j)</span>” <span class="math inline">\rightarrow</span> “along with the curves, <span class="math inline">\operatorname{logit}^{-1}(a + bx)</span>”</li>
-<li>p. 31, the compile of the model with priors is missing and should be added before it is used: <code>mod1 &lt;- cmdstan_model(&quot;bioassay1.stan&quot;, pedantic=TRUE)</code>. The sampling line should then read <code>fit1 &lt;- mod1$sample(data=bioassay_data, refresh=0)</code> and <code>print(fit_1)</code> should be <code>print(fit1)</code> (thanks to J. J. Ramsey)</li>
-<li>p. 32, “Solving <span class="math inline">\mathrm{logit}^{-1}(\alpha+\beta x) = 0.5</span> yields <span class="math inline">x_{\mathrm{LD50}}=-\alpha/\beta</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\mathrm{logit}^{-1}(a+b x) = 0.5</span> and <span class="math inline">x_{\mathrm{LD50}}=-a/b</span>”</li>
-<li>p. 38, in the caption, “<span class="math inline">y=\mathrm{logit}^{-1}(-1.40 + 0.33x)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\Pr(y=1)=\mathrm{logit}^{-1}(-1.40 + 0.33x)</span>”</li>
-<li>p. 38, “<span class="math inline">\int\!\!\int p(a,b|y)\,da\,db=\infty</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\int\!\!\int p(y|a,b)\,p(a,b)\,da\,db=\infty</span>”</li>
-<li>p. 39, “<span class="math inline">x_i=0</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">x_j=0</span>”</li>
-<li>p. 44, “means and variances” <span class="math inline">\rightarrow</span> “means and standard deviations”</li>
-<li>p. 44, in the paragraph beginning “Next we assign an exponential(1/5) distribution to <span class="math inline">\sigma_b</span>”, each <span class="math inline">\sigma_b</span> should be <span class="math inline">\sigma_a</span> (thanks to Greg Fedewa)</li>
-<li>p. 47, “most of the slopes <span class="math inline">b_j</span>” <span class="math inline">\rightarrow</span> “most of the slopes <span class="math inline">b_k</span>”</li>
-<li>p. 48, <code>corr_matrix[2] Omega_ab = Omega_ab = multiply_lower_tri_self_transpose(L_ab);</code> <span class="math inline">\rightarrow</span> <code>corr_matrix[2] Omega_ab = multiply_lower_tri_self_transpose(L_ab);</code></li>
-<li>p. 51, in the caption, “an ability parameter <span class="math inline">a</span> for each student <span class="math inline">j</span> and a difficulty parameter for each item <span class="math inline">k</span>” <span class="math inline">\rightarrow</span> “an ability parameter <span class="math inline">\alpha_j</span> for each student <span class="math inline">j</span> and a difficulty parameter <span class="math inline">\beta_k</span> for each item <span class="math inline">k</span>”</li>
-<li>p. 51, “the estimated abilities, <span class="math inline">\alpha_i</span>” <span class="math inline">\rightarrow</span> “the estimated abilities, <span class="math inline">\alpha_j</span>”</li>
-<li>p. 52, “approximately a constant <span class="math inline">0.25 + 0.75\cdot 0.5 = 0.65</span>” <span class="math inline">\rightarrow</span> “approximately a constant <span class="math inline">0.25 + 0.75\cdot 0.5 = 0.625</span>”</li>
-<li>p. 52, “In this parameterization of the gamma distribution” <span class="math inline">\rightarrow</span> “In this parameterization of the exponential distribution”</li>
-<li>p. 53, in the caption, “a discrimination parameter <span class="math inline">d_k</span>” <span class="math inline">\rightarrow</span> “a discrimination parameter <span class="math inline">\gamma_k</span>”</li>
-<li>p. 54, <span class="math inline">\beta_{2}3</span> should be <span class="math inline">\beta_{23}</span> (thanks to Greg Fedewa)</li>
-<li>p. 77, “<span class="math inline">p|y\sim\mathrm{beta}(y+1, n-y+1)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\theta|y\sim\mathrm{beta}(y+1, n-y+1)</span>”</li>
-<li>p. 83, “<span class="math inline">\tau=\sigma\sqrt{\nu_{\nu-2}}</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\tau=\sigma\sqrt{\nu/(\nu-2)}</span>”</li>
-<li>p. 87, “sample 10 balls without replacement” <span class="math inline">\rightarrow</span> “sample 10 balls with replacement”</li>
-<li>p. 93, “a unit logistic prior distribution for <span class="math inline">\theta</span>” <span class="math inline">\rightarrow</span> “a unit logistic prior distribution for <span class="math inline">\phi</span>”</li>
-<li>p. 94, in the caption, “<span class="math inline">\phi=\mathrm{logit}^{-1}(p)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\phi=\mathrm{logit}(p)</span>”</li>
-<li>p. 97, in the caption, “a <span class="math inline">\mathrm{Cauchy}(0,1)</span> prior on the bias” <span class="math inline">\rightarrow</span> <span class="math inline">a \mathrm{Cauchy}(0,0.1)</span> prior on the bias”</li>
-<li>p. 103, “posterior simulations <span class="math inline">\theta^s</span> … from <span class="math inline">p(y|x,\theta)</span>” <span class="math inline">\rightarrow</span> “posterior simulations <span class="math inline">\theta^s</span> … from <span class="math inline">p(\theta|x,y)</span>”</li>
-<li>p. 106, “then draw <span class="math inline">\tilde{y}_j \sim \mathrm{normal}(\theta_j,\tilde{\sigma}_j)</span>” <span class="math inline">\rightarrow</span> “then draw <span class="math inline">\tilde{y}_j \sim \mathrm{normal}(\tilde{\theta}_j,\tilde{\sigma}_j)</span>”</li>
-<li>p. 107, estimates of <span class="math inline">\sigma</span> are missing the squares on the residuals <span class="math inline">\rightarrow</span> <span class="math inline">\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/n}</span> and <span class="math inline">\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/(n-k)}</span></li>
-<li>p. 107, “<span class="math inline">\mathrm{mad\ sd}(z) = 1.483,\mathrm{median}(|z - \mathrm{median}(z)|)</span>” <span class="math inline">\rightarrow</span> ““<span class="math inline">\mathrm{mad\ sd}(z) = 1.483\,\mathrm{median}(|z - \mathrm{median}(z)|)</span>”</li>
-<li>p. 111, “<span class="math inline">y^* = a + bx_i + e_i + \eta_i</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">y^*_i = a + bx_i + e_i + \eta_i</span>”</li>
-<li>p. 113, “the 200 students” <span class="math inline">\rightarrow</span> “the 500 students”</li>
-<li>p. 120, “for contextually relevant values of <span class="math inline">x^{\rm hi}</span>, <span class="math inline">x^{\rm lo}</span>, and <span class="math inline">v</span>” <span class="math inline">\rightarrow</span> “for contextually relevant values of <span class="math inline">u^{\rm hi}</span>, <span class="math inline">u^{\rm lo}</span>”</li>
-<li>p. 120, “the coefficient of <span class="math inline">y</span>” <span class="math inline">\rightarrow</span> “the coefficient of <span class="math inline">u</span>”</li>
-<li>p. 124, <span class="math display">
+<li><p>p. 28, in the caption of the rats figure, “<span class="math inline">\Pr(y_j=1)=\mathrm{logit}^{-1}(a + bx_j)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\Pr(\mathrm{death} | x)=\mathrm{logit}^{-1}(a + bx)</span>”</p></li>
+<li><p>p. 29, <code>fit0 &lt;- cmdstan_model(&quot;bioassay0.stan&quot;, pedantic=TRUE)</code> should be <code>mod0 &lt;- cmdstan_model(&quot;bioassay0.stan&quot;, pedantic=TRUE)</code> (thanks to J. J. Ramsey)</p></li>
+<li><p>p. 30, “<span class="math inline">\mathrm{E}(y|x=0)</span>” <span class="math inline">\rightarrow</span> “the probability of death at <span class="math inline">x=0</span>”</p></li>
+<li><p>p. 31, “along with the curves, <span class="math inline">\operatorname{logit}^{-1}(a + bx_j)</span>” <span class="math inline">\rightarrow</span> “along with the curves, <span class="math inline">\operatorname{logit}^{-1}(a + bx)</span>”</p></li>
+<li><p>p. 31, the compile of the model with priors is missing and should be added before it is used: <code>mod1 &lt;- cmdstan_model(&quot;bioassay1.stan&quot;, pedantic=TRUE)</code>. The sampling line should then read <code>fit1 &lt;- mod1$sample(data=bioassay_data, refresh=0)</code> and <code>print(fit_1)</code> should be <code>print(fit1)</code> (thanks to J. J. Ramsey)</p></li>
+<li><p>p. 32, “Solving <span class="math inline">\mathrm{logit}^{-1}(\alpha+\beta x) = 0.5</span> yields <span class="math inline">x_{\mathrm{LD50}}=-\alpha/\beta</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\mathrm{logit}^{-1}(a+b x) = 0.5</span> and <span class="math inline">x_{\mathrm{LD50}}=-a/b</span>”</p></li>
+<li><p>p. 38, in the caption, “<span class="math inline">y=\mathrm{logit}^{-1}(-1.40 + 0.33x)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\Pr(y=1)=\mathrm{logit}^{-1}(-1.40 + 0.33x)</span>”</p></li>
+<li><p>p. 38, “<span class="math inline">\int\!\!\int p(a,b|y)\,da\,db=\infty</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\int\!\!\int p(y|a,b)\,p(a,b)\,da\,db=\infty</span>”</p></li>
+<li><p>p. 39, “<span class="math inline">x_i=0</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">x_j=0</span>”</p></li>
+<li><p>p. 44, “means and variances” <span class="math inline">\rightarrow</span> “means and standard deviations”</p></li>
+<li><p>p. 44, in the paragraph beginning “Next we assign an exponential(1/5) distribution to <span class="math inline">\sigma_b</span>”, each <span class="math inline">\sigma_b</span> should be <span class="math inline">\sigma_a</span> (thanks to Greg Fedewa)</p></li>
+<li><p>p. 47, “most of the slopes <span class="math inline">b_j</span>” <span class="math inline">\rightarrow</span> “most of the slopes <span class="math inline">b_k</span>”</p></li>
+<li><p>p. 48, <code>corr_matrix[2] Omega_ab = Omega_ab = multiply_lower_tri_self_transpose(L_ab);</code> <span class="math inline">\rightarrow</span> <code>corr_matrix[2] Omega_ab = multiply_lower_tri_self_transpose(L_ab);</code></p></li>
+<li><p>p. 51, in the caption, “an ability parameter <span class="math inline">a</span> for each student <span class="math inline">j</span> and a difficulty parameter for each item <span class="math inline">k</span>” <span class="math inline">\rightarrow</span> “an ability parameter <span class="math inline">\alpha_j</span> for each student <span class="math inline">j</span> and a difficulty parameter <span class="math inline">\beta_k</span> for each item <span class="math inline">k</span>”</p></li>
+<li><p>p. 51, “the estimated abilities, <span class="math inline">\alpha_i</span>” <span class="math inline">\rightarrow</span> “the estimated abilities, <span class="math inline">\alpha_j</span>”</p></li>
+<li><p>p. 52, “approximately a constant <span class="math inline">0.25 + 0.75\cdot 0.5 = 0.65</span>” <span class="math inline">\rightarrow</span> “approximately a constant <span class="math inline">0.25 + 0.75\cdot 0.5 = 0.625</span>”</p></li>
+<li><p>p. 52, “In this parameterization of the gamma distribution” <span class="math inline">\rightarrow</span> “In this parameterization of the exponential distribution”</p></li>
+<li><p>p. 53, in the caption, “a discrimination parameter <span class="math inline">d_k</span>” <span class="math inline">\rightarrow</span> “a discrimination parameter <span class="math inline">\gamma_k</span>”</p></li>
+<li><p>p. 54, <span class="math inline">\beta_{2}3</span> should be <span class="math inline">\beta_{23}</span> (thanks to Greg Fedewa)</p></li>
+<li><p>p. 77, “<span class="math inline">p|y\sim\mathrm{beta}(y+1, n-y+1)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\theta|y\sim\mathrm{beta}(y+1, n-y+1)</span>”</p></li>
+<li><p>p. 83, “<span class="math inline">\tau=\sigma\sqrt{\nu_{\nu-2}}</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\tau=\sigma\sqrt{\nu/(\nu-2)}</span>”</p></li>
+<li><p>p. 87, “sample 10 balls without replacement” <span class="math inline">\rightarrow</span> “sample 10 balls with replacement”</p></li>
+<li><p>p. 93, “a unit logistic prior distribution for <span class="math inline">\theta</span>” <span class="math inline">\rightarrow</span> “a unit logistic prior distribution for <span class="math inline">\phi</span>”</p></li>
+<li><p>p. 94, in the caption, “<span class="math inline">\phi=\mathrm{logit}^{-1}(p)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\phi=\mathrm{logit}(p)</span>”</p></li>
+<li><p>p. 97, in the caption, “a <span class="math inline">\mathrm{Cauchy}(0,1)</span> prior on the bias” <span class="math inline">\rightarrow</span> <span class="math inline">a \mathrm{Cauchy}(0,0.1)</span> prior on the bias”</p></li>
+<li><p>p. 103, “posterior simulations <span class="math inline">\theta^s</span> … from <span class="math inline">p(y|x,\theta)</span>” <span class="math inline">\rightarrow</span> “posterior simulations <span class="math inline">\theta^s</span> … from <span class="math inline">p(\theta|x,y)</span>”</p></li>
+<li><p>p. 106, “then draw <span class="math inline">\tilde{y}_j \sim \mathrm{normal}(\theta_j,\tilde{\sigma}_j)</span>” <span class="math inline">\rightarrow</span> “then draw <span class="math inline">\tilde{y}_j \sim \mathrm{normal}(\tilde{\theta}_j,\tilde{\sigma}_j)</span>”</p></li>
+<li><p>p. 107, estimates of <span class="math inline">\sigma</span> are missing the squares on the residuals <span class="math inline">\rightarrow</span> <span class="math inline">\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/n}</span> and <span class="math inline">\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/(n-k)}</span></p></li>
+<li><p>p. 107, “<span class="math inline">\mathrm{mad\ sd}(z) = 1.483,\mathrm{median}(|z - \mathrm{median}(z)|)</span>” <span class="math inline">\rightarrow</span> ““<span class="math inline">\mathrm{mad\ sd}(z) = 1.483\,\mathrm{median}(|z - \mathrm{median}(z)|)</span>”</p></li>
+<li><p>p. 111, “<span class="math inline">y^* = a + bx_i + e_i + \eta_i</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">y^*_i = a + bx_i + e_i + \eta_i</span>”</p></li>
+<li><p>p. 113, “the 200 students” <span class="math inline">\rightarrow</span> “the 500 students”</p></li>
+<li><p>p. 120, “for contextually relevant values of <span class="math inline">x^{\rm hi}</span>, <span class="math inline">x^{\rm lo}</span>, and <span class="math inline">v</span>” <span class="math inline">\rightarrow</span> “for contextually relevant values of <span class="math inline">u^{\rm hi}</span>, <span class="math inline">u^{\rm lo}</span>”</p></li>
+<li><p>p. 120, “the coefficient of <span class="math inline">y</span>” <span class="math inline">\rightarrow</span> “the coefficient of <span class="math inline">u</span>”</p></li>
+<li><p>p. 124, <span class="math display">
 \hat{\theta} = \frac{N_j\sum_{j=1}^J\hat{\theta}j }{\sum_{j=1}^{J}N_j}
 </span> <span class="math inline">\rightarrow</span> <span class="math display">
 \hat{\theta} = \frac{\sum_{j=1}^J N_j\hat{\theta}_j }{\sum_{j=1}^{J}N_j}
-</span></li>
-<li>p. 124, <span class="math display">
+</span></p></li>
+<li><p>p. 124, <span class="math display">
 \hat{\theta}_A = \frac{\sum_{j\in A}N_j\hat{\theta}j }{\sum_{j \in A} N_j}
 </span> <span class="math inline">\rightarrow</span> <span class="math display">
 \hat{\theta}_A = \frac{\sum_{j\in A}N_j\hat{\theta}j }{\sum_{j \in A} N_j}
-</span></li>
-<li>p. 125, “<span class="math inline">b^{th}</span> sample” <span class="math inline">\rightarrow</span> “posterior draw <span class="math inline">s</span>”</li>
-<li>p. 130, “then <span class="math inline">\tilde{y}^s|\tilde{u},\tilde{x},\tilde{z}=1,\theta^s</span>” <span class="math inline">\rightarrow</span> “then <span class="math inline">\tilde{y}^s|\tilde{u}^s,\tilde{x},\tilde{z}=0,\theta^s</span>”</li>
-<li>p. 130, “thus, <span class="math inline">(\tilde{y}^\prime)^s|\tilde{u}^s,\tilde{z}=1</span>.” <span class="math inline">\rightarrow</span> “thus, <span class="math inline">(\tilde{y}^\prime)^s|\tilde{u}^s,\tilde{x},\tilde{z}=1,\theta^s</span>.”</li>
-<li>p. 130, “The model is <span class="math inline">\hat{\theta}\sim\mathrm{normal}(\hat{\theta},s)</span>” <span class="math inline">\rightarrow</span> “The model is <span class="math inline">\hat{\theta}\sim\mathrm{normal}(\theta,s)</span>”</li>
-<li>p. 131, <span class="math inline">\theta|y\sim\operatorname{normal}\left(\frac{\frac{1}{s^2}\hat\theta}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}, \frac{1}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}\right)</span> <span class="math inline">\rightarrow</span> <span class="math inline">\theta|y\sim\operatorname{normal}\left(\frac{\frac{1}{s^2}\hat\theta}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}, \sqrt{\frac{1}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}}\right)</span></li>
-<li>p. 133, <span class="math inline">\theta/s = 0.42 \operatorname{normal}(0,1.5) + 0.58 \operatorname{normal}(0,3.5)</span> <span class="math inline">\rightarrow</span> <span class="math inline">\theta/s \sim 0.42 \operatorname{normal}(0,1.5) + 0.58 \operatorname{normal}(0,3.5)</span></li>
-<li>p. 135, “type S error (probability the estimate has the same sign as the true effect)” <span class="math inline">\rightarrow</span> “type S error (probability the estimate has a different sign than the true effect)”</li>
-<li>p. 142, <span class="math display">
+</span></p></li>
+<li><p>p. 125, “<span class="math inline">b^{th}</span> sample” <span class="math inline">\rightarrow</span> “posterior draw <span class="math inline">s</span>”</p></li>
+<li><p>p. 130, “then <span class="math inline">\tilde{y}^s|\tilde{u},\tilde{x},\tilde{z}=1,\theta^s</span>” <span class="math inline">\rightarrow</span> “then <span class="math inline">\tilde{y}^s|\tilde{u}^s,\tilde{x},\tilde{z}=0,\theta^s</span>”</p></li>
+<li><p>p. 130, “thus, <span class="math inline">(\tilde{y}^\prime)^s|\tilde{u}^s,\tilde{z}=1</span>.” <span class="math inline">\rightarrow</span> “thus, <span class="math inline">(\tilde{y}^\prime)^s|\tilde{u}^s,\tilde{x},\tilde{z}=1,\theta^s</span>.”</p></li>
+<li><p>p. 130, “The model is <span class="math inline">\hat{\theta}\sim\mathrm{normal}(\hat{\theta},s)</span>” <span class="math inline">\rightarrow</span> “The model is <span class="math inline">\hat{\theta}\sim\mathrm{normal}(\theta,s)</span>”</p></li>
+<li><p>p. 131, <span class="math inline">\theta|y\sim\operatorname{normal}\left(\frac{\frac{1}{s^2}\hat\theta}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}, \frac{1}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}\right)</span> <span class="math inline">\rightarrow</span> <span class="math inline">\theta|y\sim\operatorname{normal}\left(\frac{\frac{1}{s^2}\hat\theta}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}, \sqrt{\frac{1}{\frac{1}{s^2} + \frac{1}{\sigma_0^2}}}\right)</span></p></li>
+<li><p>p. 133, <span class="math inline">\theta/s = 0.42 \operatorname{normal}(0,1.5) + 0.58 \operatorname{normal}(0,3.5)</span> <span class="math inline">\rightarrow</span> <span class="math inline">\theta/s \sim 0.42 \operatorname{normal}(0,1.5) + 0.58 \operatorname{normal}(0,3.5)</span></p></li>
+<li><p>p. 135, “type S error (probability the estimate has the same sign as the true effect)” <span class="math inline">\rightarrow</span> “type S error (probability the estimate has a different sign than the true effect)”</p></li>
+<li><p>p. 142, <span class="math display">
   y_1^\mathrm{rep}, \ldots, y_n^\mathrm{rep} \sim  p(y^\mathrm{rep} | y ) = \int \! \! p(y^\mathrm{rep} | \theta) d\theta.
 </span> <span class="math inline">\rightarrow</span> <span class="math display">
   y_1^{\mathrm{rep}}, \ldots, y_n^{\mathrm{rep}} \sim  p(y^{\mathrm{rep}} | y ) = \int \! \! p(y^{\mathrm{rep}} | \theta)\, p(\theta|y)\, d\theta.
-</span></li>
-<li>p. 149, “<span class="math inline">d\hat{\beta}/dy_i</span> will be far from zero” <span class="math inline">\rightarrow</span> “<span class="math inline">d\hat{b}/dy_i</span> will be far from zero”</li>
-<li>p. 161, “<span class="math inline">\mathrm{SATE} = \sum_{i=1}^N (\mathrm{E}(y|X_i,z=1) - \mathrm{E}(y|X_i,z=0))</span>” <span class="math inline">\rightarrow</span> <span class="math inline">\mathrm{SATE} = \frac{1}{N}\sum_{i=1}^N (\mathrm{E}(y|X_i,z=1) - \mathrm{E}(y|X_i,z=0))</span></li>
-<li>p. 161, “<span class="math inline">\mathrm{PATE} = \sum_{i=1}^{N^{\rm new}} \mathrm{E}(y|X^{\rm new}_i,z=1) - \mathrm{E}(y|X^{\rm new}_i,z=0))</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\mathrm{PATE} = \frac{1}{N^{\rm new}}\sum_{i=1}^{N^{\rm new}} (\mathrm{E}(y|X^{\rm new}_i,z=1) - \mathrm{E}(y|X^{\rm new}_i,z=0))</span>”</li>
-<li>pp. 164–166, in the elpd-difference column headers “$_1, _k” <span class="math inline">\rightarrow</span> <span class="math inline">\mathrm{M}_k, \mathrm{M}_1</span></li>
-<li>p. 194, “In the 10-dimensional normal example” <span class="math inline">\rightarrow</span> “In the 100-dimensional normal example”</li>
-<li>p. 201, “the numerator of this expression, <span class="math inline">\frac{1}{2}\mathrm{E}((\theta^s - \theta^{s-t})^2)</span>” <span class="math inline">\rightarrow</span> ““the numerator of this expression,”<span class="math inline">\mathrm{E}((\theta^s - \theta^{s-t})^2)</span>”</li>
-<li>p. 201, “<span class="math inline">z_i= \frac{r_i - 3/8}{MN-1/4}</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">z_i= \Phi^{-1}\left(\frac{r_i - 3/8}{MN+1/4}\right)</span>, where <span class="math inline">\Phi^{-1}</span> is the inverse of the normal cumulative distribution function”</li>
-<li>p. 203, “with 99% probability” <span class="math inline">\rightarrow</span> “with 99.7% probability”</li>
-<li>p. 217, “a 6% chance” <span class="math inline">\rightarrow</span> “a 12.5% chance”</li>
-<li>p. 221, “<span class="math inline">j=1,\dots,J</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">k=1,\dots,K</span>”</li>
-<li>p. 230, “<span class="math inline">\beta</span> is a slope parameter” <span class="math inline">\rightarrow</span> “<span class="math inline">b</span> is a slope parameter”, “<span class="math inline">\alpha</span> parameters” <span class="math inline">\rightarrow</span> “<span class="math inline">a</span> parameters”, and “<span class="math inline">\eta = \alpha/\beta</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\eta = -a/b</span>”</li>
-<li>p. 237, “the posterior standard deviation of <span class="math inline">\beta_1</span> has the computational estimate of 0.680” should be 1.447 (0.680 is the posterior standard deviation of <span class="math inline">\beta_2</span>)</li>
-<li>p. 241, in the variational inference objective, <span class="math inline">q^* = \mathrm{argmin}_{q \in \mathcal{Q}}\, D(p||q)</span> should be <span class="math inline">D(q||p)</span>, matching the reverse KL divergence discussed in the text (also in three later occurrences of <span class="math inline">D(p||q)</span>)</li>
-<li>p. 244, “<span class="math inline">p(\theta|y_1,y_2)=p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_1|\phi)p(y_2|\phi,\xi_2)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">p(\theta|y_1,y_2)\propto p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_2|\phi)p(y_2|\phi,\xi_2)</span>”</li>
+</span></p></li>
+<li><p>p. 149, “<span class="math inline">d\hat{\beta}/dy_i</span> will be far from zero” <span class="math inline">\rightarrow</span> “<span class="math inline">d\hat{b}/dy_i</span> will be far from zero”</p></li>
+<li><p>p. 161, “<span class="math inline">\mathrm{SATE} = \sum_{i=1}^N (\mathrm{E}(y|X_i,z=1) - \mathrm{E}(y|X_i,z=0))</span>” <span class="math inline">\rightarrow</span> <span class="math inline">\mathrm{SATE} = \frac{1}{N}\sum_{i=1}^N (\mathrm{E}(y|X_i,z=1) - \mathrm{E}(y|X_i,z=0))</span></p></li>
+<li><p>p. 161, “<span class="math inline">\mathrm{PATE} = \sum_{i=1}^{N^{\rm new}} \mathrm{E}(y|X^{\rm new}_i,z=1) - \mathrm{E}(y|X^{\rm new}_i,z=0))</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\mathrm{PATE} = \frac{1}{N^{\rm new}}\sum_{i=1}^{N^{\rm new}} (\mathrm{E}(y|X^{\rm new}_i,z=1) - \mathrm{E}(y|X^{\rm new}_i,z=0))</span>”</p></li>
+<li><p>pp. 164–166, in the elpd-difference column headers “$_1, _k” <span class="math inline">\rightarrow</span> <span class="math inline">\mathrm{M}_k, \mathrm{M}_1</span></p></li>
+<li><p>p. 194, “In the 10-dimensional normal example” <span class="math inline">\rightarrow</span> “In the 100-dimensional normal example”</p></li>
+<li><p>p. 201, “the numerator of this expression, <span class="math inline">\frac{1}{2}\mathrm{E}((\theta^s - \theta^{s-t})^2)</span>” <span class="math inline">\rightarrow</span> ““the numerator of this expression,”<span class="math inline">\mathrm{E}((\theta^s - \theta^{s-t})^2)</span>”</p></li>
+<li><p>p. 201, “<span class="math inline">z_i= \frac{r_i - 3/8}{MN-1/4}</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">z_i= \Phi^{-1}\left(\frac{r_i - 3/8}{MN+1/4}\right)</span>, where <span class="math inline">\Phi^{-1}</span> is the inverse of the normal cumulative distribution function”</p></li>
+<li><p>p. 203, “with 99% probability” <span class="math inline">\rightarrow</span> “with 99.7% probability”</p></li>
+<li><p>p. 217, “a 6% chance” <span class="math inline">\rightarrow</span> “a 12.5% chance”</p></li>
+<li><p>p. 221, “<span class="math inline">j=1,\dots,J</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">k=1,\dots,K</span>”</p></li>
+<li><p>p. 230, “<span class="math inline">\beta</span> is a slope parameter” <span class="math inline">\rightarrow</span> “<span class="math inline">b</span> is a slope parameter”, “<span class="math inline">\alpha</span> parameters” <span class="math inline">\rightarrow</span> “<span class="math inline">a</span> parameters”, and “<span class="math inline">\eta = \alpha/\beta</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\eta = -a/b</span>”</p></li>
+<li><p>p. 237, “the posterior standard deviation of <span class="math inline">\beta_1</span> has the computational estimate of 0.680” should be 1.447 (0.680 is the posterior standard deviation of <span class="math inline">\beta_2</span>)</p></li>
+<li><p>p. 241, in the variational inference objective, <span class="math inline">q^* = \mathrm{argmin}_{q \in \mathcal{Q}}\, D(p||q)</span> should be <span class="math inline">D(q||p)</span>, matching the reverse KL divergence discussed in the text (also in three later occurrences of <span class="math inline">D(p||q)</span>)</p></li>
+<li><p>p. 244, “<span class="math inline">p(\theta|y_1,y_2)=p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_1|\phi)p(y_2|\phi,\xi_2)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">p(\theta|y_1,y_2)\propto p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_2|\phi)p(y_2|\phi,\xi_2)</span>”</p></li>
+<li><p>p. 263, “standard deviation <span class="math inline">\sigma</span>” <span class="math inline">\rightarrow</span> “standard deviation <span class="math inline">\sigma_y</span>”</p></li>
+<li><p>p. 264, <code>target += normal_lpdf(y | theta[movie[n]], sigma_y);</code> <span class="math inline">\rightarrow</span> <code>target += normal_lpdf(y[n] | theta[movie[n]], sigma_y);</code></p></li>
+<li><p>p. 267, “our understanding of <span class="math inline">\theta_3</span>” <span class="math inline">\rightarrow</span> “our understanding of <span class="math inline">\theta_1</span>”</p></li>
+<li><p>p. 267, “you could add 100 to each of the <span class="math inline">a_j</span>’s and <span class="math inline">-100</span> to each of the <span class="math inline">b_k</span>’s” <span class="math inline">\rightarrow</span> “add 100 to each of the <span class="math inline">a_j</span>’s and <span class="math inline">100</span> to each of the <span class="math inline">b_k</span>’s” (the model is <span class="math inline">y_i \sim \mathrm{normal}(a_{j[i]} - b_{k[i]}, \sigma_y)</span>, so predictions are unchanged only when the same constant is added to both)</p></li>
+<li><p>p. 267, “and not change any of the predictors at all” <span class="math inline">\rightarrow</span> “and not change any of the predictions at all”</p></li>
+<li><p>p. 268, “<span class="math inline">a_j = \mu_a + \sigma_{\alpha}\alpha_j</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">a_j = \mu_a + \sigma_a\alpha_j</span>”</p></li>
+<li><p>p. 270, “open circles for the romantic comedies (those with <span class="math inline">j=1,\dots,10</span>) and solid circles for the crime movies (<span class="math inline">j=11,\dots,20</span>)” <span class="math inline">\rightarrow</span> “open circles for the romantic comedies (those with <span class="math inline">j=1,\dots,20</span>) and solid circles for the crime movies (<span class="math inline">j=21,\dots,40</span>)”</p></li>
+<li><p>p. 276, “<span class="math inline">N = 180</span> observations” <span class="math inline">\rightarrow</span> “<span class="math inline">N = 144</span> observations”</p></li>
+<li><p>p. 281, “the 95% interval is now <span class="math inline">(253, 283)</span>, as compared to the previous <span class="math inline">(246, 289)</span>” <span class="math inline">\rightarrow</span> “the 95% interval is now <span class="math inline">(246, 289)</span>, as compared to the previous <span class="math inline">(253, 283)</span>”</p></li>
+<li><p>p. 281, “<span class="math inline">\mu_n = b_{0j_n} + b_{j1} x_n</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\mu_n = b_{0j_n} + b_{1j_n} x_n</span>”</p></li>
+<li><p>p. 282, “<span class="math inline">(b_{0j}, b_{1j}) = (b_0, b_1) + \mathrm{Diag}(\tau_0, \tau_1) \, L \, (z_{0j}, z_{1j})</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">(b_{0j}, b_{1j})^t = (b_0, b_1)^t + \mathrm{Diag}(\tau_0, \tau_1) \, L \, (z_{0j}, z_{1j})^t</span>”</p></li>
+<li><p>p. 282, “<span class="math inline">\tau_0 \sim \mathrm{exponential}(1/10)</span> prior” <span class="math inline">\rightarrow</span> “<span class="math inline">\tau_1 \sim \mathrm{exponential}(1/10)</span>”</p></li>
+<li><p>p. 288, “at least for 0 to 9 days of sleep deprivation” <span class="math inline">\rightarrow</span> “at least for 0 to 7 days of sleep deprivation”</p></li>
+<li><p>p. 293, in the <code>fit_normal</code> code, <code>prior(cauchy(1 2), class=sd)</code> <span class="math inline">\rightarrow</span> <code>prior(cauchy(1, 2), class=sd)</code></p></li>
+<li><p>p. 297, the <code>fit_betabinomial2</code> code is missing the closing parenthesis of the <code>brm(</code> call: <code>prior(normal(0,3), class=sd))</code> <span class="math inline">\rightarrow</span> <code>prior(normal(0,3), class=sd)))</code></p></li>
+<li><p>p. 298, the <code>fit_betabinomial2b</code> code is missing the closing parenthesis of the <code>brm(</code> call: <code>prior(normal(0,3), class=b))</code> <span class="math inline">\rightarrow</span> <code>prior(normal(0,3), class=b)))</code></p></li>
+<li><p>p. 301, in the <code>fit_normal2c</code> code, <code>data=cu_df_c, normal(),</code> <span class="math inline">\rightarrow</span> <code>data=cu_df_c, gaussian(),</code>, and <code>prior(normal(0 3), class=Intercept)</code> <span class="math inline">\rightarrow</span> <code>prior(normal(0, 3), class=Intercept)</code></p></li>
+<li><p>p. 303, “than the negative binomial model” <span class="math inline">\rightarrow</span> “than the beta-binomial model”</p></li>
+<li><p>p. 307, in the caption, “histogram of posterior simulations of <span class="math inline">\gamma</span>” <span class="math inline">\rightarrow</span> “histogram of posterior simulations of <span class="math inline">\pi</span>”</p></li>
+<li><p>p. 308, in the caption, “power scaled with <span class="math inline">\alpha=0.5</span> (blue curve), 1 (black), or 2 (blue)” <span class="math inline">\rightarrow</span> “<span class="math inline">\ldots</span> or 2 (red)”</p></li>
+<li><p>p. 311, in the caption, “power scaled with <span class="math inline">\alpha=0.5</span> (blue curve), 1 (black), or 2 (blue)” <span class="math inline">\rightarrow</span> “<span class="math inline">\ldots</span> or 2 (red)”</p></li>
+<li><p>p. 316, in exercise 19.1, “3300 observations” <span class="math inline">\rightarrow</span> “3330 observations”</p></li>
+<li><p>p. 318, in the slope-estimation code, the correct code is</p></li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>  coefs <span class="ot">&lt;-</span> <span class="fu">summary</span>(fit)<span class="sc">$</span>coefficients</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  slope[n] <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> coefs[<span class="dv">2</span>, <span class="st">&quot;Estimate&quot;</span>]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  se[n] <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> coefs[<span class="dv">2</span>, <span class="st">&quot;Std. Error&quot;</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>p. 321, “over 5 standard errors away” <span class="math inline">\rightarrow</span> “about 5 standard errors away”</li>
+<li>p. 326, <code>posterior_predict(fit, ndraws=1)</code> <span class="math inline">\rightarrow</span> <code>posterior_predict(bfit_0, ndraws=1)</code></li>
+<li>p. 327, “weakly informative normal prior for <span class="math inline">\beta_0</span>” <span class="math inline">\rightarrow</span> “weakly informative normal prior for <span class="math inline">\mu_{\beta}</span>”</li>
+<li>p. 329, “Posterior predictive simulations from the two-parameter model are shown in the third row of Figure 21.4” <span class="math inline">\rightarrow</span> “in the fourth row”</li>
+<li>p. 329, in the <code>loo_compare(bfit_0h, bfit_2)</code> output, the second row label <code>bfit_0</code> <span class="math inline">\rightarrow</span> <code>bfit_2</code></li>
+<li>pp. 334–337, four references to “model 5” <span class="math inline">\rightarrow</span> “model 4”</li>
+<li>p. 337, “We take the <span class="math inline">(\alpha_j,\beta_j)</span> simulated parameters” <span class="math inline">\rightarrow</span> “We take the <span class="math inline">(a_j,b_j)</span> simulated parameters”</li>
+<li>p. 343, the first Stan program’s model block is missing its closing brace</li>
+<li>pp. 343, 346, 350, in three Stan listings, <code>array&lt;lower=0, upper=1&gt;[N] int adopted;</code> <span class="math inline">\rightarrow</span> <code>array[N] int&lt;lower=0, upper=1&gt; adopted;</code></li>
+<li>p. 346, the inline code “<code>target += log((1-P)\textasciicircum days[i])</code>” <span class="math inline">\rightarrow</span> <code>target += log((1-P)^days[i])</code></li>
+<li>p. 347, in the caption, “prior simulation” <span class="math inline">\rightarrow</span> “posterior simulation”</li>
+<li>p. 353, “The 23 teams” <span class="math inline">\rightarrow</span> “The 32 teams”</li>
+<li>p. 361, in the discrete-model display, “<span class="math inline">a_j = b \cdot \mathrm{prior\_score} + \sigma_a \alpha</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">a_j = b \cdot \mathrm{prior\_score}_j + \sigma_a \alpha_j</span>”, and “<span class="math inline">y_i = \mathrm{round}(z_i, 1)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">y_i = \mathrm{round}(z_i)</span>”</li>
+<li>p. 365, the integral for the square-root model, “<span class="math inline">\int_{y_i-0.5}^{y_i+0.5} \frac{1}{2\sqrt{y_i}}\,\mathrm{normal}(y_i \,|\, a_{j_1[i]}-a_{j_2[i]}, \sigma_y)\, dy_i</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\int_{y_i-0.5}^{y_i+0.5} \frac{1}{2\sqrt{|\tilde{y}|}}\,\mathrm{normal}\big(\mathrm{sign}(\tilde{y})\sqrt{|\tilde{y}|} \,\big|\, a_{j_1[i]}-a_{j_2[i]}, \sigma_y\big)\, d\tilde{y}</span>”</li>
+<li>p. 372, “Based on this, the <code>roaches</code> predictor seems to be relevant. Dropping <code>treatment</code> or <code>senior</code> would lead to a large drop in elpd, but the uncertainty is large, and cross validation indicates that these predictors are not necessarily relevant” <span class="math inline">\rightarrow</span> “the <code>sqrt_roach1</code> predictor seems to be relevant. Dropping <code>treatment</code> would lead to a large drop in elpd, but the uncertainty is large, and cross validation indicates that neither <code>treatment</code> nor <code>senior</code> is necessarily relevant”</li>
+<li>p. 376, “64% of the observations are 0” <span class="math inline">\rightarrow</span> “36% of the observations are 0”</li>
+<li>p. 378, <code>loo_compare(list(&quot;Negative binomial&quot;=loo(kcvnb), ...))</code> <span class="math inline">\rightarrow</span> <code>loo_compare(list(&quot;Negative binomial&quot;=kcvnb, ...))</code></li>
+<li>p. 382, in the data-preparation code, <code>offset=log(roaches$exposure2)</code> <span class="math inline">\rightarrow</span> <code>offsett=log(roaches$exposure2)</code></li>
+<li>p. 383, <code>&quot;Negative binomial}=loo_nb))</code> <span class="math inline">\rightarrow</span> <code>&quot;Negative binomial&quot;=loo_nb))</code></li>
+<li>p. 383, <code>ppc_loo_pit_ecdf(y=roaches$y, vyrep=...)</code> <span class="math inline">\rightarrow</span> <code>yrep=...</code></li>
+<li>p. 386, in the caption, “coefficients of the inflated negative binomial regression” <span class="math inline">\rightarrow</span> “of the zero-inflated negative binomial regression”</li>
+<li>p. 387, in the final <code>loo_compare</code> call and its output, “Negative binomial full model” / “Negative binomial without treatment” <span class="math inline">\rightarrow</span> “ZINB full model” / “ZINB without treatment”</li>
+<li>p. 390, in the caption, “<span class="math inline">y = \mathrm{logit}^{-1}(a + bx_j)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">y = \mathrm{logit}^{-1}(a + bx)</span>”</li>
+<li>p. 396, <code>vector[J] p = p_angle .* p_distance * (1 - epsilon);</code> <span class="math inline">\rightarrow</span> <code>vector[J] p = p_angle .* p_distance .* (1 - epsilon);</code></li>
+<li>p. 419, “the estimated year, day-of-year, and day-of-year effects” <span class="math inline">\rightarrow</span> “the estimated year, day-of-week, and day-of-year effects”</li>
+<li>p. 420, “The factors <span class="math inline">(1 + \alpha_t)</span>, <span class="math inline">(1 + \beta_t)</span>, and <span class="math inline">(1 + \gamma_t)</span>” <span class="math inline">\rightarrow</span> “The factors <span class="math inline">(1 + \alpha t)</span>, <span class="math inline">(1 + \beta t)</span>, and <span class="math inline">(1 + \gamma t)</span>”</li>
+<li>p. 430, “that is, <span class="math inline">g_3(0)\beta</span>—along with <span class="math inline">g_3(t)/g_3(0)</span>” <span class="math inline">\rightarrow</span> “that is, <span class="math inline">\exp(g_3(0))\beta</span>—along with <span class="math inline">\exp(g_3(t)-g_3(0))</span>”</li>
+<li>p. 439, “default <span class="math inline">\normal^+(0, 3)</span> prior (where <span class="math inline">\normal^+</span> indicates a normal distribution constrained to be positive)” <span class="math inline">\rightarrow</span> “default <span class="math inline">t_3^+(0, 3)</span> prior (where <span class="math inline">t_\nu^+</span> indicates a <span class="math inline">t_\nu</span>-distribution constrained to be positive)”</li>
+<li>p. 442, “When predictors are nearly collinear, it is infer their predictor relevances from the univariate marginal posteriors” <span class="math inline">\rightarrow</span> “When predictors are nearly collinear, it is difficult to infer their predictor relevances from the univariate marginal posteriors”</li>
+<li>p. 452, “(or 0.41 when fit to the simulated data)” <span class="math inline">\rightarrow</span> “(or 0.53 when fit to the simulated data)”</li>
+<li>p. 454, “about two-thirds of item intercepts are in the range <span class="math inline">(-2.33, 2.33)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">(-2.31, 2.31)</span>”</li>
+<li>p. 454, “<span class="math inline">\mathrm{logit}^{-1}(\mathrm{logit}(0.24) - 2) = 0.05</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\mathrm{logit}^{-1}(\mathrm{logit}(0.24) - 2) = 0.04</span>”</li>
+<li>p. 464, “<span class="math inline">\log p(q_\mathrm{obs} | k) = C - \frac{1}{2 \sigma} \|q_\mathrm{obs} - q(k)\|^2_2</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\log p(q_\mathrm{obs} | k) = C - \frac{1}{2 \sigma^2} \|q_\mathrm{obs} - q(k)\|^2_2</span>”</li>
+<li>p. 471, “The mixture submodel where the mixing ratio is the same for all variables” <span class="math inline">\rightarrow</span> “The mixture submodel where the mixing ratio is the same for all observations”</li>
+<li>p. 479, in the combined-model Stan listing, <code>int y[N_obs];</code> <span class="math inline">\rightarrow</span> <code>array[N_obs] int y;</code></li>
+<li>p. 480, “we can safely reject datasets where the variance is more than 1.8 times the mean” <span class="math inline">\rightarrow</span> “less than 1.8 times the mean”</li>
+<li>p. 482, in exercise 31.1, “for students in the control group who scored 100 on the midterm” <span class="math inline">\rightarrow</span> “for students in the control group who scored 100 on the pre-test”</li>
 </ul>
 
 
