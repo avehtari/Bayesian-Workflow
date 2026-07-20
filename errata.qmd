@@ -94,4 +94,69 @@ $$
 - p. 237, "the posterior standard deviation of $\beta_1$ has the computational estimate of 0.680" should be 1.447 (0.680 is the posterior standard deviation of $\beta_2$)
 - p. 241, in the variational inference objective, $q^* = \mathrm{argmin}_{q \in \mathcal{Q}}\, D(p||q)$ should be $D(q||p)$, matching the reverse KL divergence discussed in the text (also in three later occurrences of $D(p||q)$)
 - p. 244, "$p(\theta|y_1,y_2)=p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_1|\phi)p(y_2|\phi,\xi_2)$" $\rightarrow$ "$p(\theta|y_1,y_2)\propto p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_2|\phi)p(y_2|\phi,\xi_2)$"
+- p. 263, "standard deviation $\sigma$" $\rightarrow$ "standard deviation $\sigma_y$"
+- p. 264, `target += normal_lpdf(y | theta[movie[n]], sigma_y);` $\rightarrow$ `target += normal_lpdf(y[n] | theta[movie[n]], sigma_y);`
+- p. 267, "our understanding of $\theta_3$" $\rightarrow$ "our understanding of $\theta_1$"
+- p. 267, "you could add 100 to each of the $a_j$'s and $-100$ to each of the $b_k$'s" $\rightarrow$ "add 100 to each of the $a_j$'s and $100$ to each of the $b_k$'s" (the model is $y_i \sim \mathrm{normal}(a_{j[i]} - b_{k[i]}, \sigma_y)$, so predictions are unchanged only when the same constant is added to both)
+- p. 267, "and not change any of the predictors at all" $\rightarrow$ "and not change any of the predictions at all"
+- p. 268, "$a_j = \mu_a + \sigma_{\alpha}\alpha_j$" $\rightarrow$ "$a_j = \mu_a + \sigma_a\alpha_j$"
+- p. 270, "open circles for the romantic comedies (those with $j=1,\dots,10$) and solid circles for the crime movies ($j=11,\dots,20$)" $\rightarrow$ "open circles for the romantic comedies (those with $j=1,\dots,20$) and solid circles for the crime movies ($j=21,\dots,40$)"
+- p. 276, "$N = 180$ observations" $\rightarrow$ "$N = 144$ observations"
+- p. 281, "the 95\% interval is now $(253, 283)$, as compared to the previous $(246, 289)$" $\rightarrow$ "the 95\% interval is now $(246, 289)$, as compared to the previous $(253, 283)$"
+- p. 281, "$\mu_n = b_{0j_n} + b_{j1} x_n$" $\rightarrow$ "$\mu_n = b_{0j_n} + b_{1j_n} x_n$"
+- p. 282, "$(b_{0j}, b_{1j}) = (b_0, b_1) + \mathrm{Diag}(\tau_0, \tau_1) \, L \, (z_{0j}, z_{1j})$" $\rightarrow$ "$(b_{0j}, b_{1j})^t = (b_0, b_1)^t + \mathrm{Diag}(\tau_0, \tau_1) \, L \, (z_{0j}, z_{1j})^t$"
+- p. 282, "$\tau_0 \sim \mathrm{exponential}(1/10)$ prior" $\rightarrow$ "$\tau_1 \sim \mathrm{exponential}(1/10)$"
+- p. 288, "at least for 0 to 9 days of sleep deprivation" $\rightarrow$ "at least for 0 to 7 days of sleep deprivation"
+- p. 293, in the `fit_normal` code, `prior(cauchy(1 2), class=sd)` $\rightarrow$ `prior(cauchy(1, 2), class=sd)`
+- p. 297, the `fit_betabinomial2` code is missing the closing parenthesis of the `brm(` call: `prior(normal(0,3), class=sd))` $\rightarrow$ `prior(normal(0,3), class=sd)))`
+- p. 298, the `fit_betabinomial2b` code is missing the closing parenthesis of the `brm(` call: `prior(normal(0,3), class=b))` $\rightarrow$ `prior(normal(0,3), class=b)))`
+- p. 301, in the `fit_normal2c` code, `data=cu_df_c, normal(),` $\rightarrow$ `data=cu_df_c, gaussian(),`, and `prior(normal(0 3), class=Intercept)` $\rightarrow$ `prior(normal(0, 3), class=Intercept)`
+- p. 303, "than the negative binomial model" $\rightarrow$ "than the beta-binomial model"
+- p. 307, in the caption, "histogram of posterior simulations of $\gamma$" $\rightarrow$ "histogram of posterior simulations of $\pi$"
+- p. 308, in the caption, "power scaled with $\alpha=0.5$ (blue curve), 1 (black), or 2 (blue)" $\rightarrow$ "$\ldots$ or 2 (red)"
+- p. 311, in the caption, "power scaled with $\alpha=0.5$ (blue curve), 1 (black), or 2 (blue)" $\rightarrow$ "$\ldots$ or 2 (red)"
+- p. 316, in exercise 19.1, "3300 observations" $\rightarrow$ "3330 observations"
 
+- p. 318, in the slope-estimation code, the correct code is
+```r
+  coefs <- summary(fit)$coefficients
+  slope[n] <- 100 * coefs[2, "Estimate"]
+  se[n] <- 100 * coefs[2, "Std. Error"]
+```
+- p. 321, "over 5 standard errors away" $\rightarrow$ "about 5 standard errors away"
+- p. 326, `posterior_predict(fit, ndraws=1)` $\rightarrow$ `posterior_predict(bfit_0, ndraws=1)`
+- p. 327, "weakly informative normal prior for $\beta_0$" $\rightarrow$ "weakly informative normal prior for $\mu_{\beta}$"
+- p. 329, "Posterior predictive simulations from the two-parameter model are shown in the third row of Figure 21.4" $\rightarrow$ "in the fourth row"
+- p. 329, in the `loo_compare(bfit_0h, bfit_2)` output, the second row label `bfit_0` $\rightarrow$ `bfit_2`
+- pp. 334--337, four references to "model 5" $\rightarrow$ "model 4"
+- p. 337, "We take the $(\alpha_j,\beta_j)$ simulated parameters" $\rightarrow$ "We take the $(a_j,b_j)$ simulated parameters"
+- p. 343, the first Stan program's model block is missing its closing brace
+- pp. 343, 346, 350, in three Stan listings, `array<lower=0, upper=1>[N] int adopted;` $\rightarrow$ `array[N] int<lower=0, upper=1> adopted;`
+- p. 346, the inline code "`target += log((1-P)\textasciicircum days[i])`" $\rightarrow$ `target += log((1-P)^days[i])`
+- p. 347, in the caption, "prior simulation" $\rightarrow$ "posterior simulation"
+- p. 353, "The 23 teams" $\rightarrow$ "The 32 teams"
+- p. 361, in the discrete-model display, "$a_j = b \cdot \mathrm{prior\_score} + \sigma_a \alpha$" $\rightarrow$ "$a_j = b \cdot \mathrm{prior\_score}_j + \sigma_a \alpha_j$", and "$y_i = \mathrm{round}(z_i, 1)$" $\rightarrow$ "$y_i = \mathrm{round}(z_i)$"
+- p. 365, the integral for the square-root model, "$\int_{y_i-0.5}^{y_i+0.5} \frac{1}{2\sqrt{y_i}}\,\mathrm{normal}(y_i \,|\, a_{j_1[i]}-a_{j_2[i]}, \sigma_y)\, dy_i$" $\rightarrow$ "$\int_{y_i-0.5}^{y_i+0.5} \frac{1}{2\sqrt{|\tilde{y}|}}\,\mathrm{normal}\big(\mathrm{sign}(\tilde{y})\sqrt{|\tilde{y}|} \,\big|\, a_{j_1[i]}-a_{j_2[i]}, \sigma_y\big)\, d\tilde{y}$"
+- p. 372, "Based on this, the `roaches` predictor seems to be relevant. Dropping `treatment` or `senior` would lead to a large drop in elpd, but the uncertainty is large, and cross validation indicates that these predictors are not necessarily relevant" $\rightarrow$ "the `sqrt_roach1` predictor seems to be relevant. Dropping `treatment` would lead to a large drop in elpd, but the uncertainty is large, and cross validation indicates that neither `treatment` nor `senior` is necessarily relevant"
+- p. 376, "64\% of the observations are 0" $\rightarrow$ "36\% of the observations are 0"
+- p. 378, `loo_compare(list("Negative binomial"=loo(kcvnb), ...))` $\rightarrow$ `loo_compare(list("Negative binomial"=kcvnb, ...))`
+- p. 382, in the data-preparation code, `offset=log(roaches$exposure2)` $\rightarrow$ `offsett=log(roaches$exposure2)`
+- p. 383, `"Negative binomial}=loo_nb))` $\rightarrow$ `"Negative binomial"=loo_nb))`
+- p. 383, `ppc_loo_pit_ecdf(y=roaches$y, vyrep=...)` $\rightarrow$ `yrep=...`
+- p. 386, in the caption, "coefficients of the inflated negative binomial regression" $\rightarrow$ "of the zero-inflated negative binomial regression"
+- p. 387, in the final `loo_compare` call and its output, "Negative binomial full model" / "Negative binomial without treatment" $\rightarrow$ "ZINB full model" / "ZINB without treatment"
+- p. 390, in the caption, "$y = \mathrm{logit}^{-1}(a + bx_j)$" $\rightarrow$ "$y = \mathrm{logit}^{-1}(a + bx)$"
+- p. 396, `vector[J] p = p_angle .* p_distance * (1 - epsilon);` $\rightarrow$ `vector[J] p = p_angle .* p_distance .* (1 - epsilon);`
+- p. 419, "the estimated year, day-of-year, and day-of-year effects" $\rightarrow$ "the estimated year, day-of-week, and day-of-year effects"
+- p. 420, "The factors $(1 + \alpha_t)$, $(1 + \beta_t)$, and $(1 + \gamma_t)$" $\rightarrow$ "The factors $(1 + \alpha t)$, $(1 + \beta t)$, and $(1 + \gamma t)$"
+- p. 430, "that is, $g_3(0)\beta$---along with $g_3(t)/g_3(0)$" $\rightarrow$ "that is, $\exp(g_3(0))\beta$---along with $\exp(g_3(t)-g_3(0))$"
+- p. 439, "default $\normal^+(0, 3)$ prior (where $\normal^+$ indicates a normal distribution constrained to be positive)" $\rightarrow$ "default $t_3^+(0, 3)$ prior (where $t_\nu^+$ indicates a $t_\nu$-distribution constrained to be positive)"
+- p. 442, "When predictors are nearly collinear, it is infer their predictor relevances from the univariate marginal posteriors" $\rightarrow$ "When predictors are nearly collinear, it is difficult to infer their predictor relevances from the univariate marginal posteriors"
+- p. 452, "(or 0.41 when fit to the simulated data)" $\rightarrow$ "(or 0.53 when fit to the simulated data)"
+- p. 454, "about two-thirds of item intercepts are in the range $(-2.33, 2.33)$" $\rightarrow$ "$(-2.31, 2.31)$"
+- p. 454, "$\mathrm{logit}^{-1}(\mathrm{logit}(0.24) - 2) = 0.05$" $\rightarrow$ "$\mathrm{logit}^{-1}(\mathrm{logit}(0.24) - 2) = 0.04$"
+- p. 464, "$\log p(q_\mathrm{obs} | k) = C - \frac{1}{2 \sigma} \|q_\mathrm{obs} - q(k)\|^2_2$" $\rightarrow$ "$\log p(q_\mathrm{obs} | k) = C - \frac{1}{2 \sigma^2} \|q_\mathrm{obs} - q(k)\|^2_2$"
+- p. 471, "The mixture submodel where the mixing ratio is the same for all variables" $\rightarrow$ "The mixture submodel where the mixing ratio is the same for all observations"
+- p. 479, in the combined-model Stan listing, `int y[N_obs];` $\rightarrow$ `array[N_obs] int y;`
+- p. 480, "we can safely reject datasets where the variance is more than 1.8 times the mean" $\rightarrow$ "less than 1.8 times the mean"
+- p. 482, in exercise 31.1, "for students in the control group who scored 100 on the midterm" $\rightarrow$ "for students in the control group who scored 100 on the pre-test"
