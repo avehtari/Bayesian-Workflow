@@ -151,7 +151,7 @@ $$
 - p. 419, "the estimated year, day-of-year, and day-of-year effects" $\rightarrow$ "the estimated year, day-of-week, and day-of-year effects"
 - p. 420, "The factors $(1 + \alpha_t)$, $(1 + \beta_t)$, and $(1 + \gamma_t)$" $\rightarrow$ "The factors $(1 + \alpha t)$, $(1 + \beta t)$, and $(1 + \gamma t)$"
 - p. 430, "that is, $g_3(0)\beta$---along with $g_3(t)/g_3(0)$" $\rightarrow$ "that is, $\exp(g_3(0))\beta$---along with $\exp(g_3(t)-g_3(0))$"
-- p. 439, "default $\normal^+(0, 3)$ prior (where $\normal^+$ indicates a normal distribution constrained to be positive)" $\rightarrow$ "default $t_3^+(0, 3)$ prior (where $t_\nu^+$ indicates a $t_\nu$-distribution constrained to be positive)"
+- p. 439, "default $\operatorname{normal}^+(0, 3)$ prior (where $\operatorname{normal}^+$ indicates a normal distribution constrained to be positive)" $\rightarrow$ "default $t_3^+(0, 3)$ prior (where $t_\nu^+$ indicates a $t_\nu$-distribution constrained to be positive)"
 - p. 442, "When predictors are nearly collinear, it is infer their predictor relevances from the univariate marginal posteriors" $\rightarrow$ "When predictors are nearly collinear, it is difficult to infer their predictor relevances from the univariate marginal posteriors"
 - p. 452, "(or 0.41 when fit to the simulated data)" $\rightarrow$ "(or 0.53 when fit to the simulated data)"
 - p. 454, "about two-thirds of item intercepts are in the range $(-2.33, 2.33)$" $\rightarrow$ "$(-2.31, 2.31)$"
