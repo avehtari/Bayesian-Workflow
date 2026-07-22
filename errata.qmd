@@ -94,6 +94,15 @@ $$
 - p. 237, "the posterior standard deviation of $\beta_1$ has the computational estimate of 0.680" should be 1.447 (0.680 is the posterior standard deviation of $\beta_2$)
 - p. 241, in the variational inference objective, $q^* = \mathrm{argmin}_{q \in \mathcal{Q}}\, D(p||q)$ should be $D(q||p)$, matching the reverse KL divergence discussed in the text (also in three later occurrences of $D(p||q)$)
 - p. 244, "$p(\theta|y_1,y_2)=p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_1|\phi)p(y_2|\phi,\xi_2)$" $\rightarrow$ "$p(\theta|y_1,y_2)\propto p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_2|\phi)p(y_2|\phi,\xi_2)$"
+- p. 247, 
+$$
+    \text{KL}(q||p) = K + \frac{1}{2} (\nu - \mu)^t \Sigma (\nu - \mu) + \frac{1}{2} \log |\Psi| + \frac{1}{2} \Sigma_{i = 1}^d (\Sigma^{-1})_{ii} \Psi_{ii},
+$$
+$\rightarrow$
+$$
+    \text{KL}(q||p) = K + \frac{1}{2} (\nu - \mu)^t \Sigma^{-1} (\nu - \mu) - \frac{1}{2} \log |\Psi| + \frac{1}{2} \sum_{i = 1}^d (\Sigma^{-1})_{ii} \Psi_{ii},
+$$
+- p. 248, "correctly estimates the marginal precisions of $p$ (that is, the diagonal elements of $(\Sigma^{-1})_{ii}$) $\rightarrow$ "correctly estimates the conditional variance of $p$."
 - p. 263, "standard deviation $\sigma$" $\rightarrow$ "standard deviation $\sigma_y$"
 - p. 264, `target += normal_lpdf(y | theta[movie[n]], sigma_y);` $\rightarrow$ `target += normal_lpdf(y[n] | theta[movie[n]], sigma_y);`
 - p. 267, "our understanding of $\theta_3$" $\rightarrow$ "our understanding of $\theta_1$"
@@ -147,6 +156,8 @@ $$
 - p. 387, in the final `loo_compare` call and its output, "Negative binomial full model" / "Negative binomial without treatment" $\rightarrow$ "ZINB full model" / "ZINB without treatment"
 - p. 390, in the caption, "$y = \mathrm{logit}^{-1}(a + bx_j)$" $\rightarrow$ "$y = \mathrm{logit}^{-1}(a + bx)$"
 - p. 396, `vector[J] p = p_angle .* p_distance * (1 - epsilon);` $\rightarrow$ `vector[J] p = p_angle .* p_distance .* (1 - epsilon);`
+- p. 404, in the definition of the forward vector, "$\alpha_t = \delta^{\top} P(y_1) \prod_{t=1}^{t} \omega P(y_t)$" $\rightarrow$ "${\alpha}_t = {\delta}^{\top} P\left(y_1\right) \prod_{t=2}^T \omega P\left(y_t\right)$"
+- p. 404, in the first line of the log-forward recursion, "$\log(\alpha_{1,k}) = \log \delta_{1,k} + \log f(y_1 | z_1 = k)$" $\rightarrow$ "$\log(\alpha_{1,k}) = \log \delta_{k} + \log f(y_1 | z_1 = k)$"
 - p. 412, in the forecast-pseudo-residual definition, "$z_t = \Phi^{-1}(\Pr(X_t \leq x_t | X_{1:(t-1)=X_{1:(t-1)}}))$" $\rightarrow$ "$z_t = \Phi^{-1}(\Pr(X_t \leq x_t | X_{1:(t-1)} = x_{1:(t-1)}))$".
 - p. 419, "the estimated year, day-of-year, and day-of-year effects" $\rightarrow$ "the estimated year, day-of-week, and day-of-year effects"
 - p. 420, "The factors $(1 + \alpha_t)$, $(1 + \beta_t)$, and $(1 + \gamma_t)$" $\rightarrow$ "The factors $(1 + \alpha t)$, $(1 + \beta t)$, and $(1 + \gamma t)$"
