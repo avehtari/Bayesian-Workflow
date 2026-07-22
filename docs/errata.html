@@ -4239,7 +4239,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-07-20</p>
+      <p class="date-modified">2026-07-22</p>
     </div>
   </div>
     
@@ -4324,6 +4324,12 @@ padding: 0 !important;
 <li><p>p. 237, “the posterior standard deviation of <span class="math inline">\beta_1</span> has the computational estimate of 0.680” should be 1.447 (0.680 is the posterior standard deviation of <span class="math inline">\beta_2</span>)</p></li>
 <li><p>p. 241, in the variational inference objective, <span class="math inline">q^* = \mathrm{argmin}_{q \in \mathcal{Q}}\, D(p||q)</span> should be <span class="math inline">D(q||p)</span>, matching the reverse KL divergence discussed in the text (also in three later occurrences of <span class="math inline">D(p||q)</span>)</p></li>
 <li><p>p. 244, “<span class="math inline">p(\theta|y_1,y_2)=p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_1|\phi)p(y_2|\phi,\xi_2)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">p(\theta|y_1,y_2)\propto p(\phi)p(\xi_1|\phi)p(y_1|\phi,\xi_1)p(\xi_2|\phi)p(y_2|\phi,\xi_2)</span>”</p></li>
+<li><p>p. 247, <span class="math display">
+  \text{KL}(q||p) = K + \frac{1}{2} (\nu - \mu)^t \Sigma (\nu - \mu) + \frac{1}{2} \log |\Psi| + \frac{1}{2} \Sigma_{i = 1}^d (\Sigma^{-1})_{ii} \Psi_{ii},
+</span> <span class="math inline">\rightarrow</span> <span class="math display">
+  \text{KL}(q||p) = K + \frac{1}{2} (\nu - \mu)^t \Sigma^{-1} (\nu - \mu) - \frac{1}{2} \log |\Psi| + \frac{1}{2} \sum_{i = 1}^d (\Sigma^{-1})_{ii} \Psi_{ii},
+</span></p></li>
+<li><p>p. 248, “correctly estimates the marginal precisions of <span class="math inline">p</span> (that is, the diagonal elements of <span class="math inline">(\Sigma^{-1})_{ii}</span>) <span class="math inline">\rightarrow</span>”correctly estimates the conditional variance of <span class="math inline">p</span>.”</p></li>
 <li><p>p. 263, “standard deviation <span class="math inline">\sigma</span>” <span class="math inline">\rightarrow</span> “standard deviation <span class="math inline">\sigma_y</span>”</p></li>
 <li><p>p. 264, <code>target += normal_lpdf(y | theta[movie[n]], sigma_y);</code> <span class="math inline">\rightarrow</span> <code>target += normal_lpdf(y[n] | theta[movie[n]], sigma_y);</code></p></li>
 <li><p>p. 267, “our understanding of <span class="math inline">\theta_3</span>” <span class="math inline">\rightarrow</span> “our understanding of <span class="math inline">\theta_1</span>”</p></li>
@@ -4376,6 +4382,8 @@ padding: 0 !important;
 <li>p. 387, in the final <code>loo_compare</code> call and its output, “Negative binomial full model” / “Negative binomial without treatment” <span class="math inline">\rightarrow</span> “ZINB full model” / “ZINB without treatment”</li>
 <li>p. 390, in the caption, “<span class="math inline">y = \mathrm{logit}^{-1}(a + bx_j)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">y = \mathrm{logit}^{-1}(a + bx)</span>”</li>
 <li>p. 396, <code>vector[J] p = p_angle .* p_distance * (1 - epsilon);</code> <span class="math inline">\rightarrow</span> <code>vector[J] p = p_angle .* p_distance .* (1 - epsilon);</code></li>
+<li>p. 404, in the definition of the forward vector, “<span class="math inline">\alpha_t = \delta^{\top} P(y_1) \prod_{t=1}^{t} \omega P(y_t)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">{\alpha}_t = {\delta}^{\top} P\left(y_1\right) \prod_{t=2}^T \omega P\left(y_t\right)</span>”</li>
+<li>p. 404, in the first line of the log-forward recursion, “<span class="math inline">\log(\alpha_{1,k}) = \log \delta_{1,k} + \log f(y_1 | z_1 = k)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\log(\alpha_{1,k}) = \log \delta_{k} + \log f(y_1 | z_1 = k)</span>”</li>
 <li>p. 412, in the forecast-pseudo-residual definition, “<span class="math inline">z_t = \Phi^{-1}(\Pr(X_t \leq x_t | X_{1:(t-1)=X_{1:(t-1)}}))</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">z_t = \Phi^{-1}(\Pr(X_t \leq x_t | X_{1:(t-1)} = x_{1:(t-1)}))</span>”.</li>
 <li>p. 419, “the estimated year, day-of-year, and day-of-year effects” <span class="math inline">\rightarrow</span> “the estimated year, day-of-week, and day-of-year effects”</li>
 <li>p. 420, “The factors <span class="math inline">(1 + \alpha_t)</span>, <span class="math inline">(1 + \beta_t)</span>, and <span class="math inline">(1 + \gamma_t)</span>” <span class="math inline">\rightarrow</span> “The factors <span class="math inline">(1 + \alpha t)</span>, <span class="math inline">(1 + \beta t)</span>, and <span class="math inline">(1 + \gamma t)</span>”</li>
