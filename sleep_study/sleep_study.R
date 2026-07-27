@@ -312,8 +312,8 @@ qexp(c(0.025, 0.975), 0.02)
 #' Prior 3
 prior3 <- prior(normal(250, 100), class = Intercept) +
   prior(normal(0, 20), class = b) +
-  prior(exponential(0.02), class = sigma) +
-  prior(exponential(0.02), class = sd)
+  prior(exponential(0.04), class = sigma) +
+  prior(exponential(0.04), class = sd)
 
 #' Model 3: sample from the posterior
 #| label: fit3
@@ -358,7 +358,7 @@ prior4 <- prior(normal(250, 100), class = Intercept) +
   prior(normal(0, 20), class = b) +
   prior(exponential(0.04), class = sigma) +
   prior(exponential(0.04), class = sd, group = Subject, coef = Intercept) +
-  prior("exponential(1.0/15)", class = sd, group = Subject, coef = Days) +
+  prior(exponential(0.1), class = sd, group = Subject, coef = Days) +
   prior(lkj(1), class = cor)
 
 #' Model 4: sample from the posterior
