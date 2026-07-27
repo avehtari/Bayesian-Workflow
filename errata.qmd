@@ -112,9 +112,11 @@ $$
 - p. 270, "open circles for the romantic comedies (those with $j=1,\dots,10$) and solid circles for the crime movies ($j=11,\dots,20$)" $\rightarrow$ "open circles for the romantic comedies (those with $j=1,\dots,20$) and solid circles for the crime movies ($j=21,\dots,40$)"
 - p. 276, "$N = 180$ observations" $\rightarrow$ "$N = 144$ observations"
 - p. 281, "the 95\% interval is now $(253, 283)$, as compared to the previous $(246, 289)$" $\rightarrow$ "the 95\% interval is now $(246, 289)$, as compared to the previous $(253, 283)$"
+- p. 281, the priors on $\tau_0$ and $\sigma$ for the varying-intercept model as shown in the code as `prior3` are now the same as the priors discussed in the text
 - p. 281, "$\mu_n = b_{0j_n} + b_{j1} x_n$" $\rightarrow$ "$\mu_n = b_{0j_n} + b_{1j_n} x_n$"
 - p. 282, "$(b_{0j}, b_{1j}) = (b_0, b_1) + \mathrm{Diag}(\tau_0, \tau_1) \, L \, (z_{0j}, z_{1j})$" $\rightarrow$ "$(b_{0j}, b_{1j})^t = (b_0, b_1)^t + \mathrm{Diag}(\tau_0, \tau_1) \, L \, (z_{0j}, z_{1j})^t$"
 - p. 282, "$\tau_0 \sim \mathrm{exponential}(1/10)$ prior" $\rightarrow$ "$\tau_1 \sim \mathrm{exponential}(1/10)$"
+- p. 283, the priors on $\tau_0$, $\tau_1$, and $\sigma$ for the varying-intercept, varying-slope model as shown in the code as `prior4` are now the same as the priors discussed in the text
 - p. 288, "at least for 0 to 9 days of sleep deprivation" $\rightarrow$ "at least for 0 to 7 days of sleep deprivation"
 - p. 293, in the `fit_normal` code, `prior(cauchy(1 2), class=sd)` $\rightarrow$ `prior(cauchy(1, 2), class=sd)`
 - p. 297, the `fit_betabinomial2` code is missing the closing parenthesis of the `brm(` call: `prior(normal(0,3), class=sd))` $\rightarrow$ `prior(normal(0,3), class=sd)))`
