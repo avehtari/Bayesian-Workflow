@@ -32,6 +32,8 @@ Published by CRC Press in 2026. Copyright by the authors.
 
 - Buy the book via [publisher's website](https://www.routledge.com/Bayesian-Workflow/Gelman-Vehtari-McElreath-Simpson-Margossian-Yao-Kennedy-Gabry-Burkner-Modrak-Barajas/p/book/9780367490140). 20% Discount code: 26ESA2.
 
+- [Electronic edition for non-commercial purposes only](https://users.aalto.fi/~ave/Bayesian-Workflow.pdf)
+
 <details><summary>How to cite</summary>
 
 Cite the book:
