@@ -35,12 +35,14 @@ The sampling line should then read `fit1 <- mod1$sample(data=bioassay_data, refr
 - p. 52, "In this parameterization of the gamma distribution" $\rightarrow$ "In this parameterization of the exponential distribution"
 - p. 53, in the caption, "a discrimination parameter $d_k$" $\rightarrow$ "a discrimination parameter  $\gamma_k$"
 - p. 54, $\beta_{2}3$ should be $\beta_{23}$ (thanks to Greg Fedewa)
+- p. 63, "The likelihood is the only part of the data model that is needed for Bayesian inference conditional" $\rightarrow$ "The likelihood is the only part of the data model that is needed for Bayesian inference"
 - p. 77, "$p|y\sim\mathrm{beta}(y+1, n-y+1)$" $\rightarrow$ "$\theta|y\sim\mathrm{beta}(y+1, n-y+1)$"
 - p. 83, "$\tau=\sigma\sqrt{\nu_{\nu-2}}$" $\rightarrow$ "$\tau=\sigma\sqrt{\nu/(\nu-2)}$"
 - p. 87, "sample 10 balls without replacement" $\rightarrow$ "sample 10 balls with replacement"
 - p. 93, "a unit logistic prior distribution for $\theta$"  $\rightarrow$ "a unit logistic prior distribution for $\phi$"
 - p. 94, in the caption, "$\phi=\mathrm{logit}^{-1}(p)$" $\rightarrow$ "$\phi=\mathrm{logit}(p)$"
 - p. 97, in the caption, "a $\mathrm{Cauchy}(0,1)$ prior on the bias" $\rightarrow$ $a \mathrm{Cauchy}(0,0.1)$  prior on the bias"
+- p. 98, in Exercise 5.2c, "the conditional distributions $x|y\sim\mathrm{normal}(0.5y,1),\ x|y\sim\mathrm{normal}(0.5y,1)$" $\rightarrow$ "$x|y\sim\mathrm{normal}(0.5y,1),\ y|x\sim\mathrm{normal}(0.5x,1)$" (as printed, the two conditionals are identical and the exercise becomes trivial).
 - p. 103, "posterior simulations $\theta^s$ ... from $p(y|x,\theta)$" $\rightarrow$ "posterior simulations $\theta^s$ ... from $p(\theta|x,y)$"
 - p. 106, "then draw $\tilde{y}_j \sim \mathrm{normal}(\theta_j,\tilde{\sigma}_j)$" $\rightarrow$ "then draw $\tilde{y}_j \sim \mathrm{normal}(\tilde{\theta}_j,\tilde{\sigma}_j)$"
 - p. 107, estimates of $\sigma$ are missing the squares on the residuals $\rightarrow$ $\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/n}$ and $\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/(n-k)}$
@@ -105,10 +107,12 @@ $$
 - p. 248, "correctly estimates the marginal precisions of $p$ (that is, the diagonal elements of $(\Sigma^{-1})_{ii}$) $\rightarrow$ "correctly estimates the conditional variance of $p$."
 - p. 263, "standard deviation $\sigma$" $\rightarrow$ "standard deviation $\sigma_y$"
 - p. 264, `target += normal_lpdf(y | theta[movie[n]], sigma_y);` $\rightarrow$ `target += normal_lpdf(y[n] | theta[movie[n]], sigma_y);`
+- p. 264, "between 1 and 5" $\rightarrow$ "between 0 and 5"
 - p. 267, "our understanding of $\theta_3$" $\rightarrow$ "our understanding of $\theta_1$"
 - p. 267, "you could add 100 to each of the $a_j$'s and $-100$ to each of the $b_k$'s" $\rightarrow$ "add 100 to each of the $a_j$'s and $100$ to each of the $b_k$'s" (the model is $y_i \sim \mathrm{normal}(a_{j[i]} - b_{k[i]}, \sigma_y)$, so predictions are unchanged only when the same constant is added to both)
 - p. 267, "and not change any of the predictors at all" $\rightarrow$ "and not change any of the predictions at all"
 - p. 268, "$a_j = \mu_a + \sigma_{\alpha}\alpha_j$" $\rightarrow$ "$a_j = \mu_a + \sigma_a\alpha_j$"
+- p. 269, "the variance parameters are accurately estimated" $\rightarrow$ "the scale parameters are accurately estimated"
 - p. 270, "open circles for the romantic comedies (those with $j=1,\dots,10$) and solid circles for the crime movies ($j=11,\dots,20$)" $\rightarrow$ "open circles for the romantic comedies (those with $j=1,\dots,20$) and solid circles for the crime movies ($j=21,\dots,40$)"
 - p. 276, "$N = 180$ observations" $\rightarrow$ "$N = 144$ observations"
 - p. 281, "the 95\% interval is now $(253, 283)$, as compared to the previous $(246, 289)$" $\rightarrow$ "the 95\% interval is now $(246, 289)$, as compared to the previous $(253, 283)$"
@@ -126,6 +130,9 @@ $$
 - p. 307, in the caption, "histogram of posterior simulations of $\gamma$" $\rightarrow$ "histogram of posterior simulations of $\pi$"
 - p. 308, in the caption, "power scaled with $\alpha=0.5$ (blue curve), 1 (black), or 2 (blue)" $\rightarrow$ "$\ldots$ or 2 (red)"
 - p. 311, in the caption, "power scaled with $\alpha=0.5$ (blue curve), 1 (black), or 2 (blue)" $\rightarrow$ "$\ldots$ or 2 (red)"
+- p. 311, "the point estimate from Figure 19.3a of $\mu_{\delta}$, which is 1.58 ... $\logit^{-1}(1.58 \pm 0.3)$, which is $(0.78, 0.87)$" $\rightarrow$ "which is 1.54 ... $\logit^{-1}(1.54 \pm 0.3)$, which is $(0.78, 0.86)$" (matching the posterior median of $\mu_{\delta}$ in the table on p. 310).
+- p. 312, "We do not believe these tests have specificities below 50\%" $\rightarrow$ "We do not believe these tests have sensitivities below 50\%".
+- p. 313, "roughly consistent with inter-site variation in specificity" $\rightarrow$ "roughly consistent with inter-site variation in sensitivity".
 - p. 316, in exercise 19.1, "3300 observations" $\rightarrow$ "3330 observations"
 
 - p. 318, in the slope-estimation code, the correct code is
