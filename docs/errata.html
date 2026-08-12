@@ -4239,7 +4239,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-07-27</p>
+      <p class="date-modified">2026-08-12</p>
     </div>
   </div>
     
@@ -4274,12 +4274,14 @@ padding: 0 !important;
 <li><p>p. 52, “In this parameterization of the gamma distribution” <span class="math inline">\rightarrow</span> “In this parameterization of the exponential distribution”</p></li>
 <li><p>p. 53, in the caption, “a discrimination parameter <span class="math inline">d_k</span>” <span class="math inline">\rightarrow</span> “a discrimination parameter <span class="math inline">\gamma_k</span>”</p></li>
 <li><p>p. 54, <span class="math inline">\beta_{2}3</span> should be <span class="math inline">\beta_{23}</span> (thanks to Greg Fedewa)</p></li>
+<li><p>p. 63, “The likelihood is the only part of the data model that is needed for Bayesian inference conditional” <span class="math inline">\rightarrow</span> “The likelihood is the only part of the data model that is needed for Bayesian inference”</p></li>
 <li><p>p. 77, “<span class="math inline">p|y\sim\mathrm{beta}(y+1, n-y+1)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\theta|y\sim\mathrm{beta}(y+1, n-y+1)</span>”</p></li>
 <li><p>p. 83, “<span class="math inline">\tau=\sigma\sqrt{\nu_{\nu-2}}</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\tau=\sigma\sqrt{\nu/(\nu-2)}</span>”</p></li>
 <li><p>p. 87, “sample 10 balls without replacement” <span class="math inline">\rightarrow</span> “sample 10 balls with replacement”</p></li>
 <li><p>p. 93, “a unit logistic prior distribution for <span class="math inline">\theta</span>” <span class="math inline">\rightarrow</span> “a unit logistic prior distribution for <span class="math inline">\phi</span>”</p></li>
 <li><p>p. 94, in the caption, “<span class="math inline">\phi=\mathrm{logit}^{-1}(p)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">\phi=\mathrm{logit}(p)</span>”</p></li>
 <li><p>p. 97, in the caption, “a <span class="math inline">\mathrm{Cauchy}(0,1)</span> prior on the bias” <span class="math inline">\rightarrow</span> <span class="math inline">a \mathrm{Cauchy}(0,0.1)</span> prior on the bias”</p></li>
+<li><p>p. 98, in Exercise 5.2c, “the conditional distributions <span class="math inline">x|y\sim\mathrm{normal}(0.5y,1),\ x|y\sim\mathrm{normal}(0.5y,1)</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">x|y\sim\mathrm{normal}(0.5y,1),\ y|x\sim\mathrm{normal}(0.5x,1)</span>” (as printed, the two conditionals are identical and the exercise becomes trivial).</p></li>
 <li><p>p. 103, “posterior simulations <span class="math inline">\theta^s</span> … from <span class="math inline">p(y|x,\theta)</span>” <span class="math inline">\rightarrow</span> “posterior simulations <span class="math inline">\theta^s</span> … from <span class="math inline">p(\theta|x,y)</span>”</p></li>
 <li><p>p. 106, “then draw <span class="math inline">\tilde{y}_j \sim \mathrm{normal}(\theta_j,\tilde{\sigma}_j)</span>” <span class="math inline">\rightarrow</span> “then draw <span class="math inline">\tilde{y}_j \sim \mathrm{normal}(\tilde{\theta}_j,\tilde{\sigma}_j)</span>”</p></li>
 <li><p>p. 107, estimates of <span class="math inline">\sigma</span> are missing the squares on the residuals <span class="math inline">\rightarrow</span> <span class="math inline">\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/n}</span> and <span class="math inline">\sqrt{\sum_{i=1}^n(y_i - X_i\hat{\beta})^2/(n-k)}</span></p></li>
@@ -4332,10 +4334,12 @@ padding: 0 !important;
 <li><p>p. 248, “correctly estimates the marginal precisions of <span class="math inline">p</span> (that is, the diagonal elements of <span class="math inline">(\Sigma^{-1})_{ii}</span>) <span class="math inline">\rightarrow</span>”correctly estimates the conditional variance of <span class="math inline">p</span>.”</p></li>
 <li><p>p. 263, “standard deviation <span class="math inline">\sigma</span>” <span class="math inline">\rightarrow</span> “standard deviation <span class="math inline">\sigma_y</span>”</p></li>
 <li><p>p. 264, <code>target += normal_lpdf(y | theta[movie[n]], sigma_y);</code> <span class="math inline">\rightarrow</span> <code>target += normal_lpdf(y[n] | theta[movie[n]], sigma_y);</code></p></li>
+<li><p>p. 264, “between 1 and 5” <span class="math inline">\rightarrow</span> “between 0 and 5”</p></li>
 <li><p>p. 267, “our understanding of <span class="math inline">\theta_3</span>” <span class="math inline">\rightarrow</span> “our understanding of <span class="math inline">\theta_1</span>”</p></li>
 <li><p>p. 267, “you could add 100 to each of the <span class="math inline">a_j</span>’s and <span class="math inline">-100</span> to each of the <span class="math inline">b_k</span>’s” <span class="math inline">\rightarrow</span> “add 100 to each of the <span class="math inline">a_j</span>’s and <span class="math inline">100</span> to each of the <span class="math inline">b_k</span>’s” (the model is <span class="math inline">y_i \sim \mathrm{normal}(a_{j[i]} - b_{k[i]}, \sigma_y)</span>, so predictions are unchanged only when the same constant is added to both)</p></li>
 <li><p>p. 267, “and not change any of the predictors at all” <span class="math inline">\rightarrow</span> “and not change any of the predictions at all”</p></li>
 <li><p>p. 268, “<span class="math inline">a_j = \mu_a + \sigma_{\alpha}\alpha_j</span>” <span class="math inline">\rightarrow</span> “<span class="math inline">a_j = \mu_a + \sigma_a\alpha_j</span>”</p></li>
+<li><p>p. 269, “the variance parameters are accurately estimated” <span class="math inline">\rightarrow</span> “the scale parameters are accurately estimated”</p></li>
 <li><p>p. 270, “open circles for the romantic comedies (those with <span class="math inline">j=1,\dots,10</span>) and solid circles for the crime movies (<span class="math inline">j=11,\dots,20</span>)” <span class="math inline">\rightarrow</span> “open circles for the romantic comedies (those with <span class="math inline">j=1,\dots,20</span>) and solid circles for the crime movies (<span class="math inline">j=21,\dots,40</span>)”</p></li>
 <li><p>p. 276, “<span class="math inline">N = 180</span> observations” <span class="math inline">\rightarrow</span> “<span class="math inline">N = 144</span> observations”</p></li>
 <li><p>p. 281, “the 95% interval is now <span class="math inline">(253, 283)</span>, as compared to the previous <span class="math inline">(246, 289)</span>” <span class="math inline">\rightarrow</span> “the 95% interval is now <span class="math inline">(246, 289)</span>, as compared to the previous <span class="math inline">(253, 283)</span>”</p></li>
@@ -4353,6 +4357,9 @@ padding: 0 !important;
 <li><p>p. 307, in the caption, “histogram of posterior simulations of <span class="math inline">\gamma</span>” <span class="math inline">\rightarrow</span> “histogram of posterior simulations of <span class="math inline">\pi</span>”</p></li>
 <li><p>p. 308, in the caption, “power scaled with <span class="math inline">\alpha=0.5</span> (blue curve), 1 (black), or 2 (blue)” <span class="math inline">\rightarrow</span> “<span class="math inline">\ldots</span> or 2 (red)”</p></li>
 <li><p>p. 311, in the caption, “power scaled with <span class="math inline">\alpha=0.5</span> (blue curve), 1 (black), or 2 (blue)” <span class="math inline">\rightarrow</span> “<span class="math inline">\ldots</span> or 2 (red)”</p></li>
+<li><p>p. 311, “the point estimate from Figure 19.3a of <span class="math inline">\mu_{\delta}</span>, which is 1.58 … <span class="math inline">\logit^{-1}(1.58 \pm 0.3)</span>, which is <span class="math inline">(0.78, 0.87)</span>” <span class="math inline">\rightarrow</span> “which is 1.54 … <span class="math inline">\logit^{-1}(1.54 \pm 0.3)</span>, which is <span class="math inline">(0.78, 0.86)</span>” (matching the posterior median of <span class="math inline">\mu_{\delta}</span> in the table on p. 310).</p></li>
+<li><p>p. 312, “We do not believe these tests have specificities below 50%” <span class="math inline">\rightarrow</span> “We do not believe these tests have sensitivities below 50%”.</p></li>
+<li><p>p. 313, “roughly consistent with inter-site variation in specificity” <span class="math inline">\rightarrow</span> “roughly consistent with inter-site variation in sensitivity”.</p></li>
 <li><p>p. 316, in exercise 19.1, “3300 observations” <span class="math inline">\rightarrow</span> “3330 observations”</p></li>
 <li><p>p. 318, in the slope-estimation code, the correct code is</p></li>
 </ul>
