@@ -499,7 +499,7 @@ sm <- summarise_draws(subset(draws1b, variable = variables))
 make_pth_vs_fit(sm, sp)
 
 #' 
-#' ### Model 2: Slow trend + yearly seasonal trend
+#' ## Model 2: Slow trend + yearly seasonal trend
 #' 
 #' The model 2 adds yearly seasonal trend using GP with periodic
 #' covariance function.
@@ -635,7 +635,7 @@ sp <- summarise_draws(subset(pdraws2, variable = variables))
 sm <- summarise_draws(subset(draws2, variable = variables))
 make_pth_vs_fit(sm, sp)
 
-#' ### Model 3: Slow trend + yearly seasonal trend + day of week
+#' ## Model 3: Slow trend + yearly seasonal trend + day of week
 #'
 #' Based on the quick plotting of the data above, day of week has a
 #' clear effect and there are less babies born on Saturday and
@@ -757,7 +757,7 @@ sp <- summarise_draws(subset(pdraws3, variable = variables))
 sm <- summarise_draws(subset(draws3, variable = variables))
 make_pth_vs_fit(sm, sp)
  
-#' ### Model 4: long term smooth + seasonal + weekday with increasing magnitude
+#' ## Model 4: long term smooth + seasonal + weekday with increasing magnitude
 #'
 #' Looking at the time series of whole data we see the dots
 #' representing the daily values forming three branches that are
@@ -892,7 +892,7 @@ sp <- summarise_draws(subset(pdraws4, variable = variables))
 sm <- summarise_draws(subset(draws4, variable = variables))
 make_pth_vs_fit(sm, sp)
 
-#' ### Model 5: long term smooth + seasonal + weekday with time dependent magnitude + day of year RHS
+#' ## Model 5: long term smooth + seasonal + weekday with time dependent magnitude + day of year RHS
 #'
 #' The next component to add is day of year effect. Many bank holidays
 #' are every year on the same day of year and there might be also
@@ -1122,7 +1122,7 @@ sp <- summarise_draws(subset(pth5$draws(), variable = variables))
 sm <- summarise_draws(subset(draws5, variable = variables))
 make_pth_vs_fit(sm, sp)
 
-#' ### Model 6: long term smooth + seasonal + weekday + day of year
+#' ## Model 6: long term smooth + seasonal + weekday + day of year
 #'
 #' To simplify the analysis of the day of year effect and make the
 #' inference during the exploration faster, we drop the time dependent
@@ -1338,7 +1338,7 @@ f13r <- birthdays |>
 #' `r round(mean(1-rvar_mean(f13r$ydist)),3)*100`% fewer births.
 #'
 
-#' ### Model 7: long term smooth + seasonal + weekday + day of year normal + floating special days
+#' ## Model 7: long term smooth + seasonal + weekday + day of year normal + floating special days
 #'
 #' We can see in the model 6 results that day of year effects have
 #' some dips in the relative number of births that are spread over a
@@ -1540,7 +1540,7 @@ f13r <- birthdays |>
 #' `r round(mean(1-rvar_mean(f13r$ydist)),3)*100`% fewer births.
 #'
 
-#' ### Model 8: long term smooth + seasonal + weekday with time dependent magnitude + day of year + special
+#' ## Model 8: long term smooth + seasonal + weekday with time dependent magnitude + day of year + special
 #'
 #' As the day of year and floating day effects work well, we'll add
 #' the time dependent day of week effect back to the model.
@@ -1710,7 +1710,7 @@ sm <- summarise_draws(subset(draws8, variable = variables))
 make_pth_vs_fit(sm, sp)
 
 #'
-#' ### Model 8+t_nu: day of year effect with Student's t prior
+#' ## Model 8+t_nu: day of year effect with Student's t prior
 #' 
 #' Compile Stan model 8 + t_nu [gpbf8tnu.stan](https://github.com/avehtari/Bayesian-Workflow/blob/master/birthdays/gpbf8tnu.stan)
 #| label: model8tnu
@@ -1829,7 +1829,7 @@ sp <- summarise_draws(subset(pth8tnu$draws(), variable = variables))
 sm <- summarise_draws(subset(draws8tnu, variable = variables))
 make_pth_vs_fit(sm, sp)
 
-#' ### Model 8+RHS: day of year effect with RHS prior
+#' ## Model 8+RHS: day of year effect with RHS prior
 #'
 #' Model 5 had RHS prior but the problem was that optimization result
 #' wasn't even close to sensible and MCMC was very slow. Given the
