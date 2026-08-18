@@ -545,7 +545,7 @@ pred_log <- function(fit) {
   pred_shock <- matrix(rep(1, 30), nrow = 30)
   for (t in 2:25) {
     dogs_df_pred <- dplyr::filter(dogs_df, time == t)
-    dogs_df_pred$prev_pred_shock <- as.numeric(rowSums(pred_shock))
+    dogs_df_pred$prev_shock <- as.numeric(rowSums(pred_shock))
     dogs_df_pred$prev_avoid <- as.numeric(rowSums(1 - pred_shock))
     pred <- posterior_predict(fit, ndraws = 1, newdata = dogs_df_pred)
     pred_shock <- cbind(pred_shock, as.numeric(pred))
@@ -555,7 +555,7 @@ pred_log <- function(fit) {
 #| label: fig-ppc_shocks-4
 #| fig-height: 4
 #| fig-width: 5
-ppc_shocks(pred_log(bfit_4), "PPsims from M4:\nhier logit model") 
+ppc_shocks(pred_log(bfit_4), "PPsims from M4:\nhier 2-par log model") 
 
 #' Posterior predictive checking using mean number of switches between
 #' shocks and avoidances as the test statistic.
@@ -627,7 +627,8 @@ loo_compare(list(bfit_0h=elpd(ll_0h),bfit_4=elpd(ll_4))) |>
 as_draws_df(bfit_4) |>
   mutate(a = inv_logit(b_etaa_Intercept),
          b = inv_logit(b_etab_Intercept)) |>
-  mcmc_areas(pars = c("a", "b"))
+  mcmc_areas(pars = c("a", "b")) +
+  labs(title = "Model 4: hier. log, fitted to the original data")
 
 #' The posteriors are clearly different, but is this due to different
 #' learning rate? We can test this by generating simulated data from
@@ -641,11 +642,14 @@ as_draws_df(bfit_4) |>
 dogs_df_pred_0 <- dogs_df
 pred_shock_0 <- matrix(c(rep(1, 30), posterior_predict(bfit_0, ndraws = 1) |> as.numeric()),
                        nrow = 30, ncol = 25)
-dogs_df_pred_0$prev_shock_0 <- as.numeric(rowCumsums(pred_shock_0)[, 1:(ncol(pred_shock_0) - 1)])
+dogs_df_pred_0$shock <- as.numeric(pred_shock_0[, 2:ncol(pred_shock_0)])
+dogs_df_pred_0$prev_shock <- as.numeric(rowCumsums(pred_shock_0)[, 1:(ncol(pred_shock_0) - 1)])
 dogs_df_pred_0$prev_avoid <- as.numeric(rowCumsums(1-pred_shock_0)[, 1:(ncol(pred_shock_0) - 1)])
 bfit_4s <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoid,
                  mvbind(etaa, etab) ~ (1 |p| dog), nl = TRUE),
               family = bernoulli(link = "identity"),
+              prior = c(prior(student_t(3, 0, 2.5), nlpar = "etaa"),
+                        prior(student_t(3, 0, 2.5), nlpar = "etab")),
               data = dogs_df_pred_0, refresh=0)
 #' The posterior for a and b are different!
 #| label: fig-mcmc_areas-4s
@@ -661,11 +665,14 @@ as_draws_df(bfit_4s) |>
 dogs_df_pred_0h <- dogs_df
 pred_shock_0h <- matrix(c(rep(1, 30), posterior_predict(bfit_0h, ndraws = 1) |> as.numeric()),
                        nrow = 30, ncol = 25)
-dogs_df_pred_0h$prev_shock_0h <- as.numeric(rowCumsums(pred_shock_0h)[, 1:(ncol(pred_shock_0h) - 1)])
+dogs_df_pred_0h$shock <- as.numeric(pred_shock_0h[, 2:ncol(pred_shock_0h)])
+dogs_df_pred_0h$prev_shock <- as.numeric(rowCumsums(pred_shock_0h)[, 1:(ncol(pred_shock_0h) - 1)])
 dogs_df_pred_0h$prev_avoid <- as.numeric(rowCumsums(1-pred_shock_0h)[, 1:(ncol(pred_shock_0h) - 1)])
 bfit_4sh <- brm(bf(shock ~ inv_logit(etaa)^prev_shock * inv_logit(etab)^prev_avoid,
                 mvbind(etaa, etab) ~ (1 |p| dog), nl=TRUE),
                 family = bernoulli(link = "identity"),
+                prior = c(prior(student_t(3, 0, 2.5), nlpar = "etaa"),
+                          prior(student_t(3, 0, 2.5), nlpar = "etab")),
                 data = dogs_df_pred_0h, refresh = 0)
 
 #' The posterior for a and b are different!
@@ -674,7 +681,7 @@ as_draws_df(bfit_4sh) |>
   mutate(a = inv_logit(b_etaa_Intercept),
          b = inv_logit(b_etab_Intercept)) |>
   mcmc_areas(pars = c("a", "b")) +
-  labs(title = "Model 4: hier. logit, simulated data from Model 0h")
+  labs(title = "Model 4: hier. log, simulated data from Model 0h")
 
 #' # Conclusion
 #'
