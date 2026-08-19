@@ -38,6 +38,7 @@ The sampling line should then read `fit1 <- mod1$sample(data=bioassay_data, refr
 - p. 63, "The likelihood is the only part of the data model that is needed for Bayesian inference conditional" $\rightarrow$ "The likelihood is the only part of the data model that is needed for Bayesian inference"
 - p. 77, "$p|y\sim\mathrm{beta}(y+1, n-y+1)$" $\rightarrow$ "$\theta|y\sim\mathrm{beta}(y+1, n-y+1)$"
 - p. 83, "$\tau=\sigma\sqrt{\nu_{\nu-2}}$" $\rightarrow$ "$\tau=\sigma\sqrt{\nu/(\nu-2)}$"
+- p. 86, "something more informative such as $\exponential(0.1)$ or $\normal^+(0,10)$" $\rightarrow$ "something more informative such as $\exponential(1)$ or $\normal^+(0,1)$" (thanks to Marco Prevedello)
 - p. 87, "sample 10 balls without replacement" $\rightarrow$ "sample 10 balls with replacement"
 - p. 93, "a unit logistic prior distribution for $\theta$"  $\rightarrow$ "a unit logistic prior distribution for $\phi$"
 - p. 94, in the caption, "$\phi=\mathrm{logit}^{-1}(p)$" $\rightarrow$ "$\phi=\mathrm{logit}(p)$"
