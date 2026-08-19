@@ -38,9 +38,9 @@ model {
       y[j,t] ~ bernoulli(p);
     }
   }
-  mu_logit_ab ~ logistic(0, 1);
-  sigma_logit_ab ~ normal(0, 1);
-  L_logit_ab ~ lkj_corr_cholesky(2);
+  mu_logit_ab ~ student_t(3, 0, 2.5);
+  sigma_logit_ab ~ student_t(3, 0, 2.5);
+  L_logit_ab ~ lkj_corr_cholesky(1);
   to_vector(z) ~ normal(0, 1);
 }
 generated quantities {

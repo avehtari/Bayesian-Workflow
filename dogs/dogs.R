@@ -557,6 +557,44 @@ pred_log <- function(fit) {
 #| fig-width: 5
 ppc_shocks(pred_log(bfit_4), "PPsims from M4:\nhier 2-par log model") 
 
+#' The combined posterior predictive check across models (Figure 21.4 in the book).
+#| label: fig-ppc_shocks-all
+#| fig-height: 9
+#| fig-width: 12
+ppc_shocks_df <- function(shock, model, sim) {
+  ord <- order(apply(shock, 1, \(x) max(which(x == 1))))
+  expand.grid(dog = rev(1:30), time = 1:25) |>
+    mutate(shock = as.numeric(shock[ord, ]), model = model, sim = sim)
+}
+labs_ppc <- c("Real dogs",
+              "PPsims from M0:\nlogit model",
+              "PPsims from M0h:\nhier logit model",
+              "PPsims from M2:\n2-par log model",
+              "PPsims from M4:\nhier 2-par log model")
+ppc_all <- bind_rows(
+  ppc_shocks_df(shock, labs_ppc[1], 1),
+  bind_rows(lapply(1:5, \(s) ppc_shocks_df(pred_logit(bfit_0),  labs_ppc[2], s))),
+  bind_rows(lapply(1:5, \(s) ppc_shocks_df(pred_logit(bfit_0h), labs_ppc[3], s))),
+  bind_rows(lapply(1:5, \(s) ppc_shocks_df(pred_log(bfit_2),    labs_ppc[4], s))),
+  bind_rows(lapply(1:5, \(s) ppc_shocks_df(pred_log(bfit_4),    labs_ppc[5], s)))
+) |>
+  mutate(model = factor(model, levels = labs_ppc))
+fig_ppc2 <- ggplot(ppc_all, aes(time, dog, fill = shock)) +
+  geom_tile() +
+  facet_grid(model ~ sim, switch = "y") +
+  scale_fill_gradient(low = "#ffffc8", high = "#7c0025") +
+  theme(legend.position = "none",
+        axis.line = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title = element_blank(),
+        panel.spacing = unit(0.6, "lines"),
+        strip.background = element_blank(),
+        strip.placement = "outside",
+        strip.text.x = element_blank(),
+        strip.text.y.left = element_text(angle = 0, hjust = 1))
+fig_ppc2
+
 #' Posterior predictive checking using mean number of switches between
 #' shocks and avoidances as the test statistic.
 #| label: fig-ppc_mean_switches-4
@@ -682,6 +720,22 @@ as_draws_df(bfit_4sh) |>
          b = inv_logit(b_etab_Intercept)) |>
   mcmc_areas(pars = c("a", "b")) +
   labs(title = "Model 4: hier. log, simulated data from Model 0h")
+
+#' The two panels combined (Figure 21.12 in the book).
+#| label: fig-mcmc_areas-4-4sh
+#| fig-height: 6
+#| fig-width: 12
+areas_ab <- function(fit, title) {
+  as_draws_df(fit) |>
+    mutate(a = inv_logit(b_etaa_Intercept),
+           b = inv_logit(b_etab_Intercept)) |>
+    mcmc_areas(pars = c("a", "b")) +
+    labs(title = title)
+}
+fig_simulfit <-
+  areas_ab(bfit_4,   "Model 4: hier. log, fitted to the original data") /
+  areas_ab(bfit_4sh, "Model 4: hier. log, fitted to Model 0h simulation")
+fig_simulfit
 
 #' # Conclusion
 #'
