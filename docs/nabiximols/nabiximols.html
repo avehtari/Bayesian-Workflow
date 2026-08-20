@@ -3884,6 +3884,7 @@ vertical-align: -.125em;
   }
 }</script>
 <style>html{ scroll-behavior: smooth; }</style>
+<script data-goatcounter="https://avehtari.goatcounter.com/count" data-external="1" async src="https://gc.zgo.at/count.js"></script>
 
   
   <script>
@@ -4283,7 +4284,7 @@ padding: 0 !important;
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026-06-15</p>
+      <p class="date-modified">2026-08-20</p>
     </div>
   </div>
     
@@ -5334,6 +5335,11 @@ position: relative;
 --line-width-bottom: 0.1em;
 --line-width-left: 0.1em;
 
+--line-type-top: solid;
+--line-type-right: solid;
+--line-type-bottom: solid;
+--line-type-left: solid;
+
 --trim-top-left: 0%;
 --trim-top-right: 0%;
 --trim-right-top: 0%;
@@ -5353,9 +5359,9 @@ right: var(--trim-right-top, 0);
 bottom: 0;
 pointer-events: none;
 z-index: 1;
-border-top: calc(var(--border-top) * var(--line-width-top)) solid var(--line-color-top);
-border-right: calc(var(--border-right) * var(--line-width-right)) solid var(--line-color-right);
-border-left: calc(var(--border-left) * var(--line-width-left)) solid var(--line-color-left);
+border-top: calc(var(--border-top) * var(--line-width-top)) var(--line-type-top, solid) var(--line-color-top);
+border-right: calc(var(--border-right) * var(--line-width-right)) var(--line-type-right, solid) var(--line-color-right);
+border-left: calc(var(--border-left) * var(--line-width-left)) var(--line-type-left, solid) var(--line-color-left);
 }
 
 .tinytable :is(td, th)[class*="tinytable_css_"]::after {
@@ -5364,8 +5370,8 @@ position: absolute;
 left: var(--trim-bottom-left, 0);
 right: var(--trim-bottom-right, 0);
 bottom: var(--trim-left-bottom, var(--trim-right-bottom, 0));
-height: calc(var(--border-bottom) * var(--line-width-bottom));
-background: var(--line-color-bottom);
+height: 0;
+border-bottom: calc(var(--border-bottom) * var(--line-width-bottom)) var(--line-type-bottom, solid) var(--line-color-bottom);
 pointer-events: none;
 z-index: 2;
 }
@@ -5900,6 +5906,11 @@ position: relative;
 --line-width-bottom: 0.1em;
 --line-width-left: 0.1em;
 
+--line-type-top: solid;
+--line-type-right: solid;
+--line-type-bottom: solid;
+--line-type-left: solid;
+
 --trim-top-left: 0%;
 --trim-top-right: 0%;
 --trim-right-top: 0%;
@@ -5919,9 +5930,9 @@ right: var(--trim-right-top, 0);
 bottom: 0;
 pointer-events: none;
 z-index: 1;
-border-top: calc(var(--border-top) * var(--line-width-top)) solid var(--line-color-top);
-border-right: calc(var(--border-right) * var(--line-width-right)) solid var(--line-color-right);
-border-left: calc(var(--border-left) * var(--line-width-left)) solid var(--line-color-left);
+border-top: calc(var(--border-top) * var(--line-width-top)) var(--line-type-top, solid) var(--line-color-top);
+border-right: calc(var(--border-right) * var(--line-width-right)) var(--line-type-right, solid) var(--line-color-right);
+border-left: calc(var(--border-left) * var(--line-width-left)) var(--line-type-left, solid) var(--line-color-left);
 }
 
 .tinytable :is(td, th)[class*="tinytable_css_"]::after {
@@ -5930,8 +5941,8 @@ position: absolute;
 left: var(--trim-bottom-left, 0);
 right: var(--trim-bottom-right, 0);
 bottom: var(--trim-left-bottom, var(--trim-right-bottom, 0));
-height: calc(var(--border-bottom) * var(--line-width-bottom));
-background: var(--line-color-bottom);
+height: 0;
+border-bottom: calc(var(--border-bottom) * var(--line-width-bottom)) var(--line-type-bottom, solid) var(--line-color-bottom);
 pointer-events: none;
 z-index: 2;
 }
@@ -6512,6 +6523,11 @@ position: relative;
 --line-width-bottom: 0.1em;
 --line-width-left: 0.1em;
 
+--line-type-top: solid;
+--line-type-right: solid;
+--line-type-bottom: solid;
+--line-type-left: solid;
+
 --trim-top-left: 0%;
 --trim-top-right: 0%;
 --trim-right-top: 0%;
@@ -6531,9 +6547,9 @@ right: var(--trim-right-top, 0);
 bottom: 0;
 pointer-events: none;
 z-index: 1;
-border-top: calc(var(--border-top) * var(--line-width-top)) solid var(--line-color-top);
-border-right: calc(var(--border-right) * var(--line-width-right)) solid var(--line-color-right);
-border-left: calc(var(--border-left) * var(--line-width-left)) solid var(--line-color-left);
+border-top: calc(var(--border-top) * var(--line-width-top)) var(--line-type-top, solid) var(--line-color-top);
+border-right: calc(var(--border-right) * var(--line-width-right)) var(--line-type-right, solid) var(--line-color-right);
+border-left: calc(var(--border-left) * var(--line-width-left)) var(--line-type-left, solid) var(--line-color-left);
 }
 
 .tinytable :is(td, th)[class*="tinytable_css_"]::after {
@@ -6542,8 +6558,8 @@ position: absolute;
 left: var(--trim-bottom-left, 0);
 right: var(--trim-bottom-right, 0);
 bottom: var(--trim-left-bottom, var(--trim-right-bottom, 0));
-height: calc(var(--border-bottom) * var(--line-width-bottom));
-background: var(--line-color-bottom);
+height: 0;
+border-bottom: calc(var(--border-bottom) * var(--line-width-bottom)) var(--line-type-bottom, solid) var(--line-color-bottom);
 pointer-events: none;
 z-index: 2;
 }
@@ -7011,6 +7027,11 @@ position: relative;
 --line-width-bottom: 0.1em;
 --line-width-left: 0.1em;
 
+--line-type-top: solid;
+--line-type-right: solid;
+--line-type-bottom: solid;
+--line-type-left: solid;
+
 --trim-top-left: 0%;
 --trim-top-right: 0%;
 --trim-right-top: 0%;
@@ -7030,9 +7051,9 @@ right: var(--trim-right-top, 0);
 bottom: 0;
 pointer-events: none;
 z-index: 1;
-border-top: calc(var(--border-top) * var(--line-width-top)) solid var(--line-color-top);
-border-right: calc(var(--border-right) * var(--line-width-right)) solid var(--line-color-right);
-border-left: calc(var(--border-left) * var(--line-width-left)) solid var(--line-color-left);
+border-top: calc(var(--border-top) * var(--line-width-top)) var(--line-type-top, solid) var(--line-color-top);
+border-right: calc(var(--border-right) * var(--line-width-right)) var(--line-type-right, solid) var(--line-color-right);
+border-left: calc(var(--border-left) * var(--line-width-left)) var(--line-type-left, solid) var(--line-color-left);
 }
 
 .tinytable :is(td, th)[class*="tinytable_css_"]::after {
@@ -7041,8 +7062,8 @@ position: absolute;
 left: var(--trim-bottom-left, 0);
 right: var(--trim-bottom-right, 0);
 bottom: var(--trim-left-bottom, var(--trim-right-bottom, 0));
-height: calc(var(--border-bottom) * var(--line-width-bottom));
-background: var(--line-color-bottom);
+height: 0;
+border-bottom: calc(var(--border-bottom) * var(--line-width-bottom)) var(--line-type-bottom, solid) var(--line-color-bottom);
 pointer-events: none;
 z-index: 2;
 }
@@ -7645,14 +7666,14 @@ Figure 27
 <div class="cell-output cell-output-stdout">
 <pre><code>Running MCMC with 4 parallel chains...
 
-Chain 2 finished in 3.4 seconds.
-Chain 3 finished in 3.7 seconds.
-Chain 1 finished in 4.2 seconds.
-Chain 4 finished in 5.4 seconds.
+Chain 1 finished in 2.8 seconds.
+Chain 2 finished in 3.3 seconds.
+Chain 3 finished in 3.3 seconds.
+Chain 4 finished in 3.9 seconds.
 
 All 4 chains finished successfully.
-Mean chain execution time: 4.2 seconds.
-Total execution time: 5.7 seconds.</code></pre>
+Mean chain execution time: 3.3 seconds.
+Total execution time: 4.2 seconds.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>fit_betabinomial3b <span class="ot">&lt;-</span> <span class="fu">add_criterion</span>(fit_betabinomial3b, <span class="at">criterion =</span> <span class="st">&quot;loo&quot;</span>, </span>
 <span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>                                    <span class="at">save_psis =</span> <span class="cn">TRUE</span>, <span class="at">moment_match =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -7673,7 +7694,7 @@ observations directly.</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>              model elpd_diff se_diff p_worse       diag_diff      diag_elpd
  fit_betabinomial3b       0.0     0.0      NA                 3 k_psis &gt; 0.7
- fit_betabinomial2b      -1.1     2.4    0.68 |elpd_diff| &lt; 4 3 k_psis &gt; 0.7</code></pre>
+ fit_betabinomial2b       0.0     2.4    0.51 |elpd_diff| &lt; 4 3 k_psis &gt; 0.7</code></pre>
 </div>
 </div>
 <p>There are a few high Pareto k values for PSIS-LOO even after moment matching, and for final results we would use also <code>reloo=TRUE</code> argument, but the conclusions are likely to be the same.</p>
@@ -7689,7 +7710,7 @@ observations directly.</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pnorm</span>(<span class="dv">0</span>, <span class="fu">mean</span>(ae2<span class="sc">-</span>ae3), <span class="fu">sd</span>(ae2<span class="sc">-</span>ae3)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">257</span>)) <span class="sc">|&gt;</span> <span class="fu">round</span>(<span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.95</code></pre>
+<pre><code>[1] 0.96</code></pre>
 </div>
 </div>
 <p>By dropping out the aleatoric part from the LOO-CV predictions we do see clear difference in the predictive performance if the treatment group variable is dropped, but still the randomness in the actual observations makes the probability of the difference to be further away from 1 than when we focused in the expected counterfactual predictions above.</p>
@@ -7702,12 +7723,12 @@ Estimate obtained in 8 iteration(s) via method &quot;normal&quot;.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a>(br3b <span class="ot">&lt;-</span> bridgesampling<span class="sc">::</span><span class="fu">bridge_sampler</span>(fit_betabinomial3b, <span class="at">silent =</span> <span class="cn">TRUE</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Bridge sampling estimate of the log marginal likelihood: -606.4898
+<pre><code>Bridge sampling estimate of the log marginal likelihood: -606.2498
 Estimate obtained in 10 iteration(s) via method &quot;normal&quot;.</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a>bridgesampling<span class="sc">::</span><span class="fu">bf</span>(br2b, br3b)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Estimated Bayes factor in favor of br2b over br3b: 0.42299</code></pre>
+<pre><code>Estimated Bayes factor in favor of br2b over br3b: 0.33272</code></pre>
 </div>
 </div>
 <p>Like LOO-CV, Bayes factor does not see difference between models with or without treatment group variable. Bayes factor is a ratio of marginal likelihoods, and marginal likelihoods can be formulated as sequential log score predictive performance quantity, which explains why BF is also weak to rank models in case of high aleatoric uncertainty. <br></p>
