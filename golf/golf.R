@@ -32,6 +32,9 @@ knitr::opts_chunk$set(
   out.width = '95%'
 )
 
+#' Define LaTeX commands
+#' \newcommand*{\normal}{\mathrm{normal}}
+
 #' 
 #' **Load packages**
 #| cache: FALSE

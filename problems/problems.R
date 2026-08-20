@@ -34,6 +34,9 @@ knitr::opts_chunk$set(
   out.width = "90%"
 )
 
+#' Define LaTeX commands
+#' \newcommand*{\normal}{\mathrm{normal}}
+
 #' **Load packages**
 library(rprojroot)
 root <- has_file(".Bayesian-Workflow-root")$make_fix_file()
