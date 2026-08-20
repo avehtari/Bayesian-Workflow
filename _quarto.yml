@@ -96,3 +96,10 @@ format:
     embed-resources: true
     anchor-sections: true
     html-math-method: katex
+    # GoatCounter analytics. data-external="1" stops embed-resources
+    # from inlining count.js (which would strip data-goatcounter and
+    # silently disable counting).
+    include-in-header:
+      - text: |
+          <script data-goatcounter="https://avehtari.goatcounter.com/count"
+                  data-external="1" async src="https://gc.zgo.at/count.js"></script>
