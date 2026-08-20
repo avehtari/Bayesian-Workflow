@@ -1,3 +1,6 @@
+// Model 4: hierarchical two-parameter logarithmic model, no priors.
+// See dogs_5.stan for the version with weakly informative priors,
+// which is the one used for the results in the book.
 data {
   int<lower=0> J;
   int<lower=0> T;

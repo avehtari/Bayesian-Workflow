@@ -81,6 +81,10 @@ fit_3 <- dogs_3$sample(data = dogs_data, refresh = 0)
 #'
 print(fit_3, variables = c("mu_logit_a", "sigma_logit_a"))
 
+#' The hierarchical two-parameter logarithmic model is Model 4 in the book.
+#' `dogs_4.stan` is the direct implementation with a `cov_matrix` hyperparameter
+#' and no priors. `dogs_5.stan` uses a non-centered parameterization with weakly
+#' informative priors.
 dogs_4 <- cmdstan_model(root("dogs", "dogs_4.stan"))
 #| results: hide
 #| cache: true
@@ -138,8 +142,8 @@ plot_ppc(fit_0, "PPsims from M0:\nlogit model")
 plot_ppc(fit_1, "PPsims from M1:\n1-parameter\nlog model")
 plot_ppc(fit_2, "PPsims from M2:\n2-parameter\nlog model")
 plot_ppc(fit_3, "PPsims from M3:\nhier 1-par\nlog model")
-plot_ppc(fit_4, "PPsims from M4:\nhier 2-par\nlog model")
-plot_ppc(fit_5, "PPsims from M5:\nhier 2-par\nlog model\nwith prior")
+plot_ppc(fit_4, "PPsims from M4:\nhier 2-par log\nmodel, flat priors")
+plot_ppc(fit_5, "PPsims from M4:\nhier 2-par log\nmodel, with priors")
 
 #| label: fig-dogs_inference
 #| fig-height: 3
@@ -242,32 +246,6 @@ for (j in 1:J){
   lines(quantile(post$b[j], c(0.25, 0.75)), rep(b[j], 2), lwd = 0.5, col = "red")
 }
 
-J <- 300
-new_dogs_ab <- invlogit(mvrnorm(J, new_dogs_mu_logit_ab, new_dogs_Sigma_ab))
-a <- new_dogs_ab[, 1]
-b <- new_dogs_ab[, 2]
-T <- 25
-new_dogs <- array(NA, c(J, T))
-for (j in 1:J) {
-  prev_shock <- 0
-  prev_avoid <-  0
-  new_dogs[j, 1] <- 1
-  for (t in 2:T) {
-    prev_shock = prev_shock + new_dogs[j, t - 1]
-    prev_avoid = prev_avoid + 1 - new_dogs[j, t - 1]
-    p = a[j] ^ prev_shock * b[j] ^ prev_avoid
-    new_dogs[j, t] <- rbinom(1, 1, p)
-  }
-}
-new_dogs_data <- list(y = new_dogs, J = J, T = T)
-#| results: hide
-#| cache: true
-new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
-#'
-print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
-                               "a[1]", "a[2]", "b[1]", "b[2]"))
-
-
 T <- 50
 new_dogs <- array(NA, c(J, T))
 for (j in 1:J){
@@ -311,6 +289,33 @@ for (j in 1:J){
   points(median(post$b[j]), b[j], pch = 20, cex = 0.6, col = "red")
   lines(quantile(post$b[j], c(0.25, 0.75)), rep(b[j], 2), lwd = 0.5, col = "red")
 }
+
+
+J <- 300
+new_dogs_ab <- invlogit(mvrnorm(J, new_dogs_mu_logit_ab, new_dogs_Sigma_ab))
+a <- new_dogs_ab[, 1]
+b <- new_dogs_ab[, 2]
+T <- 25
+new_dogs <- array(NA, c(J, T))
+for (j in 1:J) {
+  prev_shock <- 0
+  prev_avoid <-  0
+  new_dogs[j, 1] <- 1
+  for (t in 2:T) {
+    prev_shock = prev_shock + new_dogs[j, t - 1]
+    prev_avoid = prev_avoid + 1 - new_dogs[j, t - 1]
+    p = a[j] ^ prev_shock * b[j] ^ prev_avoid
+    new_dogs[j, t] <- rbinom(1, 1, p)
+  }
+}
+new_dogs_data <- list(y = new_dogs, J = J, T = T)
+#| results: hide
+#| cache: true
+new_fit_5 <- dogs_5$sample(data = new_dogs_data, refresh = 0)
+#'
+print(new_fit_5, variables = c("mu_logit_ab", "sigma_logit_ab", "Omega_logit_ab[1,2]",
+                               "a[1]", "a[2]", "b[1]", "b[2]"))
+
 
 #' # References {.unnumbered}
 #'

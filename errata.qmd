@@ -144,10 +144,45 @@ $$
 ```
 - p. 321, "over 5 standard errors away" $\rightarrow$ "about 5 standard errors away"
 - p. 326, `posterior_predict(fit, ndraws=1)` $\rightarrow$ `posterior_predict(bfit_0, ndraws=1)`
+- p. 326, in Figure 21.4 the in-figure row subtitles for the third and fourth rows of posterior predictive simulations are both "hier logit model". The third row is the two-parameter logarithmic model (M2) and the fourth row is the hierarchical two-parameter logarithmic model (M4).
 - p. 327, "weakly informative normal prior for $\beta_0$" $\rightarrow$ "weakly informative normal prior for $\mu_{\beta}$"
 - p. 329, "Posterior predictive simulations from the two-parameter model are shown in the third row of Figure 21.4" $\rightarrow$ "in the fourth row"
 - p. 329, in the `loo_compare(bfit_0h, bfit_2)` output, the second row label `bfit_0` $\rightarrow$ `bfit_2`
+- p. 329, in the sequential posterior predictive simulation code, `dogs_df_pred$prev_pred_shock <- as.numeric(rowSums(pred_shock))` $\rightarrow$ `dogs_df_pred$prev_shock <- as.numeric(rowSums(pred_shock))`. 
+- pp. 330--331, the Stan program shown is the version without priors. The Stan 
+program should instead have the `parameters` block
+```stan
+parameters {
+  vector[2] mu_logit_ab;
+  vector<lower=0>[2] sigma_logit_ab;
+  cholesky_factor_corr[2] L_logit_ab;
+  matrix[J,2] z;
+}
+```
+the `transformed parameters` block
+```stan
+transformed parameters {
+  matrix[J,2] logit_ab = rep_vector(1, J) * mu_logit_ab' +
+    z * diag_pre_multiply(sigma_logit_ab, L_logit_ab);
+  corr_matrix[2] Omega_logit_ab = L_logit_ab * L_logit_ab';
+  cov_matrix[2] Sigma_logit_ab = quad_form_diag(Omega_logit_ab, sigma_logit_ab);
+  vector[J] a = inv_logit(logit_ab[,1]);
+  vector[J] b = inv_logit(logit_ab[,2]);
+}
+```
+and, in place of the `logit_ab[j,] ~ multi_normal(...)` line in the `model` block, the priors from the display on p. 329:
+```stan
+  mu_logit_ab ~ student_t(3, 0, 2.5);
+  sigma_logit_ab ~ student_t(3, 0, 2.5);
+  L_logit_ab ~ lkj_corr_cholesky(1);
+  to_vector(z) ~ normal(0, 1);
+```
+The complete program is `dogs_5.stan` in the `dogs` case study directory and has
+been fixed in the book PDF.
 - pp. 334--337, four references to "model 5" $\rightarrow$ "model 4"
+- p. 335, in Figure 21.12 both in-figure panel titles read "Model 4: hier. logit". 
+These should read "hier. log".
+- p. 336, the priors in the Stan program have been changed to match the model displayed on p. 329 (see the pp. 330--331 entry above). With those priors the posterior median of the correlation between $\mathrm{logit}(a)_j$ and $\mathrm{logit}(b)_j$ is $-0.2$ with a posterior standard deviation of $0.5$, rather than $-0.1$ and $0.4$ as printed.
 - p. 337, "We take the $(\alpha_j,\beta_j)$ simulated parameters" $\rightarrow$ "We take the $(a_j,b_j)$ simulated parameters"
 - p. 343, the first Stan program's model block is missing its closing brace
 - pp. 343, 346, 350, in three Stan listings, `array<lower=0, upper=1>[N] int adopted;` $\rightarrow$ `array[N] int<lower=0, upper=1> adopted;`

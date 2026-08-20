@@ -1,3 +1,5 @@
+// Model 4 with weakly informative priors, non-centered parameterization.
+// This is the program printed in the book and used in Sections 21.4-21.5.
 data {
   int<lower=0> J;
   int<lower=0> T;
@@ -30,15 +32,15 @@ transformed parameters {
   vector[J] b = inv_logit(logit_ab[,2]);
 }
 model {
-  for (j in 1:J){
-    for (t in 1:T){
+  for (j in 1:J) {
+    for (t in 1:T) {
       real p = a[j]^prev_shock[j,t] * b[j]^prev_avoid[j,t];
       y[j,t] ~ bernoulli(p);
     }
   }
-  mu_logit_ab ~ logistic(0, 1);
-  sigma_logit_ab ~ normal(0, 1);
-  L_logit_ab ~ lkj_corr_cholesky(2);
+  mu_logit_ab ~ student_t(3, 0, 2.5);
+  sigma_logit_ab ~ student_t(3, 0, 2.5);
+  L_logit_ab ~ lkj_corr_cholesky(1);
   to_vector(z) ~ normal(0, 1);
 }
 generated quantities {
