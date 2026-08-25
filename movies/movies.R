@@ -159,8 +159,8 @@ mtext("Where you have more data, you have less uncertainty", side = 3)
 #| fig-height: 4
 #| fig-width: 6
 bind_cols(tibble(N = N_ratings),
-          summarize_draws(draws, ~quantile(.x, probs = c(0.025, 0.975)))) |>
-  mutate(interval_width = `97.5%` - `2.5%`) |>
+          summarize_draws(draws, ~quantile(.x, probs = c(0.25, 0.75)))) |>
+  mutate(interval_width = `75%` - `25%`) |>
   ggplot(aes(x = N, y = interval_width)) +
   geom_point() +
   ylim(c(0, NA)) +
