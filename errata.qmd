@@ -22,6 +22,7 @@ If you notice an error that is not mentioned here, [submit an issue](https://git
 before it is used: `mod1 <- cmdstan_model("bioassay1.stan", pedantic=TRUE)`. 
 The sampling line should then read `fit1 <- mod1$sample(data=bioassay_data, refresh=0)` and `print(fit_1)` should be `print(fit1)` (thanks to J. J. Ramsey)
 - p. 32, "Solving $\mathrm{logit}^{-1}(\alpha+\beta x) = 0.5$ yields $x_{\mathrm{LD50}}=-\alpha/\beta$" $\rightarrow$ "$\mathrm{logit}^{-1}(a+b x) = 0.5$ and $x_{\mathrm{LD50}}=-a/b$"
+- p. 34, Several Chapter 3 exercises were copies of Chapter 2 exercises. See [the online PDF](https://users.aalto.fi/~ave/Bayesian-Workflow.pdf) for the correct exercises.
 - p. 38, in the caption, "$y=\mathrm{logit}^{-1}(-1.40 + 0.33x)$" $\rightarrow$ "$\Pr(y=1)=\mathrm{logit}^{-1}(-1.40 + 0.33x)$"
 - p. 38, "$\int\!\!\int p(a,b|y)\,da\,db=\infty$" $\rightarrow$ "$\int\!\!\int p(y|a,b)\,p(a,b)\,da\,db=\infty$"
 - p. 39, "$x_i=0$" $\rightarrow$ "$x_j=0$"
@@ -179,6 +180,7 @@ and, in place of the `logit_ab[j,] ~ multi_normal(...)` line in the `model` bloc
 ```
 The complete program is `dogs_5.stan` in the `dogs` case study directory and has
 been fixed in the book PDF.
+
 - pp. 334--337, four references to "model 5" $\rightarrow$ "model 4"
 - p. 335, in Figure 21.12 both in-figure panel titles read "Model 4: hier. logit". 
 These should read "hier. log".
