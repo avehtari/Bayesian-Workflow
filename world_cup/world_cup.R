@@ -57,8 +57,7 @@ options(
   pillar.subtle = FALSE,
   pillar.sigfig = 2
 )
-devtools::load_all("~/proj/bayesplot")
-## library(bayesplot)
+library(bayesplot)
 library(ggplot2)
 theme_set(bayesplot::theme_default(base_family = "sans", base_size=14))
 library(arm)
