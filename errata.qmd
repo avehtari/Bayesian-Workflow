@@ -51,6 +51,7 @@ The sampling line should then read `fit1 <- mod1$sample(data=bioassay_data, refr
 - p. 107, "$\mathrm{mad\ sd}(z) = 1.483,\mathrm{median}(|z - \mathrm{median}(z)|)$" $\rightarrow$ ""$\mathrm{mad\ sd}(z) = 1.483\,\mathrm{median}(|z - \mathrm{median}(z)|)$"
 - p. 111, "$y^* = a + bx_i + e_i + \eta_i$" $\rightarrow$ "$y^*_i = a + bx_i + e_i + \eta_i$"
 - p. 113, "the 200 students" $\rightarrow$ "the 500 students"
+- p. 113, "$\mathrm{Pr}(z=1)=\mathrm{logit}^{-1}((x-50)/10)$" $\rightarrow$ "$\mathrm{Pr}(z=1)=\mathrm{logit}^{-1}(-(x-50)/10)$"
 - p. 120, "for contextually relevant values of $x^{\rm hi}$, $x^{\rm lo}$, and $v$" $\rightarrow$ "for contextually relevant values of $u^{\rm hi}$, $u^{\rm lo}$"
 - p. 120, "the coefficient of $y$" $\rightarrow$ "the coefficient of $u$"
 - p. 124, 
