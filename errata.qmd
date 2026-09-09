@@ -113,7 +113,7 @@ $$
 - p. 267, "our understanding of $\theta_3$" $\rightarrow$ "our understanding of $\theta_1$"
 - p. 267, "you could add 100 to each of the $a_j$'s and $-100$ to each of the $b_k$'s" $\rightarrow$ "add 100 to each of the $a_j$'s and $100$ to each of the $b_k$'s" (the model is $y_i \sim \mathrm{normal}(a_{j[i]} - b_{k[i]}, \sigma_y)$, so predictions are unchanged only when the same constant is added to both)
 - p. 267, "and not change any of the predictors at all" $\rightarrow$ "and not change any of the predictions at all"
-- p. 268, "$a_j = \mu_a + \sigma_{\alpha}\alpha_j$" $\rightarrow$ "$a_j = \mu_a + \sigma_a\alpha_j$"
+- p. 268, "$a_j = \mu_a + \sigma_{\alpha}\alpha_j$" $\rightarrow$ "$a_j = \mu + \sigma_a\alpha_j$"
 - p. 269, "the variance parameters are accurately estimated" $\rightarrow$ "the scale parameters are accurately estimated"
 - p. 270, "open circles for the romantic comedies (those with $j=1,\dots,10$) and solid circles for the crime movies ($j=11,\dots,20$)" $\rightarrow$ "open circles for the romantic comedies (those with $j=1,\dots,20$) and solid circles for the crime movies ($j=21,\dots,40$)"
 - p. 276, "$N = 180$ observations" $\rightarrow$ "$N = 144$ observations"
