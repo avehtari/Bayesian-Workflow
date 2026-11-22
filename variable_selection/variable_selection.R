@@ -647,7 +647,7 @@ plot(vselm, stats = c("elpd", "R2"), deltas = "mixed", alpha = 0.1) +
   geom_vline(xintercept = seq(0, 25, by = 5), colour = "black", alpha = 0.1)
 
 #' `projpred` can also provide suggestion for the sufficient model size.
-(nselm <- suggest_size(vselm, alpha = 0.1))
+(nselm <- suggest_size(vselm))
 
 #' Form the projected posterior for the selected model.
 #'
@@ -764,7 +764,7 @@ plot(vselp, stats = c("elpd", "R2"), deltas = "mixed", alpha = 0.1) +
   geom_vline(xintercept = seq(0, 10, by = 5), colour = "black", alpha = 0.1)
 
 #' `projpred` can also provide suggestion for the sufficient model size.
-(nselp <- suggest_size(vselp, alpha = 0.1))
+(nselp <- suggest_size(vselp))
 
 #' Form the projected posterior for the selected model.
 #'
