@@ -131,6 +131,7 @@ student <- student %>%
 student_Gmat <- subset(student, is.finite(Gmat), select = c("Gmat", predictors))
 student_Gmat <- student_Gmat[is.finite(rowMeans(student_Gmat)),]
 student_Gpor <- subset(student, is.finite(Gpor), select = c("Gpor", predictors))
+student_Gpor <- student_Gpor[is.finite(rowMeans(student_Gpor)),]
 (nmat <- nrow(student_Gmat))
 head(student_Gmat) |> tt()
 (npor <- nrow(student_Gpor))
@@ -596,8 +597,8 @@ vselm_fast <- cv_varsel(fitm, nterms_max = 27, validate_search = FALSE)
 
 #' The following plot shows the relevance order of the predictors and
 #' estimated predictive performance given those variables. As the
-#' search can overfit and we didn't cross-validate the search, the
-#' performance estimates can go above the reference model
+#' search slightly overfits and we didn't cross-validate the search, the
+#' performance estimates go slightly above the reference model
 #' performance. However, this plot helps as to see that 10 or fewer
 #' predictors would be sufficient.
 #'
@@ -606,11 +607,8 @@ vselm_fast <- cv_varsel(fitm, nterms_max = 27, validate_search = FALSE)
 #| fig-height: 6
 #| out-width: "100%"
 #| cache: false
-plot(vselm_fast, stats = c("elpd", "R2"), deltas = "mixed",
-     text_angle = 45, alpha = 0.1,  size_position = "primary_x_top",
-     show_cv_proportions = FALSE) +
+plot(vselm_fast, stats = c("elpd", "R2"), deltas = "mixed", alpha = 0.1) +
   geom_vline(xintercept = seq(0, 25, by = 5), colour = "black", alpha = 0.1)
-
 
 #' Next we repeat the search, but now cross-validate the search,
 #' too. We repeat the search with PSIS-LOO-CV criterion only for
@@ -621,35 +619,35 @@ plot(vselm_fast, stats = c("elpd", "R2"), deltas = "mixed",
 #' the projection for the selected model is as good as with computationally
 #' more expensive search validation. Based on the previous
 #' quick result, we search only up to models of size 10.
-#' With my laptop and 8 parallel workers, this takes less than 5min.
 #| label: vselm-subsampling-loo
 #| results: hide
-#| cache: true
-registerDoFuture()
-plan(multisession, workers = getOption("mc.cores", default = 1))
-vselm <- cv_varsel(fitm, nterms_max = 10, validate_search = TRUE,
-                   refit_prj = TRUE, nloo = 50,
-                   parallel = TRUE, verbose = TRUE)
-plan(sequential)
+#| cache: false
+vselm <- cv_varsel(fitm, nterms_max = 10, nloo = 50)
+
+#' projpred version >= 3.0.0 is much faster, and using full LOO and
+#' searching up to model size 27 takes about 25s with my laptop.
+#| label: vselm-loo
+#| results: hide
+#| cache: false
+vselm <- cv_varsel(fitm, nterms_max = 27)
 
 #' The following plot shows the relevance order of the predictors and
 #' estimated predictive performance given those variables. The order
 #' is the same as in the previous plot, but now the predictive
 #' performance estimates are taking into account search and have
-#' smaller bias. It seems using just four predictors can provide the
+#' the estimates don't go above the reference model performance.
+#' It seems using just four to six predictors can provide the
 #' similar predictive performance as using all the predictors.
 #| label: fig-vselm
 #| fig-width:  8
-#| fig-height: 5
+#| fig-height: 6
 #| out-width: "100%"
 #| cache: false
-plot(vselm, stats = c("elpd", "R2"), deltas = "mixed",
-     text_angle = 45, alpha = 0.1, size_position = "primary_x_top",
-     show_cv_proportions = FALSE) +
-  geom_vline(xintercept = seq(0, 10, by = 5), colour = "black", alpha = 0.1)
+plot(vselm, stats = c("elpd", "R2"), deltas = "mixed", alpha = 0.1) +
+  geom_vline(xintercept = seq(0, 25, by = 5), colour = "black", alpha = 0.1)
 
 #' `projpred` can also provide suggestion for the sufficient model size.
-(nselm <- suggest_size(vselm))
+(nselm <- suggest_size(vselm, alpha = 0.1))
 
 #' Form the projected posterior for the selected model.
 #'
@@ -663,7 +661,7 @@ drawsm_proj <- as_draws_df(projm) |>
 
 #' The marginals of the projected posterior are all clearly away from 0.
 #| label: fig-fitm-proj-mcmc_areas
-#| fig-height: 2
+#| fig-height: 4
 #| fig-width: 8
 mcmc_areas(drawsm_proj, prob_outer = 0.98, area_method = "scaled height")
 
@@ -713,13 +711,13 @@ p
 #' only for the full data search path.
 #| label: vselp_fast
 #| results: hide
-#| cache: true
+#| cache: false
 vselp_fast <- cv_varsel(fitp, nterms_max = 27, validate_search = FALSE)
 
 #' The following plot shows the relevance order of the predictors and
 #' estimated predictive performance given those variables. As there is
 #' some overfitting in the search and we didn't cross-validate the
-#' search, the performance estimates scan go above the reference model
+#' search, the performance estimates go slightly above the reference model
 #' performance. However, this plot helps as to see that 10 or fewer
 #' predictors would be sufficient.
 #| label: fig-vselp_fast
@@ -727,9 +725,7 @@ vselp_fast <- cv_varsel(fitp, nterms_max = 27, validate_search = FALSE)
 #| fig-height: 6
 #| out-width: "100%"
 #| cache: false
-plot(vselp_fast, stats = c("elpd","R2"), deltas = "mixed",
-     text_angle = 45, alpha = 0.1,  size_position = "primary_x_top",
-     show_cv_proportions = FALSE) +
+plot(vselp_fast, stats = c("elpd","R2"), deltas = "mixed", alpha = 0.1) +
   geom_vline(xintercept = seq(0, 25, by = 5), colour = "black", alpha = 0.1)
 
 #' Next we repeat the search, but now cross-validate the search,
@@ -740,36 +736,35 @@ plot(vselp_fast, stats = c("elpd","R2"), deltas = "mixed",
 #' affects only the model size selection and given that is stable,
 #' the projection for the selected model is as good as with computationally
 #' more expensive search validation. Based on the previous
-#' quick result, we search only up to models of size 10. With my
-#' laptop and 8 parallel workers, this takes less than 5min.
+#' quick result, we search only up to models of size 10.
 #| label: vselp-subsampling-loo
 #| results: hide
+#| cache: false
+vselp <- cv_varsel(fitp, nterms_max = 10, nloo = 50)
+
+#' projpred version >= 3.0.0 is much faster, and using full LOO and
+#' searching up to model size 27 takes about 25s with my laptop.
+#| label: vselp-loo
+#| results: hide
 #| cache: true
-registerDoFuture()
-plan(multisession, workers = getOption("mc.cores", default = 1))
-vselp <- cv_varsel(fitp, nterms_max = 10, validate_search = TRUE,
-                   refit_prj = TRUE, nloo = 50,
-                   parallel = TRUE)
-plan(sequential)
+vselp <- cv_varsel(fitm, nterms_max = 27)
 
 #' The following plot shows the relevance order of the predictors and
 #' estimated predictive performance given those variables. The order
 #' is the same as in the previous plot, but now the predictive
 #' performance estimates are taking into account search and have
-#' smaller bias. It seems using just seven predictors can provide the
+#' smaller bias. It seems using seven to ten predictors can provide the
 #' similar predictive performance as using all the predictors.
 #| label: fig-vselp
 #| fig-width:  8
-#| fig-height: 5
+#| fig-height: 6
 #| out-width: "100%"
 #| cache: false
-plot(vselp, stats = c("elpd", "R2"), deltas = "mixed",
-     text_angle = 45, alpha = 0.1, size_position = "primary_x_top",
-     show_cv_proportions = FALSE) +
+plot(vselp, stats = c("elpd", "R2"), deltas = "mixed", alpha = 0.1) +
   geom_vline(xintercept = seq(0, 10, by = 5), colour = "black", alpha = 0.1)
 
 #' `projpred` can also provide suggestion for the sufficient model size.
-(nselp <- suggest_size(vselp))
+(nselp <- suggest_size(vselp, alpha = 0.1))
 
 #' Form the projected posterior for the selected model.
 #'
@@ -783,7 +778,7 @@ drawsp_proj <- as_draws_df(projp) |>
 
 #' The marginals of the projected posterior are all clearly away from 0.
 #| label: fig-fitp-proj-mcmc_areas
-#| fig-height: 2.5
+#| fig-height: 3.5
 #| fig-width: 8
 mcmc_areas(drawsp_proj, prob_outer = 0.98, area_method = "scaled height")
 
